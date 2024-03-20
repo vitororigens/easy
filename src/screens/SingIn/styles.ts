@@ -1,3 +1,4 @@
+import { TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
 
 export const Container = styled.View`
@@ -7,6 +8,8 @@ export const Container = styled.View`
     align-items: center;
 
 `;
+
+export const ButtonForgetPassword = styled(TouchableOpacity)``
 
 export const Title = styled.Text`
     font-size: ${({theme}) => theme.FONTE_SIZE.SM}px;

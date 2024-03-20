@@ -27,7 +27,10 @@ flex-direction: row;
 
 export const Button = styled(TouchableOpacity)``;
 
-export const BackButton = styled(Ionicons).attrs(({theme}) => ({
-  color: theme.COLORS.WHITE,
-  size: theme.FONTE_SIZE.XL,
-}))``;
+export const BackButton = styled(Ionicons).attrs(({ theme }) => ({
+        color: theme.COLORS.WHITE,
+        size: theme.FONTE_SIZE.XL,
+}))`
+
+margin-bottom: 30px;
+`;

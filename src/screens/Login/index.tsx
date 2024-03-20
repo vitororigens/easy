@@ -15,30 +15,30 @@ export function Login() {
 
     return (
         <DefaultContainer>
-    <ScrollView showsHorizontalScrollIndicator>
-    <Container>
-                <Header>
-                    <Divider style={{ alignSelf: activeButton === "Entrar" ? "flex-start" : "flex-end" }} />
-                    <Content>
-                        <Button onPress={() => handleButtonClick("Entrar")}>
-                            <Title>
-                                Entrar
-                            </Title>
-                        </Button>
-                        <Button onPress={() => handleButtonClick("Inscrever-se")}>
-                            <Title>
-                                INSCREVER-SE
-                            </Title>
-                        </Button>
-                    </Content>
-                </Header>
-                {activeButton === "Entrar" && <SingIn />}
-                {activeButton === "Inscrever-se" && <SingUp />}
-            </Container>
-            <LogoContainer>
-                <Logo />
-            </LogoContainer>
-    </ScrollView>
+            <ScrollView showsVerticalScrollIndicator  >
+                <Container>
+                    <Header>
+                        <Divider style={{ alignSelf: activeButton === "Entrar" ? "flex-start" : "flex-end" }} />
+                        <Content>
+                            <Button onPress={() => handleButtonClick("Entrar")}>
+                                <Title>
+                                    Entrar
+                                </Title>
+                            </Button>
+                            <Button onPress={() => handleButtonClick("Inscrever-se")}>
+                                <Title>
+                                    INSCREVER-SE
+                                </Title>
+                            </Button>
+                        </Content>
+                    </Header>
+                    {activeButton === "Entrar" && <SingIn />}
+                    {activeButton === "Inscrever-se" && <SingUp />}
+                </Container>
+                <LogoContainer>
+                    <Logo />
+                </LogoContainer>
+            </ScrollView>
         </DefaultContainer>
     );
 }
