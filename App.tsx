@@ -4,8 +4,9 @@ import { ThemeProvider } from 'styled-components';
 import { StatusBar } from 'react-native';
 import { Loading } from './src/components/Loading';
 import theme from './src/theme';
-import { NavigationContainer } from '@react-navigation/native';
 import { Login } from './src/screens/Login'
+import { ToastProvider } from 'react-native-toast-notifications';
+import { Routes } from './src/routes';
 
 
 export default function App() {
@@ -16,14 +17,14 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-       <NavigationContainer>
-       <StatusBar
-            barStyle='light-content'
-            backgroundColor='transparent'
-            translucent
-          />
-          {fontLoader ? <Login /> : <Loading />}
-       </NavigationContainer>
+      <ToastProvider>
+        <StatusBar
+          barStyle='light-content'
+          backgroundColor='transparent'
+          translucent
+        />
+        {fontLoader ? <Routes /> : <Loading />}
+      </ToastProvider>
     </ThemeProvider>
   );
 }

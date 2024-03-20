@@ -4,6 +4,7 @@ import { Button, Container, Content, Divider, Header, LogoContainer, Title } fro
 import { Logo } from "../../components/Logo";
 import { SingIn } from "../SingIn";
 import { SingUp } from "../SingUp";
+import { ScrollView } from "react-native";
 
 export function Login() {
     const [activeButton, setActiveButton] = useState("Entrar");
@@ -14,7 +15,8 @@ export function Login() {
 
     return (
         <DefaultContainer>
-            <Container>
+    <ScrollView showsHorizontalScrollIndicator>
+    <Container>
                 <Header>
                     <Divider style={{ alignSelf: activeButton === "Entrar" ? "flex-start" : "flex-end" }} />
                     <Content>
@@ -36,6 +38,7 @@ export function Login() {
             <LogoContainer>
                 <Logo />
             </LogoContainer>
+    </ScrollView>
         </DefaultContainer>
     );
 }

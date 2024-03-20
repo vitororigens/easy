@@ -10,9 +10,10 @@ type InputProps = TextInputProps & {
     showSearch?: boolean;
     showIcon?: boolean;
     name: string;
+    value: string;
 }
 
-export function Input({ placeholder, onChangeText, showSearch = false, passwordType = false, showIcon = false, name }: InputProps) {
+export function Input({ placeholder, onChangeText, value, showSearch = false, passwordType = false, showIcon = false, name }: InputProps) {
     const [showPassword, setShowPassword] = useState(false);
 
 
@@ -31,6 +32,7 @@ export function Input({ placeholder, onChangeText, showSearch = false, passwordT
                 placeholder={placeholder}
                 onChangeText={onChangeText}
                 secureTextEntry={!showPassword && passwordType}
+                value={value}
             />
             {passwordType && (
                 <Button onPress={togglePasswordVisibility}>
