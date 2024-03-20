@@ -1,8 +1,9 @@
-import { Text } from "react-native";
+import React, { useState } from "react";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Button, Container, Content, Divider, Header, LogoContainer, Title } from "./styles";
 import { Logo } from "../../components/Logo";
-import { useState } from "react";
+import { SingIn } from "../SingIn";
+import { SingUp } from "../SingUp";
 
 export function Login() {
     const [activeButton, setActiveButton] = useState("Entrar");
@@ -29,10 +30,12 @@ export function Login() {
                         </Button>
                     </Content>
                 </Header>
+                {activeButton === "Entrar" && <SingIn />}
+                {activeButton === "Inscrever-se" && <SingUp />}
             </Container>
             <LogoContainer>
                 <Logo />
             </LogoContainer>
         </DefaultContainer>
-    )
+    );
 }
