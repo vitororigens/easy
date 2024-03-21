@@ -15,7 +15,11 @@ export function Login() {
 
     return (
         <DefaultContainer>
-            <ScrollView showsVerticalScrollIndicator  >
+       <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ flexGrow: 1  }}
+            >
+              
                 <Container>
                     <Header>
                         <Divider style={{ alignSelf: activeButton === "Entrar" ? "flex-start" : "flex-end" }} />

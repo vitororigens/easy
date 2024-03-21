@@ -1,7 +1,10 @@
 import { Text } from "react-native";
+import { DefaultContainer } from "../../components/DefaultContainer";
 
 export function Home() {
     return (
-        <Text>Home</Text>
+      <DefaultContainer>
+          <Text>Home</Text>
+      </DefaultContainer>
     );
 }

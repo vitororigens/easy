@@ -116,7 +116,7 @@ export function SingUp() {
             {errors.confirmPasswordError && <Text style={{ color: COLORS.RED_700, marginBottom: 10, marginLeft: 10 }}>{errors.confirmPasswordError}</Text>}
             <Input name="lock" value={user.confirmPassword} onChangeText={confirmPassword => setUser({...user, confirmPassword})} showIcon placeholder="Confirme a sua senha" passwordType />
             <Button title={isLoading ? <ActivityIndicator /> : "Cadastrar"} onPress={handleRegister} disabled={isLoading} />
-            <Content>
+            {/* <Content>
                 <Divider />
                 <SubTitle>
                     Conect-se
@@ -128,7 +128,7 @@ export function SingUp() {
                 <ButtonIcon name="apple" color="#7200b5" />
                 <ButtonIcon name="google" color="#dc3c2a" />
                 <ButtonIcon name="facebook" color="#0863f7" />
-            </ContentIcon>
+            </ContentIcon> */}
         </Container>
     );
 }

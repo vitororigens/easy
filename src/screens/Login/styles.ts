@@ -19,9 +19,12 @@ export const Header = styled.View`
 
 export const Content = styled.View`
     width: 100%;
-    height: 50px;
+    height: 60px;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
+    padding-left: 50px;
+    padding-right: 25px;
+    padding-top: 10px;
 `;
 
 export const Button = styled(TouchableOpacity)``;
