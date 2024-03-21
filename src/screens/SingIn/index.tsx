@@ -13,7 +13,7 @@ export function SingIn() {
     const navigation = useNavigation()
 
     function handleRegister() {
-        navigation.navigate('home')
+        navigation.navigate('tabroutes')
     }
     function handleForgetPassword(){
         navigation.navigate('forgetPassword')
