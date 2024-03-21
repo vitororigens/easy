@@ -3,6 +3,10 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Home } from "../screens/Home";
 import { useTheme } from "styled-components/native";
 import { FontAwesome, Entypo, FontAwesome5 } from '@expo/vector-icons';
+import { Charts } from '../screens/Charts';
+import { Marketplace } from '../screens/Marketplace';
+import { PiggyBank } from '../screens/PiggyBank';
+import { Gears } from '../screens/Gears';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
@@ -10,6 +14,7 @@ export function BottomTabsNavigation() {
     const { COLORS, FONTE_SIZE, FONT_FAMILY } = useTheme();
     return (
         <Navigator
+            initialRouteName="home"
             screenOptions={{
                 headerShown: false,
                 tabBarStyle: {
@@ -26,9 +31,11 @@ export function BottomTabsNavigation() {
                 },
                 tabBarActiveTintColor: COLORS.TEAL_600,
 
+
             }}
+
         >
-           
+
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
@@ -36,7 +43,7 @@ export function BottomTabsNavigation() {
                     )
                 }}
                 name="Gráficos"
-                component={Home}
+                component={Charts}
             />
             <Screen
                 options={{
@@ -45,9 +52,9 @@ export function BottomTabsNavigation() {
                     )
                 }}
                 name="Mercado"
-                component={Home}
+                component={Marketplace}
             />
-             <Screen
+            <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
                         <Entypo name="wallet" color={color} size={35} />
@@ -56,6 +63,7 @@ export function BottomTabsNavigation() {
                 }}
                 name="home"
                 component={Home}
+
             />
             <Screen
                 options={{
@@ -64,7 +72,7 @@ export function BottomTabsNavigation() {
                     )
                 }}
                 name="Cofrinho"
-                component={Home}
+                component={PiggyBank}
             />
             <Screen
                 options={{
@@ -73,7 +81,7 @@ export function BottomTabsNavigation() {
                     )
                 }}
                 name="config"
-                component={Home}
+                component={Gears}
             />
         </Navigator>
     )
