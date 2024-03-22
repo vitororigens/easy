@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { ContainerTypeStyleProps, Content, Header, Icon, Title } from "./styles";
 
 type ContainerProps= {
@@ -5,9 +6,10 @@ type ContainerProps= {
     name?: string;
     color?:string;
     type?:ContainerTypeStyleProps;
+    children?: ReactNode;
 }
 
-export function Container({ title, name, type = 'PRIMARY'}: ContainerProps){
+export function Container({ title, name, type = 'PRIMARY', children}: ContainerProps){
     return(
       <Content>
           <Header type={type}>
@@ -16,6 +18,7 @@ export function Container({ title, name, type = 'PRIMARY'}: ContainerProps){
                 {title}
             </Title>
           </Header>
+          {children}
       </Content>
     )
 }

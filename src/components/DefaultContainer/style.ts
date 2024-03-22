@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Importe a imagem que você deseja usar como background
 import backgroundImage from "../../assets/background.png";
 
 export const Container = styled(SafeAreaView)`
@@ -21,11 +20,18 @@ export const Background = styled(ImageBackground).attrs({
  `;
 
 export const Header = styled.View`
-flex: 1;
-flex-direction: row;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        height: 60px;
 ` ;
 
-export const Button = styled(TouchableOpacity)``;
+export const Button = styled(TouchableOpacity)`
+        height: 100%;
+        width: 35%;
+        margin-top: 30px;
+
+`;
 
 export const BackButton = styled(Ionicons).attrs(({ theme }) => ({
         color: theme.COLORS.WHITE,
@@ -33,4 +39,10 @@ export const BackButton = styled(Ionicons).attrs(({ theme }) => ({
 }))`
 
 margin-bottom: 30px;
+`;
+
+export const ContainerMonth = styled.View`
+        width: 150px;
+        height: 100%;
+
 `;
