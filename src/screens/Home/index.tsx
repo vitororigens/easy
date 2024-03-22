@@ -1,10 +1,11 @@
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Button, Content, Divider, Header, Title, NavBar, SubTitle } from "./styles";
+import { Button, Content, Divider, Header, Title, NavBar, SubTitle, ContainerItems, HeaderItems, TitleItems } from "./styles";
 import { useState } from "react";
+import { Items } from "../../components/Items";
 
 export function Home() {
-  const [activeButton, setActiveButton] = useState("Entrar");
+  const [activeButton, setActiveButton] = useState("receitas");
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
@@ -36,8 +37,27 @@ export function Home() {
               </Button>
             </NavBar>
           </Header>
-          {activeButton === "receitas" && <Title>teste2</Title>}
-          {activeButton === "despesas" && <Title >teste1</Title>}
+          {activeButton === "receitas" &&
+            <ContainerItems>
+              <HeaderItems type="PRIMARY">
+                <TitleItems>
+                  Histórico
+                </TitleItems>
+
+              </HeaderItems>
+              <Items />
+            </ContainerItems>
+          }
+          {activeButton === "despesas" &&
+            <ContainerItems>
+              <HeaderItems type="SECONDARY">
+                <TitleItems>
+                  Histórico
+                </TitleItems>
+
+              </HeaderItems>
+              <Items />
+            </ContainerItems>}
         </Content>
       </Container>
     </DefaultContainer>

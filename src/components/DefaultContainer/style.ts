@@ -42,7 +42,7 @@ margin-bottom: 30px;
 `;
 
 export const ContainerMonth = styled.View`
-        width: 150px;
+        width: 160px;
         height: 100%;
 
 `;
