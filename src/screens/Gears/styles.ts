@@ -24,7 +24,7 @@ export const ContentItems = styled.View`
 
 export const Header = styled.View`
     width: 100%;
-
+    align-items: center;
 `;
 
 export const NavBar = styled.View`

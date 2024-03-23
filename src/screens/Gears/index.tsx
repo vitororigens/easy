@@ -5,6 +5,7 @@ import { Button } from "../../components/Button";
 import { useEffect, useState } from "react";
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { CustomModal } from "../../components/CustomModal";
+import { LogoUser } from "../../components/LogoUser";
 
 
 export function Gears() {
@@ -42,16 +43,21 @@ export function Gears() {
         <Content>
           <Header>
             <Divider />
+            <LogoUser title={user?.displayName || ""} />
           </Header>
           <ContentItems>
+        
             <Items>
               <Title>
                 Nome:
               </Title>
+              
               <SubTitle type="SECONDARY">
                 {user?.displayName}
               </SubTitle>
             </Items>
+
+         
             <Items>
               <Title>
                 Email:
@@ -65,8 +71,10 @@ export function Gears() {
                 ID:
               </Title>
               <SubTitle type="SECONDARY">
-                {user?.uid}
+                {user?.uid ? (user.uid.length > 10 ? user.uid.substring(0, 15) + '...' : user.uid) : ""}
               </SubTitle>
+
+
             </Items>
             <Button style={{
               marginTop: 20,
