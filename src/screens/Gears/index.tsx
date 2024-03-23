@@ -4,7 +4,8 @@ import { Content, Divider, Header, SubTitle, Title, Items, ContentItems } from "
 import { Button } from "../../components/Button";
 import { useEffect, useState } from "react";
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
-import { Modal, Text, TouchableOpacity, View } from 'react-native';
+import { CustomModal } from "../../components/CustomModal";
+
 
 export function Gears() {
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
@@ -26,8 +27,8 @@ export function Gears() {
   }
 
   function handleDeleteUser() {
-   
-   auth().currentUser?.delete() 
+
+    auth().currentUser?.delete()
   }
 
   useEffect(() => {
@@ -68,60 +69,38 @@ export function Gears() {
               </SubTitle>
             </Items>
             <Button style={{
-              marginTop:20,
-              marginBottom: 20 
+              marginTop: 20,
+              marginBottom: 20
             }} title={'Sair'} onPress={handleLogoutConfirmation} />
             <Button title={'Deletar Conta'} onPress={handleDeleteUserConfirmation} />
           </ContentItems>
         </Content>
       </Container>
-      {/* Modal de confirmação para sair da conta */}
-      <Modal
+      <CustomModal
         animationType="slide"
         transparent={true}
-        visible={confirmLogoutVisible}
-        onRequestClose={() => {
+        onCancel={() => setConfirmLogoutVisible(false)}
+        onClose={() => { setConfirmLogoutVisible(false); }}
+        onConfirme={() => {
           setConfirmLogoutVisible(false);
+          handleLogout();
         }}
-      >
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-          <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10 }}>
-            <Text>Deseja realmente sair da conta?</Text>
-            <TouchableOpacity onPress={() => {
-              setConfirmLogoutVisible(false);
-              handleLogout();
-            }}>
-              <Text style={{ color: 'blue', marginTop: 10 }}>Sim</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setConfirmLogoutVisible(false)}>
-              <Text style={{ color: 'red', marginTop: 10 }}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-      <Modal
+        title="Deseja realmente sair da conta?"
+        visible={confirmLogoutVisible}
+      />
+      <CustomModal
         animationType="slide"
         transparent={true}
-        visible={confirmDeleteVisible}
-        onRequestClose={() => {
+        onCancel={() => setConfirmDeleteVisible(false)}
+        onClose={() => { setConfirmDeleteVisible(false); }}
+        onConfirme={() => {
           setConfirmDeleteVisible(false);
+          handleDeleteUser()
         }}
-      >
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-          <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10 }}>
-            <Text>Deseja realmente excluir sua conta?</Text>
-            <TouchableOpacity onPress={() => {
-              setConfirmDeleteVisible(false);
-              handleDeleteUser();
-            }}>
-              <Text style={{ color: 'blue', marginTop: 10 }}>Sim</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setConfirmDeleteVisible(false)}>
-              <Text style={{ color: 'red', marginTop: 10 }}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        title="Deseja realmente excluir essa conta?"
+        visible={confirmDeleteVisible}
+      />
+
     </DefaultContainer>
   );
 }
