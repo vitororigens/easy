@@ -78,6 +78,7 @@ export function SingUp() {
         if (validateForm()) {
             auth()
                 .createUserWithEmailAndPassword(user.email, user.password)
+                
                 .then(() => {
                     Toast.show("Conta cadastrada com sucesso!", { type: 'success' });
                     navigation.navigate('login');
