@@ -72,19 +72,22 @@ export function SingUp() {
 
         return isValid;
     }
-
     function handleRegister() {
         setIsLoading(true);
         if (validateForm()) {
             auth()
                 .createUserWithEmailAndPassword(user.email, user.password)
-                
-                .then(() => {
-                    Toast.show("Conta cadastrada com sucesso!", { type: 'success' });
-                    navigation.navigate('login');
+                .then((userCredential) => {
+                    userCredential.user.updateProfile({
+                        displayName: user.name
+                    }).then(() => {
+                        Toast.show("Conta cadastrada com sucesso!", { type: 'success' });
+                        navigation.navigate('login');
+                    })
                 })
-                .catch(() => {
-                    Toast.show("Não foi possível cadastrar sua conta, verifique", { type: 'danger' });
+                .catch((error) => {
+                    console.error("Erro ao criar conta:", error);
+                    Toast.show("Não foi possível cadastrar sua conta, verifique.", { type: 'danger' });
                 })
                 .finally(() => {
                     setIsLoading(false);
@@ -101,7 +104,6 @@ export function SingUp() {
         }
     }
     
-
 
     return (
         <Container>

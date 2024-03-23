@@ -14,6 +14,13 @@ export const Content = styled.View`
 `;
 
 
+export const ContentItems = styled.View`
+ flex: 1;
+    background-color: ${({theme}) => theme.COLORS.WHITE};
+    padding-left: 15px;
+    padding-right: 15px;
+`;
+
 
 export const Header = styled.View`
     width: 100%;
@@ -35,8 +42,9 @@ align-items: center;
 `;
 
 export const Title = styled.Text`
-    font-size: ${({theme}) => theme.FONTE_SIZE.LG}px;
+    font-size: ${({theme}) => theme.FONTE_SIZE.GG}px;
     font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
+    color: ${({theme}) => theme.COLORS.GRAY_600};
 `;
 
 export const Divider = styled.View`
@@ -47,9 +55,17 @@ export const Divider = styled.View`
 
 
 export const SubTitle = styled.Text<Props>`
-font-size: ${({theme}) => theme.FONTE_SIZE.XL}px;
-font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
+font-size: ${({theme}) => theme.FONTE_SIZE.GG}px;
+font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
 color: ${({theme, type}) => type === 'PRIMARY' 
     ? theme.COLORS.TEAL_600 
     : theme.COLORS.PURPLE_800};
+`;
+
+export const Items = styled.View`
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 50px;
+    align-items: center;
 `;
