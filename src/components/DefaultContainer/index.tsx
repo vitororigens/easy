@@ -40,7 +40,6 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
         setBottomSheetVisible(false);
     };
 
-    console.log(bottomSheetVisible)
 
 
     function handleGoBack() {

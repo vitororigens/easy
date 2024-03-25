@@ -2,7 +2,9 @@ import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
 import { Button, Content, Divider, Header, Title, NavBar, SubTitle } from "./styles";
 import { useState } from "react";
-import { database } from "../../services";
+import { LineChart } from "react-native-chart-kit";
+import { Dimensions } from "react-native";
+const screenWidth = Dimensions.get("window").width;
 
 export function Charts() {
   const [activeButton, setActiveButton] = useState("Entrar");
@@ -11,23 +13,29 @@ export function Charts() {
     setActiveButton(buttonName);
   };
 
+  const data = {
+    labels: ["January", "February", "March", "April", "May", "June"],
+    datasets: [
+      {
+        data: [20, 45, 28, 80, 99, 43],
+        color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, 
+        strokeWidth: 2 
+      }
+    ],
+    legend: ["Rainy Days"] 
+  };
 
+  const chartConfig = {
+    backgroundGradientFrom: "#FFFFFF",
+    backgroundGradientFromOpacity: 0,
+    backgroundGradientTo: "#FFFFFF",
+    backgroundGradientToOpacity: 0.5,
+    color: (opacity = 1) => `rgba(49, 46, 45, ${opacity})`,
+    strokeWidth: 2, 
+    barPercentage: 0.5,
+    useShadowColorFromDataset: false 
+  };
 
-  database
-  .collection('Users')
-  .doc('123456')
-  .set({
-    name: 'Ada Lovelace',
-    age: 30,
-  })
-  .then(() => {
-    console.log('User added!');
-  })
-  .catch(error => {
-    console.error('Error adding user: ', error);
-  });
-
-  
   return (
     <DefaultContainer monthButton>
       <Container type="SECONDARY" title="ANÁLISE GRÁFICA">
@@ -39,18 +47,22 @@ export function Charts() {
                 <Title>
                   Receitas
                 </Title>
-              
+
               </Button>
               <Button onPress={() => handleButtonClick("despesas")}>
                 <Title>
                   Despesas
                 </Title>
-              
+
               </Button>
             </NavBar>
           </Header>
-          {activeButton === "receitas" && <Title>teste2</Title>}
-          {activeButton === "despesas" && <Title >teste1</Title>}
+          <LineChart
+            data={data}
+            width={screenWidth}
+            height={220}
+            chartConfig={chartConfig}
+          />
         </Content>
       </Container>
     </DefaultContainer>

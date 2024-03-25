@@ -12,7 +12,6 @@ import { database } from "../../services";
 
 export function SingUp() {
     const { COLORS } = useTheme()
-    const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState({
         name: '',
@@ -73,6 +72,11 @@ export function SingUp() {
 
         return isValid;
     }
+    function handleLogout() {
+        auth()
+          .signOut()
+          .then(() => console.log('User signed out'));
+      }
 
     function handleRegister() {
         setIsLoading(true);
@@ -85,6 +89,7 @@ export function SingUp() {
                         displayName: user.name
                     }).then(() => {
                         Toast.show("Conta cadastrada com sucesso!", { type: 'success' });
+                        handleLogout()
                         database
                             .collection('Tasks')
                             .doc(uid) 
