@@ -7,10 +7,11 @@ import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { CustomModal } from "../../components/CustomModal";
 import { LogoUser } from "../../components/LogoUser";
 import { ScrollView } from "react-native";
+import { useUserAuth } from "../../hooks/useUserAuth";
 
 
 export function Gears() {
-  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+  const user = useUserAuth();
   const [confirmLogoutVisible, setConfirmLogoutVisible] = useState(false);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
 
@@ -33,10 +34,9 @@ export function Gears() {
     auth().currentUser?.delete()
   }
 
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(setUser);
-    return subscriber;
-  }, []);
+
+
+  
 
   return (
     <DefaultContainer>

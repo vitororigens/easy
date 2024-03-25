@@ -3,9 +3,14 @@ import { Container } from "../../components/Container";
 import { Button, Content, Divider, Header, Title, NavBar, SubTitle, ContainerItems, HeaderItems, TitleItems } from "./styles";
 import { useState } from "react";
 import { Items } from "../../components/Items";
+import { useFinanceData } from "../../hooks/useFinanceAuth";
+import { useUserAuth } from "../../hooks/useUserAuth";
 
 export function Home() {
+  const user = useUserAuth()
   const [activeButton, setActiveButton] = useState("receitas");
+  const uid = user?.uid ;
+  const financeData = useFinanceData(uid || 'não há registro');
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
@@ -22,7 +27,7 @@ export function Home() {
                   Receitas
                 </Title>
                 <SubTitle type="PRIMARY">
-                  R$: 8.350
+                  R$: {financeData?.revenue}
                 </SubTitle>
               </Button>
               <Button  onPress={() => handleButtonClick("despesas")}>
@@ -30,7 +35,7 @@ export function Home() {
                   Despesas
                 </Title>
                 <SubTitle type="SECONDARY">
-                  R$: 3.557
+                  R$: {financeData?.expense}
                 </SubTitle>
               </Button>
             </NavBar>
