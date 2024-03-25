@@ -25,15 +25,14 @@ export const NavBar = styled.View`
     height: 60px;
     flex-direction: row;
     justify-content: space-between;
-    padding-left: 50px;
-    padding-right: 25px;
-    padding-top: 10px;
+
 `;
 
 export const Button = styled(TouchableOpacity)`
-align-items: center;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
 `;
-
 export const Title = styled.Text`
     font-size: ${({theme}) => theme.FONTE_SIZE.LG}px;
     font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};

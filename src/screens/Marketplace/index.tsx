@@ -22,9 +22,7 @@ export function Marketplace() {
                 </Title>
               
               </Button>
-              <Button style={{
-                right: 20
-              }} onPress={() => handleButtonClick("pendentes")}>
+              <Button  onPress={() => handleButtonClick("pendentes")}>
                 <Title>
                   Pendentes
                 </Title>

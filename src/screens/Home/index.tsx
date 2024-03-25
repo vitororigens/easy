@@ -11,7 +11,7 @@ export function Home() {
     setActiveButton(buttonName);
   };
   return (
-    <DefaultContainer monthButton>
+    <DefaultContainer addButton monthButton>
       <Container type="PRIMARY" name="file-invoice-dollar" title="R$ 4.793">
         <Content>
           <Header>
@@ -25,9 +25,7 @@ export function Home() {
                   R$: 8.350
                 </SubTitle>
               </Button>
-              <Button style={{
-                right: 20
-              }} onPress={() => handleButtonClick("despesas")}>
+              <Button  onPress={() => handleButtonClick("despesas")}>
                 <Title>
                   Despesas
                 </Title>

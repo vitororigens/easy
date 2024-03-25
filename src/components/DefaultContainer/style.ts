@@ -22,27 +22,32 @@ export const Background = styled(ImageBackground).attrs({
 export const Header = styled.View`
         width: 100%;
         flex-direction: row;
-        align-items: center;
         height: 60px;
+        justify-content: space-between;
+
 ` ;
 
 export const Button = styled(TouchableOpacity)`
         height: 100%;
-        width: 35%;
-        margin-top: 30px;
+        align-items: end;
+        justify-content: center;
+        width: 27%;
+        padding: 10px;
 
 `;
+export const ContainerMonth = styled.View`
+        width: 40%;
+        height: 100%;
+`;
 
-export const BackButton = styled(Ionicons).attrs(({ theme }) => ({
+export const Title = styled.Text`
+        color: ${({theme}) => theme.COLORS.WHITE};
+        font-size: ${({theme}) => theme.FONTE_SIZE.MD}px;
+        font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
+        margin-right: 10px;
+`;
+
+export const Icon = styled(Ionicons).attrs(({ theme }) => ({
         color: theme.COLORS.WHITE,
         size: theme.FONTE_SIZE.XL,
-}))`
-
-margin-bottom: 30px;
-`;
-
-export const ContainerMonth = styled.View`
-        width: 160px;
-        height: 100%;
-
-`;
+}))``;

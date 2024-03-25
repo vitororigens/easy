@@ -8,6 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Toast } from "react-native-toast-notifications";
 import { useTheme } from "styled-components/native";
 import { ActivityIndicator } from "react-native";
+import { database } from "../../services";
 
 export function SingUp() {
     const { COLORS } = useTheme()
@@ -72,18 +73,33 @@ export function SingUp() {
 
         return isValid;
     }
+
     function handleRegister() {
         setIsLoading(true);
         if (validateForm()) {
             auth()
                 .createUserWithEmailAndPassword(user.email, user.password)
                 .then((userCredential) => {
+                    const { uid } = userCredential.user;
                     userCredential.user.updateProfile({
                         displayName: user.name
                     }).then(() => {
                         Toast.show("Conta cadastrada com sucesso!", { type: 'success' });
-                        navigation.navigate('login');
-                    })
+                        database
+                            .collection('Tasks')
+                            .doc(uid) 
+                            .set({
+                                revenue: 0,
+                                expense: 0,
+                            })
+                            .then(() => {
+                                console.log('Task adicionada!');
+                            })
+                            .catch(error => {
+                                console.error('Erro ao adicionar a tarefa: ', error);
+                            });
+
+                    });
                 })
                 .catch((error) => {
                     console.error("Erro ao criar conta:", error);
@@ -103,7 +119,7 @@ export function SingUp() {
             setIsLoading(false);
         }
     }
-    
+
 
     return (
         <Container>
@@ -111,13 +127,13 @@ export function SingUp() {
                 Entre e faça o controle de suas <Span>finanças pessoais</Span>.
             </Title>
             {errors.nameError && <Text style={{ color: COLORS.RED_700, marginBottom: 10, marginLeft: 10 }}>{errors.nameError}</Text>}
-            <Input name="user" value={user.name} onChangeText={name => setUser({...user, name})} showIcon placeholder="Nome" />
+            <Input name="user" value={user.name} onChangeText={name => setUser({ ...user, name })} showIcon placeholder="Nome" />
             {errors.emailError && <Text style={{ color: COLORS.RED_700, marginBottom: 10, marginLeft: 10 }}>{errors.emailError}</Text>}
-            <Input name="envelope" value={user.email} onChangeText={email => setUser({...user, email})} showIcon placeholder="Email" />
+            <Input name="envelope" value={user.email} onChangeText={email => setUser({ ...user, email })} showIcon placeholder="Email" />
             {errors.passwordError && <Text style={{ color: COLORS.RED_700, marginBottom: 10, marginLeft: 10 }}>{errors.passwordError}</Text>}
-            <Input name="lock" value={user.password} onChangeText={password => setUser({...user, password})} showIcon placeholder="Senha" passwordType />
+            <Input name="lock" value={user.password} onChangeText={password => setUser({ ...user, password })} showIcon placeholder="Senha" passwordType />
             {errors.confirmPasswordError && <Text style={{ color: COLORS.RED_700, marginBottom: 10, marginLeft: 10 }}>{errors.confirmPasswordError}</Text>}
-            <Input name="lock" value={user.confirmPassword} onChangeText={confirmPassword => setUser({...user, confirmPassword})} showIcon placeholder="Confirme a sua senha" passwordType />
+            <Input name="lock" value={user.confirmPassword} onChangeText={confirmPassword => setUser({ ...user, confirmPassword })} showIcon placeholder="Confirme a sua senha" passwordType />
             <Button title={isLoading ? <ActivityIndicator /> : "Cadastrar"} onPress={handleRegister} disabled={isLoading} />
             {/* <Content>
                 <Divider />

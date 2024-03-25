@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { CustomModal } from "../../components/CustomModal";
 import { LogoUser } from "../../components/LogoUser";
+import { ScrollView } from "react-native";
 
 
 export function Gears() {
@@ -40,6 +41,7 @@ export function Gears() {
   return (
     <DefaultContainer>
       <Container type="SECONDARY" title="Configurações">
+        <ScrollView showsVerticalScrollIndicator={false}>
         <Content>
           <Header>
             <Divider />
@@ -83,6 +85,7 @@ export function Gears() {
             <Button title={'Deletar Conta'} onPress={handleDeleteUserConfirmation} />
           </ContentItems>
         </Content>
+        </ScrollView>
       </Container>
       <CustomModal
         animationType="slide"

@@ -5,6 +5,8 @@ export declare global{
             forgetPassword: undefined;
             home: undefined;
             tabroutes: undefined;
+            newtask: undefined;
+            privateroutes: undefined;
         }
     }
 }

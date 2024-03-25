@@ -1,19 +1,24 @@
 import React, { ReactNode, useState } from "react";
-import { BackButton, Background, Button, Container, ContainerMonth, Header } from "./style";
+import { Icon, Background, Button, Container, ContainerMonth, Header, Title } from "./style";
 import { useNavigation } from "@react-navigation/native";
 import RNPickerSelect from 'react-native-picker-select';
 import { Ionicons } from '@expo/vector-icons';
+import { Modal, Text } from "react-native";
+import { NewTask } from "../../screens/NewTask";
 
 type DefaultContainerProps = {
     children: ReactNode;
     backButton?: boolean;
     monthButton?: boolean;
+    addButton?: boolean;
+
 
 }
 
-export function DefaultContainer({ children, backButton = false, monthButton = false }: DefaultContainerProps) {
+export function DefaultContainer({ children, backButton = false, monthButton = false, addButton = false }: DefaultContainerProps) {
     const navigation = useNavigation();
     const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+    const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
     const months = [
@@ -31,8 +36,19 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
         { id: 11, name: 'Dezembro' }
     ];
 
+    function closeBottomSheet() {
+        setBottomSheetVisible(false);
+    };
+
+    console.log(bottomSheetVisible)
+
+
     function handleGoBack() {
         navigation.goBack();
+    }
+
+    function handleNewTask() {
+        setBottomSheetVisible(true)
     }
 
     return (
@@ -41,10 +57,10 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                 <Header>
                     {backButton ? (
                         <Button onPress={handleGoBack}>
-                            <BackButton name="chevron-back-outline" />
+                            <Icon name="chevron-back-outline" />
                         </Button>
                     ) : (
-                        <Button style={{ width:'35%' }} />
+                        <Button />
                     )}
                     {monthButton &&
                         <ContainerMonth style={{ justifyContent: backButton ? 'flex-start' : 'center' }}>
@@ -72,7 +88,7 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                                         borderColor: 'gray',
                                         borderRadius: 8,
                                         color: 'white',
-                                        paddingRight: 30, 
+                                        paddingRight: 30,
                                     },
                                     iconContainer: {
                                         top: 15,
@@ -83,10 +99,33 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                                     return <Ionicons name="chevron-down" size={24} color="white" />;
                                 }}
                             />
+
                         </ContainerMonth>
                     }
+                    {addButton ? (
+                        <Button style={{
+                            alignItems: 'center',
+                            flexDirection: 'row'
+                        }} onPress={handleNewTask}>
+                            <Title>
+                                Novo
+                            </Title>
+                            <Icon name="add" />
+
+                        </Button>
+                    ) : (
+                        <Button />
+                    )}
                 </Header>
                 {children}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={bottomSheetVisible}
+                    onRequestClose={closeBottomSheet}
+                >
+                    <NewTask closeBottomSheet={closeBottomSheet}/>
+                </Modal>
             </Container>
         </Background>
     );

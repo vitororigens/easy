@@ -16,8 +16,7 @@ export function StackNavigation() {
              <Screen
                 name='forgetPassword'
                 component={ForgetPassword}
-            />
-             
+            />        
         </Navigator>
     )
 }

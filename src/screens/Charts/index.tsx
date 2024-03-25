@@ -2,6 +2,7 @@ import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
 import { Button, Content, Divider, Header, Title, NavBar, SubTitle } from "./styles";
 import { useState } from "react";
+import { database } from "../../services";
 
 export function Charts() {
   const [activeButton, setActiveButton] = useState("Entrar");
@@ -9,6 +10,24 @@ export function Charts() {
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
   };
+
+
+
+  database
+  .collection('Users')
+  .doc('123456')
+  .set({
+    name: 'Ada Lovelace',
+    age: 30,
+  })
+  .then(() => {
+    console.log('User added!');
+  })
+  .catch(error => {
+    console.error('Error adding user: ', error);
+  });
+
+  
   return (
     <DefaultContainer monthButton>
       <Container type="SECONDARY" title="ANÁLISE GRÁFICA">
@@ -22,9 +41,7 @@ export function Charts() {
                 </Title>
               
               </Button>
-              <Button style={{
-                right: 20
-              }} onPress={() => handleButtonClick("despesas")}>
+              <Button onPress={() => handleButtonClick("despesas")}>
                 <Title>
                   Despesas
                 </Title>

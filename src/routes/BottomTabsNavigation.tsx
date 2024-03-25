@@ -14,7 +14,7 @@ export function BottomTabsNavigation() {
     const { COLORS, FONTE_SIZE, FONT_FAMILY } = useTheme();
     return (
         <Navigator
-            initialRouteName="home"
+            initialRouteName="Home"
             screenOptions={{
                 headerShown: false,
                 tabBarStyle: {
@@ -30,10 +30,7 @@ export function BottomTabsNavigation() {
                     fontFamily: FONT_FAMILY.REGULAR,
                 },
                 tabBarActiveTintColor: COLORS.TEAL_600,
-
-
             }}
-
         >
 
             <Screen
@@ -61,7 +58,7 @@ export function BottomTabsNavigation() {
                     )
 
                 }}
-                name="home"
+                name="Home"
                 component={Home}
 
             />
@@ -80,7 +77,7 @@ export function BottomTabsNavigation() {
                         <FontAwesome name="gear" color={color} size={35} />
                     )
                 }}
-                name="config"
+                name="Config"
                 component={Gears}
             />
         </Navigator>
