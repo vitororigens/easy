@@ -12,10 +12,12 @@ export const Container = styled.View`
     padding-top: 10px;
 `;
 
-export const Icon = styled.View`
+export const Icon = styled.View<Props>`
     width: 13%;
     height: 45px;
-    background-color: ${({theme}) => theme.COLORS.PURPLE_800};
+    background-color: ${({theme, type}) => type === 'PRIMARY' 
+    ? theme.COLORS.TEAL_600 
+    : theme.COLORS.PURPLE_800};
     align-items: center;
     justify-content: center;
     border-radius: 10px;

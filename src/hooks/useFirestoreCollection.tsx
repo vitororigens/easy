@@ -4,12 +4,13 @@ import { database } from '../services';
 
 interface ExpenseData {
   id: string;
-  categoria: string;
+  category: string;
   date: string;
   description: string;
   valueTransaction: string;
   repeat: boolean;
   uid: string;
+  type: string;
 }
 
 const useFirestoreCollection = (

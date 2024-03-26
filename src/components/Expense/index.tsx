@@ -42,7 +42,8 @@ export function Expense() {
             date: formattedDate,
             valueTransaction: valueTransaction,
             description: description,
-            repeat:repeat
+            repeat:repeat,
+            type:'output'
 
         })
         .then(() => {

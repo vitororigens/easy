@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Items } from "../../components/Items";
 import { useFinanceData } from "../../hooks/useFinanceAuth";
 import { useUserAuth } from "../../hooks/useUserAuth";
+import useFirestoreCollection from "../../hooks/useFirestoreCollection";
+import { FlatList } from "react-native";
 
 
 
@@ -13,6 +15,8 @@ export function Home() {
   const [activeButton, setActiveButton] = useState("receitas");
   const uid = user?.uid;
   const financeData = useFinanceData(uid || 'não há registro');
+  const revenue = useFirestoreCollection('Revenue');
+  const expense = useFirestoreCollection('Expense');
 
 
   const handleButtonClick = (buttonName: string) => {
@@ -51,7 +55,12 @@ export function Home() {
                 </TitleItems>
 
               </HeaderItems>
-              <Items />
+              <FlatList
+                data={revenue}
+                renderItem={({item}) =>(
+                  <Items type={item.type} category={item.category} date={item.date} repeat valueTransaction={item.valueTransaction}/>
+                )}
+              />
             </ContainerItems>
           }
           {activeButton === "despesas" &&
@@ -62,7 +71,12 @@ export function Home() {
                 </TitleItems>
 
               </HeaderItems>
-              <Items />
+              <FlatList
+                data={expense}
+                renderItem={({item}) =>(
+                  <Items type={item.type} category={item.category} date={item.date} repeat valueTransaction={item.valueTransaction}/>
+                )}
+              />
             </ContainerItems>}
         </Content>
       </Container>

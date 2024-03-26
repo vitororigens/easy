@@ -1,28 +1,39 @@
 import { Container, Content, ContentItems, Divider, Icon, SubTitle, Title } from "./styles";
 import { AntDesign } from '@expo/vector-icons';
 
-export function Items(){
+type ItemsProps ={
+    category: string;
+    date: string;
+    valueTransaction: string;
+    repeat: boolean;
+    type: string;
+}
+
+export function Items({ category, date, valueTransaction, repeat, type }: ItemsProps){
+    const transactionType = repeat ? 'Despesa fixa' : 'Despesa variável';
+    const titleType = type === 'output' ? 'SECONDARY' : 'PRIMARY';
+
     return(
         <Container>
-            <Icon>
+            <Icon type={titleType}>
             <AntDesign name="infocirlce" size={24} color="white" />
             </Icon>
             <Content>
                 <ContentItems>
-                    <Title type="SECONDARY">
-                        Mercado
+                    <Title type={titleType}>
+                        {category}
                     </Title>
-                    <Title type="SECONDARY">
-                        R$: 437
+                    <Title type={titleType}> 
+                        R$: {valueTransaction}
                     </Title>
                 </ContentItems>
                 <Divider/>
                 <ContentItems>
-                <SubTitle>
-                        8 de março de 2024
+                    <SubTitle>
+                        {date}
                     </SubTitle>
                     <SubTitle>
-                        Despesa variável
+                        {transactionType}
                     </SubTitle>
                 </ContentItems>
             </Content>

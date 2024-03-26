@@ -38,12 +38,13 @@ export function Revenue() {
         .collection('Revenue')
         .doc() 
         .set({
-            categoria: selectedCategory,
+            category: selectedCategory,
             uid:uid,
             date: formattedDate,
             valueTransaction: valueTransaction,
             description: description,
-            repeat:repeat
+            repeat:repeat,
+            type:'input'
 
         })
         .then(() => {
