@@ -3,7 +3,7 @@ import { Icon, Background, Button, Container, ContainerMonth, Header, Title } fr
 import { useNavigation } from "@react-navigation/native";
 import RNPickerSelect from 'react-native-picker-select';
 import { Ionicons } from '@expo/vector-icons';
-import { Modal, Text } from "react-native";
+import { Modal } from "react-native";
 import { NewTask } from "../../screens/NewTask";
 
 type DefaultContainerProps = {
@@ -55,14 +55,19 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
             <Container>
                 <Header>
                     {backButton ? (
-                        <Button onPress={handleGoBack}>
+                        <Button style={{
+                            height: 60
+                        }} onPress={handleGoBack}>
                             <Icon name="chevron-back-outline" />
                         </Button>
                     ) : (
                         <Button />
                     )}
                     {monthButton &&
-                        <ContainerMonth style={{ justifyContent: backButton ? 'flex-start' : 'center' }}>
+                        <ContainerMonth style={{
+                            height: 60,
+                            justifyContent: backButton ? 'flex-start' : 'center'
+                        }}>
                             <RNPickerSelect
                                 onValueChange={(value) => setSelectedMonth(value)}
                                 items={months.map(month => ({ label: month.name, value: month.id }))}
@@ -104,7 +109,8 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                     {addButton ? (
                         <Button style={{
                             alignItems: 'center',
-                            flexDirection: 'row'
+                            flexDirection: 'row',
+                            height: 60
                         }} onPress={handleNewTask}>
                             <Title>
                                 Novo
@@ -123,7 +129,7 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                     visible={bottomSheetVisible}
                     onRequestClose={closeBottomSheet}
                 >
-                    <NewTask closeBottomSheet={closeBottomSheet}/>
+                    <NewTask closeBottomSheet={closeBottomSheet} />
                 </Modal>
             </Container>
         </Background>

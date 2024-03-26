@@ -20,10 +20,10 @@ export function BottomTabsNavigation() {
                 tabBarStyle: {
                     position: 'absolute',
                     backgroundColor: COLORS.WHITE,
-                    height: 80,
+                    height: 60,
                     borderTopWidth: 0,
-                    borderTopRightRadius: 40,
-                    borderTopLeftRadius: 40
+                    borderTopRightRadius: 30,
+                    borderTopLeftRadius: 30
                 },
                 tabBarLabelStyle: {
                     fontSize: FONTE_SIZE.LG,
@@ -36,7 +36,7 @@ export function BottomTabsNavigation() {
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <FontAwesome name="line-chart" color={color} size={35} />
+                        <FontAwesome name="line-chart" color={color} size={30} />
                     )
                 }}
                 name="Gráficos"
@@ -45,7 +45,7 @@ export function BottomTabsNavigation() {
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <FontAwesome name="opencart" color={color} size={35} />
+                        <FontAwesome name="opencart" color={color} size={30} />
                     )
                 }}
                 name="Mercado"
@@ -54,7 +54,7 @@ export function BottomTabsNavigation() {
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <Entypo name="wallet" color={color} size={35} />
+                        <Entypo name="wallet" color={color} size={30} />
                     )
 
                 }}
@@ -65,7 +65,7 @@ export function BottomTabsNavigation() {
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <FontAwesome5 name="piggy-bank" color={color} size={35} />
+                        <FontAwesome5 name="piggy-bank" color={color} size={30} />
                     )
                 }}
                 name="Cofrinho"
@@ -74,7 +74,7 @@ export function BottomTabsNavigation() {
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <FontAwesome name="gear" color={color} size={35} />
+                        <FontAwesome name="gear" color={color} size={30} />
                     )
                 }}
                 name="Config"
