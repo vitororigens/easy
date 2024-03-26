@@ -56,9 +56,14 @@ export function Home() {
 
               </HeaderItems>
               <FlatList
-                data={revenue}
-                renderItem={({item}) =>(
-                  <Items type={item.type} category={item.category} date={item.date} repeat valueTransaction={item.valueTransaction}/>
+                data={revenue.filter(item => item.uid === uid)}
+                renderItem={({ item }) => (
+                  <Items 
+                  type={item.type} 
+                  category={item.category} 
+                  date={item.date} 
+                  repeat={item.repeat}
+                  valueTransaction={item.valueTransaction} />
                 )}
               />
             </ContainerItems>
@@ -72,11 +77,18 @@ export function Home() {
 
               </HeaderItems>
               <FlatList
-                data={expense}
-                renderItem={({item}) =>(
-                  <Items type={item.type} category={item.category} date={item.date} repeat valueTransaction={item.valueTransaction}/>
+                data={expense.filter(item => item.uid === uid)}
+                renderItem={({ item }) => (
+                  <Items
+                    type={item.type}
+                    category={item.category}
+                    date={item.date}
+                    repeat={item.repeat}
+                    valueTransaction={item.valueTransaction}
+                  />
                 )}
               />
+
             </ContainerItems>}
         </Content>
       </Container>

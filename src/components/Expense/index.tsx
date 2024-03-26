@@ -36,14 +36,15 @@ export function Expense() {
     function handleExpense(){
         database
         .collection('Expense')
-        .doc(uid) 
+        .doc() 
         .set({
             category: selectedCategory,
             date: formattedDate,
             valueTransaction: valueTransaction,
             description: description,
             repeat:repeat,
-            type:'output'
+            type:'output',
+            uid:uid,
 
         })
         .then(() => {
@@ -97,6 +98,9 @@ export function Expense() {
                                     { label: 'Investimentos', value: 'investimentos' },
                                     { label: 'Contas', value:'Contas' },
                                     { label: 'Compras', value: 'compras' },
+                                    { label: 'Faculdade', value: 'Faculdade' },
+                                    { label: 'Internet', value: 'Internet' },
+                                    { label: 'Emprestimo', value: 'Emprestimo' },
                                     { label: 'Comida', value: 'comida' },
                                     { label: 'Telefone', value: 'telefone' },
                                     { label: 'Entretenimento', value: 'entretenimento' },
