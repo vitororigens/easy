@@ -6,11 +6,14 @@ import { Items } from "../../components/Items";
 import { useFinanceData } from "../../hooks/useFinanceAuth";
 import { useUserAuth } from "../../hooks/useUserAuth";
 
+
+
 export function Home() {
   const user = useUserAuth()
   const [activeButton, setActiveButton] = useState("receitas");
-  const uid = user?.uid ;
+  const uid = user?.uid;
   const financeData = useFinanceData(uid || 'não há registro');
+
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
@@ -30,7 +33,7 @@ export function Home() {
                   R$: {financeData?.revenue}
                 </SubTitle>
               </Button>
-              <Button  onPress={() => handleButtonClick("despesas")}>
+              <Button onPress={() => handleButtonClick("despesas")}>
                 <Title>
                   Despesas
                 </Title>

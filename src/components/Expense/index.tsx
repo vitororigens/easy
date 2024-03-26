@@ -38,7 +38,7 @@ export function Expense() {
         .collection('Expense')
         .doc(uid) 
         .set({
-            categoria: selectedCategory,
+            category: selectedCategory,
             date: formattedDate,
             valueTransaction: valueTransaction,
             description: description,
