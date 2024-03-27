@@ -2,9 +2,10 @@ import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
 import { Button, Content, Divider, Header, Title, NavBar, SubTitle } from "./styles";
 import { useState } from "react";
+import { LoadData } from "../../components/LoadData";
 
 export function Marketplace() {
-  const [activeButton, setActiveButton] = useState("Entrar");
+  const [activeButton, setActiveButton] = useState("concluidos");
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
@@ -30,8 +31,8 @@ export function Marketplace() {
               </Button>
             </NavBar>
           </Header>
-          {activeButton === "concluidos" && <Title>teste2</Title>}
-          {activeButton === "pendentes" && <Title >teste1</Title>}
+          {activeButton === "concluidos" && <LoadData/>}
+          {activeButton === "pendentes" && <LoadData/>}
         </Content>
       </Container>
     </DefaultContainer>
