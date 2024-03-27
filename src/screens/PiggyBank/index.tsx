@@ -4,26 +4,40 @@ import { Content, Divider, Header, SubTitle, Title } from "./styles";
 import { PieChart } from "react-native-chart-kit";
 import { Dimensions, View } from "react-native";
 import { useTheme } from "styled-components/native";
+import { useUserAuth } from "../../hooks/useUserAuth";
+import { useTotalValue } from "../../hooks/useTotalValue";
 const screenWidth = Dimensions.get("window").width;
 
 
 export function PiggyBank() {
-  const { COLORS } = useTheme()
+  const user = useUserAuth();
+  const uid = user?.uid;
+  const { totalExpense, totalRevenue } = useTotalValue(uid || 'Não foi possivel encontrar o uid');
+  const formattedRevenue = totalRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formattedExpense = totalExpense.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  const { COLORS } = useTheme();
+
+  const savedPercentage = ((totalRevenue - totalExpense) / totalRevenue) * 100;
+  const formattedSavedPercentage = savedPercentage.toFixed(2); 
+
   const data = [
     {
       name: "Despesas",
-      population: 10,
+      population: totalExpense,
       color: COLORS.PURPLE_600,
       legendFontColor: "#7F7F7F",
       legendFontSize: 15
     },
     {
       name: "Receitas",
-      population: 90,
+      population: totalRevenue,
       color: COLORS.TEAL_600,
       legendFontColor: "#7F7F7F",
       legendFontSize: 15
-    },]
+    },
+  ];
+
   const chartConfig = {
     backgroundGradientFrom: "#FFFFFF",
     backgroundGradientFromOpacity: 0,
@@ -62,10 +76,10 @@ export function PiggyBank() {
               Parabéns
             </SubTitle>
             <Title style={{
-              textAlign: 'center'
+              textAlign: 'center',
+              width:300
             }}>
-              Você economizou 80% do seu rendimento total!
-
+              Você economizou {formattedSavedPercentage}% do seu rendimento total!
             </Title>
           </View>
         </Content>
@@ -73,3 +87,4 @@ export function PiggyBank() {
     </DefaultContainer>
   );
 }
+

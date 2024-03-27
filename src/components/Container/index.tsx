@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { ContainerTypeStyleProps, Content, Header, Icon, Title } from "./styles";
 
 type ContainerProps= {
-    title?: string;
+    title?: string | number;
     name?: string;
     color?:string;
     type?:ContainerTypeStyleProps;

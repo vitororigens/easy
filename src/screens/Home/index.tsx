@@ -5,8 +5,9 @@ import { useState } from "react";
 import { Items } from "../../components/Items";
 import { useFinanceData } from "../../hooks/useFinanceAuth";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import useFirestoreCollection from "../../hooks/useFirestoreCollection";
+import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCollection";
 import { FlatList } from "react-native";
+import { useTotalValue } from "../../hooks/useTotalValue";
 
 
 
@@ -14,9 +15,13 @@ export function Home() {
   const user = useUserAuth()
   const [activeButton, setActiveButton] = useState("receitas");
   const uid = user?.uid;
-  const financeData = useFinanceData(uid || 'não há registro');
   const revenue = useFirestoreCollection('Revenue');
   const expense = useFirestoreCollection('Expense');
+  const {totalExpense, totalRevenue,totalValue} = useTotalValue(uid || 'Não foi possivel encontrar o uid')
+
+  const formattedRevenue = totalRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formattedExpense = totalExpense.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formattedTotalValue = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 
   const handleButtonClick = (buttonName: string) => {
@@ -24,7 +29,7 @@ export function Home() {
   };
   return (
     <DefaultContainer addButton monthButton>
-      <Container type="PRIMARY" name="file-invoice-dollar" title="R$ 4.793">
+      <Container type="PRIMARY" name="file-invoice-dollar" title={formattedTotalValue}>
         <Content>
           <Header>
             <Divider style={{ alignSelf: activeButton === "receitas" ? "flex-start" : "flex-end" }} />
@@ -34,7 +39,7 @@ export function Home() {
                   Receitas
                 </Title>
                 <SubTitle type="PRIMARY">
-                  R$: {financeData?.revenue}
+                {formattedRevenue}
                 </SubTitle>
               </Button>
               <Button onPress={() => handleButtonClick("despesas")}>
@@ -42,7 +47,7 @@ export function Home() {
                   Despesas
                 </Title>
                 <SubTitle type="SECONDARY">
-                  R$: {financeData?.expense}
+               {formattedExpense}
                 </SubTitle>
               </Button>
             </NavBar>
