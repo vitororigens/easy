@@ -26,6 +26,7 @@ export function Revenue() {
         setDate(currentDate);
         const formattedDateString = currentDate.toLocaleDateString('pt-BR');
         setFormattedDate(formattedDateString);
+        
     };
 
     const showDatePickerModal = () => {
@@ -34,6 +35,9 @@ export function Revenue() {
 
 
     function handleExpense(){
+        const [day, month, year] = formattedDate.split('/');
+        const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
+        const monthNumber = selectedDate.getMonth() + 1;
         database
         .collection('Revenue')
         .doc() 
@@ -44,7 +48,8 @@ export function Revenue() {
             valueTransaction: valueTransaction,
             description: description,
             repeat:repeat,
-            type:'input'
+            type:'input',
+            month: monthNumber
 
         })
         .then(() => {

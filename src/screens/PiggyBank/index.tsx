@@ -13,8 +13,6 @@ export function PiggyBank() {
   const user = useUserAuth();
   const uid = user?.uid;
   const { totalExpense, totalRevenue } = useTotalValue(uid || 'Não foi possivel encontrar o uid');
-  const formattedRevenue = totalRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  const formattedExpense = totalExpense.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const { COLORS } = useTheme();
 

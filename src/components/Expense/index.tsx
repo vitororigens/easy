@@ -34,6 +34,9 @@ export function Expense() {
 
 
     function handleExpense(){
+        const [day, month, year] = formattedDate.split('/');
+        const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
+        const monthNumber = selectedDate.getMonth() + 1;
         database
         .collection('Expense')
         .doc() 
@@ -45,6 +48,7 @@ export function Expense() {
             repeat:repeat,
             type:'output',
             uid:uid,
+            month: monthNumber
 
         })
         .then(() => {
