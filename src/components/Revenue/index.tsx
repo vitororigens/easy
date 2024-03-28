@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { DividerTask, Input, TitleTask, InputDescription, Button } from "./styles";
-import { View, TouchableOpacity, ScrollView } from "react-native";
+import { View, TouchableOpacity, ScrollView, Alert } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Switch } from "react-native";
 import RNPickerSelect from 'react-native-picker-select';
 import { database } from '../../services';
 import { useUserAuth } from '../../hooks/useUserAuth';
+import { Toast } from 'react-native-toast-notifications';
 
 
 export function Revenue() {
@@ -34,35 +35,41 @@ export function Revenue() {
     };
 
 
-    function handleExpense(){
+    function handleExpense() {
+        if (!selectedCategory || !valueTransaction || !formattedDate || !description) {
+           Alert.alert('Atenção!','Por favor, preencha todos os campos antes de salvar.')
+            return;
+        }
+    
         const [day, month, year] = formattedDate.split('/');
         const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
         const monthNumber = selectedDate.getMonth() + 1;
+        
         database
-        .collection('Revenue')
-        .doc() 
-        .set({
-            category: selectedCategory,
-            uid:uid,
-            date: formattedDate,
-            valueTransaction: valueTransaction,
-            description: description,
-            repeat:repeat,
-            type:'input',
-            month: monthNumber
-
-        })
-        .then(() => {
-            console.log('transação adicionada!');
-            setDescription('')
-            setFormattedDate('')
-            setRepeat(false)
-            setValuetransaction('')
-        })
-        .catch(error => {
-            console.error('Erro ao adicionar a transação: ', error);
-        });
+            .collection('Revenue')
+            .doc() 
+            .set({
+                category: selectedCategory,
+                uid: uid,
+                date: formattedDate,
+                valueTransaction: valueTransaction,
+                description: description,
+                repeat: repeat,
+                type: 'input',
+                month: monthNumber
+            })
+            .then(() => {
+                Toast.show('Transação adicionada!', {type: 'sucess'} )
+                setDescription('');
+                setFormattedDate('');
+                setRepeat(false);
+                setValuetransaction('');
+            })
+            .catch(error => {
+                console.error('Erro ao adicionar a transação: ', error);
+            });
     }
+    
 
     return (
         <View style={{ flex: 1, padding: 10 }}>

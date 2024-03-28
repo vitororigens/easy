@@ -31,8 +31,8 @@ export function Marketplace() {
               </Button>
             </NavBar>
           </Header>
-          {activeButton === "concluidos" && <LoadData/>}
-          {activeButton === "pendentes" && <LoadData/>}
+          {activeButton === "concluidos" && <LoadData image='SECONDARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui!' />}
+          {activeButton === "pendentes" && <LoadData image='SECONDARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui!' />}
         </Content>
       </Container>
     </DefaultContainer>

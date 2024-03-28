@@ -49,10 +49,10 @@ export function PiggyBank() {
     useShadowColorFromDataset: false
   };
 
-  
+
   if (uid === undefined) {
     return <Loading />;
-}
+  }
 
   return (
     <DefaultContainer >
@@ -62,7 +62,7 @@ export function PiggyBank() {
             <Divider />
           </Header>
           {totalExpense === 0 || totalRevenue === 0 ?
-          <LoadData/>
+            <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui!' />
             :
             <View style={{
               justifyContent: 'center',
@@ -90,7 +90,7 @@ export function PiggyBank() {
                 Você economizou {formattedSavedPercentage}% do seu rendimento total!
               </Title>
             </View>
-            }
+          }
         </Content>
       </Container>
     </DefaultContainer>

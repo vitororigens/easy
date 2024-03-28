@@ -62,13 +62,12 @@ export function Charts() {
   };
   
   useEffect(() => {
-    let timer;
+    let timer: NodeJS.Timeout;
 
     if (uid === undefined) {
       return;
     }
 
-    // Definindo temporizador para 2 segundos
     timer = setTimeout(() => {
       if (revenue && revenue.length > 0) {
         setRevenueData(revenue.filter(item => item.uid === uid));
@@ -76,14 +75,13 @@ export function Charts() {
       if (expense && expense.length > 0) {
         setExpenseData(expense.filter(item => item.uid === uid));
       }
-      setIsLoading(false); // Marca como carregado após o temporizador
+      setIsLoading(false); 
     }, 1000);
 
-    // Limpa o temporizador quando o componente for desmontado ou quando o uid mudar
+
     return () => clearTimeout(timer);
   }, [revenue, expense, uid]);
 
-  // Renderização condicional
   if (isLoading || uid === undefined) {
     return <Loading />;
   }
@@ -126,7 +124,7 @@ export function Charts() {
               chartConfig={chartConfig}
             />
           ) : (
-            <LoadData/>
+            <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui!' />
           )}
         </Content>
       </Container>
