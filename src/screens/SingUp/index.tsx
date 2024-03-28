@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { ButtonIcon } from "../../components/ButtonIcon";
 import { Input } from "../../components/Input";
 import auth from "@react-native-firebase/auth";
 import { Container, Content, ContentIcon, Divider, Span, SubTitle, Text, Title } from "./styles";
-import { useNavigation } from "@react-navigation/native";
 import { Toast } from "react-native-toast-notifications";
 import { useTheme } from "styled-components/native";
 import { ActivityIndicator } from "react-native";
 import { database } from "../../services";
+
 
 export function SingUp() {
     const { COLORS } = useTheme()
@@ -25,7 +25,6 @@ export function SingUp() {
         passwordError: '',
         confirmPasswordError: ''
     });
-    console.log(user)
 
     function validateForm() {
         let isValid = true;
@@ -60,7 +59,7 @@ export function SingUp() {
             setErrors(prevState => ({ ...prevState, passwordError: '' }));
         }
 
-        if (user.password !== user.confirmPassword) {
+        if (user.password.trim() !== user.confirmPassword.trim()) {
             setErrors(prevState => ({
                 ...prevState,
                 confirmPasswordError: 'As senhas não coincidem.'
@@ -82,11 +81,11 @@ export function SingUp() {
         setIsLoading(true);
         if (validateForm()) {
             auth()
-                .createUserWithEmailAndPassword(user.email, user.password)
+                .createUserWithEmailAndPassword(user.email.trim(), user.password.trim())
                 .then((userCredential) => {
                     const { uid } = userCredential.user;
                     userCredential.user.updateProfile({
-                        displayName: user.name
+                        displayName: user.name.trim()
                     }).then(() => {
                         Toast.show("Conta cadastrada com sucesso!", { type: 'success' });
                         handleLogout()
@@ -124,7 +123,6 @@ export function SingUp() {
             setIsLoading(false);
         }
     }
-
 
     return (
         <Container>

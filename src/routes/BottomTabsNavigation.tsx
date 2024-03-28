@@ -15,14 +15,17 @@ const { Navigator, Screen } = createBottomTabNavigator();
 export function BottomTabsNavigation() {
     const { COLORS, FONTE_SIZE, FONT_FAMILY } = useTheme();
     const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
-
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const subscriber = auth().onAuthStateChanged(setUser);
+        setTimeout(() => {
+            setIsLoading(false); 
+        }, 3000); 
         return subscriber;
     }, []);
 
-    if (user === null) {
+    if (isLoading || user === null) {
         return <Loading />;
     }
     return (

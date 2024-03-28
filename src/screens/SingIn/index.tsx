@@ -22,7 +22,7 @@ export function SingIn() {
         }
 
         auth()
-            .signInWithEmailAndPassword(email, password)
+            .signInWithEmailAndPassword(email.trim(), password.trim())
             .then(() => {
                 Toast.show('Login realizado com sucesso!', { type: 'success' })
                 setEmail("")
