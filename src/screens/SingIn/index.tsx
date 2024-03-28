@@ -27,7 +27,7 @@ export function SingIn() {
                 Toast.show('Login realizado com sucesso!', { type: 'success' })
                 setEmail("")
                 setPassword("")
-              
+                navigation.navigate('tabroutes')
 
             })
             .catch(() => Toast.show('Verifique se seu e-mail ou senha estão corretos.', { type: 'danger' }))

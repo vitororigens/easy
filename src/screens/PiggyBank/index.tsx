@@ -6,6 +6,8 @@ import { Dimensions, View } from "react-native";
 import { useTheme } from "styled-components/native";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { useTotalValue } from "../../hooks/useTotalValue";
+import { Loading } from "../../components/Loading";
+import { LoadData } from "../../components/LoadData";
 const screenWidth = Dimensions.get("window").width;
 
 
@@ -17,7 +19,7 @@ export function PiggyBank() {
   const { COLORS } = useTheme();
 
   const savedPercentage = ((totalRevenue - totalExpense) / totalRevenue) * 100;
-  const formattedSavedPercentage = savedPercentage.toFixed(2); 
+  const formattedSavedPercentage = savedPercentage.toFixed(2);
 
   const data = [
     {
@@ -47,6 +49,11 @@ export function PiggyBank() {
     useShadowColorFromDataset: false
   };
 
+  
+  if (uid === undefined) {
+    return <Loading />;
+}
+
   return (
     <DefaultContainer >
       <Container type="SECONDARY" title="Cofrinho">
@@ -54,32 +61,36 @@ export function PiggyBank() {
           <Header>
             <Divider />
           </Header>
-          <View style={{
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            <PieChart
-              data={data}
-              width={screenWidth}
-              height={220}
-              chartConfig={chartConfig}
-              accessor={"population"}
-              backgroundColor={"transparent"}
-              paddingLeft={"15"}
-              center={[10, 10]}
-              absolute
-            />
-
-            <SubTitle type="PRIMARY">
-              Parabéns
-            </SubTitle>
-            <Title style={{
-              textAlign: 'center',
-              width:300
+          {totalExpense === 0 || totalRevenue === 0 ?
+          <LoadData/>
+            :
+            <View style={{
+              justifyContent: 'center',
+              alignItems: 'center'
             }}>
-              Você economizou {formattedSavedPercentage}% do seu rendimento total!
-            </Title>
-          </View>
+              <PieChart
+                data={data}
+                width={screenWidth}
+                height={220}
+                chartConfig={chartConfig}
+                accessor={"population"}
+                backgroundColor={"transparent"}
+                paddingLeft={"15"}
+                center={[10, 10]}
+                absolute
+              />
+
+              <SubTitle type="PRIMARY">
+                Parabéns
+              </SubTitle>
+              <Title style={{
+                textAlign: 'center',
+                width: 300
+              }}>
+                Você economizou {formattedSavedPercentage}% do seu rendimento total!
+              </Title>
+            </View>
+            }
         </Content>
       </Container>
     </DefaultContainer>

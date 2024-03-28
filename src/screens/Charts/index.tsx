@@ -1,24 +1,33 @@
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Container } from "../../components/Container";
-import { Button, Content, Divider, Header, Title, NavBar } from "./styles";
-import { useState } from "react";
-import { LineChart } from "react-native-chart-kit";
-import { Dimensions } from "react-native";
-import { useUserAuth } from "../../hooks/useUserAuth";
+import React, { useState, useEffect } from 'react';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { Container } from '../../components/Container';
+import { Button, Content, Divider, Header, Title, NavBar } from './styles';
+import { LineChart } from 'react-native-chart-kit';
+import { Dimensions } from 'react-native';
 import useFirestoreCollection, { ExpenseData } from './../../hooks/useFirestoreCollection';
-import { useTheme } from "styled-components/native";
+import { useTheme } from 'styled-components/native';
+import { Loading } from '../../components/Loading';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { LoadData } from '../../components/LoadData';
 
-const screenWidth = Dimensions.get("window").width;
+const screenWidth = Dimensions.get('window').width;
 
 export function Charts() {
-  const [activeButton, setActiveButton] = useState("Entrar");
-  const {COLORS} = useTheme();
-  const user = useUserAuth();
-  const uid = user?.uid;
+  const [activeButton, setActiveButton] = useState('receitas');
+  const [revenueData, setRevenueData] = useState<ExpenseData[] | never[]>([]);
+  const [expenseData, setExpenseData] = useState<ExpenseData[] | never[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { COLORS } = useTheme();
   const revenue = useFirestoreCollection('Revenue');
   const expense = useFirestoreCollection('Expense');
+  const user = useUserAuth()
+  const uid = user?.uid;
 
-  const monthNames: string[] = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+
+  const monthNames: string[] = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  ];
 
   const getMonthName = (month: number): string => {
     return monthNames[month - 1];
@@ -35,12 +44,8 @@ export function Charts() {
 
   const generateChartData = (data: ExpenseData[]): any => {
     const uniqueMonths = Array.from(new Set(data.map(item => item.month)));
-
-    // Ordene os meses em ordem crescente
     const sortedMonths = uniqueMonths.sort((a, b) => a - b);
-
     const labels = sortedMonths.map(month => getMonthName(month));
-
     const totalByMonth = sortedMonths.map(month => getTotalByMonth(data, month));
 
     return {
@@ -48,65 +53,81 @@ export function Charts() {
       datasets: [
         {
           data: totalByMonth,
-          color:  activeButton === "receitas" ? (opacity = 1) => COLORS.TEAL_600 : (opacity = 1) => COLORS.PURPLE_600, 
-          strokeWidth: 2 
+          color: activeButton === "receitas" ? (opacity = 1) => COLORS.TEAL_600 : (opacity = 1) => COLORS.PURPLE_600,
+          strokeWidth: 2
         }
       ],
-      legend: ["Total por mês"] 
+      legend: ['Total por mês']
     };
   };
+  
+  useEffect(() => {
+    let timer;
 
-  const revenueData = generateChartData(revenue);
-  const expenseData = generateChartData(expense);
+    if (uid === undefined) {
+      return;
+    }
+
+    // Definindo temporizador para 2 segundos
+    timer = setTimeout(() => {
+      if (revenue && revenue.length > 0) {
+        setRevenueData(revenue.filter(item => item.uid === uid));
+      }
+      if (expense && expense.length > 0) {
+        setExpenseData(expense.filter(item => item.uid === uid));
+      }
+      setIsLoading(false); // Marca como carregado após o temporizador
+    }, 1000);
+
+    // Limpa o temporizador quando o componente for desmontado ou quando o uid mudar
+    return () => clearTimeout(timer);
+  }, [revenue, expense, uid]);
+
+  // Renderização condicional
+  if (isLoading || uid === undefined) {
+    return <Loading />;
+  }
+  
+
+  
+  const chartData = activeButton === 'receitas' ? generateChartData(revenueData) : generateChartData(expenseData);
 
   const chartConfig = {
-    backgroundGradientFrom: "#FFFFFF",
+    backgroundGradientFrom: '#FFFFFF',
     backgroundGradientFromOpacity: 0,
-    backgroundGradientTo: "#FFFFFF",
+    backgroundGradientTo: '#FFFFFF',
     backgroundGradientToOpacity: 0.5,
     color: activeButton === "receitas" ? (opacity = 1) => COLORS.TEAL_600 : (opacity = 1) => COLORS.PURPLE_600,
     strokeWidth: 2,
     barPercentage: 0.5,
     useShadowColorFromDataset: false
   };
-  
 
   return (
     <DefaultContainer monthButton>
       <Container type="SECONDARY" title="ANÁLISE GRÁFICA">
         <Content>
           <Header>
-            <Divider style={{ alignSelf: activeButton === "receitas" ? "flex-start" : "flex-end" }} />
+            <Divider style={{ alignSelf: activeButton === 'receitas' ? 'flex-start' : 'flex-end' }} />
             <NavBar>
-              <Button onPress={() => handleButtonClick("receitas")}>
-                <Title>
-                  Receitas
-                </Title>
+              <Button onPress={() => handleButtonClick('receitas')}>
+                <Title>Receitas</Title>
               </Button>
-              <Button onPress={() => handleButtonClick("despesas")}>
-                <Title>
-                  Despesas
-                </Title>
+              <Button onPress={() => handleButtonClick('despesas')}>
+                <Title>Despesas</Title>
               </Button>
             </NavBar>
           </Header>
-          {activeButton === "receitas" &&
-             <LineChart
-             data={revenueData}
-             width={screenWidth}
-             height={220}
-             chartConfig={chartConfig}
-           />
-          }
-          {activeButton === "despesas" && 
-             <LineChart
-             data={expenseData}
-             width={screenWidth}
-             height={220}
-             chartConfig={chartConfig}
-           />
-          }
-       
+          {(revenueData.length > 0 && activeButton === 'receitas') || (expenseData.length > 0 && activeButton === 'despesas') ? (
+            <LineChart
+              data={chartData}
+              width={screenWidth}
+              height={220}
+              chartConfig={chartConfig}
+            />
+          ) : (
+            <LoadData/>
+          )}
         </Content>
       </Container>
     </DefaultContainer>

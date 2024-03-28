@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Home } from "../screens/Home";
 import { useTheme } from "styled-components/native";
@@ -7,11 +7,24 @@ import { Charts } from '../screens/Charts';
 import { Marketplace } from '../screens/Marketplace';
 import { PiggyBank } from '../screens/PiggyBank';
 import { Gears } from '../screens/Gears';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { Loading } from '../components/Loading';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
 export function BottomTabsNavigation() {
     const { COLORS, FONTE_SIZE, FONT_FAMILY } = useTheme();
+    const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+
+
+    useEffect(() => {
+        const subscriber = auth().onAuthStateChanged(setUser);
+        return subscriber;
+    }, []);
+
+    if (user === null) {
+        return <Loading />;
+    }
     return (
         <Navigator
             initialRouteName="Home"

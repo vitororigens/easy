@@ -17,7 +17,10 @@
     "ios": {
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
-      "bundleIdentifier": "com.easy.app"
+      "bundleIdentifier": "com.easy.app",
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "googleServicesFile": "./google-services.json",
@@ -25,7 +28,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,6 +39,14 @@
       "@react-native-firebase/auth",
       "@react-native-firebase/messaging",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "644c7760-a5b0-4044-bcd4-9288b16c6948"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/644c7760-a5b0-4044-bcd4-9288b16c6948"
+    }
   }
 }
