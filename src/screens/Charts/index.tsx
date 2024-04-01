@@ -3,14 +3,14 @@ import { DefaultContainer } from '../../components/DefaultContainer';
 import { Container } from '../../components/Container';
 import { Button, Content, Divider, Header, Title, NavBar } from './styles';
 import { LineChart } from 'react-native-chart-kit';
-import { Dimensions } from 'react-native';
+import { Dimensions, ScrollView } from 'react-native';
 import useFirestoreCollection, { ExpenseData } from './../../hooks/useFirestoreCollection';
 import { useTheme } from 'styled-components/native';
 import { Loading } from '../../components/Loading';
 import { useUserAuth } from '../../hooks/useUserAuth';
 import { LoadData } from '../../components/LoadData';
 
-const screenWidth = Dimensions.get('window').width;
+const screenWidth = Dimensions.get('screen').width;
 
 export function Charts() {
   const [activeButton, setActiveButton] = useState('receitas');
@@ -22,8 +22,6 @@ export function Charts() {
   const expense = useFirestoreCollection('Expense');
   const user = useUserAuth()
   const uid = user?.uid;
-
-
 
   const monthNames: string[] = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
@@ -86,8 +84,6 @@ export function Charts() {
     return <Loading />;
   }
   
-
-  
   const chartData = activeButton === 'receitas' ? generateChartData(revenueData) : generateChartData(expenseData);
 
   const chartConfig = {
@@ -101,8 +97,10 @@ export function Charts() {
     useShadowColorFromDataset: false
   };
 
+  const chartWidth = Math.max(screenWidth, chartData.labels.length * 60); // Adjust according to your preference
+
   return (
-    <DefaultContainer monthButton>
+    <DefaultContainer >
       <Container type="SECONDARY" title="ANÁLISE GRÁFICA">
         <Content>
           <Header>
@@ -117,12 +115,15 @@ export function Charts() {
             </NavBar>
           </Header>
           {(revenueData.length > 0 && activeButton === 'receitas') || (expenseData.length > 0 && activeButton === 'despesas') ? (
-            <LineChart
-              data={chartData}
-              width={screenWidth}
-              height={220}
-              chartConfig={chartConfig}
-            />
+            <ScrollView horizontal>
+              <LineChart
+                data={chartData}
+                width={chartWidth}
+                height={220}
+                chartConfig={chartConfig}
+                bezier
+              />
+            </ScrollView>
           ) : (
             <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui!' />
           )}

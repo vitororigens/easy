@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
 import { Content, Divider, Header, SubTitle, Title } from "./styles";
@@ -8,13 +9,14 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { useTotalValue } from "../../hooks/useTotalValue";
 import { Loading } from "../../components/Loading";
 import { LoadData } from "../../components/LoadData";
-const screenWidth = Dimensions.get("window").width;
 
+const screenWidth = Dimensions.get("window").width;
 
 export function PiggyBank() {
   const user = useUserAuth();
   const uid = user?.uid;
-  const { totalExpense, totalRevenue } = useTotalValue(uid || 'Não foi possivel encontrar o uid');
+  const { totalExpense, totalRevenue } = useTotalValue(uid || 'Não foi possível encontrar o uid');
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const { COLORS } = useTheme();
 
@@ -49,25 +51,29 @@ export function PiggyBank() {
     useShadowColorFromDataset: false
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 3000);
 
-  if (uid === undefined) {
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!isLoaded || uid === undefined) {
     return <Loading />;
   }
 
   return (
-    <DefaultContainer >
+    <DefaultContainer>
       <Container type="SECONDARY" title="Cofrinho">
         <Content>
           <Header>
             <Divider />
           </Header>
-          {totalExpense === 0 || totalRevenue === 0 ?
+          {totalExpense === 0 || totalRevenue === 0 ? (
             <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui!' />
-            :
-            <View style={{
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
+          ) : (
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
               <PieChart
                 data={data}
                 width={screenWidth}
@@ -79,21 +85,22 @@ export function PiggyBank() {
                 center={[10, 10]}
                 absolute
               />
-
-              <SubTitle type="PRIMARY">
-                Parabéns
-              </SubTitle>
-              <Title style={{
-                textAlign: 'center',
-                width: 300
-              }}>
-                Você economizou {formattedSavedPercentage}% do seu rendimento total!
-              </Title>
+              {savedPercentage < 0 ? (
+                <Title style={{ textAlign: 'center', width: 300 }}>
+                  Desculpe, este mês você ficou com saldo negativo {formattedSavedPercentage}. 
+                </Title>
+              ) : (
+                <View>
+                  <SubTitle type="PRIMARY">Parabéns</SubTitle>
+                  <Title style={{ textAlign: 'center', width: 300 }}>
+                    Você economizou {formattedSavedPercentage}% do seu rendimento total!
+                  </Title>
+                </View>
+              )}
             </View>
-          }
+          )}
         </Content>
       </Container>
     </DefaultContainer>
   );
 }
-
