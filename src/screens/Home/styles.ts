@@ -78,3 +78,7 @@ export const TitleItems = styled.Text`
     font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
     color: ${({ theme }) => theme.COLORS.WHITE};
 `;
+
+export const ButtonClose = styled(TouchableOpacity)`
+    height: 40px;
+`;

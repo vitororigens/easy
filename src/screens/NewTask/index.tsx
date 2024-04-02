@@ -47,10 +47,10 @@ export function NewTask({ closeBottomSheet }: Props) {
                 </NavBar>
               </Header>
               {activeButton === "receitas" &&
-                <Revenue/>
+                <Revenue showButtonSave/>
               }
               {activeButton === "despesas" && 
-              <Expense/>
+              <Expense showButtonSave/>
               }
             </Content>
           </Container>

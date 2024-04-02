@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Button, Content, Divider, Header, Title, NavBar, SubTitle, ContainerItems, HeaderItems, TitleItems } from "./styles";
+import { Button, Content, Divider, Header, Title, NavBar, SubTitle, ContainerItems, HeaderItems, TitleItems, ButtonClose } from "./styles";
 import { Items } from "../../components/Items";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import useFirestoreCollection from "../../hooks/useFirestoreCollection";
-import { FlatList, TouchableOpacity } from "react-native";
+import { FlatList, Modal, TouchableOpacity } from "react-native";
 import { useTotalValue } from "../../hooks/useTotalValue";
 import { Loading } from "../../components/Loading";
 import { LoadData } from "../../components/LoadData";
-import { database } from "../../services";
-import { CustomModal } from "../../components/CustomModal";
+import { Revenue } from "../../components/Revenue";
+import { Expense } from "../../components/Expense";
 
 export function Home() {
   const user = useUserAuth();
@@ -36,30 +36,6 @@ export function Home() {
   function handleExpenseConfirmation(documentId: string) {
     setConfirmExpenseVisible(true);
     setSelectedItemId(documentId);
-  }
-
-  function handleDeleteRevenue(documentId: string) {
-    const revenueRef = database.collection('Revenue').doc(documentId);
-    revenueRef.delete()
-      .then(() => {
-        console.log('Documento de receita excluído com sucesso.');
-      })
-      .catch((error) => {
-        console.error('Erro ao excluir o documento de receita:', error);
-      });
-    setConfirmRevenueVisible(false);
-  }
-
-  function handleDeleteExpense(documentId: string) {
-    const expenseRef = database.collection('Expense').doc(documentId);
-    expenseRef.delete()
-      .then(() => {
-        console.log('Documento de despesa excluído com sucesso.');
-      })
-      .catch((error) => {
-        console.error('Erro ao excluir o documento de despesa:', error);
-      });
-    setConfirmExpenseVisible(false);
   }
 
   const handleButtonClick = (buttonName: string) => {
@@ -106,7 +82,7 @@ export function Home() {
                 <FlatList
                   data={revenue.filter(item => item.uid === uid)}
                   renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => handleRevenueConfirmation(item.id)}> 
+                    <TouchableOpacity onPress={() => handleRevenueConfirmation(item.id)}>
                       <Items
                         type={item.type}
                         category={item.category}
@@ -131,7 +107,7 @@ export function Home() {
                 <FlatList
                   data={expense.filter(item => item.uid === uid)}
                   renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => handleExpenseConfirmation(item.id)}> 
+                    <TouchableOpacity onPress={() => handleExpenseConfirmation(item.id)}>
                       <Items
                         type={item.type}
                         category={item.category}
@@ -147,28 +123,29 @@ export function Home() {
           )}
         </Content>
       </Container>
-      <CustomModal
-        animationType="slide"
-        transparent={true}
-        onCancel={() => setConfirmRevenueVisible(false)}
-        onClose={() => setConfirmRevenueVisible(false)}
-        onConfirme={() => {
-          handleDeleteRevenue(selectedItemId);
-        }}
-        title="Deseja realmente excluir esta receita?"
-        visible={confirmRevenueVisible}
-      />
-      <CustomModal
-        animationType="slide"
-        transparent={true}
-        onCancel={() => setConfirmExpenseVisible(false)}
-        onClose={() => setConfirmExpenseVisible(false)}
-        onConfirme={() => {
-          handleDeleteExpense(selectedItemId);
-        }}
-        title="Deseja realmente excluir esta despesa?"
-        visible={confirmExpenseVisible}
-      />
+
+      <Modal visible={confirmRevenueVisible} onRequestClose={() => setConfirmRevenueVisible(false)}>
+
+        <DefaultContainer>
+          <ButtonClose onPress={() => setConfirmRevenueVisible(false)} >
+            <Title style={{ color: 'white' }}>Fechar</Title>
+          </ButtonClose>
+          <Container title={'Editar Entrada'}>
+            <Revenue selectedItemId={selectedItemId} showButtonRemove onCloseModal={() => setConfirmRevenueVisible(false)} showButtonEdit />
+          </Container>
+        </DefaultContainer>
+      </Modal>
+      <Modal visible={confirmExpenseVisible} onRequestClose={() => setConfirmExpenseVisible(false)}>
+
+        <DefaultContainer>
+          <ButtonClose onPress={() => setConfirmExpenseVisible(false)} >
+            <Title style={{ color: 'white' }}>Fechar</Title>
+          </ButtonClose>
+          <Container type="SECONDARY" title={'Editar Saida'}>
+            <Expense selectedItemId={selectedItemId} showButtonRemove onCloseModal={() => setConfirmExpenseVisible(false)} showButtonEdit />
+          </Container>
+        </DefaultContainer>
+      </Modal>
     </DefaultContainer>
   );
 }

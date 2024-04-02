@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DividerTask, Input, TitleTask, InputDescription, Button } from "./styles";
 import { View, TouchableOpacity, ScrollView, Alert } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -8,8 +8,15 @@ import { database } from '../../services';
 import { useUserAuth } from '../../hooks/useUserAuth';
 import { Toast } from 'react-native-toast-notifications';
 
+type RevenueProps = {
+    selectedItemId?: string;
+    showButtonRemove?: boolean;
+    onCloseModal?: () => void;
+    showButtonEdit?: boolean;
+    showButtonSave?: boolean;
+}
 
-export function Revenue() {
+export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showButtonEdit, showButtonSave }: RevenueProps) {
     const user = useUserAuth()
     const [selectedCategory, setSelectedCategory] = useState('');
     const [valueTransaction, setValuetransaction] = useState('');
@@ -18,6 +25,7 @@ export function Revenue() {
     const [formattedDate, setFormattedDate] = useState("");
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [repeat, setRepeat] = useState(false);
+    const [isEditing, setIsEditing] = useState(false); // Estado para controlar o modo de edição
 
     const uid = user?.uid
 
@@ -35,7 +43,7 @@ export function Revenue() {
     };
 
 
-    function handleExpense() {
+    function handleSaveRevenue() {
         if (!selectedCategory || !valueTransaction || !formattedDate || !description) {
             Alert.alert('Atenção!', 'Por favor, preencha todos os campos antes de salvar.')
             return;
@@ -70,6 +78,93 @@ export function Revenue() {
             });
     }
 
+    function handleEditRevenue() {
+        if (!selectedItemId) {
+            console.error('Nenhum documento selecionado para edição!');
+            return;
+        }
+
+        if (!selectedCategory || !valueTransaction || !formattedDate || !description) {
+            Alert.alert('Atenção!', 'Por favor, preencha todos os campos antes de salvar.')
+            return;
+        }
+
+        const [day, month, year] = formattedDate.split('/');
+        const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
+        const monthNumber = selectedDate.getMonth() + 1;
+
+        database
+            .collection('Revenue')
+            .doc(selectedItemId)
+            .set({
+                category: selectedCategory,
+                uid: uid,
+                date: formattedDate,
+                valueTransaction: valueTransaction,
+                description: description,
+                repeat: repeat,
+                type: 'input',
+                month: monthNumber
+            })
+            .then(() => {
+                Toast.show('Transação editada!', { type: 'success' })
+                setDescription('');
+                setFormattedDate('');
+                setRepeat(false);
+                setValuetransaction('');
+                setIsEditing(false); 
+                if (onCloseModal) {
+                    onCloseModal();
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao editar a transação: ', error);
+            });
+    }
+
+    function handleDeleteRevenue() {
+        if (!selectedItemId) {
+            console.error('Nenhum documento selecionado para exclusão!');
+            return;
+        }
+
+        const revenueRef = database.collection('Revenue').doc(selectedItemId);
+        revenueRef.delete()
+            .then(() => {
+                console.log('Documento de receita excluído com sucesso.');
+                if (onCloseModal) {
+                    onCloseModal();
+                }
+            })
+            .catch((error) => {
+                console.error('Erro ao excluir o documento de receita:', error);
+            });
+    }
+
+    useEffect(() => {
+        if (selectedItemId) {
+            database.collection('Revenue').doc(selectedItemId).get().then((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data) {
+                        setSelectedCategory(data.category);
+                        setValuetransaction(data.valueTransaction);
+                        setDescription(data.description);
+                        setFormattedDate(data.date);
+                        setRepeat(data.repeat);
+                        setDate(new Date(data.date));
+                        setIsEditing(true); // Entrar no modo de edição
+                    } else {
+                        console.log('Dados do documento estão vazios!');
+                    }
+                } else {
+                    console.log('Nenhum documento encontrado!');
+                }
+            }).catch((error) => {
+                console.error('Erro ao obter o documento:', error);
+            });
+        }
+    }, [selectedItemId]);
 
     return (
         <View style={{ flex: 1, padding: 10 }}>
@@ -98,12 +193,8 @@ export function Revenue() {
                             )}
                         </View>
                         <View>
-                            <TitleTask style={{
-                                marginTop: 20
-                            }}>Categorias:</TitleTask>
-                            <View style={{
-                                height: 50,
-                            }}>
+                            <TitleTask style={{ marginTop: 20 }}>Categorias:</TitleTask>
+                            <View style={{ height: 50 }}>
                                 <RNPickerSelect
                                     onValueChange={(value) => setSelectedCategory(value)}
                                     items={[
@@ -114,7 +205,6 @@ export function Revenue() {
                                     value={selectedCategory}
                                     placeholder={{ label: 'Selecione', value: 'Selecione' }}
                                 />
-
                             </View>
                         </View>
                     </View>
@@ -127,10 +217,7 @@ export function Revenue() {
                             ios_backgroundColor="#3e3e3e"
                             onValueChange={() => setRepeat(!repeat)}
                             value={repeat}
-                            style={{
-                                width: 50,
-
-                            }}
+                            style={{ width: 50 }}
                         />
                     </View>
                 </View>
@@ -143,18 +230,24 @@ export function Revenue() {
                         onChangeText={setDescription}
                     />
                 </View>
-                <View style={{
-                    marginBottom: 10
-                }}>
-                    <Button onPress={handleExpense}>
-                        <TitleTask>
-                            Salvar
-                        </TitleTask>
-                    </Button>
+                <View style={{ marginBottom: 10, height: 200 }}>
+                    {showButtonSave && (
+                        <Button style={{ marginBottom: 10 }} onPress={isEditing ? handleEditRevenue : handleSaveRevenue}>
+                            <TitleTask>{isEditing ? 'Editar' : 'Salvar'}</TitleTask>
+                        </Button>
+                    )}
+                    {showButtonEdit && (
+                        <Button style={{ marginBottom: 10 }} onPress={handleEditRevenue}>
+                            <TitleTask>Editar</TitleTask>
+                        </Button>
+                    )}
+                    {showButtonRemove && (
+                        <Button style={{ marginBottom: 10 }} onPress={handleDeleteRevenue}>
+                            <TitleTask>Excluir</TitleTask>
+                        </Button>
+                    )}
                 </View>
             </ScrollView>
-
         </View>
-
     );
 }
