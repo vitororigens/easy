@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.easy.app",
+  "applicationId": "com.easy.io.app",
   "variantName": "release",
   "elements": [
     {

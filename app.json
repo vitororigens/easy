@@ -17,14 +17,14 @@
     "ios": {
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
-      "bundleIdentifier": "com.easy.app",
+      "bundleIdentifier": "com.easy.io.app",
       "runtimeVersion": {
         "policy": "appVersion"
       }
     },
     "android": {
       "googleServicesFile": "./google-services.json",
-      "package": "com.easy.app",
+      "package": "com.easy.io.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
