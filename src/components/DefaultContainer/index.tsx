@@ -5,20 +5,21 @@ import RNPickerSelect from 'react-native-picker-select';
 import { Ionicons } from '@expo/vector-icons';
 import { Modal } from "react-native";
 import { NewTask } from "../../screens/NewTask";
+import { NewItem } from "../../screens/NewItem";
 
 type DefaultContainerProps = {
     children: ReactNode;
     backButton?: boolean;
     monthButton?: boolean;
     addButton?: boolean;
-
-
+    newItem?: boolean;
 }
 
-export function DefaultContainer({ children, backButton = false, monthButton = false, addButton = false }: DefaultContainerProps) {
+export function DefaultContainer({ children, backButton = false, monthButton = false, addButton = false, newItem = false }: DefaultContainerProps) {
     const navigation = useNavigation();
     const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
-    const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
+    const [showNewTaskModal, setShowNewTaskModal] = useState(false);
+    const [showNewItemModal, setShowNewItemModal] = useState(false);
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
     const months = [
@@ -36,18 +37,21 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
         { id: 11, name: 'Dezembro' }
     ];
 
-    function closeBottomSheet() {
-        setBottomSheetVisible(false);
-    };
-
-
+    function closeModals() {
+        setShowNewTaskModal(false);
+        setShowNewItemModal(false);
+    }
 
     function handleGoBack() {
         navigation.goBack();
     }
 
     function handleNewTask() {
-        setBottomSheetVisible(true)
+        setShowNewTaskModal(true);
+    }
+
+    function handleNewItem() {
+        setShowNewItemModal(true);
     }
 
     return (
@@ -103,10 +107,9 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                                     return <Ionicons name="chevron-down" size={24} color="white" />;
                                 }}
                             />
-
                         </ContainerMonth>
                     }
-                    {addButton ? (
+                    {addButton && (
                         <Button style={{
                             alignItems: 'center',
                             flexDirection: 'row',
@@ -116,20 +119,38 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                                 Novo
                             </Title>
                             <Icon name="add" />
-
                         </Button>
-                    ) : (
-                        <Button />
+                    )}
+
+                    {newItem && (
+                        <Button style={{
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                            height: 60
+                        }} onPress={handleNewItem}>
+                            <Title>
+                                Novo
+                            </Title>
+                            <Icon name="add" />
+                        </Button>
                     )}
                 </Header>
                 {children}
                 <Modal
                     animationType="slide"
                     transparent={true}
-                    visible={bottomSheetVisible}
-                    onRequestClose={closeBottomSheet}
+                    visible={showNewTaskModal}
+                    onRequestClose={closeModals}
                 >
-                    <NewTask closeBottomSheet={closeBottomSheet} />
+                    <NewTask closeBottomSheet={closeModals} />
+                </Modal>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={showNewItemModal}
+                    onRequestClose={closeModals}
+                >
+                    <NewItem closeBottomSheet={closeModals} />
                 </Modal>
             </Container>
         </Background>

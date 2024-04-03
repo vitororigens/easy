@@ -11,7 +11,7 @@ export function Marketplace() {
     setActiveButton(buttonName);
   };
   return (
-    <DefaultContainer monthButton>
+    <DefaultContainer monthButton newItem>
       <Container type="SECONDARY" title="Mercado">
         <Content>
           <Header>
