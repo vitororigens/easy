@@ -6,6 +6,7 @@ import { ScrollView, View } from "react-native";
 import { useState } from "react";
 import { database } from '../../services';
 import { Toast } from "react-native-toast-notifications";
+import { useUserAuth } from "../../hooks/useUserAuth";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -20,6 +21,9 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
   const [name, setName] = useState('')
   const [amount, setAmount] = useState('')
   const [description, setDescription] = useState('');
+  const user = useUserAuth();
+  const uid = user?.uid;
+  console.log(uid)
 
 
   function formatQuantity(quantity: string) {
@@ -39,6 +43,7 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
         name,
         amount: parseFloat(amount as string),
         description,
+        uid: uid,
       })
       .then(() => {
         Toast.show('Item adicionado!', { type: 'success' });
@@ -54,6 +59,7 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
         console.error('Erro ao adicionar o item: ', error);
       });
   }
+  
 
   return (
     <>

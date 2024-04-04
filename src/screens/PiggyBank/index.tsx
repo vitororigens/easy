@@ -86,12 +86,19 @@ export function PiggyBank() {
                 absolute
               />
               {savedPercentage < 0 ? (
-                <Title style={{ textAlign: 'center', width: 300 }}>
-                  Desculpe, este mês você ficou com saldo negativo {formattedSavedPercentage}. 
-                </Title>
+                <View>
+                  <SubTitle style={{
+                    textAlign: 'center'
+                  }} type="PRIMARY">Shiii!</SubTitle>
+                  <Title style={{ textAlign: 'center', width: 300 }}>
+                    Desculpe, este mês você ficou com saldo negativo {formattedSavedPercentage}.
+                  </Title>
+                </View>
               ) : (
                 <View>
-                  <SubTitle type="PRIMARY">Parabéns</SubTitle>
+                  <SubTitle style={{
+                    textAlign: 'center'
+                  }} type="PRIMARY">Parabéns</SubTitle>
                   <Title style={{ textAlign: 'center', width: 300 }}>
                     Você economizou {formattedSavedPercentage}% do seu rendimento total!
                   </Title>
