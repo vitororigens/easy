@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Container, ContainerQuantity, Contant, Icon, SubTitle, Title } from "./styles";
+import { Button, CartIcon, Container, ContainerQuantity, Contant, Icon, SubTitle, Title } from "./styles";
 
 type ItemMarketplaceProps = {
     title: string;
@@ -39,7 +39,8 @@ export function ItemMarketplace({ title, quantity, value, measurements, addItem,
 
     return (
         <Container>
-            <Contant style={{width:'60%'}}>
+            <CartIcon name="cart-variant"/>
+            <Contant >
                 <Title>{title}</Title>
                 <SubTitle>{quantity} {measurements}</SubTitle>
             </Contant>

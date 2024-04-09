@@ -19,6 +19,7 @@ export const ContentItems = styled.View`
     background-color: ${({theme}) => theme.COLORS.WHITE};
     padding-left: 15px;
     padding-right: 15px;
+    margin-bottom: 20px;
 `;
 
 

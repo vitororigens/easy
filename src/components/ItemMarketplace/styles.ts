@@ -1,11 +1,14 @@
 import styled from "styled-components/native";
 import { Entypo } from '@expo/vector-icons';
 import { TouchableOpacity } from "react-native";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export const Container =  styled.View`
     width: 100%;
     flex-direction: row;
     height: 100px;
+    align-items: center;
+    padding: 10px;
 `;
 
 export const Title = styled.Text`
@@ -42,3 +45,8 @@ export const Icon = styled(Entypo).attrs(({theme}) => ({
 }))``;
 
 export const Button = styled(TouchableOpacity)``
+
+export const CartIcon = styled(MaterialCommunityIcons).attrs(({ theme }) => ({
+    color: theme.COLORS.GRAY_600,
+    size: 32
+}))``;

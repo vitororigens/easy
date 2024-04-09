@@ -24,7 +24,7 @@ export function Items({ category, date, valueTransaction, repeat, type }: ItemsP
                         {category}
                     </Title>
                     <Title type={titleType}> 
-                        R$: {valueTransaction}
+                     {valueTransaction}
                     </Title>
                 </ContentItems>
                 <Divider/>

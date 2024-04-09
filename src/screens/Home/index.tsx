@@ -11,6 +11,7 @@ import { Loading } from "../../components/Loading";
 import { LoadData } from "../../components/LoadData";
 import { Revenue } from "../../components/Revenue";
 import { Expense } from "../../components/Expense";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 export function Home() {
   const user = useUserAuth();
@@ -88,7 +89,7 @@ export function Home() {
                         category={item.category}
                         date={item.date}
                         repeat={item.repeat}
-                        valueTransaction={item.valueTransaction}
+                        valueTransaction={formatCurrency(item.valueTransaction)}
                       />
                     </TouchableOpacity>
                   )}
@@ -113,7 +114,7 @@ export function Home() {
                         category={item.category}
                         date={item.date}
                         repeat={item.repeat}
-                        valueTransaction={item.valueTransaction}
+                        valueTransaction={formatCurrency(item.valueTransaction)}
                       />
                     </TouchableOpacity>
                   )}

@@ -97,7 +97,7 @@ export function Charts() {
     useShadowColorFromDataset: false
   };
 
-  const chartWidth = Math.max(screenWidth, chartData.labels.length * 60); // Adjust according to your preference
+  const chartWidth = Math.max(screenWidth, chartData.labels.length * 60);
 
   return (
     <DefaultContainer >

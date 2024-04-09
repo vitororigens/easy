@@ -8,7 +8,7 @@ import { database } from '../../services';
 import { useUserAuth } from '../../hooks/useUserAuth';
 import { Toast } from 'react-native-toast-notifications';
 
-type ExpenseProps = {
+export type ExpenseProps = {
     selectedItemId?: string;
     showButtonRemove?: boolean;
     onCloseModal?: () => void;

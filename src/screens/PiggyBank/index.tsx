@@ -29,7 +29,7 @@ export function PiggyBank() {
       population: totalExpense,
       color: COLORS.PURPLE_600,
       legendFontColor: "#7F7F7F",
-      legendFontSize: 15
+      legendFontSize: 12
     },
     {
       name: "Receitas",

@@ -5,20 +5,27 @@ import { Button, Content, Divider, Header, Title, NavBar, SubTitle } from "./sty
 import { LoadData } from "../../components/LoadData";
 import { ItemMarketplace } from "../../components/ItemMarketplace";
 import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
-import { FlatList, Modal, View, Text } from "react-native";
+import { FlatList, Modal, View, Text, TouchableOpacity } from "react-native";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { useTheme } from "styled-components/native";
 import { database } from "../../services";
 import { Toast } from "react-native-toast-notifications";
+import { Cart } from "../../components/Cart";
+import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCollection";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Items } from "../../components/Items";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 export function Marketplace() {
-  const [activeButton, setActiveButton] = useState("concluidos");
+  const [activeButton, setActiveButton] = useState("items");
   const data = useMarketplaceCollections('Marketplace');
-  const [date, setDate] = useState(new Date());
-  const [formattedDate, setFormattedDate] = useState("");
+  const expense = useFirestoreCollection('Expense');
   const [modalActive, setModalActive] = useState(false);
   const [itemsCount, setItemsCount] = useState(0);
   const [totalValue, setTotalValue] = useState(0);
+  const [selectedItem, setSelectedItem] = useState(false);
+  const [selectedItemData, setSelectedItemData] = useState<ExpenseData | null>(null);
+
   const user = useUserAuth();
   const uid = user?.uid;
   const { COLORS } = useTheme();
@@ -32,17 +39,18 @@ export function Marketplace() {
     setTotalValue(prevTotal => prevTotal + parseFloat(value));
     setModalActive(true);
   };
+
   const handleRemoveItem = (value: string) => {
     setItemsCount(itemsCount - 1);
     setTotalValue(prevTotal => prevTotal - parseFloat(value));
     if (itemsCount - 1 <= 0) {
-      setModalActive(false); 
+      setModalActive(false);
       setItemsCount(0)
       setTotalValue(0)
     }
   };
 
-  const handleCloseModal = () => {
+  const handleSaveList = () => {
     const currentDate = new Date();
     const day = currentDate.getDate();
     const month = currentDate.getMonth() + 1;
@@ -50,26 +58,80 @@ export function Marketplace() {
     const formattedDate = `${day}/${month}/${year}`;
 
     database
-        .collection('Expense')
-        .doc()
-        .set({
-            category: 'mercado',
-            date: formattedDate,
-            valueTransaction: totalValue,
-            type: 'output',
-            uid: uid,
-            month: month
-        })
+      .collection('Expense')
+      .doc()
+      .set({
+        category: 'mercado',
+        date: formattedDate,
+        valueTransaction: totalValue,
+        type: 'output',
+        uid: uid,
+        month: month
+      })
+      .then(() => {
+        Toast.show('Transação adicionada!', { type: 'success' });
+        setModalActive(false);
+        setItemsCount(0);
+        setTotalValue(0);
+      })
+      .catch(error => {
+        console.error('Erro ao adicionar a transação: ', error);
+      });
+  };
+
+  const handleSaveListAgain = (selectedItemData: ExpenseData | null) => {
+    const currentDate = new Date();
+    const day = currentDate.getDate();
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+    const formattedDate = `${day}/${month}/${year}`;
+
+    database
+      .collection('Expense')
+      .doc()
+      .set({
+        category: 'mercado',
+        date: formattedDate,
+        valueTransaction: selectedItemData?.valueTransaction,
+        type: 'output',
+        uid: uid,
+        month: month
+      })
+      .then(() => {
+        Toast.show('Transação adicionada!', { type: 'success' });
+        setModalActive(false);
+        setItemsCount(0);
+        setTotalValue(0);
+      })
+      .catch(error => {
+        console.error('Erro ao adicionar a transação: ', error);
+      });
+  };
+
+  const handleItemSelected = (item: any) => {
+    setSelectedItemData(item);
+    setSelectedItem(true);
+  }
+
+  const handleUseListAgain = () => {
+    if (selectedItemData) {
+      handleSaveListAgain(selectedItemData);
+    }
+    setSelectedItem(false);
+  };
+
+  const handleDeleteList = () => {
+    if (selectedItemData) {
+      database.collection('Expense').doc(selectedItemData.id).delete()
         .then(() => {
-            Toast.show('Transação adicionada!', { type: 'success' });
-            setModalActive(false); 
-            setItemsCount(0);
-            setTotalValue(0);
+          Toast.show('Lista excluída!', { type: 'success' });
         })
         .catch(error => {
-            console.error('Erro ao adicionar a transação: ', error);
+          console.error('Erro ao excluir a lista: ', error);
         });
-};
+    }
+    setSelectedItem(false);
+  };
 
 
   return (
@@ -77,21 +139,21 @@ export function Marketplace() {
       <Container type="SECONDARY" title="Mercado">
         <Content>
           <Header>
-            <Divider style={{ alignSelf: activeButton === "concluidos" ? "flex-start" : "flex-end" }} />
+            <Divider style={{ alignSelf: activeButton === "items" ? "flex-start" : "flex-end" }} />
             <NavBar>
-              <Button onPress={() => handleButtonClick("concluidos")}>
+              <Button onPress={() => handleButtonClick("items")}>
                 <Title>
                   Items
                 </Title>
               </Button>
-              <Button onPress={() => handleButtonClick("pendentes")}>
+              <Button onPress={() => handleButtonClick("lista")}>
                 <Title>
                   Lista
                 </Title>
               </Button>
             </NavBar>
           </Header>
-          {activeButton === "concluidos" &&
+          {activeButton === "items" &&
             <FlatList
               data={data.filter(item => item.uid === uid)}
               renderItem={({ item }) => (
@@ -106,37 +168,127 @@ export function Marketplace() {
               )}
             />
           }
-          {activeButton === "pendentes" && <LoadData image='SECONDARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui!' />}
+          {activeButton === "lista" &&
+            <FlatList
+              data={expense.filter(item => item.uid === uid && item.category === 'mercado')}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => handleItemSelected(item)}>
+                  <Items
+                    type={item.type}
+                    category={item.category}
+                    date={item.date}
+                    repeat={item.repeat}
+                    valueTransaction={formatCurrency(item.valueTransaction)}
+                  />
+                </TouchableOpacity>
+              )}
+            />
+          }
         </Content>
       </Container>
-      {modalActive && (
-        <View style={{ position: 'absolute', bottom: 70, left: 20, backgroundColor: COLORS.TEAL_600, borderTopLeftRadius: 20, borderTopRightRadius: 20, height: 100, width: '100%', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', padding: 10 }}>
+
+      <Modal
+        visible={selectedItem}
+        transparent
+      >
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+
           <View style={{
-            width: '60%'
+            width: 250,
+            height: 80,
+            alignItems: 'center',
+            backgroundColor: COLORS.PURPLE_800,
+            justifyContent: 'center',
+            borderTopEndRadius: 20,
+            borderTopLeftRadius: 20,
           }}>
-            <Text style={{
-              color: COLORS.GRAY_600
-            }}>Itens: {itemsCount}</Text>
-            <Text style={{
-              color: COLORS.GRAY_600
-            }}>Valor Total: {totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
+            <View style={{
+              width: '100%',
+              paddingRight: 10,
+              alignItems: 'flex-end'
+
+            }}>
+              <TouchableOpacity onPress={() => setSelectedItem(false)}>
+                <Text style={{
+                  color: 'white'
+                }}>
+                  X
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{
+              alignItems: 'center'
+            }}>
+              <MaterialCommunityIcons name="cart-variant" size={32} color="white" />
+            </View>
+
           </View>
           <View style={{
-            width: '40%'
+            width: 250,
+            height: 150,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'white',
+            padding: 5,
+            borderBottomEndRadius: 20,
+            borderBottomLeftRadius: 20
           }}>
-            <Button style={{
-              width: '100%',
-              backgroundColor: COLORS.PURPLE_600,
-              height: 60,
-              borderRadius: 20
-            }} onPress={handleCloseModal}>
-              <Title style={{
-                color: COLORS.WHITE
-              }} >Criar lista</Title>
-            </Button>
+            <Text>Lista mercado selecionado </Text>
+            <Text style={{
+              marginBottom: 10
+            }}>
+              Valor: {formatCurrency(selectedItemData?.valueTransaction)}
+            </Text>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              width: '100%'
+            }}>
+              <Button style={{
+                backgroundColor: COLORS.GREEN_700,
+                borderRadius: 20,
+                width: '40%',
+                padding: 5
+              }} onPress={handleUseListAgain}>
+                <Text style={{
+                  color: 'white',
+                  textAlign: 'center'
+                }}>Usar Lista Novamente</Text>
+              </Button>
+              <Button style={{
+                backgroundColor: COLORS.RED_700,
+                borderRadius: 20,
+                width: '40%'
+              }} onPress={handleDeleteList}>
+                <Text style={{
+                  color: 'white'
+                }}>Excluir Lista</Text>
+              </Button>
+            </View>
           </View>
         </View>
+      </Modal>
 
+      {modalActive && (
+        <View style={{
+          position: 'absolute',
+          bottom: 70,
+          left: 20,
+          backgroundColor: COLORS.TEAL_600,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          height: 100, width: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'row',
+          padding: 10
+        }}>
+          <Cart
+            buttonSave={handleSaveList}
+            itemsCount={itemsCount}
+            totalValue={totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          />
+        </View>
       )}
     </DefaultContainer>
   );
