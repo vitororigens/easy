@@ -2,7 +2,7 @@ import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
 import { Content, Divider, Header, Title, ButtonClose, Input, Button } from "./styles";
 import RNPickerSelect from 'react-native-picker-select';
-import { ScrollView, View } from "react-native";
+import { Alert, ScrollView, View } from "react-native";
 import { useState } from "react";
 import { database } from '../../services';
 import { Toast } from "react-native-toast-notifications";
@@ -33,6 +33,10 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
 
 
   const handleSaveItem = () => {
+    if(name === '' || amount === 'NaN' || description ===  '' || selectedCategory === '' || valueItem === 'NaN'){
+      Alert.alert('Atenção!', 'Por favor, preencha todos os campos antes de salvar.');
+      return;
+  }
     database
       .collection('Marketplace')
       .doc()

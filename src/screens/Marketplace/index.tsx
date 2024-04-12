@@ -153,36 +153,45 @@ export function Marketplace() {
               </Button>
             </NavBar>
           </Header>
-          {activeButton === "items" &&
-            <FlatList
-              data={data.filter(item => item.uid === uid)}
-              renderItem={({ item }) => (
-                <ItemMarketplace
-                  removeItem={handleRemoveItem}
-                  addItem={handleAddItem}
-                  measurements={item.measurements}
-                  quantity={item.amount}
-                  title={item.name}
-                  value={item.valueItem}
-                />
-              )}
-            />
-          }
-          {activeButton === "lista" &&
-            <FlatList
-              data={expense.filter(item => item.uid === uid && item.category === 'mercado')}
-              renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleItemSelected(item)}>
-                  <Items
-                    type={item.type}
-                    category={item.category}
-                    date={item.date}
-                    repeat={item.repeat}
-                    valueTransaction={formatCurrency(item.valueTransaction)}
+          {activeButton === "items" && (
+            data.length === 0 ? (
+              <LoadData image='SECONDARY' title='Desculpe!' subtitle='Não há itens disponíveis para exibir aqui!' />
+            ) : (
+              <FlatList
+                data={data.filter(item => item.uid === uid)}
+                renderItem={({ item }) => (
+                  <ItemMarketplace
+                    removeItem={handleRemoveItem}
+                    addItem={handleAddItem}
+                    measurements={item.measurements}
+                    quantity={item.amount}
+                    title={item.name}
+                    value={item.valueItem}
                   />
-                </TouchableOpacity>
-              )}
-            />
+                )}
+              />
+            )
+          )}
+
+          {activeButton === "lista" &&
+            (expense.filter(item => item.uid === uid && item.category === 'mercado').length === 0 && uid !== undefined ? (
+              <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui!' />
+            ) : (
+              <FlatList
+                data={expense.filter(item => item.uid === uid && item.category === 'mercado')}
+                renderItem={({ item }) => (
+                  <TouchableOpacity onPress={() => handleItemSelected(item)}>
+                    <Items
+                      type={item.type}
+                      category={item.category}
+                      date={item.date}
+                      repeat={item.repeat}
+                      valueTransaction={formatCurrency(item.valueTransaction)}
+                    />
+                  </TouchableOpacity>
+                )}
+              />
+            ))
           }
         </Content>
       </Container>
