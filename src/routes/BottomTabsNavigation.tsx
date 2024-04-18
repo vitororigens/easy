@@ -9,6 +9,11 @@ import { PiggyBank } from '../screens/PiggyBank';
 import { Gears } from '../screens/Gears';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { Loading } from '../components/Loading';
+import LogoHome from '../assets/Icones/icones_brokerx_cinza-19.svg'
+import LogoPiggBank from '../assets/Icones/icones_brokerx_cinza-01.svg'
+import LogoOpenCart from '../assets/Icones/icones_brokerx_cinza-25.svg'
+import LogoLineChart from '../assets/Icones/icones_brokerx_cinza-07.svg'
+import LogoGears from '../assets/Icones/icones_brokerx_cinza-32.svg'
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
@@ -42,17 +47,17 @@ export function BottomTabsNavigation() {
                     borderTopLeftRadius: 30
                 },
                 tabBarLabelStyle: {
-                    fontSize: FONTE_SIZE.LG,
-                    fontFamily: FONT_FAMILY.REGULAR,
+                    display: 'none'
                 },
                 tabBarActiveTintColor: COLORS.TEAL_600,
+                
             }}
         >
 
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <FontAwesome name="line-chart" color={color} size={30} />
+                        <LogoLineChart width={50} height={50} fill={color}/>
                     )
                 }}
                 name="Gráficos"
@@ -61,7 +66,7 @@ export function BottomTabsNavigation() {
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <FontAwesome name="opencart" color={color} size={30} />
+                        <LogoOpenCart width={50} height={50} fill={color}/>
                     )
                 }}
                 name="Mercado"
@@ -70,7 +75,7 @@ export function BottomTabsNavigation() {
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <Entypo name="wallet" color={color} size={30} />
+                        <LogoHome width={50} height={50} fill={color}/>
                     )
 
                 }}
@@ -81,7 +86,7 @@ export function BottomTabsNavigation() {
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <FontAwesome5 name="piggy-bank" color={color} size={30} />
+                        <LogoPiggBank width={50} height={50} fill={color}/>
                     )
                 }}
                 name="Cofrinho"
@@ -90,7 +95,7 @@ export function BottomTabsNavigation() {
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <FontAwesome name="gear" color={color} size={30} />
+                        <LogoGears width={50} height={50} fill={color} />
                     )
                 }}
                 name="Config"
