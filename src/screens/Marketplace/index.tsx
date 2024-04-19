@@ -5,7 +5,7 @@ import { Button, Content, Divider, Header, Title, NavBar, SubTitle } from "./sty
 import { LoadData } from "../../components/LoadData";
 import { ItemMarketplace } from "../../components/ItemMarketplace";
 import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
-import { FlatList, Modal, View, Text, TouchableOpacity } from "react-native";
+import { FlatList, Modal, View, Text, TouchableOpacity, Platform } from "react-native";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { useTheme } from "styled-components/native";
 import { database } from "../../services";
@@ -15,6 +15,8 @@ import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCol
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Items } from "../../components/Items";
 import { formatCurrency } from "../../utils/formatCurrency";
+
+const modalBottom = Platform.OS === 'ios' ? 90 : 70;
 
 export function Marketplace() {
   const [activeButton, setActiveButton] = useState("items");
@@ -169,6 +171,7 @@ export function Marketplace() {
                     value={item.valueItem}
                   />
                 )}
+                ListFooterComponent={<View style={{ marginBottom: 70 }} />} 
               />
             )
           )}
@@ -281,7 +284,7 @@ export function Marketplace() {
       {modalActive && (
         <View style={{
           position: 'absolute',
-          bottom: 70,
+          bottom: modalBottom,
           left: 20,
           backgroundColor: COLORS.TEAL_600,
           borderTopLeftRadius: 20,

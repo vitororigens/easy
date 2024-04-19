@@ -67,10 +67,11 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
 
   return (
     <>
+      
+      <DefaultContainer>
       <ButtonClose onPress={closeBottomSheet} >
         <Title style={{ color: 'white' }}>Fechar</Title>
       </ButtonClose>
-      <DefaultContainer>
         <ScrollView
           keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}

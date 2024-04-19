@@ -26,7 +26,7 @@ export function Login() {
                         <Content>
                             <Button onPress={() => handleButtonClick("Entrar")}>
                                 <Title>
-                                    Entrar
+                                    ENTRAR
                                 </Title>
                             </Button>
                             <Button onPress={() => handleButtonClick("Inscrever-se")}>

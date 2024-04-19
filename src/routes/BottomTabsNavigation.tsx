@@ -14,8 +14,10 @@ import LogoPiggBank from '../assets/Icones/icones_brokerx_cinza-01.svg'
 import LogoOpenCart from '../assets/Icones/icones_brokerx_cinza-25.svg'
 import LogoLineChart from '../assets/Icones/icones_brokerx_cinza-07.svg'
 import LogoGears from '../assets/Icones/icones_brokerx_cinza-32.svg'
+import { Platform } from 'react-native';
 
 const { Navigator, Screen } = createBottomTabNavigator();
+const tabBarHeight = Platform.OS === 'ios' ? 80 : 60;
 
 export function BottomTabsNavigation() {
     const { COLORS, FONTE_SIZE, FONT_FAMILY } = useTheme();
@@ -41,7 +43,7 @@ export function BottomTabsNavigation() {
                 tabBarStyle: {
                     position: 'absolute',
                     backgroundColor: COLORS.WHITE,
-                    height: 60,
+                    height: tabBarHeight,
                     borderTopWidth: 0,
                     borderTopRightRadius: 30,
                     borderTopLeftRadius: 30
