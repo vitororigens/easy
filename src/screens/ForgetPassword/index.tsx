@@ -2,7 +2,7 @@ import { Toast } from "react-native-toast-notifications";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import auth from "@react-native-firebase/auth";
-import { Container, LogoContainer, Span, Title } from "./styles";
+import { Container, LogoContainer, Title } from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { DefaultContainer } from "../../components/DefaultContainer";

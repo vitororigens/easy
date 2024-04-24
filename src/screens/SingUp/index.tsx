@@ -9,16 +9,15 @@ import { useTheme } from "styled-components/native";
 import { ActivityIndicator } from "react-native";
 import { database } from "../../services";
 
-
 export function SingUp() {
-    const { COLORS } = useTheme()
+    const { COLORS } = useTheme();
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState({
         name: '',
         email: '',
         password: '',
         confirmPassword: ''
-    })
+    });
     const [errors, setErrors] = useState({
         nameError: '',
         emailError: '',
@@ -29,7 +28,13 @@ export function SingUp() {
     function validateForm() {
         let isValid = true;
 
-        if (!user.name.trim().includes(' ')) {
+        if (!user.name.trim()) {
+            setErrors(prevState => ({
+                ...prevState,
+                nameError: 'O nome é obrigatório.'
+            }));
+            isValid = false;
+        } else if (!user.name.trim().includes(' ')) {
             setErrors(prevState => ({
                 ...prevState,
                 nameError: 'O nome completo deve conter pelo menos um sobrenome.'
@@ -39,7 +44,13 @@ export function SingUp() {
             setErrors(prevState => ({ ...prevState, nameError: '' }));
         }
 
-        if (!/\S+@\S+\.\S+/.test(user.email)) {
+        if (!user.email.trim()) {
+            setErrors(prevState => ({
+                ...prevState,
+                emailError: 'O email é obrigatório.'
+            }));
+            isValid = false;
+        } else if (!/\S+@\S+\.\S+/.test(user.email)) {
             setErrors(prevState => ({
                 ...prevState,
                 emailError: 'O email deve ser válido.'
@@ -49,7 +60,13 @@ export function SingUp() {
             setErrors(prevState => ({ ...prevState, emailError: '' }));
         }
 
-        if (user.password.length < 6) {
+        if (!user.password.trim()) {
+            setErrors(prevState => ({
+                ...prevState,
+                passwordError: 'A senha é obrigatória.'
+            }));
+            isValid = false;
+        } else if (user.password.length < 6) {
             setErrors(prevState => ({
                 ...prevState,
                 passwordError: 'A senha deve conter pelo menos 6 caracteres.'
@@ -59,7 +76,13 @@ export function SingUp() {
             setErrors(prevState => ({ ...prevState, passwordError: '' }));
         }
 
-        if (user.password.trim() !== user.confirmPassword.trim()) {
+        if (!user.confirmPassword.trim()) {
+            setErrors(prevState => ({
+                ...prevState,
+                confirmPasswordError: 'Confirme sua senha.'
+            }));
+            isValid = false;
+        } else if (user.password.trim() !== user.confirmPassword.trim()) {
             setErrors(prevState => ({
                 ...prevState,
                 confirmPasswordError: 'As senhas não coincidem.'
@@ -71,11 +94,12 @@ export function SingUp() {
 
         return isValid;
     }
+
     function handleLogout() {
         auth()
           .signOut()
           .then(() => console.log('User signed out'));
-      }
+    }
 
     function handleRegister() {
         setIsLoading(true);
@@ -129,16 +153,43 @@ export function SingUp() {
             <Title>
                 Entre e faça o controle de suas <Span>finanças pessoais</Span>.
             </Title>
-            {errors.nameError && <Text style={{ color: COLORS.RED_700, marginBottom: 10, marginLeft: 10 }}>{errors.nameError}</Text>}
-            <Input name="user" value={user.name} onChangeText={name => setUser({ ...user, name })} showIcon placeholder="Nome" />
-            {errors.emailError && <Text style={{ color: COLORS.RED_700, marginBottom: 10, marginLeft: 10 }}>{errors.emailError}</Text>}
-            <Input name="envelope" value={user.email} onChangeText={email => setUser({ ...user, email })} showIcon placeholder="Email" />
-            {errors.passwordError && <Text style={{ color: COLORS.RED_700, marginBottom: 10, marginLeft: 10 }}>{errors.passwordError}</Text>}
-            <Input name="lock" value={user.password} onChangeText={password => setUser({ ...user, password })} showIcon placeholder="Senha" passwordType />
-            {errors.confirmPasswordError && <Text style={{ color: COLORS.RED_700, marginBottom: 10, marginLeft: 10 }}>{errors.confirmPasswordError}</Text>}
-            <Input name="lock" value={user.confirmPassword} onChangeText={confirmPassword => setUser({ ...user, confirmPassword })} showIcon placeholder="Confirme a sua senha" passwordType />
+            
+            <Input 
+                name="user" 
+                value={user.name} 
+                onChangeText={name => setUser({ ...user, name })} 
+                showIcon 
+                placeholder="Nome*" 
+            />
+            {errors.nameError && <Text style={{ color: COLORS.RED_700, marginBottom: 20, marginLeft: 10 }}>{errors.nameError}</Text>}
+            <Input 
+                name="envelope" 
+                value={user.email} 
+                onChangeText={email => setUser({ ...user, email })} 
+                showIcon 
+                placeholder="Email*" 
+            />
+            {errors.emailError && <Text style={{ color: COLORS.RED_700, marginBottom: 20, marginLeft: 10 }}>{errors.emailError}</Text>}
+            <Input 
+                name="lock" 
+                value={user.password} 
+                onChangeText={password => setUser({ ...user, password })} 
+                showIcon 
+                placeholder="Senha*" 
+                passwordType 
+            />
+            {errors.passwordError && <Text style={{ color: COLORS.RED_700, marginBottom: 20, marginLeft: 10 }}>{errors.passwordError}</Text>}
+            <Input 
+                name="lock" 
+                value={user.confirmPassword} 
+                onChangeText={confirmPassword => setUser({ ...user, confirmPassword })} 
+                showIcon 
+                placeholder="Confirme a sua senha*" 
+                passwordType 
+            />
+            {errors.confirmPasswordError && <Text style={{ color: COLORS.RED_700, marginBottom: 20, marginLeft: 10 }}>{errors.confirmPasswordError}</Text>}
             <Button title={isLoading ? <ActivityIndicator /> : "Cadastrar"} onPress={handleRegister} disabled={isLoading} />
-            {/* <Content>
+              {/* <Content>
                 <Divider />
                 <SubTitle>
                     Conect-se
