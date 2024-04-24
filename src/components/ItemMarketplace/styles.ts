@@ -50,3 +50,4 @@ export const CartIcon = styled(MaterialCommunityIcons).attrs(({ theme }) => ({
     color: theme.COLORS.GRAY_600,
     size: 32
 }))``;
+

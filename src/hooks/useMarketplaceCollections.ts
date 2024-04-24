@@ -10,6 +10,7 @@ export interface MarketplaceData {
   measurements: string;
   name: string;
   valueItem: string;
+  id:string;
 }
 
 const useMarketplaceCollections = (
@@ -22,7 +23,7 @@ const useMarketplaceCollections = (
       (snapshot: FirebaseFirestoreTypes.QuerySnapshot) => {
         const collectionData: MarketplaceData[] = [];
         snapshot.forEach(doc => {
-          collectionData.push({ uid: doc.id, ...doc.data() } as MarketplaceData);
+          collectionData.push({ id: doc.id, ...doc.data() } as MarketplaceData);
         });
         setData(collectionData);
       }

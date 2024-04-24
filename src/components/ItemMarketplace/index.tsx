@@ -8,44 +8,47 @@ type ItemMarketplaceProps = {
     measurements: string;
     addItem: (value: string) => void;
     removeItem: (value: string) => void;
+    handleDeletItem: () => void
 }
 
-export function ItemMarketplace({ title, quantity, value, measurements, addItem, removeItem }: ItemMarketplaceProps) {
-    const [isTyping, setIsTyping] = useState(false); 
+export function ItemMarketplace({ title, quantity, value, measurements, addItem, removeItem, handleDeletItem }: ItemMarketplaceProps) {
+    const [isTyping, setIsTyping] = useState(false);
     const [quantityValue, setQuantityValue] = useState(1);
     const handleClickAddItem = () => {
-        setIsTyping(true); 
-        addItem(value); 
+        setIsTyping(true);
+        addItem(value);
     };
 
 
     const handleDecreaseQuantity = () => {
-        if (quantityValue > 1) { 
-            setQuantityValue(quantityValue - 1); 
-            
+        if (quantityValue > 1) {
+            setQuantityValue(quantityValue - 1);
+
         }
         removeItem(value)
 
-        if( quantityValue === 1) {
+        if (quantityValue === 1) {
             setIsTyping(false)
             removeItem(value)
         }
     };
 
     const handleIncreaseQuantity = () => {
-        setQuantityValue(quantityValue + 1); 
+        setQuantityValue(quantityValue + 1);
         addItem(value)
     };
 
     return (
         <Container>
-            <CartIcon name="cart-variant"/>
+            <CartIcon name="cart-variant" />
             <Contant >
-                <Title>{title}</Title>
-                <SubTitle>{quantity} {measurements}</SubTitle>
+                <Button onPress={handleDeletItem}>
+                    <Title>{title}</Title>
+                    <SubTitle>{quantity} {measurements}</SubTitle>
+                </Button>
             </Contant>
             <Contant style={{ justifyContent: 'center', alignItems: 'center' }}>
-                {isTyping ? ( 
+                {isTyping ? (
                     <ContainerQuantity>
                         <Button onPress={handleDecreaseQuantity}>
                             <Icon name="minus" />

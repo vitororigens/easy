@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
 import { Button, Content, Divider, Header, Title, NavBar, SubTitle } from "./styles";
 import { LoadData } from "../../components/LoadData";
 import { ItemMarketplace } from "../../components/ItemMarketplace";
-import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
+import useMarketplaceCollections, { MarketplaceData } from "../../hooks/useMarketplaceCollections";
 import { FlatList, Modal, View, Text, TouchableOpacity, Platform } from "react-native";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { useTheme } from "styled-components/native";
@@ -15,6 +15,8 @@ import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCol
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Items } from "../../components/Items";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { Loading } from "../../components/Loading";
+import { CustomModal } from "../../components/CustomModal";
 
 const modalBottom = Platform.OS === 'ios' ? 90 : 70;
 
@@ -26,7 +28,10 @@ export function Marketplace() {
   const [itemsCount, setItemsCount] = useState(0);
   const [totalValue, setTotalValue] = useState(0);
   const [selectedItem, setSelectedItem] = useState(false);
-  const [selectedItemData, setSelectedItemData] = useState<ExpenseData | null>(null);
+  const [selectedListData, setSelectedListData] = useState<ExpenseData | null>(null);
+  const [selectedItemData, setSelectedItemData] = useState<MarketplaceData | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [selectedList, setSelectedList] = useState(false);
 
   const user = useUserAuth();
   const uid = user?.uid;
@@ -110,30 +115,63 @@ export function Marketplace() {
       });
   };
 
+  const handleListSelected = (item: any) => {
+    setSelectedListData(item);
+    setSelectedList(true)
+  }
+
   const handleItemSelected = (item: any) => {
     setSelectedItemData(item);
-    setSelectedItem(true);
+    setSelectedItem(true); 
   }
 
   const handleUseListAgain = () => {
     if (selectedItemData) {
-      handleSaveListAgain(selectedItemData);
+      handleSaveListAgain(selectedListData);
     }
-    setSelectedItem(false);
+    setSelectedList(false);
   };
 
   const handleDeleteList = () => {
-    if (selectedItemData) {
-      database.collection('Expense').doc(selectedItemData.id).delete()
-        .then(() => {
-          Toast.show('Lista excluída!', { type: 'success' });
-        })
-        .catch(error => {
-          console.error('Erro ao excluir a lista: ', error);
-        });
+    console.log("Selected List Data:", selectedListData);
+    if (selectedListData) {
+        database.collection('Expense').doc(selectedListData?.id).delete()
+            .then(() => {
+                Toast.show('Lista excluída!', { type: 'success' });
+            })
+            .catch(error => {
+                console.error('Erro ao excluir a lista: ', error);
+            });
     }
-    setSelectedItem(false);
-  };
+    setSelectedList(false);
+};
+
+
+  const handleDeletItem = () => {
+    if(selectedItemData){
+      database.collection('Marketplace').doc(selectedItemData?.id).delete()
+      .then(() => {
+        Toast.show('Item excluído!', { type: 'success' });
+      })
+      .catch(error => {
+        console.error('Erro ao excluir a Item: ', error);
+      });
+    }
+    setSelectedItem(false)
+  }
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!isLoaded || uid === undefined) {
+    return <Loading />;
+  }
 
 
   return (
@@ -156,13 +194,14 @@ export function Marketplace() {
             </NavBar>
           </Header>
           {activeButton === "items" && (
-            data.length === 0 ? (
-              <LoadData image='SECONDARY' title='Desculpe!' subtitle='Não há itens disponíveis para exibir aqui!' />
+            data.filter(item => item.uid === uid).length === 0 ? (
+              <LoadData image='SECONDARY' title='Desculpe!' subtitle='Não há itens disponíveis para exibir aqui! Clique em "Novo" e adicione um item!' />
             ) : (
               <FlatList
                 data={data.filter(item => item.uid === uid)}
                 renderItem={({ item }) => (
                   <ItemMarketplace
+                    handleDeletItem={() => handleItemSelected(item)}
                     removeItem={handleRemoveItem}
                     addItem={handleAddItem}
                     measurements={item.measurements}
@@ -178,12 +217,12 @@ export function Marketplace() {
 
           {activeButton === "lista" &&
             (expense.filter(item => item.uid === uid && item.category === 'mercado').length === 0 && uid !== undefined ? (
-              <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui!' />
+              <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando itens no seu carrinho e crie sua lista de mercado.' />
             ) : (
               <FlatList
                 data={expense.filter(item => item.uid === uid && item.category === 'mercado')}
                 renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => handleItemSelected(item)}>
+                  <TouchableOpacity onPress={() => handleListSelected(item)}>
                     <Items
                       type={item.type}
                       category={item.category}
@@ -200,7 +239,7 @@ export function Marketplace() {
       </Container>
 
       <Modal
-        visible={selectedItem}
+        visible={selectedList}
         transparent
       >
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -220,7 +259,7 @@ export function Marketplace() {
               alignItems: 'flex-end'
 
             }}>
-              <TouchableOpacity onPress={() => setSelectedItem(false)}>
+              <TouchableOpacity onPress={() => setSelectedList(false)}>
                 <Text style={{
                   color: 'white'
                 }}>
@@ -249,7 +288,7 @@ export function Marketplace() {
             <Text style={{
               marginBottom: 10
             }}>
-              Valor: {formatCurrency(selectedItemData?.valueTransaction)}
+              Valor: {formatCurrency(selectedListData?.valueTransaction)}
             </Text>
             <View style={{
               flexDirection: 'row',
@@ -280,6 +319,18 @@ export function Marketplace() {
           </View>
         </View>
       </Modal>
+      <CustomModal
+        animationType="slide"
+        transparent
+        onCancel={() => setSelectedItem(false)}
+        onClose={() => { setSelectedItem(false); }}
+        onConfirme={() => {
+          setSelectedItem(false);
+          handleDeletItem();
+        }}
+        title="Deseja realmente excluir esse item?"
+        visible={selectedItem}
+      />
 
       {modalActive && (
         <View style={{

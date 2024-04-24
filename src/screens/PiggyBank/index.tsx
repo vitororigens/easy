@@ -71,7 +71,7 @@ export function PiggyBank() {
             <Divider />
           </Header>
           {totalExpense === 0 || totalRevenue === 0 ? (
-            <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui!' />
+            <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui!                          vá para pagina inicial e comece adicionando um novo lançamento de entrada e saida.' />
           ) : (
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
               <PieChart

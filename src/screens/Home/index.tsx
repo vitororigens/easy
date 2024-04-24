@@ -118,6 +118,7 @@ export function Home() {
                       />
                     </TouchableOpacity>
                   )}
+                  
                 />
               )}
             </ContainerItems>

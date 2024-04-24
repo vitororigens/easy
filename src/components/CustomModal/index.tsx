@@ -14,7 +14,7 @@ type CustomModalProps = {
 
 export function CustomModal({ title, visible, onClose, onConfirme, onCancel }: CustomModalProps) {
     return (
-        <Modal visible={visible} onRequestClose={onClose}>
+        <Modal transparent visible={visible} onRequestClose={onClose}>
             <Container>
              <ModalContainer>
                     <Title>{title}</Title>
