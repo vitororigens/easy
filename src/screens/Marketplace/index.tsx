@@ -17,6 +17,7 @@ import { Items } from "../../components/Items";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { Loading } from "../../components/Loading";
 import { CustomModal } from "../../components/CustomModal";
+import { useMonth } from "../../hooks/MonthProvider";
 
 const modalBottom = Platform.OS === 'ios' ? 90 : 70;
 
@@ -33,6 +34,7 @@ export function Marketplace() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedList, setSelectedList] = useState(false);
 
+  const {selectedMonth} = useMonth()
   const user = useUserAuth();
   const uid = user?.uid;
   const { COLORS } = useTheme();
@@ -69,11 +71,14 @@ export function Marketplace() {
       .doc()
       .set({
         category: 'mercado',
+        uid: uid,
         date: formattedDate,
         valueTransaction: totalValue,
+        description: '',
+        repeat: false,
         type: 'output',
-        uid: uid,
         month: month
+        
       })
       .then(() => {
         Toast.show('Transação adicionada!', { type: 'success' });
@@ -98,10 +103,12 @@ export function Marketplace() {
       .doc()
       .set({
         category: 'mercado',
-        date: formattedDate,
-        valueTransaction: selectedItemData?.valueTransaction,
-        type: 'output',
         uid: uid,
+        date: formattedDate,
+        valueTransaction: totalValue,
+        description: '',
+        repeat: false,
+        type: 'output',
         month: month
       })
       .then(() => {
@@ -220,7 +227,7 @@ export function Marketplace() {
               <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando itens no seu carrinho e crie sua lista de mercado.' />
             ) : (
               <FlatList
-                data={expense.filter(item => item.uid === uid && item.category === 'mercado')}
+                data={expense.filter(item => item.uid === uid && item.category === 'mercado' && item.month === selectedMonth )}
                 renderItem={({ item }) => (
                   <TouchableOpacity onPress={() => handleListSelected(item)}>
                     <Items

@@ -5,28 +5,30 @@ import { Button, Content, Divider, Header, Title, NavBar, SubTitle, ContainerIte
 import { Items } from "../../components/Items";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import useFirestoreCollection from "../../hooks/useFirestoreCollection";
-import { FlatList, Modal, TouchableOpacity } from "react-native";
+import { FlatList, Modal, ScrollView, TouchableOpacity } from "react-native";
 import { useTotalValue } from "../../hooks/useTotalValue";
 import { Loading } from "../../components/Loading";
 import { LoadData } from "../../components/LoadData";
 import { Revenue } from "../../components/Revenue";
 import { Expense } from "../../components/Expense";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { useMonth } from "../../hooks/MonthProvider";
 
 export function Home() {
   const user = useUserAuth();
   const [activeButton, setActiveButton] = useState("receitas");
+  const { selectedMonth } = useMonth()
   const uid = user?.uid;
   const revenue = useFirestoreCollection('Revenue');
   const expense = useFirestoreCollection('Expense');
-  const { totalExpense, totalRevenue, totalValue } = useTotalValue(uid || 'Não foi possivel encontrar o uid');
+  const { totalValue, tolalRevenueMunth, totalExpenseMunth } = useTotalValue(uid || 'Não foi possivel encontrar o uid');
   const [confirmRevenueVisible, setConfirmRevenueVisible] = useState(false);
   const [confirmExpenseVisible, setConfirmExpenseVisible] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const formattedRevenue = totalRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  const formattedExpense = totalExpense.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formattedRevenue = tolalRevenueMunth.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formattedExpense = totalExpenseMunth.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const formattedTotalValue = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   function handleRevenueConfirmation(documentId: string) {
@@ -78,10 +80,12 @@ export function Home() {
                 <TitleItems>Histórico</TitleItems>
               </HeaderItems>
               {revenue.filter(item => item.uid === uid).length === 0 ? (
-                <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de entradas' />
+                <ScrollView>
+                  <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de entradas! começe adicionando uma nova entrada.' />
+                </ScrollView>
               ) : (
                 <FlatList
-                  data={revenue.filter(item => item.uid === uid)}
+                  data={revenue.filter(item => item.uid === uid && item.month === selectedMonth)}
                   renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleRevenueConfirmation(item.id)}>
                       <Items
@@ -103,10 +107,12 @@ export function Home() {
                 <TitleItems>Histórico</TitleItems>
               </HeaderItems>
               {expense.filter(item => item.uid === uid).length === 0 ? (
-                <LoadData image='SECONDARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de saídas' />
+                <ScrollView>
+                  <LoadData image='SECONDARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de saídas! Começe lanaçando uma nova saida.' />
+                </ScrollView>
               ) : (
                 <FlatList
-                  data={expense.filter(item => item.uid === uid)}
+                  data={expense.filter(item => item.uid === uid && item.month === selectedMonth)}
                   renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleExpenseConfirmation(item.id)}>
                       <Items

@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { Icon, Background, Button, Container, ContainerMonth, Header, Title } from "./style";
 import { useNavigation } from "@react-navigation/native";
 import RNPickerSelect from 'react-native-picker-select';
@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Modal } from "react-native";
 import { NewTask } from "../../screens/NewTask";
 import { NewItem } from "../../screens/NewItem";
+import { useMonth } from "../../hooks/MonthProvider";
 
 type DefaultContainerProps = {
     children: ReactNode;
@@ -17,24 +18,25 @@ type DefaultContainerProps = {
 
 export function DefaultContainer({ children, backButton = false, monthButton = false, addButton = false, newItem = false }: DefaultContainerProps) {
     const navigation = useNavigation();
-    const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+     const { selectedMonth, setSelectedMonth } = useMonth();
+     console.log('Mês atual', selectedMonth)
     const [showNewTaskModal, setShowNewTaskModal] = useState(false);
     const [showNewItemModal, setShowNewItemModal] = useState(false);
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
     const months = [
-        { id: 0, name: 'Janeiro' },
-        { id: 1, name: 'Fevereiro' },
-        { id: 2, name: 'Março' },
-        { id: 3, name: 'Abril' },
-        { id: 4, name: 'Maio' },
-        { id: 5, name: 'Junho' },
-        { id: 6, name: 'Julho' },
-        { id: 7, name: 'Agosto' },
-        { id: 8, name: 'Setembro' },
-        { id: 9, name: 'Outubro' },
-        { id: 10, name: 'Novembro' },
-        { id: 11, name: 'Dezembro' }
+        { id: 1, name: 'Janeiro' },
+        { id: 2, name: 'Fevereiro' },
+        { id: 3, name: 'Março' },
+        { id: 4, name: 'Abril' },
+        { id: 5, name: 'Maio' },
+        { id: 6, name: 'Junho' },
+        { id: 7, name: 'Julho' },
+        { id: 8, name: 'Agosto' },
+        { id: 9, name: 'Setembro' },
+        { id: 10, name: 'Outubro' },
+        { id: 11, name: 'Novembro' },
+        { id: 12, name: 'Dezembro' }
     ];
 
     function closeModals() {
@@ -53,6 +55,10 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
     function handleNewItem() {
         setShowNewItemModal(true);
     }
+    useEffect(() => {
+        const monthDate = currentDate.getMonth() + 1
+        setSelectedMonth(  monthDate  );
+    }, []);
 
     return (
         <Background>

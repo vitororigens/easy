@@ -42,8 +42,8 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
     };
 
     const handleSaveExpense = () => {
-        if (!selectedCategory || !valueTransaction || !formattedDate || !description) {
-            Alert.alert('Atenção!', 'Por favor, preencha todos os campos antes de salvar.');
+        if (!selectedCategory || !valueTransaction || !formattedDate ) {
+            Alert.alert('Atenção!', 'Por favor, preencha todos os campos obrigatórios antes de salvar.');
             return;
         }
 
@@ -100,7 +100,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
         }
 
         if (!selectedCategory || !valueTransaction || !formattedDate || !description) {
-            Alert.alert('Atenção!', 'Por favor, preencha todos os campos antes de salvar.');
+            Alert.alert('Atenção!', 'Por favor, preencha todos os campos obrigatórios antes de salvar.');
             return;
         }
 
@@ -163,7 +163,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
         <View style={{ flex: 1, padding: 10 }}>
             <ScrollView>
                 <View style={{ height: '20%' }}>
-                    <TitleTask>Valor</TitleTask>
+                    <TitleTask>Valor* </TitleTask>
                     <Input
                         value={valueTransaction}
                         keyboardType="numeric"
@@ -173,7 +173,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 <View style={{ flexDirection: 'row', height: 180, marginBottom: 10 }}>
                     <View style={{ width: '50%', height: 180 }}>
                         <View>
-                            <TitleTask>Data:</TitleTask>
+                            <TitleTask>Data* </TitleTask>
                             <TouchableOpacity style={{ height: 50 }} onPress={showDatePickerModal}>
                                 <Input value={formattedDate} editable={false} />
                             </TouchableOpacity>
@@ -186,7 +186,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                             )}
                         </View>
                         <View>
-                            <TitleTask style={{ marginTop: 20 }}>Categorias:</TitleTask>
+                            <TitleTask style={{ marginTop: 20 }}>Categorias* </TitleTask>
                             <View style={{ height: 50 }}>
                                 <RNPickerSelect
                                     onValueChange={(value) => setSelectedCategory(value)}

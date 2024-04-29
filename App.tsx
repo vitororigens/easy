@@ -4,9 +4,9 @@ import { ThemeProvider } from 'styled-components';
 import { StatusBar } from 'react-native';
 import { Loading } from './src/components/Loading';
 import theme from './src/theme';
-import { Login } from './src/screens/Login'
 import { ToastProvider } from 'react-native-toast-notifications';
 import { Routes } from './src/routes';
+import { MonthProvider } from './src/hooks/MonthProvider'
 
 
 export default function App() {
@@ -17,14 +17,16 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <ToastProvider>
-        <StatusBar
-          barStyle='light-content'
-          backgroundColor='transparent'
-          translucent
-        />
-        {fontLoader ? <Routes /> : <Loading />}
-      </ToastProvider>
+      <MonthProvider>
+        <ToastProvider>
+          <StatusBar
+            barStyle='light-content'
+            backgroundColor='transparent'
+            translucent
+          />
+          {fontLoader ? <Routes /> : <Loading />}
+        </ToastProvider>
+      </MonthProvider>
     </ThemeProvider>
   );
 }

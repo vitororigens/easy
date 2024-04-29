@@ -25,7 +25,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
     const [formattedDate, setFormattedDate] = useState("");
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [repeat, setRepeat] = useState(false);
-    const [isEditing, setIsEditing] = useState(false); // Estado para controlar o modo de edição
+    const [isEditing, setIsEditing] = useState(false); 
 
     const uid = user?.uid
 
@@ -44,8 +44,8 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
 
 
     function handleSaveRevenue() {
-        if (!selectedCategory || !valueTransaction || !formattedDate || !description) {
-            Alert.alert('Atenção!', 'Por favor, preencha todos os campos antes de salvar.')
+        if (!selectedCategory || !valueTransaction || !formattedDate) {
+            Alert.alert('Atenção!', 'Por favor, preencha os campos obrigatório antes de salvar.')
             return;
         }
 
@@ -67,7 +67,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 month: monthNumber
             })
             .then(() => {
-                Toast.show('Transação adicionada!', { type: 'sucess' })
+                Toast.show('Transação adicionada!', { type: 'success' });
                 setDescription('');
                 setFormattedDate('');
                 setRepeat(false);
@@ -84,8 +84,8 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
             return;
         }
 
-        if (!selectedCategory || !valueTransaction || !formattedDate || !description) {
-            Alert.alert('Atenção!', 'Por favor, preencha todos os campos antes de salvar.')
+        if (!selectedCategory || !valueTransaction || !formattedDate) {
+            Alert.alert('Atenção!', 'Por favor, preencha todos os campos obrigatórios antes de salvar.')
             return;
         }
 
@@ -112,7 +112,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 setFormattedDate('');
                 setRepeat(false);
                 setValuetransaction('');
-                setIsEditing(false); 
+                setIsEditing(false);
                 if (onCloseModal) {
                     onCloseModal();
                 }
@@ -153,7 +153,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                         setFormattedDate(data.date);
                         setRepeat(data.repeat);
                         setDate(new Date(data.date));
-                        setIsEditing(true); // Entrar no modo de edição
+                        setIsEditing(true); 
                     } else {
                         console.log('Dados do documento estão vazios!');
                     }
@@ -170,7 +170,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
         <View style={{ flex: 1, padding: 10 }}>
             <ScrollView>
                 <View style={{ height: '20%' }}>
-                    <TitleTask>Valor</TitleTask>
+                    <TitleTask>Valor* </TitleTask>
                     <Input
                         value={valueTransaction}
                         keyboardType="numeric"
@@ -180,7 +180,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 <View style={{ flexDirection: 'row', height: 180, marginBottom: 10 }}>
                     <View style={{ width: '50%', height: 180 }}>
                         <View>
-                            <TitleTask>Data:</TitleTask>
+                            <TitleTask>Data*</TitleTask>
                             <TouchableOpacity style={{ height: 50 }} onPress={showDatePickerModal}>
                                 <Input value={formattedDate} editable={false} />
                             </TouchableOpacity>
@@ -193,7 +193,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                             )}
                         </View>
                         <View>
-                            <TitleTask style={{ marginTop: 20 }}>Categorias:</TitleTask>
+                            <TitleTask style={{ marginTop: 20 }}>Categorias*</TitleTask>
                             <View style={{ height: 50 }}>
                                 <RNPickerSelect
                                     onValueChange={(value) => setSelectedCategory(value)}
@@ -201,6 +201,8 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                                         { label: 'Salário', value: 'salario' },
                                         { label: 'Vendas', value: 'vendas' },
                                         { label: 'Investimentos', value: 'investimentos' },
+                                        { label: 'Comissão', value: 'Comissão' },
+                                        { label: 'Adiantamentos', value: 'Adiantamentos'}
                                     ]}
                                     value={selectedCategory}
                                     placeholder={{ label: 'Selecione', value: 'Selecione' }}

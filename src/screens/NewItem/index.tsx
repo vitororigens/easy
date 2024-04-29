@@ -17,7 +17,6 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedMeasurements, setSelectedMeasurements] = useState('');
   const [valueItem, setValueItem] = useState('');
-  console.log(valueItem)
   const [name, setName] = useState('')
   const [amount, setAmount] = useState('')
   const [description, setDescription] = useState('');
@@ -33,8 +32,8 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
 
 
   const handleSaveItem = () => {
-    if(name === '' || amount === 'NaN' || description ===  '' || selectedCategory === '' || valueItem === 'NaN'){
-      Alert.alert('Atenção!', 'Por favor, preencha todos os campos antes de salvar.');
+    if(name === '' || amount === 'NaN'  || selectedCategory === '' || valueItem === 'NaN'){
+      Alert.alert('Atenção!', 'Por favor, preencha todos os campos obriatórios antes de salvar.');
       return;
   }
     database
@@ -83,7 +82,7 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
             <Content>
 
               <Title>
-                Nome
+                Nome* 
               </Title>
               <Input
               value={name}
@@ -100,7 +99,7 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
                   paddingRight: 20
                 }}>
                   <Title>
-                    Quantidade
+                    Quantidade* 
                   </Title>
                   <Input
                     value={formatQuantity(amount)}
@@ -129,7 +128,7 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
                 </View>
               </View>
               <Title>
-                Preço
+                Preço* 
               </Title>
               <Input
                 placeholder="0,00"
@@ -140,7 +139,7 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
 
 
               <Title>
-                Categoria
+                Categoria* 
               </Title>
               <RNPickerSelect
                 onValueChange={(value) => setSelectedCategory(value)}
