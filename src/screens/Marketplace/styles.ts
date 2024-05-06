@@ -53,3 +53,8 @@ color: ${({theme, type}) => type === 'PRIMARY'
     ? theme.COLORS.TEAL_600 
     : theme.COLORS.PURPLE_800};
 `;
+
+
+export const ButtonClose = styled(TouchableOpacity)`
+    height: 40px;
+`;

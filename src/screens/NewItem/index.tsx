@@ -14,11 +14,11 @@ type Props = {
 }
 
 export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('geral');
   const [selectedMeasurements, setSelectedMeasurements] = useState('');
-  const [valueItem, setValueItem] = useState('');
+  const [valueItem, setValueItem] = useState('0');
   const [name, setName] = useState('')
-  const [amount, setAmount] = useState('')
+  const [amount, setAmount] = useState('1')
   const [description, setDescription] = useState('');
   const user = useUserAuth();
   const uid = user?.uid;
@@ -32,7 +32,7 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
 
 
   const handleSaveItem = () => {
-    if(name === '' || amount === 'NaN'  || selectedCategory === '' || valueItem === 'NaN'){
+    if(name === '' ){
       Alert.alert('Atenção!', 'Por favor, preencha todos os campos obriatórios antes de salvar.');
       return;
   }
@@ -99,7 +99,7 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
                   paddingRight: 20
                 }}>
                   <Title>
-                    Quantidade* 
+                    Quantidade
                   </Title>
                   <Input
                     value={formatQuantity(amount)}
@@ -128,7 +128,7 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
                 </View>
               </View>
               <Title>
-                Preço* 
+                Preço
               </Title>
               <Input
                 placeholder="0,00"
@@ -139,7 +139,7 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
 
 
               <Title>
-                Categoria* 
+                Categoria
               </Title>
               <RNPickerSelect
                 onValueChange={(value) => setSelectedCategory(value)}

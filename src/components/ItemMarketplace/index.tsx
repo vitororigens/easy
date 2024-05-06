@@ -9,10 +9,10 @@ type ItemMarketplaceProps = {
     measurements: string;
     addItem: (value: string) => void;
     removeItem: (value: string) => void;
-    handleDeletItem: () => void
+    onEditItem: () => void;
 }
 
-export function ItemMarketplace({ title, quantity, value, measurements, addItem, removeItem, handleDeletItem }: ItemMarketplaceProps) {
+export function ItemMarketplace({ title, quantity, value, measurements, addItem, removeItem, onEditItem }: ItemMarketplaceProps) {
     const {COLORS} = useTheme()
     const [isTyping, setIsTyping] = useState(false);
     const [quantityValue, setQuantityValue] = useState(1);
@@ -44,7 +44,7 @@ export function ItemMarketplace({ title, quantity, value, measurements, addItem,
         <Container>
             <CartIcon name="cart-variant" />
             <Contant >
-                <Button onPress={handleDeletItem}>
+                <Button onPress={onEditItem}>
                     <Title style={{
                         textDecorationLine: isTyping ? 'line-through' : 'none',
                         color: isTyping ? COLORS.GRAY_400 : COLORS.GRAY_600

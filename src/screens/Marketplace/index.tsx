@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Button, Content, Divider, Header, Title, NavBar, SubTitle } from "./styles";
+import { Button, Content, Divider, Header, Title, NavBar, SubTitle, ButtonClose } from "./styles";
 import { LoadData } from "../../components/LoadData";
 import { ItemMarketplace } from "../../components/ItemMarketplace";
 import useMarketplaceCollections, { MarketplaceData } from "../../hooks/useMarketplaceCollections";
@@ -13,29 +13,31 @@ import { Toast } from "react-native-toast-notifications";
 import { Cart } from "../../components/Cart";
 import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCollection";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Items } from "../../components/Items";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { Loading } from "../../components/Loading";
-import { CustomModal } from "../../components/CustomModal";
 import { useMonth } from "../../hooks/MonthProvider";
 import { ListItem } from "../../components/ListItem";
+import { NewItem } from "../NewItem";
 
 const modalBottom = Platform.OS === 'ios' ? 90 : 70;
 
 export function Marketplace() {
   const [activeButton, setActiveButton] = useState("items");
+  const [confirmItemVisible, setConfirmItemVisible] = useState(false)
   const data = useMarketplaceCollections('Marketplace');
   const expense = useFirestoreCollection('Expense');
   const [modalActive, setModalActive] = useState(false);
   const [itemsCount, setItemsCount] = useState(0);
   const [totalValue, setTotalValue] = useState(0);
+  const [selectedItemId, setSelectedItemId] = useState<MarketplaceData | null>(null);
   const [selectedItem, setSelectedItem] = useState(false);
   const [selectedListData, setSelectedListData] = useState<ExpenseData | null>(null);
   const [selectedItemData, setSelectedItemData] = useState<MarketplaceData | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedList, setSelectedList] = useState(false);
+  console.log(selectedItemData)
 
-  const {selectedMonth} = useMonth()
+  const { selectedMonth } = useMonth()
   const user = useUserAuth();
   const uid = user?.uid;
   const { COLORS } = useTheme();
@@ -79,7 +81,7 @@ export function Marketplace() {
         repeat: false,
         type: 'output',
         month: month
-        
+
       })
       .then(() => {
         Toast.show('Transação adicionada!', { type: 'success' });
@@ -92,82 +94,33 @@ export function Marketplace() {
       });
   };
 
-  const handleSaveListAgain = (selectedItemData: ExpenseData | null) => {
-    const currentDate = new Date();
-    const day = currentDate.getDate();
-    const month = currentDate.getMonth() + 1;
-    const year = currentDate.getFullYear();
-    const formattedDate = `${day}/${month}/${year}`;
 
-    database
-      .collection('Expense')
-      .doc()
-      .set({
-        category: 'mercado',
-        uid: uid,
-        date: formattedDate,
-        valueTransaction: totalValue,
-        description: '',
-        repeat: false,
-        type: 'output',
-        month: month
-      })
-      .then(() => {
-        Toast.show('Transação adicionada!', { type: 'success' });
-        setModalActive(false);
-        setItemsCount(0);
-        setTotalValue(0);
-      })
-      .catch(error => {
-        console.error('Erro ao adicionar a transação: ', error);
-      });
-  };
-
-  const handleListSelected = (item: any) => {
-    setSelectedListData(item);
-    setSelectedList(true)
+  const handleEditItem = (item: MarketplaceData) => {
+    setConfirmItemVisible(true)
+    setSelectedItemId(item)
   }
 
-  const handleItemSelected = (item: any) => {
+  const handleItemSelected = (item: MarketplaceData) => {
+
     setSelectedItemData(item);
-    setSelectedItem(true); 
+    setSelectedItem(true);
   }
 
-  const handleUseListAgain = () => {
-    if (selectedItemData) {
-      handleSaveListAgain(selectedListData);
-    }
-    setSelectedList(false);
-  };
 
-  const handleDeleteList = () => {
-    console.log("Selected List Data:", selectedListData);
-    if (selectedListData) {
-        database.collection('Expense').doc(selectedListData?.id).delete()
-            .then(() => {
-                Toast.show('Lista excluída!', { type: 'success' });
-            })
-            .catch(error => {
-                console.error('Erro ao excluir a lista: ', error);
-            });
-    }
-    setSelectedList(false);
-};
 
 
   const handleDeletItem = () => {
-    if(selectedItemData){
+    if (selectedItemData) {
       database.collection('Marketplace').doc(selectedItemData?.id).delete()
-      .then(() => {
-        Toast.show('Item excluído!', { type: 'success' });
-      })
-      .catch(error => {
-        console.error('Erro ao excluir a Item: ', error);
-      });
+        .then(() => {
+          Toast.show('Item excluído!', { type: 'success' });
+        })
+        .catch(error => {
+          console.error('Erro ao excluir a Item: ', error);
+        });
     }
     setSelectedItem(false)
   }
-
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -181,7 +134,6 @@ export function Marketplace() {
     return <Loading />;
   }
 
-
   return (
     <DefaultContainer monthButton newItem>
       <Container type="SECONDARY" title="Mercado">
@@ -191,17 +143,32 @@ export function Marketplace() {
             <NavBar>
               <Button onPress={() => handleButtonClick("items")}>
                 <Title>
-                  Items
+                  Lista
                 </Title>
               </Button>
               <Button onPress={() => handleButtonClick("lista")}>
                 <Title>
-                  Lista
+                  Carrinho
                 </Title>
               </Button>
             </NavBar>
           </Header>
-          {activeButton === "items" && (
+
+          {activeButton === "items" &&
+            (expense.filter(item => item.uid === uid && item.category === 'mercado').length === 0 && uid !== undefined ? (
+              <ScrollView>
+                <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando itens no seu carrinho e crie sua lista de mercado.' />
+              </ScrollView>
+            ) : (
+              <FlatList
+                data={data.filter(item => item.uid === uid)}
+                renderItem={({ item }) => (
+                  <ListItem title={item.name} />
+                )}
+              />
+            ))
+          }
+          {activeButton === "lista" && (
             data.filter(item => item.uid === uid).length === 0 ? (
               <ScrollView>
                 <LoadData image='SECONDARY' title='Desculpe!' subtitle='Não há itens disponíveis para exibir aqui! Clique em "Novo" e adicione um item!' />
@@ -211,7 +178,7 @@ export function Marketplace() {
                 data={data.filter(item => item.uid === uid)}
                 renderItem={({ item }) => (
                   <ItemMarketplace
-                    handleDeletItem={() => handleItemSelected(item)}
+                    onEditItem={() => handleItemSelected(item)}
                     removeItem={handleRemoveItem}
                     addItem={handleAddItem}
                     measurements={item.measurements}
@@ -220,36 +187,18 @@ export function Marketplace() {
                     value={item.valueItem}
                   />
                 )}
-                ListFooterComponent={<View style={{ marginBottom: 70 }} />} 
+                ListFooterComponent={<View style={{ marginBottom: 70 }} />}
               />
             )
           )}
-
-          {activeButton === "lista" &&
-            (expense.filter(item => item.uid === uid && item.category === 'mercado').length === 0 && uid !== undefined ? (
-              <ScrollView>
-                <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando itens no seu carrinho e crie sua lista de mercado.' />
-              </ScrollView>
-            ) : (
-              <FlatList
-              data={data.filter(item => item.uid === uid)}
-                renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => handleListSelected(item)}>
-                  <ListItem title={item.name}/>
-                  </TouchableOpacity>
-                )}
-              />
-            ))
-          }
         </Content>
       </Container>
 
       <Modal
-        visible={selectedList}
+        visible={selectedItem}
         transparent
       >
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
-
           <View style={{
             width: 250,
             height: 80,
@@ -263,9 +212,8 @@ export function Marketplace() {
               width: '100%',
               paddingRight: 10,
               alignItems: 'flex-end'
-
             }}>
-              <TouchableOpacity onPress={() => setSelectedList(false)}>
+              <TouchableOpacity onPress={() => setSelectedItem(false)}>
                 <Text style={{
                   color: 'white'
                 }}>
@@ -278,7 +226,6 @@ export function Marketplace() {
             }}>
               <MaterialCommunityIcons name="cart-variant" size={32} color="white" />
             </View>
-
           </View>
           <View style={{
             width: 250,
@@ -290,11 +237,11 @@ export function Marketplace() {
             borderBottomEndRadius: 20,
             borderBottomLeftRadius: 20
           }}>
-            <Text>Lista mercado selecionado </Text>
+            <Text>Item selecionado </Text>
             <Text style={{
               marginBottom: 10
             }}>
-              Valor: {formatCurrency(selectedListData?.valueTransaction)}
+              Valor: {selectedItemData?.name}
             </Text>
             <View style={{
               flexDirection: 'row',
@@ -306,38 +253,47 @@ export function Marketplace() {
                 borderRadius: 20,
                 width: '40%',
                 padding: 5
-              }} onPress={handleUseListAgain}>
+              }} onPress={() => {
+                setSelectedItem(false); // Definindo selectedItem como false
+                if (selectedItemData) {
+
+                  handleEditItem(selectedItemData);
+                }
+              }}>
                 <Text style={{
                   color: 'white',
                   textAlign: 'center'
-                }}>Usar Lista Novamente</Text>
+                }}>Editar Item</Text>
               </Button>
+
+
               <Button style={{
                 backgroundColor: COLORS.RED_700,
                 borderRadius: 20,
+                height: 30,
                 width: '40%'
-              }} onPress={handleDeleteList}>
+              }} onPress={() => {
+                setSelectedItem(false);
+                handleDeletItem();
+              }}>
                 <Text style={{
                   color: 'white'
-                }}>Excluir Lista</Text>
+                }}>Excluir Item</Text>
               </Button>
             </View>
           </View>
         </View>
       </Modal>
-      <CustomModal
-        animationType="slide"
-        transparent
-        onCancel={() => setSelectedItem(false)}
-        onClose={() => { setSelectedItem(false); }}
-        onConfirme={() => {
-          setSelectedItem(false);
-          handleDeletItem();
-        }}
-        title="Deseja realmente excluir esse item?"
-        visible={selectedItem}
-      />
-
+      <Modal visible={confirmItemVisible} onRequestClose={() => setConfirmItemVisible(false)}>
+        <DefaultContainer>
+          <ButtonClose onPress={() => setConfirmItemVisible(false)} >
+            <Title style={{ color: 'white' }}>Fechar</Title>
+          </ButtonClose>
+          <Container type="SECONDARY" title={'Editar Saída'}>
+            <NewItem closeBottomSheet={() => setConfirmItemVisible(false)} />
+          </Container>
+        </DefaultContainer>
+      </Modal>
       {modalActive && (
         <View style={{
           position: 'absolute',
