@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, CartIcon, Container, ContainerQuantity, Contant, Icon, SubTitle, Title } from "./styles";
+import { useTheme } from "styled-components/native";
 
 type ItemMarketplaceProps = {
     title: string;
@@ -12,6 +13,7 @@ type ItemMarketplaceProps = {
 }
 
 export function ItemMarketplace({ title, quantity, value, measurements, addItem, removeItem, handleDeletItem }: ItemMarketplaceProps) {
+    const {COLORS} = useTheme()
     const [isTyping, setIsTyping] = useState(false);
     const [quantityValue, setQuantityValue] = useState(1);
     const handleClickAddItem = () => {
@@ -45,6 +47,7 @@ export function ItemMarketplace({ title, quantity, value, measurements, addItem,
                 <Button onPress={handleDeletItem}>
                     <Title style={{
                         textDecorationLine: isTyping ? 'line-through' : 'none',
+                        color: isTyping ? COLORS.GRAY_400 : COLORS.GRAY_600
                     }}>{title}</Title>
                     <SubTitle>{quantity} {measurements}</SubTitle>
                 </Button>

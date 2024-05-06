@@ -5,7 +5,7 @@ import { Button, Content, Divider, Header, Title, NavBar, SubTitle } from "./sty
 import { LoadData } from "../../components/LoadData";
 import { ItemMarketplace } from "../../components/ItemMarketplace";
 import useMarketplaceCollections, { MarketplaceData } from "../../hooks/useMarketplaceCollections";
-import { FlatList, Modal, View, Text, TouchableOpacity, Platform } from "react-native";
+import { FlatList, Modal, View, Text, TouchableOpacity, Platform, ScrollView } from "react-native";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { useTheme } from "styled-components/native";
 import { database } from "../../services";
@@ -18,6 +18,7 @@ import { formatCurrency } from "../../utils/formatCurrency";
 import { Loading } from "../../components/Loading";
 import { CustomModal } from "../../components/CustomModal";
 import { useMonth } from "../../hooks/MonthProvider";
+import { ListItem } from "../../components/ListItem";
 
 const modalBottom = Platform.OS === 'ios' ? 90 : 70;
 
@@ -202,7 +203,9 @@ export function Marketplace() {
           </Header>
           {activeButton === "items" && (
             data.filter(item => item.uid === uid).length === 0 ? (
-              <LoadData image='SECONDARY' title='Desculpe!' subtitle='Não há itens disponíveis para exibir aqui! Clique em "Novo" e adicione um item!' />
+              <ScrollView>
+                <LoadData image='SECONDARY' title='Desculpe!' subtitle='Não há itens disponíveis para exibir aqui! Clique em "Novo" e adicione um item!' />
+              </ScrollView>
             ) : (
               <FlatList
                 data={data.filter(item => item.uid === uid)}
@@ -224,19 +227,15 @@ export function Marketplace() {
 
           {activeButton === "lista" &&
             (expense.filter(item => item.uid === uid && item.category === 'mercado').length === 0 && uid !== undefined ? (
-              <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando itens no seu carrinho e crie sua lista de mercado.' />
+              <ScrollView>
+                <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando itens no seu carrinho e crie sua lista de mercado.' />
+              </ScrollView>
             ) : (
               <FlatList
-                data={expense.filter(item => item.uid === uid && item.category === 'mercado' && item.month === selectedMonth )}
+              data={data.filter(item => item.uid === uid)}
                 renderItem={({ item }) => (
                   <TouchableOpacity onPress={() => handleListSelected(item)}>
-                    <Items
-                      type={item.type}
-                      category={item.category}
-                      date={item.date}
-                      repeat={item.repeat}
-                      valueTransaction={formatCurrency(item.valueTransaction)}
-                    />
+                  <ListItem title={item.name}/>
                   </TouchableOpacity>
                 )}
               />
