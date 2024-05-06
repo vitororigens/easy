@@ -43,7 +43,9 @@ export function ItemMarketplace({ title, quantity, value, measurements, addItem,
             <CartIcon name="cart-variant" />
             <Contant >
                 <Button onPress={handleDeletItem}>
-                    <Title>{title}</Title>
+                    <Title style={{
+                        textDecorationLine: isTyping ? 'line-through' : 'none',
+                    }}>{title}</Title>
                     <SubTitle>{quantity} {measurements}</SubTitle>
                 </Button>
             </Contant>
