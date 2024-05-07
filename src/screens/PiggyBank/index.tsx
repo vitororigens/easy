@@ -64,7 +64,7 @@ export function PiggyBank() {
   }
 
   return (
-    <DefaultContainer>
+    <DefaultContainer newLaunch>
       <Container type="SECONDARY" title="Cofrinho">
         <Content>
           <Header>

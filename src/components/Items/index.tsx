@@ -31,9 +31,9 @@ export function Items({ category, date, valueTransaction, repeat, alert, status,
 
     return (
         <Container>
-                {type === 'input' && (
+            {type === 'input' && (
                 <>
-                <Icon style={{ backgroundColor: COLORS.GREEN_700 }} type={statusPayment}>
+                    <Icon style={{ backgroundColor: COLORS.GREEN_700 }} type={statusPayment}>
                         <AntDesign name="infocirlce" size={24} color="white" />
                     </Icon>
                     <Content>
@@ -55,7 +55,7 @@ export function Items({ category, date, valueTransaction, repeat, alert, status,
                                 {date}
                             </SubTitle>
                             <SubTitle>
-                                Atrasado
+                                {typeMode}
                             </SubTitle>
                         </ContentItems>
                     </Content>

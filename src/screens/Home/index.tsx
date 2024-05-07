@@ -21,7 +21,7 @@ export function Home() {
   const uid = user?.uid;
   const revenue = useFirestoreCollection('Revenue');
   const expense = useFirestoreCollection('Expense');
- 
+
   const { totalValue, tolalRevenueMunth, totalExpenseMunth } = useTotalValue(uid || 'Não foi possivel encontrar o uid');
   const [confirmRevenueVisible, setConfirmRevenueVisible] = useState(false);
   const [confirmExpenseVisible, setConfirmExpenseVisible] = useState(false);
@@ -86,13 +86,13 @@ export function Home() {
                   <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de entradas! começe adicionando uma nova entrada.' />
                 </ScrollView>
               ) : (
-                
+
                 <FlatList
                   data={revenue.filter(item => item.uid === uid && item.month === selectedMonth)}
                   renderItem={({ item }) => (
-                   
+
                     <TouchableOpacity onPress={() => handleRevenueConfirmation(item.id)}>
-                      <Items 
+                      <Items
                         type={item.type}
                         category={item.category}
                         date={item.date}
@@ -120,7 +120,7 @@ export function Home() {
                   renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleExpenseConfirmation(item.id)}>
                       <Items
-                      status={item.status}
+                        status={item.status}
                         type={item.type}
                         category={item.category}
                         date={item.date}
@@ -129,7 +129,7 @@ export function Home() {
                       />
                     </TouchableOpacity>
                   )}
-                  
+
                 />
               )}
             </ContainerItems>

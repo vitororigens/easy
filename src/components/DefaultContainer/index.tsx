@@ -7,6 +7,7 @@ import { Modal } from "react-native";
 import { NewTask } from "../../screens/NewTask";
 import { NewItem } from "../../screens/NewItem";
 import { useMonth } from "../../hooks/MonthProvider";
+import { NewLaunch } from "../../screens/NewLaunch";
 
 type DefaultContainerProps = {
     children: ReactNode;
@@ -14,14 +15,16 @@ type DefaultContainerProps = {
     monthButton?: boolean;
     addButton?: boolean;
     newItem?: boolean;
+    newLaunch?: boolean;
 }
 
-export function DefaultContainer({ children, backButton = false, monthButton = false, addButton = false, newItem = false }: DefaultContainerProps) {
+export function DefaultContainer({ children, backButton = false, monthButton = false, addButton = false, newItem = false, newLaunch = false }: DefaultContainerProps) {
     const navigation = useNavigation();
      const { selectedMonth, setSelectedMonth } = useMonth();
      console.log('Mês atual', selectedMonth)
     const [showNewTaskModal, setShowNewTaskModal] = useState(false);
     const [showNewItemModal, setShowNewItemModal] = useState(false);
+    const [showNewLaunchModal, setShowNewLaunchModal] = useState(false);
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
     const months = [
@@ -42,6 +45,7 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
     function closeModals() {
         setShowNewTaskModal(false);
         setShowNewItemModal(false);
+        setShowNewLaunchModal(false);
     }
 
     function handleGoBack() {
@@ -54,6 +58,9 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
 
     function handleNewItem() {
         setShowNewItemModal(true);
+    }
+    function handleNewLaunch() {
+        setShowNewLaunchModal(true);
     }
     useEffect(() => {
         const monthDate = currentDate.getMonth() + 1
@@ -140,6 +147,18 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                             <Icon name="add" />
                         </Button>
                     )}
+                      {newLaunch && (
+                        <Button style={{
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                            height: 60
+                        }} onPress={handleNewLaunch}>
+                            <Title>
+                                Novo
+                            </Title>
+                            <Icon name="add" />
+                        </Button>
+                    )}
                 </Header>
                 {children}
                 <Modal
@@ -157,6 +176,14 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                     onRequestClose={closeModals}
                 >
                     <NewItem closeBottomSheet={closeModals}  showButtonSave/>
+                </Modal>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={showNewLaunchModal}
+                    onRequestClose={closeModals}
+                >
+                    <NewLaunch closeBottomSheet={closeModals}  showButtonSave/>
                 </Modal>
             </Container>
         </Background>
