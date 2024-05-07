@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { ScrollView } from "react-native";
+//
+import { Content, Divider, Header, Title, NavBar,  ButtonBar,  ButtonClose } from "./styles";
+//
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Content, Divider, Header, Title, NavBar,  ButtonBar, Button,  ButtonClose } from "./styles";
-import { ScrollView } from "react-native";
 import { Revenue } from '../../components/Revenue';
 import { Expense } from '../../components/Expense';
 

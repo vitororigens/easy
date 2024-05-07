@@ -32,31 +32,3 @@ export const Text = styled.Text`
     margin-bottom: 40px;
     margin-top: 20px;
 `;
-
-
-export const Divider = styled.View`
-    width: 100px;
-    height: 2px;
-    background-color: ${({theme}) => theme.COLORS.GRAY_600};
-`;
-
-export const SubTitle = styled.Text`
-    font-size: ${({theme}) => theme.FONTE_SIZE.SM}px;
-    font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-    color: ${({theme}) => theme.COLORS.GRAY_600};
-`;
-export const Content = styled.View`
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 5px;
-`;
-
-export const ContentIcon = styled.View`
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-    padding: 20px;
-`;

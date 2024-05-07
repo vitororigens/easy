@@ -12,7 +12,8 @@ import { LoadData } from "../../components/LoadData";
 import { Revenue } from "../../components/Revenue";
 import { Expense } from "../../components/Expense";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { useMonth } from "../../hooks/MonthProvider";
+import { useMonth } from "../../context/MonthProvider";
+
 
 export function Home() {
   const user = useUserAuth();

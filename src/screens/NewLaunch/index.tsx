@@ -1,13 +1,15 @@
+import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Toast } from "react-native-toast-notifications";
+import { useEffect, useState } from "react";
+//
+import { Content, Divider, Header, Title, ButtonClose, Input, Button } from "./styles";
+//
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Content, Divider, Header, Title, ButtonClose, Input, Button } from "./styles";
-import RNPickerSelect from 'react-native-picker-select';
-import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
-import { useEffect, useState } from "react";
-import { database } from '../../services';
-import { Toast } from "react-native-toast-notifications";
+//
 import { useUserAuth } from "../../hooks/useUserAuth";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { database } from '../../services';
 
 type Props = {
   closeBottomSheet?: () => void;

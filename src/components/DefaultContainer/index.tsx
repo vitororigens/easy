@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Modal } from "react-native";
 import { NewTask } from "../../screens/NewTask";
 import { NewItem } from "../../screens/NewItem";
-import { useMonth } from "../../hooks/MonthProvider";
+import { useMonth } from "../../context/MonthProvider";
 import { NewLaunch } from "../../screens/NewLaunch";
 
 type DefaultContainerProps = {

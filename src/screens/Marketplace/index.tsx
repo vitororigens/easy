@@ -15,9 +15,10 @@ import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCol
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { formatCurrency } from "../../utils/formatCurrency";
 import { Loading } from "../../components/Loading";
-import { useMonth } from "../../hooks/MonthProvider";
+
 import { ListItem } from "../../components/ListItem";
 import { NewItem } from "../NewItem";
+import { useMonth } from "../../context/MonthProvider";
 
 const modalBottom = Platform.OS === 'ios' ? 90 : 70;
 

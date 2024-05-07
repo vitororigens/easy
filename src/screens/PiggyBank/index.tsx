@@ -1,14 +1,17 @@
+import { Dimensions, View } from "react-native";
+import { PieChart } from "react-native-chart-kit";
 import React, { useEffect, useState } from "react";
+import { useTheme } from "styled-components/native";
+//
+import { Content, Divider, Header, SubTitle, Title } from "./styles";
+//
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Content, Divider, Header, SubTitle, Title } from "./styles";
-import { PieChart } from "react-native-chart-kit";
-import { Dimensions, View } from "react-native";
-import { useTheme } from "styled-components/native";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { useTotalValue } from "../../hooks/useTotalValue";
-import { Loading } from "../../components/Loading";
 import { LoadData } from "../../components/LoadData";
+import { Loading } from "../../components/Loading";
+//
+import { useTotalValue } from "../../hooks/useTotalValue";
+import { useUserAuth } from "../../hooks/useUserAuth";
 
 const screenWidth = Dimensions.get("window").width;
 

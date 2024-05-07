@@ -13,8 +13,6 @@ export const Content = styled.View`
     background-color: ${({ theme }) => theme.COLORS.WHITE};
 `;
 
-
-
 export const Header = styled.View`
     width: 100%;
 
@@ -53,28 +51,12 @@ export const SubTitle = styled.Text<Props>`
         : theme.COLORS.PURPLE_800};
 `;
 
-
-export const Button = styled(TouchableOpacity)`
-    flex: 1;
-    min-height: 60px;
-    max-height: 60px;
-    background-color: ${({ theme }) => theme.COLORS.TEAL_600};
-    width: 100%;
-    border-bottom-width: 5px; 
-    border-bottom-color: ${({ theme }) => theme.COLORS.PURPLE_800};
-    align-items: center;
-    justify-content: center;
-`;
-
-
-
 export const DividerTask = styled.View`
     width: 2px;
     background-color: ${({ theme }) => theme.COLORS.GRAY_400};
     margin-left: 10px;
     margin-right:10px;
 `;
-
 
 export const Input = styled(TextInput).attrs(({ theme }) => ({
     placeholderTextColor: theme.COLORS.GRAY_400

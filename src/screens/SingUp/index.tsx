@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
-import { Button } from "../../components/Button";
-import { ButtonIcon } from "../../components/ButtonIcon";
-import { Input } from "../../components/Input";
+import { ActivityIndicator } from "react-native";
 import auth from "@react-native-firebase/auth";
-import { Container, Content, ContentIcon, Divider, Span, SubTitle, Text, Title } from "./styles";
+import { useState } from "react";
 import { Toast } from "react-native-toast-notifications";
 import { useTheme } from "styled-components/native";
-import { ActivityIndicator } from "react-native";
+//
+import { Container, Span, Text, Title } from "./styles";
+//
 import { database } from "../../services";
+//
+import { Button } from "../../components/Button";
+import { Input } from "../../components/Input";
 
 export function SingUp() {
     const { COLORS } = useTheme();

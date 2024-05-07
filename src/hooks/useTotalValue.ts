@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import useFirestoreCollection, { ExpenseData } from './useFirestoreCollection';
-import { useMonth } from './MonthProvider';
+import { useMonth } from '../context/MonthProvider';
+
 
 
 export interface TotalValues {
