@@ -25,6 +25,8 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
     const [formattedDate, setFormattedDate] = useState("");
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [repeat, setRepeat] = useState(false);
+    const [status, setStatus] = useState(false);
+    const [alert, setAlert] = useState(false)
     const [isEditing, setIsEditing] = useState(false);
 
     const uid = user?.uid;
@@ -60,6 +62,8 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 valueTransaction: valueTransaction,
                 description: description,
                 repeat: repeat,
+                status: status,
+                alert: alert,
                 type: 'output',
                 uid: uid,
                 month: monthNumber
@@ -69,6 +73,8 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 setDescription('');
                 setFormattedDate('');
                 setRepeat(false);
+                setAlert(false);
+                setStatus(false);
                 setValuetransaction('');
             })
             .catch(error => {
@@ -99,7 +105,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
             return;
         }
 
-        if (!selectedCategory || !valueTransaction || !formattedDate || !description) {
+        if (!selectedCategory || !valueTransaction || !formattedDate ) {
             Alert.alert('Atenção!', 'Por favor, preencha todos os campos obrigatórios antes de salvar.');
             return;
         }
@@ -117,6 +123,8 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 valueTransaction: valueTransaction,
                 description: description,
                 repeat: repeat,
+                status: status,
+                alert: alert,
                 type: 'output',
                 uid: uid,
                 month: monthNumber
@@ -126,6 +134,8 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 setDescription('');
                 setFormattedDate('');
                 setRepeat(false);
+                setAlert(false);
+                setStatus(false);
                 setValuetransaction('');
                 onCloseModal && onCloseModal();
             })
@@ -145,6 +155,8 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                         setDescription(data.description);
                         setFormattedDate(data.date);
                         setRepeat(data.repeat);
+                        setAlert(data.alert);
+                        setStatus(data.status);
                         setDate(new Date(data.date));
                         setIsEditing(true); 
                     } else {
@@ -237,6 +249,24 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                             ios_backgroundColor="#3e3e3e"
                             onValueChange={() => setRepeat(!repeat)}
                             value={repeat}
+                            style={{ width: 50 }}
+                        />
+                        <TitleTask>Pendente?</TitleTask>
+                        <Switch
+                            trackColor={{ false: "#767577", true: "#81b0ff" }}
+                            thumbColor={status ? "#f5dd4b" : "#f4f3f4"}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={() => setStatus(!status)}
+                            value={status}
+                            style={{ width: 50 }}
+                        />
+                        <TitleTask>Notificar?</TitleTask>
+                        <Switch
+                            trackColor={{ false: "#767577", true: "#81b0ff" }}
+                            thumbColor={alert ? "#f5dd4b" : "#f4f3f4"}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={() => setAlert(!alert)}
+                            value={alert}
                             style={{ width: 50 }}
                         />
                     </View>

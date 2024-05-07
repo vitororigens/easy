@@ -156,7 +156,7 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                     visible={showNewItemModal}
                     onRequestClose={closeModals}
                 >
-                    <NewItem closeBottomSheet={closeModals} />
+                    <NewItem closeBottomSheet={closeModals}  showButtonSave/>
                 </Modal>
             </Container>
         </Background>

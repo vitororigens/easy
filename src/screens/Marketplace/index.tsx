@@ -29,13 +29,9 @@ export function Marketplace() {
   const [modalActive, setModalActive] = useState(false);
   const [itemsCount, setItemsCount] = useState(0);
   const [totalValue, setTotalValue] = useState(0);
-  const [selectedItemId, setSelectedItemId] = useState<MarketplaceData | null>(null);
-  const [selectedItem, setSelectedItem] = useState(false);
-  const [selectedListData, setSelectedListData] = useState<ExpenseData | null>(null);
-  const [selectedItemData, setSelectedItemData] = useState<MarketplaceData | null>(null);
+  const [selectedItemData, setSelectedItemData] = useState('');
+  console.log('id',selectedItemData)
   const [isLoaded, setIsLoaded] = useState(false);
-  const [selectedList, setSelectedList] = useState(false);
-  console.log(selectedItemData)
 
   const { selectedMonth } = useMonth()
   const user = useUserAuth();
@@ -95,32 +91,15 @@ export function Marketplace() {
   };
 
 
-  const handleEditItem = (item: MarketplaceData) => {
-    setConfirmItemVisible(true)
-    setSelectedItemId(item)
-  }
+  function handleEditItem (documentId: string) {
+      setConfirmItemVisible(true)
+      setSelectedItemData(documentId)
 
-  const handleItemSelected = (item: MarketplaceData) => {
-
-    setSelectedItemData(item);
-    setSelectedItem(true);
   }
 
 
 
 
-  const handleDeletItem = () => {
-    if (selectedItemData) {
-      database.collection('Marketplace').doc(selectedItemData?.id).delete()
-        .then(() => {
-          Toast.show('Item excluído!', { type: 'success' });
-        })
-        .catch(error => {
-          console.error('Erro ao excluir a Item: ', error);
-        });
-    }
-    setSelectedItem(false)
-  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -178,7 +157,7 @@ export function Marketplace() {
                 data={data.filter(item => item.uid === uid)}
                 renderItem={({ item }) => (
                   <ItemMarketplace
-                    onEditItem={() => handleItemSelected(item)}
+                    onEditItem={() => handleEditItem(item.id)}
                     removeItem={handleRemoveItem}
                     addItem={handleAddItem}
                     measurements={item.measurements}
@@ -194,105 +173,8 @@ export function Marketplace() {
         </Content>
       </Container>
 
-      <Modal
-        visible={selectedItem}
-        transparent
-      >
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <View style={{
-            width: 250,
-            height: 80,
-            alignItems: 'center',
-            backgroundColor: COLORS.PURPLE_800,
-            justifyContent: 'center',
-            borderTopEndRadius: 20,
-            borderTopLeftRadius: 20,
-          }}>
-            <View style={{
-              width: '100%',
-              paddingRight: 10,
-              alignItems: 'flex-end'
-            }}>
-              <TouchableOpacity onPress={() => setSelectedItem(false)}>
-                <Text style={{
-                  color: 'white'
-                }}>
-                  X
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{
-              alignItems: 'center'
-            }}>
-              <MaterialCommunityIcons name="cart-variant" size={32} color="white" />
-            </View>
-          </View>
-          <View style={{
-            width: 250,
-            height: 150,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'white',
-            padding: 5,
-            borderBottomEndRadius: 20,
-            borderBottomLeftRadius: 20
-          }}>
-            <Text>Item selecionado </Text>
-            <Text style={{
-              marginBottom: 10
-            }}>
-              Valor: {selectedItemData?.name}
-            </Text>
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              width: '100%'
-            }}>
-              <Button style={{
-                backgroundColor: COLORS.GREEN_700,
-                borderRadius: 20,
-                width: '40%',
-                padding: 5
-              }} onPress={() => {
-                setSelectedItem(false); // Definindo selectedItem como false
-                if (selectedItemData) {
-
-                  handleEditItem(selectedItemData);
-                }
-              }}>
-                <Text style={{
-                  color: 'white',
-                  textAlign: 'center'
-                }}>Editar Item</Text>
-              </Button>
-
-
-              <Button style={{
-                backgroundColor: COLORS.RED_700,
-                borderRadius: 20,
-                height: 30,
-                width: '40%'
-              }} onPress={() => {
-                setSelectedItem(false);
-                handleDeletItem();
-              }}>
-                <Text style={{
-                  color: 'white'
-                }}>Excluir Item</Text>
-              </Button>
-            </View>
-          </View>
-        </View>
-      </Modal>
       <Modal visible={confirmItemVisible} onRequestClose={() => setConfirmItemVisible(false)}>
-        <DefaultContainer>
-          <ButtonClose onPress={() => setConfirmItemVisible(false)} >
-            <Title style={{ color: 'white' }}>Fechar</Title>
-          </ButtonClose>
-          <Container type="SECONDARY" title={'Editar Saída'}>
-            <NewItem closeBottomSheet={() => setConfirmItemVisible(false)} />
-          </Container>
-        </DefaultContainer>
+            <NewItem selectedItemId={selectedItemData} closeBottomSheet={() => setConfirmItemVisible(false)} onCloseModal={() => setConfirmItemVisible(false)} showButtonSave showButtonRemove />
       </Modal>
       {modalActive && (
         <View style={{

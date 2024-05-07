@@ -21,6 +21,7 @@ export function Home() {
   const uid = user?.uid;
   const revenue = useFirestoreCollection('Revenue');
   const expense = useFirestoreCollection('Expense');
+ 
   const { totalValue, tolalRevenueMunth, totalExpenseMunth } = useTotalValue(uid || 'Não foi possivel encontrar o uid');
   const [confirmRevenueVisible, setConfirmRevenueVisible] = useState(false);
   const [confirmExpenseVisible, setConfirmExpenseVisible] = useState(false);
@@ -30,6 +31,7 @@ export function Home() {
   const formattedRevenue = tolalRevenueMunth.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const formattedExpense = totalExpenseMunth.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const formattedTotalValue = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  console.log(expense.filter(item => item.uid === uid))
 
   function handleRevenueConfirmation(documentId: string) {
     setConfirmRevenueVisible(true);
@@ -84,11 +86,13 @@ export function Home() {
                   <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de entradas! começe adicionando uma nova entrada.' />
                 </ScrollView>
               ) : (
+                
                 <FlatList
                   data={revenue.filter(item => item.uid === uid && item.month === selectedMonth)}
                   renderItem={({ item }) => (
+                   
                     <TouchableOpacity onPress={() => handleRevenueConfirmation(item.id)}>
-                      <Items
+                      <Items 
                         type={item.type}
                         category={item.category}
                         date={item.date}
@@ -116,6 +120,7 @@ export function Home() {
                   renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleExpenseConfirmation(item.id)}>
                       <Items
+                      status={item.status}
                         type={item.type}
                         category={item.category}
                         date={item.date}

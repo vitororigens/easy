@@ -3,17 +3,22 @@ import { Container } from "../../components/Container";
 import { Content, Divider, Header, Title, ButtonClose, Input, Button } from "./styles";
 import RNPickerSelect from 'react-native-picker-select';
 import { Alert, ScrollView, View } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { database } from '../../services';
 import { Toast } from "react-native-toast-notifications";
 import { useUserAuth } from "../../hooks/useUserAuth";
+import { MarketplaceData } from "../../hooks/useMarketplaceCollections";
 
 type Props = {
   closeBottomSheet?: () => void;
   onCloseModal?: () => void;
+  showButtonEdit?: boolean;
+  showButtonSave?: boolean;
+  showButtonRemove?: boolean;
+  selectedItemId?: string; 
 }
 
-export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
+export function NewItem({ closeBottomSheet, onCloseModal,showButtonEdit , showButtonSave, showButtonRemove, selectedItemId }: Props) {
   const [selectedCategory, setSelectedCategory] = useState('geral');
   const [selectedMeasurements, setSelectedMeasurements] = useState('');
   const [valueItem, setValueItem] = useState('0');
@@ -22,6 +27,7 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
   const [description, setDescription] = useState('');
   const user = useUserAuth();
   const uid = user?.uid;
+  const [isEditing, setIsEditing] = useState(false);
   console.log(uid)
 
 
@@ -63,6 +69,83 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
       });
   }
   
+
+  const handleDeleteExpense = () => {
+    if (!selectedItemId) {
+        console.error('Nenhum documento selecionado para exclusão!');
+        return;
+    }
+
+    const expenseRef = database.collection('Marketplace').doc(selectedItemId);
+    expenseRef.delete()
+        .then(() => {
+          Toast.show('Item Excluido!', { type: 'success' });
+            onCloseModal && onCloseModal();
+        })
+        .catch((error) => {
+            console.error('Erro ao excluir o documento de item:', error);
+        });
+};
+
+const handleEditExpense = () => {
+    if (!selectedItemId) {
+        console.error('Nenhum documento selecionado para edição!');
+        return;
+    }
+
+
+    database
+    .collection('Marketplace')
+    .doc(selectedItemId)
+    .set({
+      category: selectedCategory,
+      measurements: selectedMeasurements,
+      valueItem: parseFloat(valueItem as string),
+      name,
+      amount: parseFloat(amount as string),
+      description,
+      uid: uid,
+    })
+    .then(() => {
+      Toast.show('Item adicionado!', { type: 'success' });
+      setSelectedCategory('')
+      setAmount('')
+      setDescription('')
+      setName('')
+      setSelectedMeasurements('')
+      setValueItem('')
+      onCloseModal && onCloseModal();
+    })
+    .catch(error => {
+      console.error('Erro ao adicionar o item: ', error);
+    });
+};
+
+
+useEffect(() => {
+  if (selectedItemId) {
+      database.collection('Marketplace').doc(selectedItemId).get().then((doc) => {
+          if (doc.exists) {
+              const data = doc.data();
+              if (data) {
+                setSelectedCategory(data.category);
+                  setSelectedMeasurements(data.measurements);
+                  setValueItem(data.valueItem);
+                  setDescription(data.description);
+                  setName(data.name);
+                  setAmount(data.amount.toString());
+                  setIsEditing(true); 
+              } else {
+                  console.log('Dados do documento estão vazios!');
+              }
+          } else {
+              console.log('Nenhum documento encontrado!');
+          }
+      }).catch((error) => {
+          console.error('Erro ao obter o documento:', error);
+      });
+  }
+}, [selectedItemId]);
 
   return (
     <>
@@ -174,9 +257,18 @@ export function NewItem({ closeBottomSheet, onCloseModal }: Props) {
                 value={description}
                 onChangeText={setDescription}
               />
-              <Button onPress={handleSaveItem}>
-                <Title>Salvar</Title>
-              </Button>
+                 <View style={{ marginBottom: 10, height: 150 }}>
+                    {showButtonSave && (
+                        <Button style={{ marginBottom: 10 }} onPress={isEditing ? handleEditExpense : handleSaveItem}>
+                            <Title>{isEditing ? 'Editar' : 'Salvar'}</Title>
+                        </Button>
+                    )}
+                    {showButtonRemove && (
+                        <Button style={{ marginBottom: 10 }} onPress={handleDeleteExpense}>
+                            <Title>Excluir</Title>
+                        </Button>
+                    )}
+                </View>
             </Content>
           </Container>
         </ScrollView>
