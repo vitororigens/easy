@@ -38,7 +38,7 @@ export function useTotalValue(uid: string | null): TotalValues {
       setTotalRevenueValue(totalRevenue);
       setTotalExpenseValue(totalExpense);
       setTotalRevenueValueMunth(totalRevenueMunth)
-      setTotalExpenseValueMunth(totalExpense)
+      setTotalExpenseValueMunth(totalExpenseMunth)
     }
   }, [uid, revenue, expense, selectedMonth]);
 

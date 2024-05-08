@@ -21,11 +21,8 @@ type Props = {
 }
 
 export function NewLaunch({ closeBottomSheet, onCloseModal, showButtonEdit, showButtonSave, showButtonRemove, selectedItemId }: Props) {
-  const [selectedCategory, setSelectedCategory] = useState('geral');
-  const [selectedMeasurements, setSelectedMeasurements] = useState('');
   const [valueItem, setValueItem] = useState('0');
   const [name, setName] = useState('')
-  const [amount, setAmount] = useState('1')
   const [description, setDescription] = useState('');
   const user = useUserAuth();
   const uid = user?.uid;
@@ -55,25 +52,25 @@ export function NewLaunch({ closeBottomSheet, onCloseModal, showButtonEdit, show
       Alert.alert('Atenção!', 'Por favor, preencha todos os campos obriatórios antes de salvar.');
       return;
     }
+
+    const [day, month, year] = formattedDate.split('/');
+    const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
+    const monthNumber = selectedDate.getMonth() + 1;
     database
       .collection('PiggyBank')
       .doc()
       .set({
-        category: selectedCategory,
-        measurements: selectedMeasurements,
         valueItem: parseFloat(valueItem as string),
         name,
-        amount: parseFloat(amount as string),
         description,
         uid: uid,
+        month: monthNumber,
+        date: formattedDate,
       })
       .then(() => {
         Toast.show('Item adicionado!', { type: 'success' });
-        setSelectedCategory('')
-        setAmount('')
         setDescription('')
         setName('')
-        setSelectedMeasurements('')
         setValueItem('')
         onCloseModal && onCloseModal();
       })
@@ -105,27 +102,25 @@ export function NewLaunch({ closeBottomSheet, onCloseModal, showButtonEdit, show
       console.error('Nenhum documento selecionado para edição!');
       return;
     }
-
+    const [day, month, year] = formattedDate.split('/');
+    const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
+    const monthNumber = selectedDate.getMonth() + 1;
 
     database
       .collection('PiggyBank')
       .doc(selectedItemId)
       .set({
-        category: selectedCategory,
-        measurements: selectedMeasurements,
         valueItem: parseFloat(valueItem as string),
         name,
-        amount: parseFloat(amount as string),
         description,
         uid: uid,
+        month: monthNumber,
+        date: formattedDate,
       })
       .then(() => {
         Toast.show('Item adicionado!', { type: 'success' });
-        setSelectedCategory('')
-        setAmount('')
         setDescription('')
         setName('')
-        setSelectedMeasurements('')
         setValueItem('')
         onCloseModal && onCloseModal();
       })
@@ -141,13 +136,11 @@ export function NewLaunch({ closeBottomSheet, onCloseModal, showButtonEdit, show
         if (doc.exists) {
           const data = doc.data();
           if (data) {
-            setSelectedCategory(data.category);
-            setSelectedMeasurements(data.measurements);
             setValueItem(data.valueItem);
             setDescription(data.description);
             setName(data.name);
-            setAmount(data.amount.toString());
             setIsEditing(true);
+            setDate(new Date(data.date));
           } else {
             console.log('Dados do documento estão vazios!');
           }

@@ -14,7 +14,10 @@ export interface ExpenseData {
   month: number;
   status: boolean;
   alert: boolean;
+  name: string;
+  valueItem: string;
 }
+
 
 const useFirestoreCollection = (
   collectionName: string 

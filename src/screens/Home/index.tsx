@@ -23,7 +23,7 @@ export function Home() {
   const revenue = useFirestoreCollection('Revenue');
   const expense = useFirestoreCollection('Expense');
 
-  const { totalValue, tolalRevenueMunth, totalExpenseMunth } = useTotalValue(uid || 'Não foi possivel encontrar o uid');
+  const { tolalRevenueMunth, totalExpenseMunth } = useTotalValue(uid || 'Não foi possivel encontrar o uid');
   const [confirmRevenueVisible, setConfirmRevenueVisible] = useState(false);
   const [confirmExpenseVisible, setConfirmExpenseVisible] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState('');
@@ -31,7 +31,8 @@ export function Home() {
 
   const formattedRevenue = tolalRevenueMunth.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const formattedExpense = totalExpenseMunth.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  const formattedTotalValue = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const totalValue = tolalRevenueMunth - totalExpenseMunth
+  const formattedTotalValue = totalValue.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL' });
   console.log(expense.filter(item => item.uid === uid))
 
   function handleRevenueConfirmation(documentId: string) {
@@ -94,6 +95,7 @@ export function Home() {
 
                     <TouchableOpacity onPress={() => handleRevenueConfirmation(item.id)}>
                       <Items
+                      showItemTask
                         type={item.type}
                         category={item.category}
                         date={item.date}
@@ -121,6 +123,7 @@ export function Home() {
                   renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleExpenseConfirmation(item.id)}>
                       <Items
+                      showItemTask
                         status={item.status}
                         type={item.type}
                         category={item.category}
