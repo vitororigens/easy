@@ -57,15 +57,18 @@ export function PiggyBank() {
           </Header>
 
           <View style={{
-            top: 60
+            top: 40
           }}>
             <View>
-            <SubTitle style={{
-              textAlign: 'center'
-            }} type="PRIMARY">Parabéns</SubTitle>
-            <Title style={{ textAlign: 'center', width: '100%' }}>
-              Você economizou {formatCurrency(valueTotal.toString())} do seu rendimento total!
-            </Title>
+              <SubTitle style={{
+                textAlign: 'center'
+              }} type="PRIMARY">Parabéns</SubTitle>
+              <Title style={{ textAlign: 'center', width: '100%' }}>
+                Você economizou {formatCurrency(valueTotal.toString())} esse mês!
+              </Title>
+              <Title style={{ textAlign: 'center', width: '100%', marginBottom: 40}}>
+                Guarde em uma poupança para render mais.
+              </Title>
 
             </View>
 

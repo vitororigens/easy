@@ -251,7 +251,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                             value={repeat}
                             style={{ width: 50 }}
                         />
-                        <TitleTask>Pendente?</TitleTask>
+                        <TitleTask>Pago?</TitleTask>
                         <Switch
                             trackColor={{ false: "#767577", true: "#81b0ff" }}
                             thumbColor={status ? "#f5dd4b" : "#f4f3f4"}
@@ -260,7 +260,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                             value={status}
                             style={{ width: 50 }}
                         />
-                        <TitleTask>Notificar?</TitleTask>
+                        <TitleTask>Lembrete?</TitleTask>
                         <Switch
                             trackColor={{ false: "#767577", true: "#81b0ff" }}
                             thumbColor={alert ? "#f5dd4b" : "#f4f3f4"}
