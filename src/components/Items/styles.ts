@@ -1,9 +1,9 @@
 import styled from "styled-components/native";
 
-export type ItemsTypeStyleProps = 'PRIMARY' | 'SECONDARY';
+export type ItemsTypeStyleProps = 'PRIMARY' | 'SECONDARY' | 'TERTIARY';
 
 type Props = {
-    type: ItemsTypeStyleProps;
+    type?: ItemsTypeStyleProps;
 }
 
 export const Container = styled.View`
@@ -17,6 +17,8 @@ export const Icon = styled.View<Props>`
     height: 45px;
     background-color: ${({theme, type}) => type === 'PRIMARY' 
     ? theme.COLORS.GREEN_700
+    : type === 'SECONDARY'
+    ? theme.COLORS.RED_700
     : theme.COLORS.YELLOW_700};
     align-items: center;
     justify-content: center;
@@ -29,6 +31,8 @@ export const Title = styled.Text<Props>`
     font-size: ${({theme}) => theme.FONTE_SIZE.LG}px;
     color: ${({theme, type}) => type === 'PRIMARY' 
     ? theme.COLORS.GREEN_700
+    : type === 'SECONDARY'
+    ? theme.COLORS.RED_700
     : theme.COLORS.YELLOW_700};
 `;
 
@@ -48,12 +52,12 @@ export const Divider = styled.View`
 
 
 export const Content = styled.View`
-width: 80%;
-padding: 10px 20px 10px 0px;
-height: 45px;
+    width: 80%;
+    padding: 10px 20px 10px 0px;
+    height: 45px;
 `;
 
 export const ContentItems = styled.View`
-flex-direction: row;
-justify-content: space-between;
+    flex-direction: row;
+    justify-content: space-between;
 `;

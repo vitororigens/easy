@@ -49,7 +49,7 @@ export function PiggyBank() {
   }
 
   return (
-    <DefaultContainer newLaunch>
+    <DefaultContainer newLaunch monthButton>
       <Container type="SECONDARY" title="Cofrinho">
         <Content>
           <Header>

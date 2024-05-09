@@ -13,12 +13,12 @@ type ItemsProps = {
     type?: string;
     showItemPiggyBank?: boolean;
     showItemTask?: boolean;
+    showItemTaskRevenue?: boolean;
 }
 
-export function Items({ category, date, valueTransaction, repeat, alert, status, type, showItemPiggyBank, showItemTask }: ItemsProps) {
+export function Items({ category, date, valueTransaction, repeat, alert, status, type, showItemPiggyBank, showItemTaskRevenue, showItemTask }: ItemsProps) {
     const transactionType = repeat ? 'Despesa fixa' : 'Despesa variável';
     const { COLORS } = useTheme();
-    const statusPayment = status ? 'PRIMARY' : 'SECONDARY';
     const textStatus = status ? 'Pago' : 'Pendente';
     const typeMode = type === 'input' ? transactionType : textStatus;
     const dateToday = formatDate(new Date());
@@ -33,111 +33,124 @@ export function Items({ category, date, valueTransaction, repeat, alert, status,
 
     return (
         <>
-            {showItemTask && (
-                <Container>
-                    {type === 'input' && (
-                        <>
-                            <Icon style={{ backgroundColor: COLORS.GREEN_700 }} type={statusPayment}>
-                                <AntDesign name="infocirlce" size={24} color="white" />
-                            </Icon>
-                            <Content>
-                                <ContentItems>
-                                    <Title style={{
-                                        color: COLORS.GREEN_700
-                                    }} type={statusPayment}>
-                                        {category}
-                                    </Title>
-                                    <Title style={{
-                                        color: COLORS.GREEN_700
-                                    }} type={statusPayment}>
-                                        {valueTransaction}
-                                    </Title>
-                                </ContentItems>
-                                <Divider />
-                                <ContentItems>
-                                    <SubTitle>
-                                        {date}
-                                    </SubTitle>
-                                    <SubTitle>
-                                        {typeMode}
-                                    </SubTitle>
-                                </ContentItems>
-                            </Content>
-                        </>
-                    )}
-                    {date >= dateToday ? (
-                        <>
-                            <Icon type={statusPayment}>
-                                <AntDesign name="infocirlce" size={24} color="white" />
-                            </Icon>
-                            <Content>
-                                <ContentItems>
-                                    <Title type={statusPayment}>
-                                        {category}
-                                    </Title>
-                                    <Title type={statusPayment}>
-                                        {valueTransaction}
-                                    </Title>
-                                </ContentItems>
-                                <Divider />
-                                <ContentItems>
-                                    <SubTitle>
-                                        {date}
-                                    </SubTitle>
-                                    <SubTitle>
-                                        {typeMode}
-                                    </SubTitle>
-                                </ContentItems>
-                            </Content>
-                        </>
-
-                    ) : (
-                        <>
-                            <Icon style={{ backgroundColor: COLORS.RED_700 }} type={statusPayment}>
-                                <AntDesign name="infocirlce" size={24} color="white" />
-                            </Icon>
-                            <Content>
-                                <ContentItems>
-                                    <Title style={{
-                                        color: COLORS.RED_700
-                                    }} type={statusPayment}>
-                                        {category}
-                                    </Title>
-                                    <Title style={{
-                                        color: COLORS.RED_700
-                                    }} type={statusPayment}>
-                                        {valueTransaction}
-                                    </Title>
-                                </ContentItems>
-                                <Divider />
-                                <ContentItems>
-                                    <SubTitle>
-                                        {date}
-                                    </SubTitle>
-                                    <SubTitle>
-                                        Atrasado
-                                    </SubTitle>
-                                </ContentItems>
-                            </Content>
-                        </>
-                    )}
-                </Container>
-            )}
+            <Container>
+             
+                {showItemTask && date <= dateToday && !status && (
+                    <>
+                        <Icon type='SECONDARY'>
+                            <AntDesign name="infocirlce" size={24} color="white" />
+                        </Icon>
+                        <Content>
+                            <ContentItems>
+                                <Title type='SECONDARY'>
+                                    {category}
+                                </Title>
+                                <Title type='SECONDARY'>
+                                    {valueTransaction}
+                                </Title>
+                            </ContentItems>
+                            <Divider />
+                            <ContentItems>
+                                <SubTitle>
+                                    {date}
+                                </SubTitle>
+                                <SubTitle>
+                                    Atrasado
+                                </SubTitle>
+                            </ContentItems>
+                        </Content>
+                    </>
+                )}
+                {showItemTask && date >= dateToday && !status && (
+                    <>
+                        <Icon type='TERTIARY'>
+                            <AntDesign name="infocirlce" size={24} color="white" />
+                        </Icon>
+                        <Content>
+                            <ContentItems>
+                                <Title type='TERTIARY'>
+                                    {category}
+                                </Title>
+                                <Title type='TERTIARY'>
+                                    {valueTransaction}
+                                </Title>
+                            </ContentItems>
+                            <Divider />
+                            <ContentItems>
+                                <SubTitle>
+                                    {date}
+                                </SubTitle>
+                                <SubTitle>
+                                {typeMode}
+                                </SubTitle>
+                            </ContentItems>
+                        </Content>
+                    </>
+                )}
+                {showItemTask && status && (
+                    <>
+                        <Icon type='PRIMARY'>
+                            <AntDesign name="infocirlce" size={24} color="white" />
+                        </Icon>
+                        <Content>
+                            <ContentItems>
+                                <Title type='PRIMARY'>
+                                    {category}
+                                </Title>
+                                <Title type='PRIMARY'>
+                                    {valueTransaction}
+                                </Title>
+                            </ContentItems>
+                            <Divider />
+                            <ContentItems>
+                                <SubTitle>
+                                    {date}
+                                </SubTitle>
+                                <SubTitle>
+                                    {typeMode}
+                                </SubTitle>
+                            </ContentItems>
+                        </Content>
+                    </>
+                )}
+                   {showItemTaskRevenue && (
+                    <>
+                        <Icon type='PRIMARY'>
+                            <AntDesign name="infocirlce" size={24} color="white" />
+                        </Icon>
+                        <Content>
+                            <ContentItems>
+                                <Title type='PRIMARY'>
+                                    {category}
+                                </Title>
+                                <Title type='PRIMARY'>
+                                    {valueTransaction}
+                                </Title>
+                            </ContentItems>
+                            <Divider />
+                            <ContentItems>
+                                <SubTitle>
+                                    {date}
+                                </SubTitle>
+                                <SubTitle>
+                                    {transactionType}
+                                </SubTitle>
+                            </ContentItems>
+                        </Content>
+                    </>
+                )}
+            </Container>
             {showItemPiggyBank && (
                 <Container>
-                    <Icon style={{ backgroundColor: COLORS.GREEN_700 }} type={statusPayment}>
+                    <Icon style={{ backgroundColor: COLORS.GREEN_700 }} type='PRIMARY'>
                         <AntDesign name="infocirlce" size={24} color="white" />
                     </Icon>
                     <Content>
                         <ContentItems>
-                            <Title style={{
-                                color: COLORS.GREEN_700
-                            }} type={statusPayment}>
+                            <Title style={{ color: COLORS.GREEN_700 }} type='PRIMARY'>
                                 {category}
                             </Title>
-                            <Title style={{
-                                color: COLORS.GREEN_700
-                            }} type={statusPayment}>
+                            <Title style={{ color: COLORS.GREEN_700 }} type='PRIMARY'>
                                 {valueTransaction}
                             </Title>
                         </ContentItems>
@@ -153,6 +166,8 @@ export function Items({ category, date, valueTransaction, repeat, alert, status,
                     </Content>
                 </Container>
             )}
+
+
         </>
     );
 }

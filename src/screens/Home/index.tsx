@@ -32,7 +32,7 @@ export function Home() {
   const formattedRevenue = tolalRevenueMunth.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const formattedExpense = totalExpenseMunth.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const totalValue = tolalRevenueMunth - totalExpenseMunth
-  const formattedTotalValue = totalValue.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL' });
+  const formattedTotalValue = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   console.log(expense.filter(item => item.uid === uid))
 
   function handleRevenueConfirmation(documentId: string) {
@@ -95,7 +95,7 @@ export function Home() {
 
                     <TouchableOpacity onPress={() => handleRevenueConfirmation(item.id)}>
                       <Items
-                      showItemTask
+                        showItemTaskRevenue
                         type={item.type}
                         category={item.category}
                         date={item.date}
@@ -123,7 +123,7 @@ export function Home() {
                   renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleExpenseConfirmation(item.id)}>
                       <Items
-                      showItemTask
+                        showItemTask
                         status={item.status}
                         type={item.type}
                         category={item.category}
