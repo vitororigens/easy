@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DividerTask, Input, TitleTask, InputDescription, Button } from "./styles";
+import { DividerTask, Input, TitleTask, InputDescription, Button, Span } from "./styles";
 import { View, TouchableOpacity, ScrollView, Alert } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Switch } from "react-native";
@@ -221,7 +221,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                         onChangeText={setValuetransaction}
                     />
 
-                    <TitleTask>Adicionar esse lançamento a sua lista de contas recorrente?</TitleTask>
+                    <TitleTask>Adicionar esse lançamento a sua lista de contas recorrente? <Span>(opicional)</Span></TitleTask>
                     <Switch
                         trackColor={{ false: "#767577", true: "#81b0ff" }}
                         thumbColor={listAccounts ? "#f5dd4b" : "#f4f3f4"}
@@ -247,7 +247,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                             )}
                         </View>
                         <View>
-                            <TitleTask style={{ marginTop: 20 }}>Categorias</TitleTask>
+                            <TitleTask style={{ marginTop: 20 }}>Categorias <Span>(opicional)</Span></TitleTask>
                             <View style={{ height: 50 }}>
                                 <RNPickerSelect
                                     onValueChange={(value) => setSelectedCategory(value)}
@@ -292,7 +292,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                     </View>
                     <DividerTask />
                     <View style={{ width: '50%' }}>
-                        <TitleTask>Repetir?</TitleTask>
+                        <TitleTask>Repetir? <Span>(opicional)</Span></TitleTask>
                         <Switch
                             trackColor={{ false: "#767577", true: "#81b0ff" }}
                             thumbColor={repeat ? "#f5dd4b" : "#f4f3f4"}
@@ -301,7 +301,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                             value={repeat}
                             style={{ width: 50 }}
                         />
-                        <TitleTask>Pago?</TitleTask>
+                        <TitleTask>Pago? <Span>(opicional)</Span></TitleTask>
                         <Switch
                             trackColor={{ false: "#767577", true: "#81b0ff" }}
                             thumbColor={status ? "#f5dd4b" : "#f4f3f4"}
@@ -310,7 +310,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                             value={status}
                             style={{ width: 50 }}
                         />
-                        <TitleTask>Lembrete?</TitleTask>
+                        <TitleTask>Lembrete? <Span>(opicional)</Span></TitleTask>
                         <Switch
                             trackColor={{ false: "#767577", true: "#81b0ff" }}
                             thumbColor={alert ? "#f5dd4b" : "#f4f3f4"}
@@ -322,7 +322,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                     </View>
                 </View>
                 <View style={{ marginBottom: 5 }}>
-                    <TitleTask>Descrição</TitleTask>
+                    <TitleTask>Descrição <Span>(opicional)</Span></TitleTask>
                     <InputDescription
                         multiline
                         numberOfLines={5}

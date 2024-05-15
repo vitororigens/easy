@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { DividerTask, Input, TitleTask, InputDescription, Button } from "./styles";
+import { DividerTask, Input, TitleTask, InputDescription, Button, Span } from "./styles";
 import { View, TouchableOpacity, ScrollView, Alert } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Switch } from "react-native";
@@ -224,7 +224,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                             )}
                         </View>
                         <View>
-                            <TitleTask style={{ marginTop: 20 }}>Categorias</TitleTask>
+                            <TitleTask style={{ marginTop: 20 }}>Categorias <Span>(opicional)</Span> </TitleTask>
                             <View style={{ height: 50 }}>
                                 <RNPickerSelect
                                     onValueChange={(value) => setSelectedCategory(value)}
@@ -244,7 +244,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                     </View>
                     <DividerTask />
                     <View style={{ width: '50%' }}>
-                        <TitleTask>Repetir?</TitleTask>
+                        <TitleTask>Repetir? <Span>(opicional)</Span></TitleTask>
                         <Switch
                             trackColor={{ false: "#767577", true: "#81b0ff" }}
                             thumbColor={repeat ? "#f5dd4b" : "#f4f3f4"}
@@ -256,7 +256,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                     </View>
                 </View>
                 <View style={{  marginBottom: 5 }}>
-                    <TitleTask>Descrição</TitleTask>
+                    <TitleTask>Descrição <Span>(opicional)</Span></TitleTask>
                     <InputDescription
                         multiline
                         numberOfLines={5}

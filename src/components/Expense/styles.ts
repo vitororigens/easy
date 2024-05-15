@@ -118,3 +118,9 @@ export const ButtonClose = styled(TouchableOpacity)`
     height: 40px;
     padding: 10px;
 `;
+
+export const Span = styled.Text`
+    font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+    font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+    color: ${({ theme }) => theme.COLORS.GRAY_600};
+`;

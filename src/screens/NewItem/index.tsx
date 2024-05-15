@@ -1,6 +1,6 @@
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Content, Divider, Header, Title, ButtonClose, Input, Button } from "./styles";
+import { Content, Divider, Header, Title, ButtonClose, Input, Button, Span } from "./styles";
 import RNPickerSelect from 'react-native-picker-select';
 import { Alert, ScrollView, View } from "react-native";
 import { useEffect, useState } from "react";
@@ -21,7 +21,7 @@ type Props = {
 export function NewItem({ closeBottomSheet, onCloseModal,showButtonEdit , showButtonSave, showButtonRemove, selectedItemId }: Props) {
   const [selectedCategory, setSelectedCategory] = useState('geral');
   const [selectedMeasurements, setSelectedMeasurements] = useState('');
-  const [valueItem, setValueItem] = useState('0');
+  const [valueItem, setValueItem] = useState('0.00');
   const [name, setName] = useState('')
   const [amount, setAmount] = useState('1')
   const [description, setDescription] = useState('');
@@ -179,10 +179,10 @@ useEffect(() => {
               }}>
                 <View style={{
                   width: '50%',
-                  paddingRight: 20
+                  paddingRight: 15
                 }}>
                   <Title>
-                    Quantidade
+                    Quantidade<Span> (opicional)</Span>
                   </Title>
                   <Input
                     value={formatQuantity(amount)}
@@ -211,7 +211,7 @@ useEffect(() => {
                 </View>
               </View>
               <Title>
-                Preço
+                Preço <Span> (opicional)</Span>
               </Title>
               <Input
                 placeholder="0,00"
@@ -222,7 +222,7 @@ useEffect(() => {
 
 
               <Title>
-                Categoria
+                Categoria <Span> (opicional)</Span>
               </Title>
               <RNPickerSelect
                 onValueChange={(value) => setSelectedCategory(value)}
@@ -251,7 +251,7 @@ useEffect(() => {
               />
 
               <Title>
-                Observação
+                Observação <Span> (opicional)</Span>
               </Title>
               <Input
                 value={description}

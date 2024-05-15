@@ -64,3 +64,10 @@ export const Button = styled(TouchableOpacity)`
     align-items: center;
     justify-content: center;
 `;
+
+
+export const Span = styled.Text`
+    font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+    font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+    color: ${({ theme }) => theme.COLORS.GRAY_600};
+`;
