@@ -18,10 +18,15 @@ export const Container = styled.View`
 
 export const Icon = styled(MaterialCommunityIcons).attrs<ListItemProps>(({theme, type}) => ({
     color: type === 'PRIMARY' ?  theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800, 
-    size: theme.FONTE_SIZE.GG
+    size: theme.FONTE_SIZE.XL
 }))``;
 
-export const Button = styled(TouchableOpacity)``;
+export const Button = styled(TouchableOpacity)`
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+`;
 
 export const Title = styled.Text<ListItemProps>`
     font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};

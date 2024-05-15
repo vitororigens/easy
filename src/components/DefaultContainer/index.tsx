@@ -9,6 +9,7 @@ import { NewItem } from "../../screens/NewItem";
 import { useMonth } from "../../context/MonthProvider";
 import { NewLaunch } from "../../screens/NewLaunch";
 import { List } from "../../screens/List";
+import { NewTaskMarketplace } from "../../screens/NewTaskMarketplace";
 
 type DefaultContainerProps = {
     children: ReactNode;
@@ -198,7 +199,7 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                     visible={showNewItemModal}
                     onRequestClose={closeModals}
                 >
-                    <NewItem closeBottomSheet={closeModals} showButtonSave />
+                    <NewTaskMarketplace closeBottomSheet={closeModals}/>
                 </Modal>
                 <Modal
                     animationType="slide"

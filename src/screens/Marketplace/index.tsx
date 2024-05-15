@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Button, Content, Divider, Header, Title, NavBar, SubTitle, ButtonClose } from "./styles";
+import { Button, Content, Divider, Header, Title, NavBar} from "./styles";
 import { LoadData } from "../../components/LoadData";
 import { ItemMarketplace } from "../../components/ItemMarketplace";
-import useMarketplaceCollections, { MarketplaceData } from "../../hooks/useMarketplaceCollections";
-import { FlatList, Modal, View, Text, TouchableOpacity, Platform, ScrollView } from "react-native";
+import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
+import { FlatList, Modal, View, Platform, ScrollView } from "react-native";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { useTheme } from "styled-components/native";
 import { database } from "../../services";
 import { Toast } from "react-native-toast-notifications";
 import { Cart } from "../../components/Cart";
-import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCollection";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { formatCurrency } from "../../utils/formatCurrency";
+import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { Loading } from "../../components/Loading";
 
 import { ListItem } from "../../components/ListItem";
@@ -26,7 +24,7 @@ export function Marketplace() {
   const [activeButton, setActiveButton] = useState("items");
   const [confirmItemVisible, setConfirmItemVisible] = useState(false)
   const data = useMarketplaceCollections('Marketplace');
-  const expense = useFirestoreCollection('Expense');
+  const dataTask = useMarketplaceCollections('Task');
   const [modalActive, setModalActive] = useState(false);
   const [itemsCount, setItemsCount] = useState(0);
   const [totalValue, setTotalValue] = useState(0);
@@ -40,6 +38,11 @@ export function Marketplace() {
   const { COLORS } = useTheme();
 
   const handleButtonClick = (buttonName: string) => {
+    if(buttonName === "items") {
+      setModalActive(false);
+      setItemsCount(0);
+      setTotalValue(0);
+    }
     setActiveButton(buttonName);
   };
 
@@ -99,9 +102,6 @@ export function Marketplace() {
   }
 
 
-
-
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
@@ -135,13 +135,13 @@ export function Marketplace() {
           </Header>
 
           {activeButton === "items" &&
-            (data.filter(item => item.uid === uid ).length === 0 ? (
+            (dataTask.filter(item => item.uid === uid ).length === 0 ? (
               <ScrollView>
                 <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando itens no seu carrinho e crie sua lista de mercado.' />
               </ScrollView>
             ) : (
               <FlatList
-                data={data.filter(item => item.uid === uid)}
+                data={dataTask.filter(item => item.uid === uid)}
                 renderItem={({ item }) => (
                   <ListItem title={item.name} />
                 )}

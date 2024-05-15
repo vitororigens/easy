@@ -2,18 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Home } from "../screens/Home";
 import { useTheme } from "styled-components/native";
-import { FontAwesome, Entypo, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { Charts } from '../screens/Charts';
 import { Marketplace } from '../screens/Marketplace';
 import { PiggyBank } from '../screens/PiggyBank';
 import { Gears } from '../screens/Gears';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { Loading } from '../components/Loading';
-import LogoHome from '../assets/Icones/icones_brokerx_cinza-19.svg'
-import LogoPiggBank from '../assets/Icones/icones_brokerx_cinza-01.svg'
-import LogoOpenCart from '../assets/Icones/icones_brokerx_cinza-25.svg'
-import LogoLineChart from '../assets/Icones/icones_brokerx_cinza-07.svg'
-import LogoGears from '../assets/Icones/icones_brokerx_cinza-32.svg'
+import LogoHome from '../assets/Icones/icones_brokerx_cinza-19.svg';
+import LogoPiggBank from '../assets/Icones/icones_brokerx_cinza-01.svg';
+import LogoOpenCart from '../assets/Icones/icones_brokerx_cinza-25.svg';
+import LogoLineChart from '../assets/Icones/icones_brokerx_cinza-07.svg';
+import LogoGears from '../assets/Icones/icones_brokerx_cinza-32.svg';
+
 import { Platform } from 'react-native';
 
 const { Navigator, Screen } = createBottomTabNavigator();
@@ -68,7 +69,7 @@ export function BottomTabsNavigation() {
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <LogoOpenCart width={50} height={50} fill={color}/>
+                        <FontAwesome5 name="clipboard-list" size={45} color={color} />
                     )
                 }}
                 name="Mercado"

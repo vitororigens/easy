@@ -20,8 +20,11 @@ export function Cart({ itemsCount, totalValue, buttonSave }: ICartProps) {
             </View>
             <View>
                 <Button onPress={buttonSave}>
-                    <Title>
-                        Criar Lista
+                    <Title style={{
+                        width: '100%',
+                        textAlign: 'center'
+                    }}>
+                        Criar carrinho de compras
                     </Title>
                 </Button>
             </View>

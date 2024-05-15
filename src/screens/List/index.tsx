@@ -52,13 +52,13 @@ export function List({ closeBottomSheet, onCloseModal, showButtonEdit, showButto
             </Header>
             <Content>
 
-            {expense.filter(item => item.uid === uid).length === 0 ? (
+            {expense.filter(item => item.uid === uid && item.repeat === null).length === 0 ? (
                 <ScrollView>
                   <LoadData image='SECONDARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de saídas! Começe lanaçando uma nova saida.' />
                 </ScrollView>
               ) : (
                 <FlatList
-                  data={expense.filter(item => item.uid === uid && item.listAccounts === true && item.month === selectedMonth )}
+                  data={expense.filter(item => item.uid === uid && item.repeat === true && item.month === selectedMonth )}
                   renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleExpenseConfirmation(item.id)}>
                       <ItemsList

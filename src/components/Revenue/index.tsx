@@ -243,8 +243,8 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                         </View>
                     </View>
                     <DividerTask />
-                    <View style={{ width: '50%' }}>
-                        <TitleTask>Repetir? <Span>(opicional)</Span></TitleTask>
+                    <View style={{ width: '40%' }}>
+                        <TitleTask>Repetir essa receita? <Span>(opicional)</Span></TitleTask>
                         <Switch
                             trackColor={{ false: "#767577", true: "#81b0ff" }}
                             thumbColor={repeat ? "#f5dd4b" : "#f4f3f4"}

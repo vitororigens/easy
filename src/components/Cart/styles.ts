@@ -13,16 +13,18 @@ export const Title = styled.Text`
     font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
     font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
     color: ${({ theme }) => theme.COLORS.WHITE};
+    
 `;
 
 export const Button = styled(TouchableOpacity)`
-    width: '100%';
+    width: 140px;
     background-color: ${({theme}) => theme.COLORS.PURPLE_600};
     height: 60px;
     align-items: center;
     justify-content: center;
     padding: 10px;
     border-radius: 20px;
+    flex-wrap: wrap;
 `;
 
 

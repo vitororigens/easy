@@ -67,7 +67,6 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
             type: 'output',
             uid: uid,
             month: monthNumber,
-            listAccounts: listAccounts
         };
 
         // Salva o lançamento de despesa para o mês atual
@@ -80,7 +79,6 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 setRepeat(false);
                 setAlert(false);
                 setStatus(false);
-                setListAccounts(false);
                 setValuetransaction('0.00');
             })
             .catch(error => {
@@ -157,7 +155,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 type: 'output',
                 uid: uid,
                 month: monthNumber,
-                listAccounts: listAccounts
+        
             })
             .then(() => {
                 Toast.show('Transação editada!', { type: 'success' });
@@ -168,7 +166,6 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 setAlert(false);
                 setStatus(false);
                 setValuetransaction('0.00');
-                setListAccounts(false);
                 onCloseModal && onCloseModal();
             })
             .catch(error => {
@@ -192,7 +189,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                         setStatus(data.status);
                         setDate(new Date(data.date));
                         setIsEditing(true);
-                        setListAccounts(data.listAccounts);
+                       
                     } else {
                         console.log('Dados do documento estão vazios!');
                     }
@@ -224,10 +221,10 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                     <TitleTask>Adicionar esse lançamento a sua lista de contas recorrente? <Span>(opicional)</Span></TitleTask>
                     <Switch
                         trackColor={{ false: "#767577", true: "#81b0ff" }}
-                        thumbColor={listAccounts ? "#f5dd4b" : "#f4f3f4"}
+                        thumbColor={repeat ? "#f5dd4b" : "#f4f3f4"}
                         ios_backgroundColor="#3e3e3e"
-                        onValueChange={() => setListAccounts(!listAccounts)}
-                        value={listAccounts}
+                        onValueChange={() => setRepeat(!repeat)}
+                        value={repeat}
                         style={{ width: 50, marginBottom: 20 }}
                     />
                 </View>
@@ -292,16 +289,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                     </View>
                     <DividerTask />
                     <View style={{ width: '50%' }}>
-                        <TitleTask>Repetir? <Span>(opicional)</Span></TitleTask>
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={repeat ? "#f5dd4b" : "#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={() => setRepeat(!repeat)}
-                            value={repeat}
-                            style={{ width: 50 }}
-                        />
-                        <TitleTask>Pago? <Span>(opicional)</Span></TitleTask>
+                        <TitleTask>Essa conta ja está paga? <Span>(opicional)</Span></TitleTask>
                         <Switch
                             trackColor={{ false: "#767577", true: "#81b0ff" }}
                             thumbColor={status ? "#f5dd4b" : "#f4f3f4"}
