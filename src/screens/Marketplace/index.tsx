@@ -116,7 +116,7 @@ export function Marketplace() {
 
   return (
     <DefaultContainer monthButton newItem>
-      <Container type="SECONDARY" title="Mercado">
+      <Container type="SECONDARY" title="Lista de tarefas">
         <Content>
           <Header>
             <Divider style={{ alignSelf: activeButton === "items" ? "flex-start" : "flex-end" }} />
@@ -135,7 +135,7 @@ export function Marketplace() {
           </Header>
 
           {activeButton === "items" &&
-            (expense.filter(item => item.uid === uid && item.category === 'mercado').length === 0 && uid !== undefined ? (
+            (data.filter(item => item.uid === uid ).length === 0 ? (
               <ScrollView>
                 <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando itens no seu carrinho e crie sua lista de mercado.' />
               </ScrollView>

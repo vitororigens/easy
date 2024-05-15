@@ -22,7 +22,7 @@ export const Background = styled(ImageBackground).attrs({
 export const Header = styled.View`
         width: 100%;
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: space-evenly;
 
 ` ;
 
@@ -44,6 +44,7 @@ export const Title = styled.Text`
         font-size: ${({theme}) => theme.FONTE_SIZE.MD}px;
         font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
         margin-right: 10px;
+        margin-left: 10px;
 `;
 
 export const Icon = styled(Ionicons).attrs(({ theme }) => ({

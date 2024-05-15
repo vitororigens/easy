@@ -8,6 +8,7 @@ import { NewTask } from "../../screens/NewTask";
 import { NewItem } from "../../screens/NewItem";
 import { useMonth } from "../../context/MonthProvider";
 import { NewLaunch } from "../../screens/NewLaunch";
+import { List } from "../../screens/List";
 
 type DefaultContainerProps = {
     children: ReactNode;
@@ -16,14 +17,16 @@ type DefaultContainerProps = {
     addButton?: boolean;
     newItem?: boolean;
     newLaunch?: boolean;
+    listButtom?: boolean;
 }
 
-export function DefaultContainer({ children, backButton = false, monthButton = false, addButton = false, newItem = false, newLaunch = false }: DefaultContainerProps) {
+export function DefaultContainer({ children, backButton = false, monthButton = false, addButton = false, newItem = false, newLaunch = false, listButtom = false }: DefaultContainerProps) {
     const navigation = useNavigation();
-     const { selectedMonth, setSelectedMonth } = useMonth();
-     console.log('Mês atual', selectedMonth)
+    const { selectedMonth, setSelectedMonth } = useMonth();
+    console.log('Mês atual', selectedMonth)
     const [showNewTaskModal, setShowNewTaskModal] = useState(false);
     const [showNewItemModal, setShowNewItemModal] = useState(false);
+    const [showListModal, setShowListModal] = useState(false);
     const [showNewLaunchModal, setShowNewLaunchModal] = useState(false);
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
@@ -46,6 +49,7 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
         setShowNewTaskModal(false);
         setShowNewItemModal(false);
         setShowNewLaunchModal(false);
+        setShowListModal(false);
     }
 
     function handleGoBack() {
@@ -56,6 +60,11 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
         setShowNewTaskModal(true);
     }
 
+    function handleList() {
+        setShowListModal(true);
+    }
+
+
     function handleNewItem() {
         setShowNewItemModal(true);
     }
@@ -64,22 +73,36 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
     }
     useEffect(() => {
         const monthDate = currentDate.getMonth() + 1
-        setSelectedMonth(  monthDate  );
+        setSelectedMonth(monthDate);
     }, []);
 
     return (
         <Background>
             <Container>
                 <Header>
-                    {backButton ? (
+                    {listButtom &&
                         <Button style={{
+                            alignItems: 'center',
+                            flexDirection: 'row',
                             height: 60
-                        }} onPress={handleGoBack}>
-                            <Icon name="chevron-back-outline" />
+                        }} onPress={handleList}>
+
+                            <Icon name="list" />
+                            <Title>
+                                Lista
+                            </Title>
                         </Button>
-                    ) : (
-                        <Button />
+                    }
+                    {!listButtom && (
+                        <Button style={{ height: 60 }} onPress={handleGoBack}>
+                            {backButton ? (
+                                <Icon name="chevron-back-outline" />
+                            ) : (
+                                <Button />
+                            )}
+                        </Button>
                     )}
+
                     {monthButton &&
                         <ContainerMonth style={{
                             height: 60,
@@ -147,7 +170,7 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                             <Icon name="add" />
                         </Button>
                     )}
-                      {newLaunch && (
+                    {newLaunch && (
                         <Button style={{
                             alignItems: 'center',
                             flexDirection: 'row',
@@ -175,7 +198,7 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                     visible={showNewItemModal}
                     onRequestClose={closeModals}
                 >
-                    <NewItem closeBottomSheet={closeModals}  showButtonSave/>
+                    <NewItem closeBottomSheet={closeModals} showButtonSave />
                 </Modal>
                 <Modal
                     animationType="slide"
@@ -183,7 +206,15 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                     visible={showNewLaunchModal}
                     onRequestClose={closeModals}
                 >
-                    <NewLaunch closeBottomSheet={closeModals}  showButtonSave/>
+                    <NewLaunch closeBottomSheet={closeModals} showButtonSave />
+                </Modal>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={showListModal}
+                    onRequestClose={closeModals}
+                >
+                    <List closeBottomSheet={closeModals} showButtonSave />
                 </Modal>
             </Container>
         </Background>

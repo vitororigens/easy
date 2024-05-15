@@ -62,7 +62,7 @@ export function Home() {
   }
 
   return (
-    <DefaultContainer addButton monthButton>
+    <DefaultContainer addButton monthButton listButtom>
       <Container type="PRIMARY" name="file-invoice-dollar" title={formattedTotalValue}>
         <Content>
           <Header>

@@ -18,9 +18,11 @@ export type ExpenseProps = {
 
 export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showButtonEdit, showButtonSave }: ExpenseProps) {
     const user = useUserAuth();
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [valueTransaction, setValuetransaction] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('Outros');
+    const [valueTransaction, setValuetransaction] = useState('0.00');
+    const [listAccounts, setListAccounts] = useState(false);
     const [description, setDescription] = useState('');
+    const [name, setName] = useState("");
     const [date, setDate] = useState(new Date());
     const [formattedDate, setFormattedDate] = useState("");
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -44,7 +46,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
     };
 
     const handleSaveExpense = () => {
-        if (!selectedCategory || !valueTransaction || !formattedDate ) {
+        if (!name || !valueTransaction || !formattedDate) {
             Alert.alert('Atenção!', 'Por favor, preencha todos os campos obrigatórios antes de salvar.');
             return;
         }
@@ -57,6 +59,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
             .collection('Expense')
             .doc()
             .set({
+                name: name,
                 category: selectedCategory,
                 date: formattedDate,
                 valueTransaction: valueTransaction,
@@ -66,16 +69,19 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 alert: alert,
                 type: 'output',
                 uid: uid,
-                month: monthNumber
+                month: monthNumber,
+                listAccounts: listAccounts
             })
             .then(() => {
                 Toast.show('Transação adicionada!', { type: 'success' });
+                setName('');
                 setDescription('');
                 setFormattedDate('');
                 setRepeat(false);
                 setAlert(false);
                 setStatus(false);
-                setValuetransaction('');
+                setListAccounts(false);
+                setValuetransaction('0.00');
             })
             .catch(error => {
                 console.error('Erro ao adicionar a transação: ', error);
@@ -105,7 +111,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
             return;
         }
 
-        if (!selectedCategory || !valueTransaction || !formattedDate ) {
+        if (!name || !valueTransaction || !formattedDate) {
             Alert.alert('Atenção!', 'Por favor, preencha todos os campos obrigatórios antes de salvar.');
             return;
         }
@@ -118,6 +124,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
             .collection('Expense')
             .doc(selectedItemId)
             .set({
+                name: name,
                 category: selectedCategory,
                 date: formattedDate,
                 valueTransaction: valueTransaction,
@@ -127,16 +134,19 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 alert: alert,
                 type: 'output',
                 uid: uid,
-                month: monthNumber
+                month: monthNumber,
+                listAccounts: listAccounts
             })
             .then(() => {
                 Toast.show('Transação editada!', { type: 'success' });
+                setName('');
                 setDescription('');
                 setFormattedDate('');
                 setRepeat(false);
                 setAlert(false);
                 setStatus(false);
-                setValuetransaction('');
+                setValuetransaction('0.00');
+                setListAccounts(false);
                 onCloseModal && onCloseModal();
             })
             .catch(error => {
@@ -150,6 +160,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 if (doc.exists) {
                     const data = doc.data();
                     if (data) {
+                        setName(data.name);
                         setSelectedCategory(data.category);
                         setValuetransaction(data.valueTransaction);
                         setDescription(data.description);
@@ -158,7 +169,8 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                         setAlert(data.alert);
                         setStatus(data.status);
                         setDate(new Date(data.date));
-                        setIsEditing(true); 
+                        setIsEditing(true);
+                        setListAccounts(data.listAccounts);
                     } else {
                         console.log('Dados do documento estão vazios!');
                     }
@@ -174,16 +186,31 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
     return (
         <View style={{ flex: 1, padding: 10 }}>
             <ScrollView>
-                <View style={{ height: '20%' }}>
-                    <TitleTask>Valor* </TitleTask>
+                <View>
+                <TitleTask>Nome*</TitleTask>
+                    <Input
+                        value={name}
+                        onChangeText={setName}
+                    />
+                    <TitleTask>Valor*</TitleTask>
                     <Input
                         value={valueTransaction}
                         keyboardType="numeric"
                         onChangeText={setValuetransaction}
                     />
+
+                    <TitleTask>Adicionar esse lançamento a sua lista de contas recorrente?</TitleTask>
+                    <Switch
+                        trackColor={{ false: "#767577", true: "#81b0ff" }}
+                        thumbColor={listAccounts ? "#f5dd4b" : "#f4f3f4"}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={() => setListAccounts(!listAccounts)}
+                        value={listAccounts}
+                        style={{ width: 50, marginBottom: 20 }}
+                    />
                 </View>
-                <View style={{ flexDirection: 'row', height: 180, marginBottom: 10 }}>
-                    <View style={{ width: '50%', height: 180 }}>
+                <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+                    <View style={{ width: '50%' }}>
                         <View>
                             <TitleTask>Data* </TitleTask>
                             <TouchableOpacity style={{ height: 50 }} onPress={showDatePickerModal}>
@@ -198,22 +225,22 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                             )}
                         </View>
                         <View>
-                            <TitleTask style={{ marginTop: 20 }}>Categorias* </TitleTask>
+                            <TitleTask style={{ marginTop: 20 }}>Categorias</TitleTask>
                             <View style={{ height: 50 }}>
                                 <RNPickerSelect
                                     onValueChange={(value) => setSelectedCategory(value)}
                                     items={[
-                                        { label: 'Investimentos', value: 'investimentos' },
+                                        { label: 'Investimentos', value: 'Investimentos' },
                                         { label: 'Contas', value: 'Contas' },
-                                        { label: 'Compras', value: 'compras' },
+                                        { label: 'Compras', value: 'Compras' },
                                         { label: 'Faculdade', value: 'Faculdade' },
                                         { label: 'Internet', value: 'Internet' },
                                         { label: 'Academia', value: 'Academia' },
                                         { label: 'Emprestimo', value: 'Emprestimo' },
-                                        { label: 'Comida', value: 'comida' },
-                                        { label: 'Telefone', value: 'telefone' },
-                                        { label: 'Entretenimento', value: 'entretenimento' },
-                                        { label: 'Educação', value: 'educacao' },
+                                        { label: 'Comida', value: 'Comida' },
+                                        { label: 'Telefone', value: 'Telefone' },
+                                        { label: 'Entretenimento', value: 'Entretenimento' },
+                                        { label: 'Educação', value: 'Educacao' },
                                         { label: 'Beleza', value: 'beleza' },
                                         { label: 'Esporte', value: 'esporte' },
                                         { label: 'Social', value: 'social' },
@@ -233,6 +260,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                                         { label: 'Loteria', value: 'loteria' },
                                         { label: 'Lanches', value: 'lanches' },
                                         { label: 'Filhos', value: 'filhos' },
+                                        { label: 'Outros', value: 'outros' },
                                     ]}
                                     value={selectedCategory}
                                     placeholder={{ label: 'Selecione', value: 'Selecione' }}
@@ -271,7 +299,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
                         />
                     </View>
                 </View>
-                <View style={{ height: '25%', marginBottom: 5 }}>
+                <View style={{ marginBottom: 5 }}>
                     <TitleTask>Descrição</TitleTask>
                     <InputDescription
                         multiline

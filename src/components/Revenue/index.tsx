@@ -18,7 +18,8 @@ type RevenueProps = {
 
 export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showButtonEdit, showButtonSave }: RevenueProps) {
     const user = useUserAuth()
-    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('Outros');
+    const [name, setName] = useState("");
     const [valueTransaction, setValuetransaction] = useState('');
     const [description, setDescription] = useState('');
     const [date, setDate] = useState(new Date());
@@ -44,7 +45,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
 
 
     function handleSaveRevenue() {
-        if (!selectedCategory || !valueTransaction || !formattedDate) {
+        if (!name || !valueTransaction || !formattedDate) {
             Alert.alert('Atenção!', 'Por favor, preencha os campos obrigatório antes de salvar.')
             return;
         }
@@ -57,6 +58,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
             .collection('Revenue')
             .doc()
             .set({
+                name: name,
                 category: selectedCategory,
                 uid: uid,
                 date: formattedDate,
@@ -68,6 +70,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
             })
             .then(() => {
                 Toast.show('Transação adicionada!', { type: 'success' });
+                setName('');
                 setDescription('');
                 setFormattedDate('');
                 setRepeat(false);
@@ -84,7 +87,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
             return;
         }
 
-        if (!selectedCategory || !valueTransaction || !formattedDate) {
+        if (!name || !valueTransaction || !formattedDate) {
             Alert.alert('Atenção!', 'Por favor, preencha todos os campos obrigatórios antes de salvar.')
             return;
         }
@@ -97,6 +100,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
             .collection('Revenue')
             .doc(selectedItemId)
             .set({
+                name: name,
                 category: selectedCategory,
                 uid: uid,
                 date: formattedDate,
@@ -108,6 +112,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
             })
             .then(() => {
                 Toast.show('Transação editada!', { type: 'success' })
+                setName('');
                 setDescription('');
                 setFormattedDate('');
                 setRepeat(false);
@@ -147,6 +152,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                 if (doc.exists) {
                     const data = doc.data();
                     if (data) {
+                        setName(data.name);
                         setSelectedCategory(data.category);
                         setValuetransaction(data.valueTransaction);
                         setDescription(data.description);
@@ -169,7 +175,12 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
     return (
         <View style={{ flex: 1, padding: 10 }}>
             <ScrollView>
-                <View style={{ height: '20%' }}>
+                <View>
+                <TitleTask>Nome*</TitleTask>
+                    <Input
+                        value={name}
+                        onChangeText={setName}
+                    />
                     <TitleTask>Valor* </TitleTask>
                     <Input
                         value={valueTransaction}
@@ -177,8 +188,8 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                         onChangeText={setValuetransaction}
                     />
                 </View>
-                <View style={{ flexDirection: 'row', height: 180, marginBottom: 10 }}>
-                    <View style={{ width: '50%', height: 180 }}>
+                <View style={{ flexDirection: 'row',  marginBottom: 10 }}>
+                    <View style={{ width: '50%' }}>
                         <View>
                             <TitleTask>Data*</TitleTask>
                             <TouchableOpacity style={{ height: 50 }} onPress={showDatePickerModal}>
@@ -193,7 +204,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                             )}
                         </View>
                         <View>
-                            <TitleTask style={{ marginTop: 20 }}>Categorias*</TitleTask>
+                            <TitleTask style={{ marginTop: 20 }}>Categorias</TitleTask>
                             <View style={{ height: 50 }}>
                                 <RNPickerSelect
                                     onValueChange={(value) => setSelectedCategory(value)}
@@ -202,7 +213,8 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                                         { label: 'Vendas', value: 'vendas' },
                                         { label: 'Investimentos', value: 'investimentos' },
                                         { label: 'Comissão', value: 'Comissão' },
-                                        { label: 'Adiantamentos', value: 'Adiantamentos'}
+                                        { label: 'Adiantamentos', value: 'Adiantamentos'},
+                                        { label: 'Outros', value: 'Outros'}
                                     ]}
                                     value={selectedCategory}
                                     placeholder={{ label: 'Selecione', value: 'Selecione' }}
@@ -223,7 +235,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                         />
                     </View>
                 </View>
-                <View style={{ height: '25%', marginBottom: 5 }}>
+                <View style={{  marginBottom: 5 }}>
                     <TitleTask>Descrição</TitleTask>
                     <InputDescription
                         multiline
