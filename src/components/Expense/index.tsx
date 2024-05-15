@@ -55,23 +55,23 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
         const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
         const monthNumber = selectedDate.getMonth() + 1;
 
-        database
-            .collection('Expense')
-            .doc()
-            .set({
-                name: name,
-                category: selectedCategory,
-                date: formattedDate,
-                valueTransaction: valueTransaction,
-                description: description,
-                repeat: repeat,
-                status: status,
-                alert: alert,
-                type: 'output',
-                uid: uid,
-                month: monthNumber,
-                listAccounts: listAccounts
-            })
+        const expenseData = {
+            name: name,
+            category: selectedCategory,
+            date: formattedDate,
+            valueTransaction: valueTransaction,
+            description: description,
+            repeat: repeat,
+            status: status,
+            alert: alert,
+            type: 'output',
+            uid: uid,
+            month: monthNumber,
+            listAccounts: listAccounts
+        };
+
+        // Salva o lançamento de despesa para o mês atual
+        database.collection('Expense').add(expenseData)
             .then(() => {
                 Toast.show('Transação adicionada!', { type: 'success' });
                 setName('');
@@ -86,6 +86,28 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
             .catch(error => {
                 console.error('Erro ao adicionar a transação: ', error);
             });
+
+        // Se o interruptor de repetição estiver ativado, cria cópias para os próximos 11 meses
+        if (repeat) {
+            for (let i = 1; i <= 11; i++) {
+                // Obtém o próximo mês e ano
+                let nextMonth = monthNumber + i;
+                let nextYear = year;
+        
+                if (nextMonth > 12) {
+                    nextMonth -= 12;
+                    nextYear++;
+                }
+        
+                const nextDate = `${day}/${nextMonth}/${nextYear}`;
+                const nextMonthExpenseData = { ...expenseData, date: nextDate, month: nextMonth };
+        
+                database.collection('Expense').add(nextMonthExpenseData)
+                    .catch(error => {
+                        console.error('Erro ao adicionar a transação repetida: ', error);
+                    });
+            }
+        }
     };
 
     const handleDeleteExpense = () => {
@@ -187,7 +209,7 @@ export function Expense({ selectedItemId, showButtonRemove, onCloseModal, showBu
         <View style={{ flex: 1, padding: 10 }}>
             <ScrollView>
                 <View>
-                <TitleTask>Nome*</TitleTask>
+                    <TitleTask>Nome*</TitleTask>
                     <Input
                         value={name}
                         onChangeText={setName}

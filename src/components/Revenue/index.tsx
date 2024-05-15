@@ -36,17 +36,15 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
         setDate(currentDate);
         const formattedDateString = currentDate.toLocaleDateString('pt-BR');
         setFormattedDate(formattedDateString);
-
     };
 
     const showDatePickerModal = () => {
         setShowDatePicker(true);
     };
 
-
     function handleSaveRevenue() {
         if (!name || !valueTransaction || !formattedDate) {
-            Alert.alert('Atenção!', 'Por favor, preencha os campos obrigatório antes de salvar.')
+            Alert.alert('Atenção!', 'Por favor, preencha os campos obrigatórios antes de salvar.')
             return;
         }
 
@@ -54,20 +52,20 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
         const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
         const monthNumber = selectedDate.getMonth() + 1;
 
-        database
-            .collection('Revenue')
-            .doc()
-            .set({
-                name: name,
-                category: selectedCategory,
-                uid: uid,
-                date: formattedDate,
-                valueTransaction: valueTransaction,
-                description: description,
-                repeat: repeat,
-                type: 'input',
-                month: monthNumber
-            })
+        const revenueData = {
+            name: name,
+            category: selectedCategory,
+            uid: uid,
+            date: formattedDate,
+            valueTransaction: valueTransaction,
+            description: description,
+            repeat: repeat,
+            type: 'input',
+            month: monthNumber
+        };
+
+        // Salva o lançamento de receita para o mês atual
+        database.collection('Revenue').add(revenueData)
             .then(() => {
                 Toast.show('Transação adicionada!', { type: 'success' });
                 setName('');
@@ -79,6 +77,28 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
             .catch(error => {
                 console.error('Erro ao adicionar a transação: ', error);
             });
+
+        // Se o interruptor de repetição estiver ativado, cria cópias para os próximos 11 meses
+        if (repeat) {
+            for (let i = 1; i <= 11; i++) {
+                // Obtém o próximo mês e ano
+                let nextMonth = monthNumber + i;
+                let nextYear = year;
+        
+                if (nextMonth > 12) {
+                    nextMonth -= 12;
+                    nextYear++;
+                }
+        
+                const nextDate = `${day}/${nextMonth}/${nextYear}`;
+                const nextMonthRevenueData = { ...revenueData, date: nextDate, month: nextMonth };
+        
+                database.collection('Revenue').add(nextMonthRevenueData)
+                    .catch(error => {
+                        console.error('Erro ao adicionar a transação repetida: ', error);
+                    });
+            }
+        }
     }
 
     function handleEditRevenue() {

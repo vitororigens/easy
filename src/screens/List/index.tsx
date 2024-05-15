@@ -1,4 +1,4 @@
-import {  FlatList, ScrollView, TouchableOpacity} from "react-native";
+import {  FlatList, Modal, ScrollView, TouchableOpacity} from "react-native";
 //
 import { Content, Divider, Header, Title, ButtonClose, Input, Button } from "./styles";
 //
@@ -7,9 +7,14 @@ import { Container } from "../../components/Container";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { LoadData } from "../../components/LoadData";
-import { Items } from "../../components/Items";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { useState } from "react";
+
+import { Expense } from "../../components/Expense";
+import { ItemsList } from "../../components/ItemsList";
+import { Toast } from "react-native-toast-notifications";
+import { database } from "../../services";
+import { useMonth } from "../../context/MonthProvider";
 //
 
 
@@ -22,8 +27,10 @@ type Props = {
 }
 
 export function List({ closeBottomSheet, onCloseModal, showButtonEdit, showButtonSave, showButtonRemove }: Props) {
+  const { selectedMonth } = useMonth()
   const user = useUserAuth();
   const uid = user?.uid;
+  const [status, setStatus] = useState(false);
   const revenue = useFirestoreCollection('Revenue');
   const expense = useFirestoreCollection('Expense');
   const [confirmRevenueVisible, setConfirmRevenueVisible] = useState(false);
@@ -38,10 +45,7 @@ export function List({ closeBottomSheet, onCloseModal, showButtonEdit, showButto
   return (
     <>
 
-      <DefaultContainer>
-        <ButtonClose onPress={closeBottomSheet} >
-          <Title style={{ color: 'white' }}>Fechar</Title>
-        </ButtonClose>
+      <DefaultContainer backButton>
           <Container type="SECONDARY" title="Lista de contas">
             <Header>
               <Divider />
@@ -54,14 +58,14 @@ export function List({ closeBottomSheet, onCloseModal, showButtonEdit, showButto
                 </ScrollView>
               ) : (
                 <FlatList
-                  data={expense.filter(item => item.uid === uid )}
+                  data={expense.filter(item => item.uid === uid && item.listAccounts === true && item.month === selectedMonth )}
                   renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleExpenseConfirmation(item.id)}>
-                      <Items
+                      <ItemsList
                         showItemTask
                         status={item.status}
                         type={item.type}
-                        category={item.category}
+                        category={item.name}
                         date={item.date}
                         repeat={item.repeat}
                         valueTransaction={formatCurrency(item.valueTransaction)}
@@ -74,6 +78,17 @@ export function List({ closeBottomSheet, onCloseModal, showButtonEdit, showButto
             </Content>
           </Container>
       </DefaultContainer>
+      <Modal visible={confirmExpenseVisible} onRequestClose={() => setConfirmExpenseVisible(false)}>
+
+        <DefaultContainer>
+          <ButtonClose onPress={() => setConfirmExpenseVisible(false)} >
+            <Title style={{ color: 'white' }}>Fechar</Title>
+          </ButtonClose>
+          <Container type="SECONDARY" title={'Editar Saida'}>
+            <Expense selectedItemId={selectedItemId} showButtonRemove onCloseModal={() => setConfirmExpenseVisible(false)} showButtonEdit />
+          </Container>
+        </DefaultContainer>
+      </Modal>
     </>
   );
 }

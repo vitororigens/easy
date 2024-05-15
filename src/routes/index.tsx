@@ -5,6 +5,7 @@ import { useTheme } from "styled-components/native";
 import { View } from "react-native";
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { BottomTabsNavigation } from "./BottomTabsNavigation";
+import { StackPrivateNavigation } from "./StackPrivateNavigation";
 
 
 export function Routes() {
@@ -19,7 +20,7 @@ export function Routes() {
     return (
         <View style={{ backgroundColor: COLORS.WHITE, flex: 1 }}>
             <NavigationContainer>
-                {user ? <BottomTabsNavigation /> : <StackNavigation />}
+                {user ? <StackPrivateNavigation /> : <StackNavigation />}
             </NavigationContainer>
         </View>
     );

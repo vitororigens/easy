@@ -7,6 +7,7 @@ export declare global{
             tabroutes: undefined;
             newtask: undefined;
             privateroutes: undefined;
+            list: undefined;
         }
     }
 }

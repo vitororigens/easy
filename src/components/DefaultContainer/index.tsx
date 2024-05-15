@@ -61,7 +61,7 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
     }
 
     function handleList() {
-        setShowListModal(true);
+        navigation.navigate('list')
     }
 
 
@@ -208,14 +208,7 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                 >
                     <NewLaunch closeBottomSheet={closeModals} showButtonSave />
                 </Modal>
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={showListModal}
-                    onRequestClose={closeModals}
-                >
-                    <List closeBottomSheet={closeModals} showButtonSave />
-                </Modal>
+               
             </Container>
         </Background>
     );

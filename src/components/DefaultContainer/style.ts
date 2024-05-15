@@ -22,7 +22,7 @@ export const Background = styled(ImageBackground).attrs({
 export const Header = styled.View`
         width: 100%;
         flex-direction: row;
-        justify-content: space-evenly;
+        justify-content: start;
 
 ` ;
 

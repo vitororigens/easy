@@ -16,6 +16,7 @@ export interface ExpenseData {
   alert: boolean;
   name: string;
   valueItem: string;
+  listAccounts: boolean;
 }
 
 
