@@ -27,10 +27,7 @@ export function NewTask({ closeBottomSheet }: Props) {
       <ButtonClose onPress={closeBottomSheet} >
         <Title style={{ color: 'white' }}>Fechar</Title>
       </ButtonClose>
-        <ScrollView
-          keyboardShouldPersistTaps="always"
-          showsVerticalScrollIndicator={false}
-        >
+      
           <Container type="SECONDARY" title="NOVO LANÇAMENTO">
             <Content>
               <Header>
@@ -56,7 +53,7 @@ export function NewTask({ closeBottomSheet }: Props) {
               }
             </Content>
           </Container>
-        </ScrollView>
+     
       </DefaultContainer>
     </>
   );

@@ -219,6 +219,7 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                                 <DateTimePicker
                                     value={date}
                                     mode="date"
+                                    display='calendar'
                                     onChange={handleDateChange}
                                 />
                             )}
