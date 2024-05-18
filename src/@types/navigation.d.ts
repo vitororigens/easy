@@ -8,6 +8,10 @@ export declare global{
             newtask: undefined;
             privateroutes: undefined;
             list: undefined;
+            graphics: undefined;
+            marketplace: undefined;
+            perfil: undefined;
+            piggybank: undefined;
         }
     }
 }

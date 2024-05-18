@@ -10,6 +10,8 @@ import { useMonth } from "../../context/MonthProvider";
 import { NewLaunch } from "../../screens/NewLaunch";
 import { List } from "../../screens/List";
 import { NewTaskMarketplace } from "../../screens/NewTaskMarketplace";
+import { NewItemTask } from "../../screens/NewItemTask";
+import { NewNotes } from "../../screens/NewNotes";
 
 type DefaultContainerProps = {
     children: ReactNode;
@@ -19,14 +21,19 @@ type DefaultContainerProps = {
     newItem?: boolean;
     newLaunch?: boolean;
     listButtom?: boolean;
+    showHeader?: boolean;
+    newItemMarketplace?: boolean;
+    newNotes?: boolean;
 }
 
-export function DefaultContainer({ children, backButton = false, monthButton = false, addButton = false, newItem = false, newLaunch = false, listButtom = false }: DefaultContainerProps) {
+export function DefaultContainer({ children, newNotes = false, newItemMarketplace = false, showHeader = false, backButton = false, monthButton = false, addButton = false, newItem = false, newLaunch = false, listButtom = false }: DefaultContainerProps) {
     const navigation = useNavigation();
     const { selectedMonth, setSelectedMonth } = useMonth();
     console.log('Mês atual', selectedMonth)
     const [showNewTaskModal, setShowNewTaskModal] = useState(false);
     const [showNewItemModal, setShowNewItemModal] = useState(false);
+    const [showNotesModal, setShowNotesModal] = useState(false);
+    const [showNewItemMarketplace, setShowNewItemMarketplace] = useState(false);
     const [showListModal, setShowListModal] = useState(false);
     const [showNewLaunchModal, setShowNewLaunchModal] = useState(false);
     const currentDate = new Date();
@@ -50,7 +57,9 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
         setShowNewTaskModal(false);
         setShowNewItemModal(false);
         setShowNewLaunchModal(false);
+        setShowNewItemMarketplace(false)
         setShowListModal(false);
+        setShowNotesModal(false)
     }
 
     function handleGoBack() {
@@ -69,6 +78,16 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
     function handleNewItem() {
         setShowNewItemModal(true);
     }
+
+    function handleNewNotes() {
+        setShowNotesModal(true);
+    }
+
+
+    function handleNewItemMarketplace() {
+        setShowNewItemMarketplace(true);
+    }
+
     function handleNewLaunch() {
         setShowNewLaunchModal(true);
     }
@@ -183,6 +202,30 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                             <Icon name="add" />
                         </Button>
                     )}
+                    {newItemMarketplace && (
+                        <Button style={{
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                            height: 60
+                        }} onPress={handleNewItemMarketplace}>
+                            <Title>
+                                Novo
+                            </Title>
+                            <Icon name="add" />
+                        </Button>
+                    )}
+                    {newNotes && (
+                        <Button style={{
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                            height: 60
+                        }} onPress={handleNewNotes}>
+                            <Title>
+                                Novo
+                            </Title>
+                            <Icon name="add" />
+                        </Button>
+                    )}
                 </Header>
                 {children}
                 <Modal
@@ -199,7 +242,7 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                     visible={showNewItemModal}
                     onRequestClose={closeModals}
                 >
-                    <NewTaskMarketplace closeBottomSheet={closeModals}/>
+                    <NewItemTask showButtonSave closeBottomSheet={closeModals}/>
                 </Modal>
                 <Modal
                     animationType="slide"
@@ -209,7 +252,22 @@ export function DefaultContainer({ children, backButton = false, monthButton = f
                 >
                     <NewLaunch closeBottomSheet={closeModals} showButtonSave />
                 </Modal>
-               
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={showNewItemMarketplace}
+                    onRequestClose={closeModals}
+                >
+                    <NewItem showButtonSave closeBottomSheet={closeModals}/>
+                </Modal>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={showNotesModal}
+                    onRequestClose={closeModals}
+                >
+                    <NewNotes showButtonSave closeBottomSheet={closeModals}/>
+                </Modal>
             </Container>
         </Background>
     );

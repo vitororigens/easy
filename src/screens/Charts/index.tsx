@@ -100,7 +100,7 @@ export function Charts() {
   const chartWidth = Math.max(screenWidth, chartData.labels.length * 60);
 
   return (
-    <DefaultContainer >
+    <DefaultContainer backButton>
       <Container type="SECONDARY" title="ANÁLISE GRÁFICA">
         <Content>
           <Header>

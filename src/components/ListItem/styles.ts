@@ -25,7 +25,8 @@ export const Button = styled(TouchableOpacity)`
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    flex: 1;
+    margin-right: 15px;
 `;
 
 export const Title = styled.Text<ListItemProps>`

@@ -1,13 +1,12 @@
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Content, Divider, Header, Title, ButtonClose, Input, Button, Span } from "./styles";
+import { Content, Title, ButtonClose, Input, Button, Span } from "./styles";
 import RNPickerSelect from 'react-native-picker-select';
 import { Alert, ScrollView, View } from "react-native";
 import { useEffect, useState } from "react";
 import { database } from '../../services';
 import { Toast } from "react-native-toast-notifications";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { MarketplaceData } from "../../hooks/useMarketplaceCollections";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -148,119 +147,124 @@ export function NewItem({ closeBottomSheet, onCloseModal, showButtonEdit, showBu
   }, [selectedItemId]);
 
   return (
-    <>
-      <ScrollView
-        keyboardShouldPersistTaps="always"
-        showsVerticalScrollIndicator={false}
-      >
-        <Content>
-          <Title>
-            Nome*
-          </Title>
-          <Input
-            value={name}
-            onChangeText={setName}
-          />
-          <View style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            width: '100%'
-          }}>
+    <DefaultContainer >
+      <ButtonClose onPress={closeBottomSheet} >
+          <Title style={{ color: 'white' }}>Fechar</Title>
+        </ButtonClose>
+      <Container>
+        <ScrollView
+          keyboardShouldPersistTaps="always"
+          showsVerticalScrollIndicator={false}
+        >
+          <Content>
+            <Title>
+              Nome*
+            </Title>
+            <Input
+              value={name}
+              onChangeText={setName}
+            />
             <View style={{
-              width: '50%',
-              paddingRight: 15
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%'
             }}>
-              <Title>
-                Quantidade<Span> (opicional)</Span>
-              </Title>
-              <Input
-                value={formatQuantity(amount)}
-                keyboardType="numeric"
-                onChangeText={setAmount}
-              />
+              <View style={{
+                width: '50%',
+                paddingRight: 15
+              }}>
+                <Title>
+                  Quantidade<Span> (opicional)</Span>
+                </Title>
+                <Input
+                  value={formatQuantity(amount)}
+                  keyboardType="numeric"
+                  onChangeText={setAmount}
+                />
 
+              </View>
+              <View style={{
+                width: 100
+              }}>
+                <RNPickerSelect
+                  onValueChange={(value) => setSelectedMeasurements(value)}
+                  items={[
+                    { label: 'un', value: 'unidade' },
+                    { label: 'kg', value: 'kilo' },
+                    { label: 'g', value: 'gramas' },
+                    { label: 'l', value: 'litro' },
+                    { label: 'ml', value: 'milimetros' },
+
+
+                  ]}
+                  value={selectedMeasurements}
+                  placeholder={{ label: 'un', value: 'un' }}
+                />
+              </View>
             </View>
-            <View style={{
-              width: 100
-            }}>
-              <RNPickerSelect
-                onValueChange={(value) => setSelectedMeasurements(value)}
-                items={[
-                  { label: 'un', value: 'unidade' },
-                  { label: 'kg', value: 'kilo' },
-                  { label: 'g', value: 'gramas' },
-                  { label: 'l', value: 'litro' },
-                  { label: 'ml', value: 'milimetros' },
+            <Title>
+              Preço <Span> (opicional)</Span>
+            </Title>
+            <Input
+              placeholder="0,00"
+              value={valueItem}
+              keyboardType="numeric"
+              onChangeText={setValueItem}
+            />
 
 
-                ]}
-                value={selectedMeasurements}
-                placeholder={{ label: 'un', value: 'un' }}
-              />
+            <Title>
+              Categoria <Span> (opicional)</Span>
+            </Title>
+            <RNPickerSelect
+              onValueChange={(value) => setSelectedCategory(value)}
+              items={[
+                { label: 'Ovos, Verduras e Frutas', value: 'ovos, verduras e frutas' },
+                { label: 'Carnes', value: 'carnes' },
+                { label: 'Laticínios', value: 'laticinios' },
+                { label: 'Padaria', value: 'padaria' },
+                { label: 'Bebidas', value: 'bebidas' },
+                { label: 'Produtos de Limpeza', value: 'produtos de limpeza' },
+                { label: 'Higiene Pessoal', value: 'higiene pessoal' },
+                { label: 'Hortifruti', value: 'hortifruti' },
+                { label: 'Congelados', value: 'congelados' },
+                { label: 'Açougue', value: 'acougue' },
+                { label: 'Peixaria', value: 'peixaria' },
+                { label: 'Bebidas Alcoólicas', value: 'bebidas alcoolicas' },
+                { label: 'Pet Shop', value: 'pet shop' },
+                { label: 'Utensílios Domésticos', value: 'utensilios domesticos' },
+                { label: 'Bebês e Crianças', value: 'bebes e criancas' },
+                { label: 'Eletronicos', value: 'Eletronicos' },
+                { label: 'Carro', value: 'Carro' },
+                { label: 'Ferramentas', value: 'Ferramentas' },
+              ]}
+              value={selectedCategory}
+              placeholder={{ label: 'Selecione', value: 'Selecione' }}
+            />
+
+            <Title>
+              Observação <Span> (opicional)</Span>
+            </Title>
+            <Input
+              value={description}
+              onChangeText={setDescription}
+            />
+            <View style={{ marginBottom: 10, height: 150 }}>
+              {showButtonSave && (
+                <Button style={{ marginBottom: 10 }} onPress={isEditing ? handleEditExpense : handleSaveItem}>
+                  <Title>{isEditing ? 'Editar' : 'Salvar'}</Title>
+                </Button>
+              )}
+              {showButtonRemove && (
+                <Button style={{ marginBottom: 10 }} onPress={handleDeleteExpense}>
+                  <Title>Excluir</Title>
+                </Button>
+              )}
             </View>
-          </View>
-          <Title>
-            Preço <Span> (opicional)</Span>
-          </Title>
-          <Input
-            placeholder="0,00"
-            value={valueItem}
-            keyboardType="numeric"
-            onChangeText={setValueItem}
-          />
-
-
-          <Title>
-            Categoria <Span> (opicional)</Span>
-          </Title>
-          <RNPickerSelect
-            onValueChange={(value) => setSelectedCategory(value)}
-            items={[
-              { label: 'Ovos, Verduras e Frutas', value: 'ovos, verduras e frutas' },
-              { label: 'Carnes', value: 'carnes' },
-              { label: 'Laticínios', value: 'laticinios' },
-              { label: 'Padaria', value: 'padaria' },
-              { label: 'Bebidas', value: 'bebidas' },
-              { label: 'Produtos de Limpeza', value: 'produtos de limpeza' },
-              { label: 'Higiene Pessoal', value: 'higiene pessoal' },
-              { label: 'Hortifruti', value: 'hortifruti' },
-              { label: 'Congelados', value: 'congelados' },
-              { label: 'Açougue', value: 'acougue' },
-              { label: 'Peixaria', value: 'peixaria' },
-              { label: 'Bebidas Alcoólicas', value: 'bebidas alcoolicas' },
-              { label: 'Pet Shop', value: 'pet shop' },
-              { label: 'Utensílios Domésticos', value: 'utensilios domesticos' },
-              { label: 'Bebês e Crianças', value: 'bebes e criancas' },
-              { label: 'Eletronicos', value: 'Eletronicos' },
-              { label: 'Carro', value: 'Carro' },
-              { label: 'Ferramentas', value: 'Ferramentas' },
-            ]}
-            value={selectedCategory}
-            placeholder={{ label: 'Selecione', value: 'Selecione' }}
-          />
-
-          <Title>
-            Observação <Span> (opicional)</Span>
-          </Title>
-          <Input
-            value={description}
-            onChangeText={setDescription}
-          />
-          <View style={{ marginBottom: 10, height: 150 }}>
-            {showButtonSave && (
-              <Button style={{ marginBottom: 10 }} onPress={isEditing ? handleEditExpense : handleSaveItem}>
-                <Title>{isEditing ? 'Editar' : 'Salvar'}</Title>
-              </Button>
-            )}
-            {showButtonRemove && (
-              <Button style={{ marginBottom: 10 }} onPress={handleDeleteExpense}>
-                <Title>Excluir</Title>
-              </Button>
-            )}
-          </View>
-        </Content>
-      </ScrollView>
-    </>
+          </Content>
+        </ScrollView>
+      </Container>
+    </DefaultContainer>
   );
 }

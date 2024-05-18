@@ -38,9 +38,7 @@ export const NavBar = styled.View`
     padding-top: 10px;
 `;
 
-export const Button = styled(TouchableOpacity)`
-align-items: center;
-`;
+export const ButtonIcon = styled(TouchableOpacity)``;
 
 export const Title = styled.Text`
     font-size: ${({theme}) => theme.FONTE_SIZE.GG}px;
@@ -67,6 +65,18 @@ export const Items = styled.View`
     width: 100%;
     flex-direction: row;
     justify-content: space-between;
-    height: 50px;
+    height: 40px;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+`;
+
+
+export const Icon = styled.View`
+    width: 40px;
+    height: 40px;
+    justify-content: center;
     align-items: center;
 `;
+

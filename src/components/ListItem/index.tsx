@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { Icon, Title, Container, Button, ListItemStyleProps } from "./styles";
+import { View } from "react-native";
 type ListItemProps = {
     title: string;
 }
@@ -20,7 +21,14 @@ export function ListItem({ title }: ListItemProps) {
                 <Icon type={isCheck ? 'PRIMARY' : 'SECONDARY'} name={isCheck ? "checkbox-marked-circle-outline" : "checkbox-blank-circle-outline"} />
 
                 <Title type={isCheck ? 'PRIMARY' : 'SECONDARY'}>{title}</Title>
-            </Button>
+                </Button>
+                <View style={{
+                    flexDirection:'row'
+                }}>
+                    <Icon type="SECONDARY" name="pencil" />
+                    <Icon type="SECONDARY" name="trash-can" />
+                </View>
+         
         </Container>
     )
 }

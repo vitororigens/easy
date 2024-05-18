@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Home } from "../screens/Home";
 import { useTheme } from "styled-components/native";
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import { Charts } from '../screens/Charts';
 import { Marketplace } from '../screens/Marketplace';
 import { PiggyBank } from '../screens/PiggyBank';
@@ -11,11 +11,15 @@ import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { Loading } from '../components/Loading';
 import LogoHome from '../assets/Icones/icones_brokerx_cinza-19.svg';
 import LogoPiggBank from '../assets/Icones/icones_brokerx_cinza-01.svg';
-import LogoOpenCart from '../assets/Icones/icones_brokerx_cinza-25.svg';
+import LogoClipBoard from '../assets/Icones/icones_brokerx_cinza-18.svg';
 import LogoLineChart from '../assets/Icones/icones_brokerx_cinza-07.svg';
+import LogoCart from '../assets/Icones/icones_brokerx_cinza-25.svg';
 import LogoGears from '../assets/Icones/icones_brokerx_cinza-32.svg';
+import { Entypo } from '@expo/vector-icons';
 
 import { Platform } from 'react-native';
+import { ListTask } from '../screens/ListTask';
+import { Notes } from '../screens/Notes';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 const tabBarHeight = Platform.OS === 'ios' ? 80 : 60;
@@ -60,20 +64,20 @@ export function BottomTabsNavigation() {
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <LogoLineChart width={50} height={50} fill={color}/>
-                    )
-                }}
-                name="Gráficos"
-                component={Charts}
-            />
-            <Screen
-                options={{
-                    tabBarIcon: ({ color }) => (
-                        <FontAwesome5 name="clipboard-list" size={45} color={color} />
+                        <LogoCart width={50} height={50} fill={color}/>
                     )
                 }}
                 name="Mercado"
                 component={Marketplace}
+            />
+            <Screen
+                options={{
+                    tabBarIcon: ({ color }) => (
+                        <LogoClipBoard width={50} height={50} fill={color}/>
+                    )
+                }}
+                name="Tarefas"
+                component={ListTask}
             />
             <Screen
                 options={{
@@ -86,19 +90,19 @@ export function BottomTabsNavigation() {
                 component={Home}
 
             />
-            <Screen
+          <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <LogoPiggBank width={50} height={50} fill={color}/>
+                        <FontAwesome name="sticky-note" size={40} color={color} />
                     )
                 }}
-                name="Cofrinho"
-                component={PiggyBank}
+                name="Notas"
+                component={Notes}
             />
             <Screen
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <LogoGears width={50} height={50} fill={color} />
+                        <Entypo name="menu" size={45} color={color} />
                     )
                 }}
                 name="Config"

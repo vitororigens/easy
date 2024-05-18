@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Button, Content, Divider, Header, Title, NavBar} from "./styles";
+import { Button, Content, Divider, Header, Title, NavBar } from "./styles";
 import { LoadData } from "../../components/LoadData";
 import { ItemMarketplace } from "../../components/ItemMarketplace";
 import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
-import { FlatList, Modal, View, Platform, ScrollView } from "react-native";
+import { FlatList, Modal, View, Platform, ScrollView, TouchableOpacity, Text, } from "react-native";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { useTheme } from "styled-components/native";
 import { database } from "../../services";
 import { Toast } from "react-native-toast-notifications";
 import { Cart } from "../../components/Cart";
-import useFirestoreCollection from "../../hooks/useFirestoreCollection";
+import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCollection";
 import { Loading } from "../../components/Loading";
-
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ListItem } from "../../components/ListItem";
 import { NewItem } from "../NewItem";
 import { useMonth } from "../../context/MonthProvider";
+import { Items } from "../../components/Items";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 const modalBottom = Platform.OS === 'ios' ? 90 : 70;
 
@@ -24,12 +26,16 @@ export function Marketplace() {
   const [activeButton, setActiveButton] = useState("items");
   const [confirmItemVisible, setConfirmItemVisible] = useState(false)
   const data = useMarketplaceCollections('Marketplace');
+  const expense = useFirestoreCollection('Expense');
   const dataTask = useMarketplaceCollections('Task');
   const [modalActive, setModalActive] = useState(false);
   const [itemsCount, setItemsCount] = useState(0);
   const [totalValue, setTotalValue] = useState(0);
+  const [status, setStatus] = useState(false);
+  const [selectedListData, setSelectedListData] = useState<ExpenseData | null>(null);
   const [selectedItemData, setSelectedItemData] = useState('');
-  console.log('id',selectedItemData)
+  const [selectedList, setSelectedList] = useState(false);
+  console.log('id', selectedItemData)
   const [isLoaded, setIsLoaded] = useState(false);
 
   const { selectedMonth } = useMonth()
@@ -38,7 +44,7 @@ export function Marketplace() {
   const { COLORS } = useTheme();
 
   const handleButtonClick = (buttonName: string) => {
-    if(buttonName === "items") {
+    if (buttonName === "items") {
       setModalActive(false);
       setItemsCount(0);
       setTotalValue(0);
@@ -62,6 +68,52 @@ export function Marketplace() {
     }
   };
 
+  const handleDeleteList = () => {
+    console.log("Selected List Data:", selectedListData);
+    if (selectedListData) {
+      database.collection('Expense').doc(selectedListData?.id).delete()
+        .then(() => {
+          Toast.show('Lista excluída!', { type: 'success' });
+        })
+        .catch(error => {
+          console.error('Erro ao excluir a lista: ', error);
+        });
+    }
+    setSelectedList(false);
+  };
+  
+  const handleSaveListAgain = (selectedItemData: ExpenseData | null) => {
+    const currentDate = new Date();
+    const day = currentDate.getDate();
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+    const formattedDate = `${day}/${month}/${year}`;
+
+    database
+      .collection('Expense')
+      .doc()
+      .set({
+        category: 'mercado',
+        uid: uid,
+        date: formattedDate,
+        valueTransaction: totalValue,
+        description: '',
+        repeat: false,
+        type: 'output',
+        month: month,
+        status: true,
+
+      })
+      .then(() => {
+        Toast.show('Transação adicionada!', { type: 'success' });
+        setModalActive(false);
+        setItemsCount(0);
+        setTotalValue(0);
+      })
+      .catch(error => {
+        console.error('Erro ao adicionar a transação: ', error);
+      });
+  };
   const handleSaveList = () => {
     const currentDate = new Date();
     const day = currentDate.getDate();
@@ -80,7 +132,8 @@ export function Marketplace() {
         description: '',
         repeat: false,
         type: 'output',
-        month: month
+        month: month,
+        status: true,
 
       })
       .then(() => {
@@ -93,12 +146,24 @@ export function Marketplace() {
         console.error('Erro ao adicionar a transação: ', error);
       });
   };
+  const handleUseListAgain = () => {
+    if (selectedItemData) {
+      handleSaveListAgain(selectedListData);
+    }
+    setSelectedList(false);
+  };
+
+  function handleEditItem(documentId: string) {
+    setConfirmItemVisible(true)
+    setSelectedItemData(documentId)
 
 
-  function handleEditItem (documentId: string) {
-      setConfirmItemVisible(true)
-      setSelectedItemData(documentId)
 
+  }
+
+  const handleListSelected = (item: any) => {
+    setSelectedListData(item);
+    setSelectedList(true)
   }
 
 
@@ -115,39 +180,24 @@ export function Marketplace() {
   }
 
   return (
-    <DefaultContainer monthButton newItem>
-      <Container type="SECONDARY" title="Lista de tarefas">
+    <DefaultContainer monthButton  newItemMarketplace>
+      <Container type="SECONDARY" title="Lista de Mercado">
         <Content>
           <Header>
-            <Divider style={{ alignSelf: activeButton === "items" ? "flex-start" : "flex-end" }} />
+            <Divider style={{ alignSelf: activeButton === "lista" ? "flex-start" : "flex-end" }} />
             <NavBar>
-              <Button onPress={() => handleButtonClick("items")}>
-                <Title>
-                  Lista
-                </Title>
-              </Button>
               <Button onPress={() => handleButtonClick("lista")}>
                 <Title>
                   Carrinho
                 </Title>
               </Button>
+              <Button onPress={() => handleButtonClick("items")}>
+                <Title>
+                  Historico de compra
+                </Title>
+              </Button>
             </NavBar>
           </Header>
-
-          {activeButton === "items" &&
-            (dataTask.filter(item => item.uid === uid ).length === 0 ? (
-              <ScrollView>
-                <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando itens no seu carrinho e crie sua lista de mercado.' />
-              </ScrollView>
-            ) : (
-              <FlatList
-                data={dataTask.filter(item => item.uid === uid)}
-                renderItem={({ item }) => (
-                  <ListItem title={item.name} />
-                )}
-              />
-            ))
-          }
           {activeButton === "lista" && (
             data.filter(item => item.uid === uid).length === 0 ? (
               <ScrollView>
@@ -171,11 +221,115 @@ export function Marketplace() {
               />
             )
           )}
+          {activeButton === "items" &&
+            (expense.filter(item => item.uid === uid && item.category === 'mercado').length === 0 && uid !== undefined ? (
+              <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando itens no seu carrinho e crie sua lista de mercado.' />
+            ) : (
+              <FlatList
+                data={expense.filter(item => item.uid === uid && item.category === 'mercado' && item.month === selectedMonth)}
+                renderItem={({ item }) => (
+                  <TouchableOpacity onPress={() => handleListSelected(item)}>
+                    <Items
+                      showItemTask
+                      status={item.status}
+                      type={item.type}
+                      category={item.category}
+                      date={item.date}
+                      repeat={item.repeat}
+                      valueTransaction={formatCurrency(item.valueTransaction)}
+                    />
+                  </TouchableOpacity>
+                )}
+              />
+            ))
+          }
+
         </Content>
       </Container>
 
       <Modal visible={confirmItemVisible} onRequestClose={() => setConfirmItemVisible(false)}>
-            <NewItem selectedItemId={selectedItemData} closeBottomSheet={() => setConfirmItemVisible(false)} onCloseModal={() => setConfirmItemVisible(false)} showButtonSave showButtonRemove />
+        <NewItem selectedItemId={selectedItemData} closeBottomSheet={() => setConfirmItemVisible(false)} onCloseModal={() => setConfirmItemVisible(false)} showButtonSave showButtonRemove />
+      </Modal>
+      <Modal
+        visible={selectedList}
+        transparent
+      >
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+
+          <View style={{
+            width: 250,
+            height: 80,
+            alignItems: 'center',
+            backgroundColor: COLORS.PURPLE_800,
+            justifyContent: 'center',
+            borderTopEndRadius: 20,
+            borderTopLeftRadius: 20,
+          }}>
+            <View style={{
+              width: '100%',
+              paddingRight: 10,
+              alignItems: 'flex-end'
+
+            }}>
+              <TouchableOpacity onPress={() => setSelectedList(false)}>
+                <Text style={{
+                  color: 'white'
+                }}>
+                  X
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{
+              alignItems: 'center'
+            }}>
+              <MaterialCommunityIcons name="cart-variant" size={32} color="white" />
+            </View>
+
+          </View>
+          <View style={{
+            width: 250,
+            height: 150,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'white',
+            padding: 5,
+            borderBottomEndRadius: 20,
+            borderBottomLeftRadius: 20
+          }}>
+            <Text>Lista mercado selecionado </Text>
+            <Text style={{
+              marginBottom: 10
+            }}>
+              Valor: {formatCurrency(selectedListData?.valueTransaction)}
+            </Text>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              width: '100%'
+            }}>
+              <Button style={{
+                backgroundColor: COLORS.GREEN_700,
+                borderRadius: 20,
+                width: '40%',
+                padding: 5
+              }} onPress={handleUseListAgain}>
+                <Text style={{
+                  color: 'white',
+                  textAlign: 'center'
+                }}>Usar Lista Novamente</Text>
+              </Button>
+              <Button style={{
+                backgroundColor: COLORS.RED_700,
+                borderRadius: 20,
+                width: '40%'
+              }} onPress={handleDeleteList}>
+                <Text style={{
+                  color: 'white'
+                }}>Excluir Lista</Text>
+              </Button>
+            </View>
+          </View>
+        </View>
       </Modal>
       {modalActive && (
         <View style={{
@@ -198,6 +352,7 @@ export function Marketplace() {
           />
         </View>
       )}
+
     </DefaultContainer>
   );
 }

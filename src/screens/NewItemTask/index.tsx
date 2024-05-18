@@ -124,7 +124,12 @@ export function NewItemTask({ closeBottomSheet, onCloseModal, showButtonEdit, sh
 
   return (
     <>
-      <ScrollView
+      <DefaultContainer>
+      <ButtonClose onPress={closeBottomSheet} >
+          <Title style={{ color: 'white' }}>Fechar</Title>
+        </ButtonClose>
+        <Container title={'Adicionar nova tarefa'}>
+        <ScrollView
         keyboardShouldPersistTaps="always"
         showsVerticalScrollIndicator={false}
       >
@@ -151,6 +156,8 @@ export function NewItemTask({ closeBottomSheet, onCloseModal, showButtonEdit, sh
           </View>
         </Content>
       </ScrollView>
+        </Container>
+      </DefaultContainer>
     </>
   );
 }

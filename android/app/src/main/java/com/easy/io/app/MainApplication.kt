@@ -2,6 +2,7 @@ package com.easy.io.app
 
 import android.app.Application
 import android.content.res.Configuration
+import androidx.annotation.NonNull
 
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication

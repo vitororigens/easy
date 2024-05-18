@@ -1,6 +1,6 @@
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Content, Divider, Header, SubTitle, Title, Items, ContentItems } from "./styles";
+import { Content, Divider, Header, SubTitle, Title, Items, ContentItems, ButtonIcon, Icon } from "./styles";
 import { Button } from "../../components/Button";
 import { useState } from "react";
 import auth from "@react-native-firebase/auth";
@@ -9,9 +9,18 @@ import { LogoUser } from "../../components/LogoUser";
 import { ScrollView, View } from "react-native";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { Loading } from "../../components/Loading";
+import LogoLineChart from '../../assets/Icones/icones_brokerx_cinza-07.svg';
+import LogoPiggBank from '../../assets/Icones/icones_brokerx_cinza-01.svg';
+import { useTheme } from "styled-components/native";
+import { useNavigation } from "@react-navigation/native";
+import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
 
 
 export function Gears() {
+  const navigation = useNavigation()
+  const { COLORS } = useTheme()
   const user = useUserAuth();
   const [confirmLogoutVisible, setConfirmLogoutVisible] = useState(false);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
@@ -35,8 +44,17 @@ export function Gears() {
     auth().currentUser?.delete()
   }
 
+  function handlePiggyBank() {
+    navigation.navigate('piggybank')
+  }
 
 
+  function handleGraphics() {
+    navigation.navigate('graphics')
+  }
+  function handlePefil() {
+    navigation.navigate('perfil')
+  }
 
 
   return (
@@ -48,44 +66,63 @@ export function Gears() {
               <View>
                 <Header>
                   <Divider />
-                  <LogoUser title={user?.displayName || ""} />
                 </Header>
                 <ContentItems>
 
-                  <Items>
-                    <Title>
-                      Nome:
-                    </Title>
+                  <ButtonIcon onPress={handleGraphics}>
+                    <Items>
+                      <Title>
+                        Grafícos
+                      </Title>
+                     <Icon>
+                     <FontAwesome name="line-chart" size={30} color={COLORS.PURPLE_800} />
+                     </Icon>
 
-                    <SubTitle type="SECONDARY">
-                      {user?.displayName}
-                    </SubTitle>
-                  </Items>
+                    </Items>
+                  </ButtonIcon>
+                  <ButtonIcon onPress={handlePiggyBank}>
+                    <Items>
+                      <Title>
+                        Cofrinho
+                      </Title>
+                      <Icon>
+                      <FontAwesome5 name="piggy-bank" size={30} color={COLORS.PURPLE_800} />
+                      </Icon>
 
+                    </Items>
+                  </ButtonIcon>
+                  <ButtonIcon onPress={handlePefil}>
+                    <Items>
+                      <Title>
+                        Perfil
+                      </Title>
+                      <Icon>
+                        <FontAwesome name="user" size={30} color={COLORS.PURPLE_800} />
+                      </Icon>
+                    </Items>
+                  </ButtonIcon>
+                  <ButtonIcon onPress={handleDeleteUser}>
+                    <Items>
+                      <Title>
+                        Deletar Conta
+                      </Title>
+                      <Icon>
+                        <FontAwesome name="trash" size={30} color={COLORS.PURPLE_800} />
+                      </Icon>
 
-                  <Items>
-                    <Title>
-                      Email:
-                    </Title>
-                    <SubTitle type="SECONDARY">
-                      {user?.email}
-                    </SubTitle>
-                  </Items>
-                  <Items>
-                    <Title>
-                      ID:
-                    </Title>
-                    <SubTitle type="SECONDARY">
-                      {user?.uid ? (user.uid.length > 10 ? user.uid.substring(0, 15) + '...' : user.uid) : ""}
-                    </SubTitle>
+                    </Items>
+                  </ButtonIcon>
+                  <ButtonIcon onPress={handleLogout}>
+                    <Items>
+                      <Title>
+                        Sair
+                      </Title>
+                      <Icon>
+                        <Entypo name="log-out" size={30} color={COLORS.PURPLE_800} />
+                      </Icon>
 
-
-                  </Items>
-                  <Button style={{
-                    marginTop: 20,
-                    marginBottom: 20
-                  }} title={'Sair'} onPress={handleLogoutConfirmation} />
-                  <Button title={'Deletar Conta'} onPress={handleDeleteUserConfirmation} />
+                    </Items>
+                  </ButtonIcon>
                 </ContentItems>
               </View>
               : <Loading />
