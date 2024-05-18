@@ -1,6 +1,6 @@
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Content, Divider, Header, Title, ButtonClose, Input, Button, Span } from "./styles";
+import { Content, Divider, Header, Title, ButtonClose, Input, Button, Span, InputContainer } from "./styles";
 import RNPickerSelect from 'react-native-picker-select';
 import { Alert, ScrollView, View } from "react-native";
 import { useEffect, useState } from "react";
@@ -19,22 +19,12 @@ type Props = {
 }
 
 export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showButtonSave, showButtonRemove, selectedItemId }: Props) {
-  const [selectedCategory, setSelectedCategory] = useState('geral');
-  const [selectedMeasurements, setSelectedMeasurements] = useState('');
-  const [valueItem, setValueItem] = useState('0.00');
   const [name, setName] = useState('')
-  const [amount, setAmount] = useState('1')
   const [description, setDescription] = useState('');
   const user = useUserAuth();
   const uid = user?.uid;
   const [isEditing, setIsEditing] = useState(false);
   console.log(uid)
-
-
-  function formatQuantity(quantity: string) {
-    const formattedQuantity = quantity.replace(/\D/g, '').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-    return formattedQuantity;
-  }
 
 
   const handleSaveItem = () => {
@@ -43,14 +33,15 @@ export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showB
       return;
     }
     database
-      .collection('Task')
+      .collection('Notes')
       .doc()
       .set({
         name,
         uid: uid,
+        description: description
       })
       .then(() => {
-        Toast.show('Item adicionado!', { type: 'success' });
+        Toast.show('Nota adicionado!', { type: 'success' });
         setName('')
         onCloseModal && onCloseModal();
       })
@@ -85,14 +76,14 @@ export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showB
 
 
     database
-      .collection('Task')
+      .collection('Notes')
       .doc(selectedItemId)
       .set({
         name,
         uid: uid,
       })
       .then(() => {
-        Toast.show('Item adicionado!', { type: 'success' });
+        Toast.show('Nota adicionado!', { type: 'success' });
         setName('')
         onCloseModal && onCloseModal();
       })
@@ -104,7 +95,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showB
 
   useEffect(() => {
     if (selectedItemId) {
-      database.collection('Task').doc(selectedItemId).get().then((doc) => {
+      database.collection('Notas').doc(selectedItemId).get().then((doc) => {
         if (doc.exists) {
           const data = doc.data();
           if (data) {
@@ -144,11 +135,11 @@ export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showB
           <Title>
             Nota
           </Title>
-          <Input
-            multiline
-            numberOfLines={5}
-            value={description}
-            onChangeText={setDescription}
+          <InputContainer
+          multiline
+          numberOfLines={20}
+          value={description}
+          onChangeText={setDescription}
           />
           <View style={{ marginBottom: 10, height: 150 }}>
             {showButtonSave && (

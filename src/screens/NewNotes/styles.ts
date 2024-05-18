@@ -71,3 +71,19 @@ export const Span = styled.Text`
     font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
     color: ${({ theme }) => theme.COLORS.GRAY_600};
 `;
+
+export const InputContainer = styled(TextInput).attrs(({theme}) => ({
+    placeholderTextColor: theme.COLORS.GRAY_400
+}))`
+flex: 1;
+
+min-height: 60px;
+max-height: 300px;
+background-color: ${({theme}) => theme.COLORS.GRAY_300};
+margin-bottom: 15px;
+
+color: ${({theme}) => theme.COLORS.GRAY_600};
+font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
+font-size: ${({theme}) => theme.FONTE_SIZE.LG}px;
+padding: 15px;
+`;
