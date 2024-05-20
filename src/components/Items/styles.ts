@@ -1,4 +1,5 @@
 import styled from "styled-components/native";
+import { Entypo } from '@expo/vector-icons';
 
 export type ItemsTypeStyleProps = 'PRIMARY' | 'SECONDARY' | 'TERTIARY';
 
@@ -8,8 +9,12 @@ type Props = {
 
 export const Container = styled.View`
     width: 100%;
+    height: 60px;
     flex-direction: row;
-    padding-top: 10px;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 10px;
+    padding-right: 10px;
 `;
 
 export const Icon = styled.View<Props>`
@@ -23,7 +28,7 @@ export const Icon = styled.View<Props>`
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    margin: 10px;
+    margin-right: 10px;
 `;
 
 export const Title = styled.Text<Props>`
@@ -52,12 +57,35 @@ export const Divider = styled.View`
 
 
 export const Content = styled.View`
-    width: 80%;
-    padding: 10px 20px 10px 0px;
-    height: 45px;
+    flex: 1;
+    height: 60px;
+    justify-content: center;
 `;
 
 export const ContentItems = styled.View`
     flex-direction: row;
     justify-content: space-between;
+`;
+
+
+export const IconMenu = styled(Entypo).attrs<Props>(({ theme, type }) => ({
+    color: type === 'PRIMARY' 
+        ? theme.COLORS.GREEN_700
+        : type === 'SECONDARY'
+        ? theme.COLORS.RED_700
+        : theme.COLORS.YELLOW_700,
+    size: theme.FONTE_SIZE.GG,
+}))``;
+
+export const ContainerMenu = styled.View`
+  min-width: 70px;
+  border-radius: 5px;
+  background-color: #fff;
+  max-height: 200px;
+  top: -20px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+  elevation: 5;
 `;

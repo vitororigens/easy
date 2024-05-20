@@ -82,7 +82,9 @@ export function ListTask() {
           <Header>
             <Divider />
           </Header>
-          <View style={{ flexDirection: 'row' }}>
+          <View style={{ flexDirection: 'row',
+            margin: 15
+           }}>
             <Button onPress={handleCheckAll}>
               <Title>Marcar todos</Title>
             </Button>
@@ -93,7 +95,7 @@ export function ListTask() {
 
             {data.filter(item => item.uid === uid).length === 0 ? (
               <ScrollView>
-                <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando itens no seu carrinho e crie sua lista de mercado.' />
+                <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando uma nova tarefa clicando em Novo +.' />
               </ScrollView>
             ) : (
               <FlatList

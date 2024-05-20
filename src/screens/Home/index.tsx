@@ -13,6 +13,8 @@ import { Revenue } from "../../components/Revenue";
 import { Expense } from "../../components/Expense";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { useMonth } from "../../context/MonthProvider";
+import { database } from "../../services";
+import { Toast } from "react-native-toast-notifications";
 
 
 export function Home() {
@@ -49,6 +51,25 @@ export function Home() {
     setActiveButton(buttonName);
   };
 
+  function handleDeleteRevenue(documentId: string) {
+    database.collection('Revenue').doc(documentId).delete()
+      .then(() => {
+        Toast.show('Nota excluída!', { type: 'success' });
+      })
+      .catch(error => {
+        console.error('Erro ao excluir a nota: ', error);
+      });
+  }
+
+  function handleDeleteExpense(documentId: string) {
+    database.collection('Expense').doc(documentId).delete()
+      .then(() => {
+        Toast.show('Nota excluída!', { type: 'success' });
+      })
+      .catch(error => {
+        console.error('Erro ao excluir a nota: ', error);
+      });
+  }
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
@@ -95,6 +116,8 @@ export function Home() {
 
                     <TouchableOpacity onPress={() => handleRevenueConfirmation(item.id)}>
                       <Items
+                      onDelete={() => handleDeleteRevenue(item.id)}
+                      onEdit={() => handleRevenueConfirmation(item.id)}
                         showItemTaskRevenue
                         type={item.type}
                         category={item.category}
@@ -123,6 +146,8 @@ export function Home() {
                   renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleExpenseConfirmation(item.id)}>
                       <Items
+                       onDelete={() => handleDeleteExpense(item.id)}
+                       onEdit={() => handleRevenueConfirmation(item.id)}
                         showItemTask
                         status={item.status}
                         type={item.type}

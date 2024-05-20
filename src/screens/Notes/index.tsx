@@ -1,6 +1,6 @@
 import { DefaultContainer } from '../../components/DefaultContainer';
 import { Container } from '../../components/Container';
-import { Dimensions, FlatList, Modal } from 'react-native';
+import { Dimensions, FlatList, Modal, ScrollView } from 'react-native';
 import { LoadData } from '../../components/LoadData';
 import useMarketplaceCollections from '../../hooks/useMarketplaceCollections';
 import { ItemNotes } from '../../components/ItemNotes';
@@ -39,21 +39,26 @@ export function Notes() {
   }
 
   return (
-    <DefaultContainer  newNotes>
+    <DefaultContainer newNotes>
       <Container type="SECONDARY" title="Notas">
-        {/* <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui notas para exibir aqui!' /> */}
-        <FlatList
-          data={data.filter(item => item.uid === uid)}
-          renderItem={({ item }) => (
-            <ItemNotes
-              onDelete={() => handleDeleteItem(item.id)}
-              onEdit={() => handleEditItem(item.id)}
-              title={item.name}
-              description={item.description}
-            />
-          )}
-          keyExtractor={(item) => item.id}
-        />
+        {data.filter(item => item.uid === uid).length === 0 ? (
+          <ScrollView>
+            <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando uma nova anotação clicando em Novo +.' />
+          </ScrollView>
+        ) : (
+          <FlatList
+            data={data.filter(item => item.uid === uid)}
+            renderItem={({ item }) => (
+              <ItemNotes
+                onDelete={() => handleDeleteItem(item.id)}
+                onEdit={() => handleEditItem(item.id)}
+                title={item.name}
+                description={item.description}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+          />
+        )}
       </Container>
 
       <Modal

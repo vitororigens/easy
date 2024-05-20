@@ -56,7 +56,7 @@ export function Perfil() {
 
   return (
     <DefaultContainer backButton>
-      <Container type="SECONDARY" title="Configurações">
+      <Container type="SECONDARY" title="Perfil">
         <ScrollView showsVerticalScrollIndicator={false}>
           <Content>
             {user ?

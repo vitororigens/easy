@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { Container, Content, ContentItems, Divider, Icon, ItemsTypeStyleProps, SubTitle, Title } from "./styles";
+import { Container, ContainerMenu, Content, ContentItems, Divider, Icon, IconMenu, ItemsTypeStyleProps, SubTitle, Title } from "./styles";
 import { AntDesign } from '@expo/vector-icons';
 import { useTheme } from "styled-components/native";
+import { Popover } from 'react-native-popper';
+import { TouchableOpacity } from "react-native";
+import { Button } from "../ItemTask/styles";
 
 type ItemsProps = {
     category?: string;
@@ -14,9 +17,11 @@ type ItemsProps = {
     showItemPiggyBank?: boolean;
     showItemTask?: boolean;
     showItemTaskRevenue?: boolean;
+    onDelete: () => void;
+    onEdit: () => void;
 }
 
-export function Items({ category, date, valueTransaction, repeat, alert, status, type, showItemPiggyBank, showItemTaskRevenue, showItemTask }: ItemsProps) {
+export function Items({ category, date, valueTransaction, repeat, alert, status, type, showItemPiggyBank, showItemTaskRevenue, showItemTask, onDelete, onEdit }: ItemsProps) {
     const transactionType = repeat ? 'Despesa fixa' : 'Despesa variável';
     const { COLORS } = useTheme();
     const textStatus = status ? 'Pago' : 'Pendente';
@@ -34,7 +39,7 @@ export function Items({ category, date, valueTransaction, repeat, alert, status,
     return (
         <>
             <Container>
-             
+
                 {showItemTask && date <= dateToday && !status && (
                     <>
                         <Icon type='SECONDARY'>
@@ -59,6 +64,31 @@ export function Items({ category, date, valueTransaction, repeat, alert, status,
                                 </SubTitle>
                             </ContentItems>
                         </Content>
+                        <Popover
+                            trigger={
+                                <TouchableOpacity>
+                                    <IconMenu type='SECONDARY' name="dots-three-vertical" />
+                                </TouchableOpacity>
+                            }
+                        >
+                            <Popover.Backdrop />
+                            <Popover.Content>
+                                <ContainerMenu>
+                                <Button onPress={onDelete}>
+                                        <IconMenu type="SECONDARY" name="trash" />
+                                        <Title type="SECONDARY">Excluir</Title>
+                                    </Button>
+                                    <Button onPress={onEdit}>
+                                        <IconMenu type="SECONDARY" name="pencil" />
+                                        <Title type="SECONDARY">Editar</Title>
+                                    </Button>
+                                    <Button onPress={onEdit}>
+                                        <IconMenu type="SECONDARY" name="pencil" />
+                                        <Title type="SECONDARY">Pagar</Title>
+                                    </Button>
+                                </ContainerMenu>
+                            </Popover.Content>
+                        </Popover>
                     </>
                 )}
                 {showItemTask && date >= dateToday && !status && (
@@ -81,10 +111,32 @@ export function Items({ category, date, valueTransaction, repeat, alert, status,
                                     {date}
                                 </SubTitle>
                                 <SubTitle>
-                                {typeMode}
+                                    {typeMode}
                                 </SubTitle>
                             </ContentItems>
                         </Content>
+
+                        <Popover
+                            trigger={
+                                <TouchableOpacity>
+                                    <IconMenu type="TERTIARY" name="dots-three-vertical" />
+                                </TouchableOpacity>
+                            }
+                        >
+                            <Popover.Backdrop />
+                            <Popover.Content>
+                                <ContainerMenu>
+                                <Button onPress={onDelete}>
+                                        <IconMenu type="TERTIARY" name="trash" />
+                                        <Title type="TERTIARY">Excluir</Title>
+                                    </Button>
+                                    <Button onPress={onEdit}>
+                                        <IconMenu type="TERTIARY" name="pencil" />
+                                        <Title type="TERTIARY">Editar</Title>
+                                    </Button>
+                                </ContainerMenu>
+                            </Popover.Content>
+                        </Popover>
                     </>
                 )}
                 {showItemTask && status && (
@@ -111,9 +163,30 @@ export function Items({ category, date, valueTransaction, repeat, alert, status,
                                 </SubTitle>
                             </ContentItems>
                         </Content>
+                        <Popover
+                            trigger={
+                                <TouchableOpacity>
+                                    <IconMenu type="PRIMARY" name="dots-three-vertical" />
+                                </TouchableOpacity>
+                            }
+                        >
+                            <Popover.Backdrop />
+                            <Popover.Content>
+                                <ContainerMenu>
+                                    <Button onPress={onDelete}>
+                                        <IconMenu type="PRIMARY" name="trash" />
+                                        <Title type="PRIMARY">Excluir</Title>
+                                    </Button>
+                                    <Button onPress={onEdit}>
+                                        <IconMenu type="PRIMARY" name="pencil" />
+                                        <Title type="PRIMARY">Editar</Title>
+                                    </Button>
+                                </ContainerMenu>
+                            </Popover.Content>
+                        </Popover>
                     </>
                 )}
-                   {showItemTaskRevenue && (
+                {showItemTaskRevenue && (
                     <>
                         <Icon type='PRIMARY'>
                             <AntDesign name="infocirlce" size={24} color="white" />
@@ -136,7 +209,30 @@ export function Items({ category, date, valueTransaction, repeat, alert, status,
                                     {transactionType}
                                 </SubTitle>
                             </ContentItems>
+
                         </Content>
+
+                        <Popover
+                            trigger={
+                                <TouchableOpacity>
+                                    <IconMenu type="PRIMARY" name="dots-three-vertical" />
+                                </TouchableOpacity>
+                            }
+                        >
+                            <Popover.Backdrop />
+                            <Popover.Content>
+                                <ContainerMenu>
+                                    <Button onPress={onDelete}>
+                                        <IconMenu type="PRIMARY" name="trash" />
+                                        <Title type="PRIMARY">Excluir</Title>
+                                    </Button>
+                                    <Button onPress={onEdit}>
+                                        <IconMenu type="PRIMARY" name="pencil" />
+                                        <Title type="PRIMARY">Editar</Title>
+                                    </Button>
+                                </ContainerMenu>
+                            </Popover.Content>
+                        </Popover>
                     </>
                 )}
             </Container>
@@ -163,7 +259,30 @@ export function Items({ category, date, valueTransaction, repeat, alert, status,
                                 Economizou
                             </SubTitle>
                         </ContentItems>
+
                     </Content>
+
+                    <Popover
+                        trigger={
+                            <TouchableOpacity>
+                                <IconMenu type="PRIMARY" name="dots-three-vertical" />
+                            </TouchableOpacity>
+                        }
+                    >
+                        <Popover.Backdrop />
+                        <Popover.Content>
+                            <ContainerMenu>
+                                <Button onPress={onDelete}>
+                                    <IconMenu type="PRIMARY" name="trash" />
+                                    <Title type="PRIMARY">Excluir</Title>
+                                </Button>
+                                <Button onPress={onEdit}>
+                                    <IconMenu type="PRIMARY" name="pencil" />
+                                    <Title type="PRIMARY">Editar</Title>
+                                </Button>
+                            </ContainerMenu>
+                        </Popover.Content>
+                    </Popover>
                 </Container>
             )}
 
