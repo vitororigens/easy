@@ -31,18 +31,29 @@ export const Button = styled(TouchableOpacity)`
     flex-direction: row;
     background-color: ${({ theme }) => theme.COLORS.WHITE};
     padding: 5px;
+    justify-content: start;
+    align-items: center;
+    border-bottom-width: 1px; 
+    border-bottom-color: ${({ theme }) => theme.COLORS.TEAL_600};
 `;
 
 export const Icon = styled(Entypo).attrs(({ theme }) => ({
     color: theme.COLORS.TEAL_600,
     size: theme.FONTE_SIZE.GG
-}))``
+}))`
+    margin-right: 5px;
+`
 
 
 export const ContainerMenu = styled.View`
-    min-width: 90,
-    borderRadius: 5,
-    backgroundColor: '#fff',
-    maxHeight: 200,
-    top: -20,
+  min-width: 90px;
+  border-radius: 5px;
+  background-color: #fff;
+  max-height: 200px;
+  top: -20px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+  elevation: 5;
 `;

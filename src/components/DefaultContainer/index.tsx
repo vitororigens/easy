@@ -99,7 +99,11 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
     return (
         <Background>
             <Container>
-                <Header>
+                <Header
+                style={{
+                    justifyContent:backButton ? 'flex-start' : 'flex-end'
+                }}
+                >
                     {listButtom &&
                         <Button style={{
                             alignItems: 'center',
@@ -218,6 +222,7 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                         <Button style={{
                             alignItems: 'center',
                             flexDirection: 'row',
+                            justifyContent: backButton ? 'flex-start' : 'flex-end',
                             height: 60
                         }} onPress={handleNewNotes}>
                             <Title>

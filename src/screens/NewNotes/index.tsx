@@ -80,7 +80,8 @@ export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showB
       .doc(selectedItemId)
       .set({
         name,
-        uid: uid,
+        uid,
+        description
       })
       .then(() => {
         Toast.show('Nota adicionado!', { type: 'success' });
@@ -100,6 +101,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showB
           const data = doc.data();
           if (data) {
             setName(data.name);
+            setDescription(data.description)
             setIsEditing(true);
           } else {
             console.log('Dados do documento estão vazios!');

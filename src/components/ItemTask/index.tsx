@@ -10,13 +10,11 @@ type ListItemProps = {
   onToggle: () => void;
 };
 
-export function ListItem({ title, onDelete, onEdit, isChecked, onToggle }: ListItemProps) {
+export function ItemTask({ title, onDelete, onEdit, isChecked, onToggle }: ListItemProps) {
   return (
     <Container>
-      <Button onPress={onToggle}>
-        <Icon type={isChecked ? 'PRIMARY' : 'SECONDARY'} name={isChecked ? "checkbox-marked-circle-outline" : "checkbox-blank-circle-outline"} />
-        <Title type={isChecked ? 'PRIMARY' : 'SECONDARY'}>{title}</Title>
-      </Button>
+        <Title >{title}</Title>
+  
       <View style={{ flexDirection: 'row' }}>
         <TouchableOpacity onPress={onEdit}>
           <Icon type="SECONDARY" name="pencil" />
