@@ -22,8 +22,6 @@ const modalBottom = Platform.OS === 'ios' ? 90 : 70;
 
 export function ListTask() {
   const [activeButton, setActiveButton] = useState("items");
-  const [confirmItemVisible, setConfirmItemVisible] = useState(false)
-  const data = useMarketplaceCollections('Marketplace');
   const dataTask = useMarketplaceCollections('Task');
   const [modalActive, setModalActive] = useState(false);
   const [itemsCount, setItemsCount] = useState(0);

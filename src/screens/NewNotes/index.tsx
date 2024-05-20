@@ -57,7 +57,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showB
       return;
     }
 
-    const expenseRef = database.collection('Marketplace').doc(selectedItemId);
+    const expenseRef = database.collection('Notes').doc(selectedItemId);
     expenseRef.delete()
       .then(() => {
         Toast.show('Item Excluido!', { type: 'success' });
@@ -95,7 +95,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showB
 
   useEffect(() => {
     if (selectedItemId) {
-      database.collection('Notas').doc(selectedItemId).get().then((doc) => {
+      database.collection('Notes').doc(selectedItemId).get().then((doc) => {
         if (doc.exists) {
           const data = doc.data();
           if (data) {

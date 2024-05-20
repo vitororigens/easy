@@ -78,7 +78,7 @@ export const InputContainer = styled(TextInput).attrs(({theme}) => ({
 flex: 1;
 
 min-height: 60px;
-max-height: 300px;
+max-height: 250px;
 background-color: ${({theme}) => theme.COLORS.GRAY_300};
 margin-bottom: 15px;
 
