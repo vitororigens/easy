@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { Button, CartIcon, Container, ContainerQuantity, Contant, Icon, SubTitle, Title } from "./styles";
 import { useTheme } from "styled-components/native";
+import { Button, CartIcon, Container, ContainerQuantity, Contant, Icon, SubTitle, Title } from "./styles";
 
 type ItemMarketplaceProps = {
     title: string;
     quantity: number;
-    value: string;
+    value: number;
     measurements: string;
-    addItem: (value: string) => void;
-    removeItem: (value: string) => void;
+    addItem: (value: number) => void;
+    removeItem: (value: number) => void;
     onEditItem: () => void;
 }
 

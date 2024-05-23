@@ -9,9 +9,10 @@ export interface MarketplaceData {
   description: string;
   measurements: string;
   name: string;
-  valueItem: string;
+  valueItem: number;
   id:string;
   createdAt?:string;
+  totalValue?: number
 }
 
 const useMarketplaceCollections = (

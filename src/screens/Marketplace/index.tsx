@@ -12,7 +12,7 @@ import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
 import { useMonth } from "../../context/MonthProvider";
 import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCollection";
-import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
+import useMarketplaceCollections, { MarketplaceData } from "../../hooks/useMarketplaceCollections";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { formatCurrency } from "../../utils/formatCurrency";
@@ -28,13 +28,11 @@ export function Marketplace() {
   const expense = useFirestoreCollection('Expense');
   const dataTask = useMarketplaceCollections('Task');
   const [modalActive, setModalActive] = useState(false);
-  const [itemsCount, setItemsCount] = useState(0);
-  const [totalValue, setTotalValue] = useState(0);
   const [status, setStatus] = useState(false);
   const [selectedListData, setSelectedListData] = useState<ExpenseData | null>(null);
   const [selectedItemData, setSelectedItemData] = useState('');
+  const [selectedItems, setSelectedItems] = useState<MarketplaceData[]>([]);
   const [selectedList, setSelectedList] = useState(false);
-  console.log('id', selectedItemData)
   const [isLoaded, setIsLoaded] = useState(false);
 
   const { selectedMonth } = useMonth()
@@ -42,28 +40,37 @@ export function Marketplace() {
   const uid = user?.uid;
   const { COLORS } = useTheme();
 
+  const totalAmount = selectedItems.reduce((total, item) => total + item.amount, 0)
+  const totalValue = selectedItems.reduce((total, item) => total + (item.totalValue || 0), 0);
+
   const handleButtonClick = (buttonName: string) => {
     if (buttonName === "items") {
       setModalActive(false);
-      setItemsCount(0);
-      setTotalValue(0);
+      setSelectedItems([]);
     }
     setActiveButton(buttonName);
   };
 
-  const handleAddItem = (value: string) => {
-    setItemsCount(itemsCount + 1);
-    setTotalValue(prevTotal => prevTotal + parseFloat(value));
-    setModalActive(true);
-  };
 
-  const handleRemoveItem = (value: string) => {
-    setItemsCount(itemsCount - 1);
-    setTotalValue(prevTotal => prevTotal - parseFloat(value));
-    if (itemsCount - 1 <= 0) {
-      setModalActive(false);
-      setItemsCount(0)
-      setTotalValue(0)
+  const handleAddItem = (item: MarketplaceData) => {
+    const itemIndex = selectedItems.findIndex(selectedItem => selectedItem.id === item.id);
+    if (itemIndex !== -1) {
+      const updatedItems = [...selectedItems];
+      updatedItems[itemIndex].amount += 1;
+      updatedItems[itemIndex].totalValue = updatedItems[itemIndex].valueItem * updatedItems[itemIndex].amount;
+      setSelectedItems(updatedItems);
+    } else {
+      setSelectedItems([...selectedItems, { ...item, amount: 1, totalValue: item.valueItem }]);
+    }
+  };
+  
+  const handleRemoveItem = (item: MarketplaceData) => {
+    const itemIndex = selectedItems.findIndex(selectedItem => selectedItem.id === item.id);
+    if (itemIndex !== -1 && selectedItems[itemIndex].amount > 0) {
+      const updatedItems = [...selectedItems];
+      updatedItems[itemIndex].amount -= 1;
+      updatedItems[itemIndex].totalValue = updatedItems[itemIndex].valueItem * updatedItems[itemIndex].amount;
+      setSelectedItems(updatedItems);
     }
   };
 
@@ -106,8 +113,7 @@ export function Marketplace() {
       .then(() => {
         Toast.show('Transação adicionada!', { type: 'success' });
         setModalActive(false);
-        setItemsCount(0);
-        setTotalValue(0);
+        setSelectedItems([]);
       })
       .catch(error => {
         console.error('Erro ao adicionar a transação: ', error);
@@ -138,8 +144,7 @@ export function Marketplace() {
       .then(() => {
         Toast.show('Transação adicionada!', { type: 'success' });
         setModalActive(false);
-        setItemsCount(0);
-        setTotalValue(0);
+        setSelectedItems([]);
       })
       .catch(error => {
         console.error('Erro ao adicionar a transação: ', error);
@@ -155,9 +160,6 @@ export function Marketplace() {
   function handleEditItem(documentId: string) {
     setConfirmItemVisible(true)
     setSelectedItemData(documentId)
-
-
-
   }
 
   const handleListSelected = (item: any) => {
@@ -173,6 +175,12 @@ export function Marketplace() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if(!totalAmount) return setModalActive(false)
+    
+    setModalActive(true)
+  }, [totalAmount])
 
   if (!isLoaded || uid === undefined) {
     return <Loading />;
@@ -208,8 +216,8 @@ export function Marketplace() {
                 renderItem={({ item }) => (
                   <ItemMarketplace
                     onEditItem={() => handleEditItem(item.id)}
-                    removeItem={handleRemoveItem}
-                    addItem={handleAddItem}
+                    removeItem={() => handleRemoveItem(item)}
+                    addItem={() => handleAddItem(item)}
                     measurements={item.measurements}
                     quantity={item.amount}
                     title={item.name}
@@ -346,7 +354,7 @@ export function Marketplace() {
         }}>
           <Cart
             buttonSave={handleSaveList}
-            itemsCount={itemsCount}
+            itemsCount={totalAmount}
             totalValue={totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
           />
         </View>
