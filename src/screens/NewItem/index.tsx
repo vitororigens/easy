@@ -1,12 +1,12 @@
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Container } from "../../components/Container";
-import { Content, Title, ButtonClose, Input, Button, Span } from "./styles";
-import RNPickerSelect from 'react-native-picker-select';
-import { Alert, ScrollView, View } from "react-native";
 import { useEffect, useState } from "react";
-import { database } from '../../services';
+import { Alert, ScrollView, View } from "react-native";
+import RNPickerSelect from 'react-native-picker-select';
 import { Toast } from "react-native-toast-notifications";
+import { Container } from "../../components/Container";
+import { DefaultContainer } from "../../components/DefaultContainer";
 import { useUserAuth } from "../../hooks/useUserAuth";
+import { database } from '../../services';
+import { Button, ButtonClose, Content, Input, Span, Title } from "./styles";
 
 type Props = {
   closeBottomSheet?: () => void;

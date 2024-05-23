@@ -1,13 +1,12 @@
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Container } from "../../components/Container";
-import { Content, Divider, Header, Title, ButtonClose, Input, Button, Span } from "./styles";
-import RNPickerSelect from 'react-native-picker-select';
-import { Alert, ScrollView, View } from "react-native";
+import { format, subDays } from "date-fns";
 import { useEffect, useState } from "react";
-import { database } from '../../services';
+import { Alert, ScrollView, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
+import { Container } from "../../components/Container";
+import { DefaultContainer } from "../../components/DefaultContainer";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { MarketplaceData } from "../../hooks/useMarketplaceCollections";
+import { database } from '../../services';
+import { Button, ButtonClose, Content, Input, Title } from "./styles";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -19,23 +18,13 @@ type Props = {
 }
 
 export function NewItemTask({ closeBottomSheet, onCloseModal, showButtonEdit, showButtonSave, showButtonRemove, selectedItemId }: Props) {
-  const [selectedCategory, setSelectedCategory] = useState('geral');
-  const [selectedMeasurements, setSelectedMeasurements] = useState('');
-  const [valueItem, setValueItem] = useState('0.00');
   const [name, setName] = useState('')
-  const [amount, setAmount] = useState('1')
-  const [description, setDescription] = useState('');
   const user = useUserAuth();
   const uid = user?.uid;
   const [isEditing, setIsEditing] = useState(false);
-  console.log(uid)
 
-
-  function formatQuantity(quantity: string) {
-    const formattedQuantity = quantity.replace(/\D/g, '').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-    return formattedQuantity;
-  }
-
+  const now = new Date()
+  const formattedDate = format(subDays(now, 1), "dd/MM/yyyy")
 
   const handleSaveItem = () => {
     if (name === '') {
@@ -48,6 +37,7 @@ export function NewItemTask({ closeBottomSheet, onCloseModal, showButtonEdit, sh
       .set({
         name,
         uid: uid,
+        createdAt: formattedDate
       })
       .then(() => {
         Toast.show('Item adicionado!', { type: 'success' });
@@ -58,7 +48,6 @@ export function NewItemTask({ closeBottomSheet, onCloseModal, showButtonEdit, sh
         console.error('Erro ao adicionar o item: ', error);
       });
   }
-
 
   const handleDeleteExpense = () => {
     if (!selectedItemId) {
@@ -100,7 +89,6 @@ export function NewItemTask({ closeBottomSheet, onCloseModal, showButtonEdit, sh
         console.error('Erro ao adicionar o item: ', error);
       });
   };
-
 
   useEffect(() => {
     if (selectedItemId) {

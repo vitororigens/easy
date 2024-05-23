@@ -1,21 +1,19 @@
-import { Dimensions, FlatList, ScrollView, View } from "react-native";
-import { PieChart } from "react-native-chart-kit";
 import React, { useEffect, useState } from "react";
+import { Dimensions, FlatList, ScrollView, View } from "react-native";
 import { useTheme } from "styled-components/native";
 //
 import { Content, Divider, Header, SubTitle, Title } from "./styles";
 //
-import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
+import { DefaultContainer } from "../../components/DefaultContainer";
 import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
 //
-import { useTotalValue } from "../../hooks/useTotalValue";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import useFirestoreCollection from "../../hooks/useFirestoreCollection";
-import { formatCurrency } from "../../utils/formatCurrency";
 import { Items } from "../../components/Items";
 import { useMonth } from "../../context/MonthProvider";
+import useFirestoreCollection from "../../hooks/useFirestoreCollection";
+import { useUserAuth } from "../../hooks/useUserAuth";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -76,7 +74,7 @@ export function PiggyBank() {
             <View>
               {PiggyBankData.filter(item => item.uid === uid).length === 0 ? (
                 <ScrollView>
-                  <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de entradas! começe adicionando uma nova entrada.' />
+                  <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de entradas! Comece adicionando uma nova entrada.' />
                 </ScrollView>
               ) : (
 

@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { DefaultContainer } from '../../components/DefaultContainer';
-import { Container } from '../../components/Container';
-import { Button, Content, Divider, Header, Title, NavBar } from './styles';
-import { LineChart } from 'react-native-chart-kit';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, ScrollView } from 'react-native';
-import useFirestoreCollection, { ExpenseData } from './../../hooks/useFirestoreCollection';
+import { LineChart } from 'react-native-chart-kit';
 import { useTheme } from 'styled-components/native';
+import { Container } from '../../components/Container';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { LoadData } from '../../components/LoadData';
 import { Loading } from '../../components/Loading';
 import { useUserAuth } from '../../hooks/useUserAuth';
-import { LoadData } from '../../components/LoadData';
+import useFirestoreCollection, { ExpenseData } from './../../hooks/useFirestoreCollection';
+import { Button, Content, Divider, Header, NavBar, Title } from './styles';
 
 const screenWidth = Dimensions.get('screen').width;
 

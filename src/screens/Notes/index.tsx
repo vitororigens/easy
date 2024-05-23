@@ -1,14 +1,14 @@
-import { DefaultContainer } from '../../components/DefaultContainer';
-import { Container } from '../../components/Container';
+import { useState } from 'react';
 import { Dimensions, FlatList, Modal, ScrollView } from 'react-native';
+import { Toast } from 'react-native-toast-notifications';
+import { Container } from '../../components/Container';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { ItemNotes } from '../../components/ItemNotes';
 import { LoadData } from '../../components/LoadData';
 import useMarketplaceCollections from '../../hooks/useMarketplaceCollections';
-import { ItemNotes } from '../../components/ItemNotes';
 import { useUserAuth } from '../../hooks/useUserAuth';
-import { NewNotes } from '../NewNotes';
-import { useState } from 'react';
 import { database } from '../../services';
-import { Toast } from 'react-native-toast-notifications';
+import { NewNotes } from '../NewNotes';
 
 const screenWidth = Dimensions.get('screen').width;
 
@@ -43,7 +43,7 @@ export function Notes() {
       <Container type="SECONDARY" title="Notas">
         {data.filter(item => item.uid === uid).length === 0 ? (
           <ScrollView>
-            <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando uma nova anotação clicando em Novo +.' />
+            <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! Comece adicionando uma nova anotação clicando em Novo +.' />
           </ScrollView>
         ) : (
           <FlatList

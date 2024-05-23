@@ -2,29 +2,28 @@ import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { useEffect, useState } from 'react';
 import { database } from '../services';
 
-export interface MarketplaceData {
+export interface HistoryTasksData {
+  id: string
   uid: string;
-  amount: number;
-  category: string;
-  description: string;
-  measurements: string;
-  name: string;
-  valueItem: string;
-  id:string;
-  createdAt?:string;
+  finishedDate: string
+  tasks: {
+    createdAt: string
+    id: string
+    name: string
+  }[]
 }
 
-const useMarketplaceCollections = (
+const useHistoryTasksCollections = (
   collectionName: string 
-): MarketplaceData[] => {
-  const [data, setData] = useState<MarketplaceData[]>([]);
+): HistoryTasksData[] => {
+  const [data, setData] = useState<HistoryTasksData[]>([]);
 
   useEffect(() => {
     const unsubscribe = database.collection(collectionName).onSnapshot(
       (snapshot: FirebaseFirestoreTypes.QuerySnapshot) => {
-        const collectionData: MarketplaceData[] = [];
+        const collectionData: HistoryTasksData[] = [];
         snapshot.forEach(doc => {
-          collectionData.push({ id: doc.id, ...doc.data() } as MarketplaceData);
+          collectionData.push({ id: doc.id, ...doc.data() } as HistoryTasksData);
         });
         setData(collectionData);
       }
@@ -36,4 +35,4 @@ const useMarketplaceCollections = (
   return data;
 };
 
-export default useMarketplaceCollections;
+export default useHistoryTasksCollections;

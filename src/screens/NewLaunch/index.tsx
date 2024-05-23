@@ -1,12 +1,12 @@
-import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Toast } from "react-native-toast-notifications";
 import { useEffect, useState } from "react";
+import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
+import { Toast } from "react-native-toast-notifications";
 //
-import { Content, Divider, Header, Title, ButtonClose, Input, Button } from "./styles";
+import { Button, ButtonClose, Content, Divider, Header, Input, Title } from "./styles";
 //
-import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
+import { DefaultContainer } from "../../components/DefaultContainer";
 //
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from '../../services';

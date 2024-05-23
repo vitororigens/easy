@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Container } from "../../components/Container";
-import { Button, Content, Divider, Header, Title, NavBar, SubTitle, ContainerItems, HeaderItems, TitleItems, ButtonClose } from "./styles";
-import { Items } from "../../components/Items";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { FlatList, Modal, ScrollView, TouchableOpacity } from "react-native";
-import { useTotalValue } from "../../hooks/useTotalValue";
-import { Loading } from "../../components/Loading";
-import { LoadData } from "../../components/LoadData";
-import { Revenue } from "../../components/Revenue";
-import { Expense } from "../../components/Expense";
-import { formatCurrency } from "../../utils/formatCurrency";
-import { useMonth } from "../../context/MonthProvider";
-import { database } from "../../services";
 import { Toast } from "react-native-toast-notifications";
+import { Container } from "../../components/Container";
+import { DefaultContainer } from "../../components/DefaultContainer";
+import { Expense } from "../../components/Expense";
+import { Items } from "../../components/Items";
+import { LoadData } from "../../components/LoadData";
+import { Loading } from "../../components/Loading";
+import { Revenue } from "../../components/Revenue";
+import { useMonth } from "../../context/MonthProvider";
+import useFirestoreCollection from "../../hooks/useFirestoreCollection";
+import { useTotalValue } from "../../hooks/useTotalValue";
+import { useUserAuth } from "../../hooks/useUserAuth";
+import { database } from "../../services";
+import { formatCurrency } from "../../utils/formatCurrency";
+import { Button, ButtonClose, ContainerItems, Content, Divider, Header, HeaderItems, NavBar, SubTitle, Title, TitleItems } from "./styles";
 
 
 export function Home() {
@@ -106,7 +106,7 @@ export function Home() {
               </HeaderItems>
               {revenue.filter(item => item.uid === uid).length === 0 ? (
                 <ScrollView>
-                  <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de entradas! começe adicionando uma nova entrada.' />
+                  <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de entradas! Comece adicionando uma nova entrada.' />
                 </ScrollView>
               ) : (
 
@@ -138,7 +138,7 @@ export function Home() {
               </HeaderItems>
               {expense.filter(item => item.uid === uid).length === 0 ? (
                 <ScrollView>
-                  <LoadData image='SECONDARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de saídas! Começe lanaçando uma nova saida.' />
+                  <LoadData image='SECONDARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de saídas! Comece lanaçando uma nova saida.' />
                 </ScrollView>
               ) : (
                 <FlatList

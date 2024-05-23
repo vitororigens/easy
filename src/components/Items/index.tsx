@@ -1,10 +1,9 @@
-import { useState } from "react";
-import { Container, ContainerMenu, Content, ContentItems, Divider, Icon, IconMenu, ItemsTypeStyleProps, SubTitle, Title } from "./styles";
 import { AntDesign } from '@expo/vector-icons';
-import { useTheme } from "styled-components/native";
-import { Popover } from 'react-native-popper';
 import { TouchableOpacity } from "react-native";
+import { Popover } from 'react-native-popper';
+import { useTheme } from "styled-components/native";
 import { Button } from "../ItemTask/styles";
+import { Container, ContainerMenu, Content, ContentItems, Divider, Icon, IconMenu, SubTitle, Title } from "./styles";
 
 type ItemsProps = {
     category?: string;
@@ -14,17 +13,19 @@ type ItemsProps = {
     status?: boolean;
     alert?: boolean;
     type?: string;
+    customStatusText?: string
     showItemPiggyBank?: boolean;
     showItemTask?: boolean;
     showItemTaskRevenue?: boolean;
-    onDelete: () => void;
-    onEdit: () => void;
+    hasEdit?: boolean
+    onDelete?: () => void;
+    onEdit?: () => void;
 }
 
-export function Items({ category, date, valueTransaction, repeat, alert, status, type, showItemPiggyBank, showItemTaskRevenue, showItemTask, onDelete, onEdit }: ItemsProps) {
+export function Items({ category, date, valueTransaction, repeat, alert, status, type, showItemPiggyBank, showItemTaskRevenue, showItemTask, customStatusText, onDelete, onEdit, hasEdit = true }: ItemsProps) {
     const transactionType = repeat ? 'Despesa fixa' : 'Despesa variável';
     const { COLORS } = useTheme();
-    const textStatus = status ? 'Pago' : 'Pendente';
+    const textStatus =  customStatusText ? customStatusText : status ? 'Pago' : 'Pendente';
     const typeMode = type === 'input' ? transactionType : textStatus;
     const dateToday = formatDate(new Date());
     console.log(dateToday)
@@ -177,10 +178,13 @@ export function Items({ category, date, valueTransaction, repeat, alert, status,
                                         <IconMenu type="PRIMARY" name="trash" />
                                         <Title type="PRIMARY">Excluir</Title>
                                     </Button>
-                                    <Button onPress={onEdit}>
-                                        <IconMenu type="PRIMARY" name="pencil" />
-                                        <Title type="PRIMARY">Editar</Title>
-                                    </Button>
+                                    {hasEdit && (
+                                        <Button onPress={onEdit}>
+                                            <IconMenu type="PRIMARY" name="pencil" />
+                                            <Title type="PRIMARY">Editar</Title>
+                                        </Button>
+                                    )}
+
                                 </ContainerMenu>
                             </Popover.Content>
                         </Popover>

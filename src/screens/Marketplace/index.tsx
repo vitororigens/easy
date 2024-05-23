@@ -1,24 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Container } from "../../components/Container";
-import { Button, Content, Divider, Header, Title, NavBar } from "./styles";
-import { LoadData } from "../../components/LoadData";
-import { ItemMarketplace } from "../../components/ItemMarketplace";
-import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
-import { FlatList, Modal, View, Platform, ScrollView, TouchableOpacity, Text, } from "react-native";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { useTheme } from "styled-components/native";
-import { database } from "../../services";
-import { Toast } from "react-native-toast-notifications";
-import { Cart } from "../../components/Cart";
-import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCollection";
-import { Loading } from "../../components/Loading";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ListItem } from "../../components/ListItem";
-import { NewItem } from "../NewItem";
-import { useMonth } from "../../context/MonthProvider";
+import React, { useEffect, useState } from "react";
+import { FlatList, Modal, Platform, ScrollView, Text, TouchableOpacity, View, } from "react-native";
+import { Toast } from "react-native-toast-notifications";
+import { useTheme } from "styled-components/native";
+import { Cart } from "../../components/Cart";
+import { Container } from "../../components/Container";
+import { DefaultContainer } from "../../components/DefaultContainer";
+import { ItemMarketplace } from "../../components/ItemMarketplace";
 import { Items } from "../../components/Items";
+import { LoadData } from "../../components/LoadData";
+import { Loading } from "../../components/Loading";
+import { useMonth } from "../../context/MonthProvider";
+import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCollection";
+import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
+import { useUserAuth } from "../../hooks/useUserAuth";
+import { database } from "../../services";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { NewItem } from "../NewItem";
+import { Button, Content, Divider, Header, NavBar, Title } from "./styles";
 
 const modalBottom = Platform.OS === 'ios' ? 90 : 70;
 
@@ -193,7 +192,7 @@ export function Marketplace() {
               </Button>
               <Button onPress={() => handleButtonClick("items")}>
                 <Title>
-                  Historico de compra
+                  Histórico de compra
                 </Title>
               </Button>
             </NavBar>
@@ -223,7 +222,7 @@ export function Marketplace() {
           )}
           {activeButton === "items" &&
             (expense.filter(item => item.uid === uid && item.category === 'mercado').length === 0 && uid !== undefined ? (
-              <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! começe adicionando itens no seu carrinho e crie sua lista de mercado.' />
+              <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui dados para exibir aqui! Comece adicionando itens no seu carrinho e crie sua lista de mercado.' />
             ) : (
               <FlatList
                 data={expense.filter(item => item.uid === uid && item.category === 'mercado' && item.month === selectedMonth)}

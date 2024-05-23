@@ -1,19 +1,17 @@
-import {  FlatList, Modal, ScrollView, TouchableOpacity} from "react-native";
+import { FlatList, Modal, ScrollView, TouchableOpacity } from "react-native";
 //
-import { Content, Divider, Header, Title, ButtonClose, Input, Button } from "./styles";
+import { ButtonClose, Content, Divider, Header, Title } from "./styles";
 //
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Container } from "../../components/Container";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import useFirestoreCollection from "../../hooks/useFirestoreCollection";
-import { LoadData } from "../../components/LoadData";
-import { formatCurrency } from "../../utils/formatCurrency";
 import { useState } from "react";
+import { Container } from "../../components/Container";
+import { DefaultContainer } from "../../components/DefaultContainer";
+import { LoadData } from "../../components/LoadData";
+import useFirestoreCollection from "../../hooks/useFirestoreCollection";
+import { useUserAuth } from "../../hooks/useUserAuth";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 import { Expense } from "../../components/Expense";
 import { ItemsList } from "../../components/ItemsList";
-import { Toast } from "react-native-toast-notifications";
-import { database } from "../../services";
 import { useMonth } from "../../context/MonthProvider";
 //
 
@@ -54,7 +52,7 @@ export function List({ closeBottomSheet, onCloseModal, showButtonEdit, showButto
 
             {expense.filter(item => item.uid === uid && item.repeat === null).length === 0 ? (
                 <ScrollView>
-                  <LoadData image='SECONDARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de saídas! Começe lanaçando uma nova saida.' />
+                  <LoadData image='SECONDARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de saídas! Comece lanaçando uma nova saida.' />
                 </ScrollView>
               ) : (
                 <FlatList

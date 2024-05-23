@@ -40,11 +40,10 @@ export const Title = styled.Text`
 `;
 
 export const Divider = styled.View`
-    width: 100%;
+    width: 50%;
     height: 4px;
     background-color: ${({theme}) => theme.COLORS.TEAL_600};
 `;
-
 
 export const SubTitle = styled.Text<Props>`
 font-size: ${({theme}) => theme.FONTE_SIZE.XL}px;
