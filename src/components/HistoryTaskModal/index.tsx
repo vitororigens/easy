@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { FlatList } from "react-native";
-import { Container } from "../../components/Container";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { ItemTask } from "../../components/ItemTask";
 import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
+import { Container } from "../Container";
+import { DefaultContainer } from "../DefaultContainer";
+import { ItemTask } from "../ItemTask";
 import { ButtonClose, Title } from "./styles";
 
 type Props = {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "styled-components/native";
 import { Button, CartIcon, Container, ContainerQuantity, Contant, Icon, SubTitle, Title } from "./styles";
 
@@ -10,17 +10,18 @@ type ItemMarketplaceProps = {
     addItem: (value: number) => void;
     removeItem: (value: number) => void;
     onEditItem: () => void;
+    resetCountQuantity?: boolean
 }
 
-export function ItemMarketplace({ title, quantity, value, measurements, addItem, removeItem, onEditItem }: ItemMarketplaceProps) {
+export function ItemMarketplace({ title, quantity, resetCountQuantity, value, measurements, addItem, removeItem, onEditItem }: ItemMarketplaceProps) {
     const {COLORS} = useTheme()
     const [isTyping, setIsTyping] = useState(false);
     const [quantityValue, setQuantityValue] = useState(1);
+
     const handleClickAddItem = () => {
         setIsTyping(true);
         addItem(value);
     };
-
 
     const handleDecreaseQuantity = () => {
         if (quantityValue > 1) {
@@ -39,6 +40,13 @@ export function ItemMarketplace({ title, quantity, value, measurements, addItem,
         setQuantityValue(quantityValue + 1);
         addItem(value)
     };
+
+    useEffect(() => {
+        if(resetCountQuantity) {
+            setQuantityValue(1)
+            setIsTyping(false)
+        }
+    }, [resetCountQuantity])
 
     return (
         <Container>
@@ -68,7 +76,7 @@ export function ItemMarketplace({ title, quantity, value, measurements, addItem,
                         <Icon name="circle-with-plus" />
                     </Button>
                 )}
-                <Title style={{ textAlign: 'center', width: 100 }}>{value}</Title>
+                <Title style={{ textAlign: 'center', width: 100 }}>R$ {value}</Title>
             </Contant>
         </Container>
     );

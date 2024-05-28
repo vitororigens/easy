@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { Button, Title,Container } from "./styles";
+import { Button, Container, Title } from "./styles";
 
 type ICartProps = {
     itemsCount: number;
@@ -24,7 +24,7 @@ export function Cart({ itemsCount, totalValue, buttonSave }: ICartProps) {
                         width: '100%',
                         textAlign: 'center'
                     }}>
-                        Criar carrinho de compras
+                        Criar lista de compras
                     </Title>
                 </Button>
             </View>

@@ -19,10 +19,10 @@ import { Button, Content, Divider, Header, NavBar, Title } from "./styles";
 import { format, subDays } from "date-fns";
 import { useTheme } from "styled-components/native";
 import { FinishTasks } from "../../components/FinishTasks";
+import { HistoryTaskModal } from "../../components/HistoryTaskModal";
 import { ItemTask } from "../../components/ItemTask";
 import { Items } from "../../components/Items";
 import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
-import { HistoryTaskModal } from "../HistoryTaskModal";
 import { NewItemTask } from "../NewItemTask";
 type SelectedItems = {
   [key: string]: boolean;
