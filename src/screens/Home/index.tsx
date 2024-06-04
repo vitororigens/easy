@@ -168,8 +168,8 @@ export function Home() {
 
       <Modal visible={confirmRevenueVisible} onRequestClose={() => setConfirmRevenueVisible(false)}>
 
-        <DefaultContainer>
-          <ButtonClose onPress={() => setConfirmRevenueVisible(false)} >
+        <DefaultContainer hasHeader={false}>
+          <ButtonClose onPress={() => setConfirmRevenueVisible(false)} style={{alignSelf: "flex-end", marginBottom: 32}}>
             <Title style={{ color: 'white' }}>Fechar</Title>
           </ButtonClose>
           <Container title={'Editar Entrada'}>
@@ -179,8 +179,8 @@ export function Home() {
       </Modal>
       <Modal visible={confirmExpenseVisible} onRequestClose={() => setConfirmExpenseVisible(false)}>
 
-        <DefaultContainer>
-          <ButtonClose onPress={() => setConfirmExpenseVisible(false)} >
+        <DefaultContainer hasHeader={false}>
+          <ButtonClose onPress={() => setConfirmExpenseVisible(false)} style={{alignSelf: "flex-end", marginBottom: 32}}>
             <Title style={{ color: 'white' }}>Fechar</Title>
           </ButtonClose>
           <Container type="SECONDARY" title={'Editar Saida'}>

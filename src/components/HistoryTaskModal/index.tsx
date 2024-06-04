@@ -25,8 +25,8 @@ export function HistoryTaskModal({ closeBottomSheet, onCloseModal, showButtonEdi
 
   return (
     <>
-      <DefaultContainer>
-      <ButtonClose onPress={closeBottomSheet} >
+      <DefaultContainer hasHeader={false}>
+      <ButtonClose onPress={closeBottomSheet} style={{alignSelf: "flex-end", marginBottom: 32}}>
           <Title style={{ color: 'white' }}>Fechar</Title>
         </ButtonClose>
         <Container title={'Tarefas'}>

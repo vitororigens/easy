@@ -1,17 +1,15 @@
-import React, { ReactNode, useEffect, useState } from "react";
-import { Icon, Background, Button, Container, ContainerMonth, Header, Title } from "./style";
-import { useNavigation } from "@react-navigation/native";
-import RNPickerSelect from 'react-native-picker-select';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from "@react-navigation/native";
+import React, { ReactNode, useEffect, useState } from "react";
 import { Modal } from "react-native";
-import { NewTask } from "../../screens/NewTask";
-import { NewItem } from "../../screens/NewItem";
+import RNPickerSelect from 'react-native-picker-select';
 import { useMonth } from "../../context/MonthProvider";
-import { NewLaunch } from "../../screens/NewLaunch";
-import { List } from "../../screens/List";
-import { NewTaskMarketplace } from "../../screens/NewTaskMarketplace";
+import { NewItem } from "../../screens/NewItem";
 import { NewItemTask } from "../../screens/NewItemTask";
+import { NewLaunch } from "../../screens/NewLaunch";
 import { NewNotes } from "../../screens/NewNotes";
+import { NewTask } from "../../screens/NewTask";
+import { Background, Button, Container, ContainerMonth, Header, Icon, Title } from "./style";
 
 type DefaultContainerProps = {
     children: ReactNode;
@@ -24,9 +22,10 @@ type DefaultContainerProps = {
     showHeader?: boolean;
     newItemMarketplace?: boolean;
     newNotes?: boolean;
+    hasHeader?: boolean;
 }
 
-export function DefaultContainer({ children, newNotes = false, newItemMarketplace = false, showHeader = false, backButton = false, monthButton = false, addButton = false, newItem = false, newLaunch = false, listButtom = false }: DefaultContainerProps) {
+export function DefaultContainer({ children, newNotes = false, newItemMarketplace = false, showHeader = false, backButton = false, monthButton = false, addButton = false, newItem = false, newLaunch = false, listButtom = false, hasHeader = true }: DefaultContainerProps) {
     const navigation = useNavigation();
     const { selectedMonth, setSelectedMonth } = useMonth();
     console.log('Mês atual', selectedMonth)
@@ -101,7 +100,8 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
             <Container>
                 <Header
                 style={{
-                    justifyContent:backButton ? 'flex-start' : 'flex-end'
+                    justifyContent:backButton ? 'flex-start' : 'flex-end',
+                    display: hasHeader ? "flex" : "none"
                 }}
                 >
                     {listButtom &&

@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { ScrollView } from "react-native";
 //
-import { Content, Divider, Header, Title, NavBar,  ButtonBar,  ButtonClose } from "./styles";
+import { ButtonBar, ButtonClose, Content, Divider, Header, NavBar, Title } from "./styles";
 //
-import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
-import { Revenue } from '../../components/Revenue';
+import { DefaultContainer } from "../../components/DefaultContainer";
 import { Expense } from '../../components/Expense';
+import { Revenue } from '../../components/Revenue';
 
 
 type Props = {
@@ -23,8 +22,8 @@ export function NewTask({ closeBottomSheet }: Props) {
 
   return (
     <>
-      <DefaultContainer>
-      <ButtonClose onPress={closeBottomSheet} >
+      <DefaultContainer hasHeader={false}>
+      <ButtonClose onPress={closeBottomSheet} style={{alignSelf: "flex-end", marginBottom: 32}}>
         <Title style={{ color: 'white' }}>Fechar</Title>
       </ButtonClose>
       

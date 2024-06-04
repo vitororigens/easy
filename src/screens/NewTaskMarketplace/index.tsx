@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 //
-import { Content, Divider, Header, Title, NavBar, ButtonBar, ButtonClose } from "./styles";
+import { ButtonBar, ButtonClose, Content, Divider, Header, NavBar, Title } from "./styles";
 //
-import { DefaultContainer } from "../../components/DefaultContainer";
 import { Container } from "../../components/Container";
+import { DefaultContainer } from "../../components/DefaultContainer";
 import { NewItem } from '../NewItem';
 import { NewItemTask } from '../NewItemTask';
 
@@ -22,8 +22,8 @@ export function NewTaskMarketplace({ closeBottomSheet }: Props) {
 
   return (
     <>
-      <DefaultContainer>
-        <ButtonClose onPress={closeBottomSheet} >
+      <DefaultContainer hasHeader={false}>
+        <ButtonClose onPress={closeBottomSheet} style={{alignSelf: "flex-end", marginBottom: 32}}>
           <Title style={{ color: 'white' }}>Fechar</Title>
         </ButtonClose>
           <Container type="SECONDARY" title="NOVO LANÇAMENTO">

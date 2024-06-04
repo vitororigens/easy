@@ -1,13 +1,11 @@
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Container } from "../../components/Container";
-import { Content, Divider, Header, Title, ButtonClose, Input, Button, Span, InputContainer } from "./styles";
-import RNPickerSelect from 'react-native-picker-select';
-import { Alert, ScrollView, View } from "react-native";
 import { useEffect, useState } from "react";
-import { database } from '../../services';
+import { Alert, ScrollView, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
+import { Container } from "../../components/Container";
+import { DefaultContainer } from "../../components/DefaultContainer";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { MarketplaceData } from "../../hooks/useMarketplaceCollections";
+import { database } from '../../services';
+import { Button, ButtonClose, Content, Input, InputContainer, Title } from "./styles";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -44,6 +42,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showB
         Toast.show('Nota adicionado!', { type: 'success' });
         setName('')
         onCloseModal && onCloseModal();
+        !!closeBottomSheet && closeBottomSheet()
       })
       .catch(error => {
         console.error('Erro ao adicionar o item: ', error);
@@ -60,8 +59,9 @@ export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showB
     const expenseRef = database.collection('Notes').doc(selectedItemId);
     expenseRef.delete()
       .then(() => {
-        Toast.show('Item Excluido!', { type: 'success' });
+        Toast.show('Nota Excluída!', { type: 'success' });
         onCloseModal && onCloseModal();
+        !!closeBottomSheet && closeBottomSheet()
       })
       .catch((error) => {
         console.error('Erro ao excluir o documento de item:', error);
@@ -117,8 +117,8 @@ export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showB
 
   return (
     <>
-      <DefaultContainer>
-      <ButtonClose onPress={closeBottomSheet} >
+      <DefaultContainer hasHeader={false}>
+      <ButtonClose onPress={closeBottomSheet} style={{alignSelf: "flex-end", marginBottom: 32}}>
           <Title style={{ color: 'white' }}>Fechar</Title>
         </ButtonClose>
         <Container title={'Adicionar nova nota'}>
@@ -142,6 +142,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal, showButtonEdit, showB
           numberOfLines={20}
           value={description}
           onChangeText={setDescription}
+          textAlignVertical="top"
           />
           <View style={{ marginBottom: 10, height: 150 }}>
             {showButtonSave && (

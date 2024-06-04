@@ -78,8 +78,8 @@ export function List({ closeBottomSheet, onCloseModal, showButtonEdit, showButto
       </DefaultContainer>
       <Modal visible={confirmExpenseVisible} onRequestClose={() => setConfirmExpenseVisible(false)}>
 
-        <DefaultContainer>
-          <ButtonClose onPress={() => setConfirmExpenseVisible(false)} >
+        <DefaultContainer hasHeader={false}>
+          <ButtonClose onPress={() => setConfirmExpenseVisible(false)} style={{alignSelf: "flex-end", marginBottom: 32}}>
             <Title style={{ color: 'white' }}>Fechar</Title>
           </ButtonClose>
           <Container type="SECONDARY" title={'Editar Saida'}>

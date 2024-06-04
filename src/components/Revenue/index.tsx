@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { DividerTask, Input, TitleTask, InputDescription, Button, Span } from "./styles";
-import { View, TouchableOpacity, ScrollView, Alert } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Switch } from "react-native";
+import React, { useEffect, useState } from 'react';
+import { Alert, ScrollView, Switch, TouchableOpacity, View } from "react-native";
 import RNPickerSelect from 'react-native-picker-select';
-import { database } from '../../services';
-import { useUserAuth } from '../../hooks/useUserAuth';
 import { Toast } from 'react-native-toast-notifications';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { database } from '../../services';
+import { Button, DividerTask, Input, InputDescription, Span, TitleTask } from "./styles";
 
 type RevenueProps = {
     selectedItemId?: string;
@@ -257,12 +256,14 @@ export function Revenue({ selectedItemId, showButtonRemove, onCloseModal, showBu
                     </View>
                 </View>
                 <View style={{  marginBottom: 5 }}>
-                    <TitleTask>Descrição <Span>(opicional)</Span></TitleTask>
+                    <TitleTask>Descrição <Span>(opcional)</Span></TitleTask>
                     <InputDescription
                         multiline
                         numberOfLines={5}
                         value={description}
                         onChangeText={setDescription}
+                        textAlignVertical="top"
+                        style={{padding: 12}}
                     />
                 </View>
                 <View style={{ marginBottom: 10, height: 200 }}>
