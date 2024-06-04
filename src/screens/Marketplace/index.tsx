@@ -42,6 +42,7 @@ export function Marketplace() {
   const [showHistory, setShowHistory] = useState(false);
 
   const data = useMarketplaceCollections("Marketplace");
+  const selectedItemsId = selectedItems.map((item) => item.id)
 
   const user = useUserAuth();
   const uid = user?.uid;
@@ -85,17 +86,23 @@ export function Marketplace() {
       ]);
     }
   };
-
+  
   const handleRemoveItem = (item: MarketplaceData) => {
     const itemIndex = selectedItems.findIndex(
       (selectedItem) => selectedItem.id === item.id
     );
-    if (itemIndex !== -1 && selectedItems[itemIndex].amount > 0) {
+    if (itemIndex !== -1) {
       const updatedItems = [...selectedItems];
-      updatedItems[itemIndex].amount -= 1;
-      updatedItems[itemIndex].totalValue =
-        updatedItems[itemIndex].valueItem * updatedItems[itemIndex].amount;
-      setSelectedItems(updatedItems);
+      if (updatedItems[itemIndex].amount > 1) {
+        updatedItems[itemIndex].amount -= 1;
+        updatedItems[itemIndex].totalValue =
+          updatedItems[itemIndex].valueItem * updatedItems[itemIndex].amount;
+        setSelectedItems(updatedItems);
+      } else {
+        // Remove the item if amount is 1
+        updatedItems.splice(itemIndex, 1);
+        setSelectedItems(updatedItems);
+      }
     }
   };
 
@@ -202,6 +209,7 @@ export function Marketplace() {
       Toast.show("Lista de compras adicionada!", { type: "success" });
       setModalActive(false);
       setSelectedItems([]);
+      removeItemsMarketplace(selectedItemsId)
     } catch (error) {
       console.error("Erro ao adicionar lista de compras: ", error);
     }
@@ -210,6 +218,21 @@ export function Marketplace() {
   function handleEditItem(documentId: string) {
     setConfirmItemVisible(true);
     setSelectedItemData(documentId);
+  }
+
+  function removeItemsMarketplace(documentIds: string[]) {
+    const batch = database.batch();
+
+    documentIds.forEach((documentId) => {
+      const docRef = database.collection("Marketplace").doc(documentId);
+      batch.delete(docRef);
+    });
+
+    batch
+      .commit()
+      .catch((error) => {
+        console.error("Erro ao excluir os produtos: ", error);
+      });
   }
 
   const handleListSelected = (item: any) => {
