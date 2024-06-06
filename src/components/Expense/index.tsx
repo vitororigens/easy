@@ -1,10 +1,20 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
-import { Alert, ScrollView, Switch, TouchableOpacity, View } from "react-native";
+import { Controller, useForm } from "react-hook-form";
+import {
+  Alert,
+  ScrollView,
+  Switch,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
+import { z } from "zod";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
+import { currencyMask, currencyUnMask } from "../../utils/currency";
 import {
   Button,
   DividerTask,
@@ -22,6 +32,16 @@ export type ExpenseProps = {
   showButtonSave?: boolean;
 };
 
+const formSchema = z.object({
+  name: z.string().min(1, "Nome da Tarefa é obrigatório"),
+  valueTransaction: z.string().min(1, "Valor é obrigatório"),
+  formattedDate: z.string().min(1, "Data é obrigatória"),
+  description: z.string().optional(),
+  selectedCategory: z.string().optional(),
+});
+
+type FormSchemaType = z.infer<typeof formSchema>;
+
 export function Expense({
   selectedItemId,
   showButtonRemove,
@@ -29,14 +49,9 @@ export function Expense({
   showButtonEdit,
   showButtonSave,
 }: ExpenseProps) {
+  // States
   const user = useUserAuth();
-  const [selectedCategory, setSelectedCategory] = useState("Outros");
-  const [valueTransaction, setValuetransaction] = useState("0.00");
-  const [listAccounts, setListAccounts] = useState(false);
-  const [description, setDescription] = useState("");
-  const [name, setName] = useState("");
   const [date, setDate] = useState(new Date());
-  const [formattedDate, setFormattedDate] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [repeat, setRepeat] = useState(false);
   const [status, setStatus] = useState(false);
@@ -45,27 +60,39 @@ export function Expense({
 
   const uid = user?.uid;
 
+  // Hooks
+  const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      description: "",
+      formattedDate: "",
+      name: "",
+      selectedCategory: "outros",
+      valueTransaction: "",
+    },
+  });
+
+  // Functions
+
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     setShowDatePicker(false);
     const currentDate = selectedDate || date;
     setDate(currentDate);
     const formattedDateString = currentDate.toLocaleDateString("pt-BR");
-    setFormattedDate(formattedDateString);
+    setValue("formattedDate", formattedDateString);
   };
 
   const showDatePickerModal = () => {
     setShowDatePicker(true);
   };
 
-  const handleSaveExpense = () => {
-    if (!name || !valueTransaction || !formattedDate) {
-      Alert.alert(
-        "Atenção!",
-        "Por favor, preencha todos os campos obrigatórios antes de salvar."
-      );
-      return;
-    }
-
+  const handleSaveExpense = ({
+    formattedDate,
+    name,
+    valueTransaction,
+    description,
+    selectedCategory,
+  }: FormSchemaType) => {
     const [day, month, year] = formattedDate.split("/");
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
@@ -74,7 +101,7 @@ export function Expense({
       name: name,
       category: selectedCategory,
       date: formattedDate,
-      valueTransaction: valueTransaction,
+      valueTransaction: currencyUnMask(valueTransaction),
       description: description,
       repeat: repeat,
       status: status,
@@ -90,13 +117,10 @@ export function Expense({
       .add(expenseData)
       .then(() => {
         Toast.show("Transação adicionada!", { type: "success" });
-        setName("");
-        setDescription("");
-        setFormattedDate("");
         setRepeat(false);
         setAlert(false);
         setStatus(false);
-        setValuetransaction("0.00");
+        reset();
       })
       .catch((error) => {
         console.error("Erro ao adicionar a transação: ", error);
@@ -107,7 +131,7 @@ export function Expense({
       for (let i = 1; i <= 11; i++) {
         // Obtém o próximo mês e ano
         let nextMonth = monthNumber + i;
-        let nextYear = year;
+        let nextYear: any = year;
 
         if (nextMonth > 12) {
           nextMonth -= 12;
@@ -149,17 +173,15 @@ export function Expense({
       });
   };
 
-  const handleEditExpense = () => {
+  const handleEditExpense = ({
+    formattedDate,
+    name,
+    valueTransaction,
+    description,
+    selectedCategory,
+  }: FormSchemaType) => {
     if (!selectedItemId) {
       console.error("Nenhum documento selecionado para edição!");
-      return;
-    }
-
-    if (!name || !valueTransaction || !formattedDate) {
-      Alert.alert(
-        "Atenção!",
-        "Por favor, preencha todos os campos obrigatórios antes de salvar."
-      );
       return;
     }
 
@@ -174,7 +196,7 @@ export function Expense({
         name: name,
         category: selectedCategory,
         date: formattedDate,
-        valueTransaction: valueTransaction,
+        valueTransaction: currencyUnMask(valueTransaction),
         description: description,
         repeat: repeat,
         status: status,
@@ -185,18 +207,22 @@ export function Expense({
       })
       .then(() => {
         Toast.show("Transação editada!", { type: "success" });
-        setName("");
-        setDescription("");
-        setFormattedDate("");
         setRepeat(false);
         setAlert(false);
         setStatus(false);
-        setValuetransaction("0.00");
+        reset();
         onCloseModal && onCloseModal();
       })
       .catch((error) => {
         console.error("Erro ao editar a transação: ", error);
       });
+  };
+
+  const onInvalid = () => {
+    Alert.alert(
+      "Atenção!",
+      "Por favor, preencha todos os campos obrigatórios antes de salvar."
+    );
   };
 
   useEffect(() => {
@@ -208,12 +234,16 @@ export function Expense({
         .then((doc) => {
           if (doc.exists) {
             const data = doc.data();
+            console.log(data);
             if (data) {
-              setName(data.name);
-              setSelectedCategory(data.category);
-              setValuetransaction(data.valueTransaction);
-              setDescription(data.description);
-              setFormattedDate(data.date);
+              setValue("name", data.name);
+              setValue(
+                "valueTransaction",
+                currencyMask(String(data.valueTransaction))
+              );
+              setValue("description", data.description);
+              setValue("formattedDate", data.date);
+              setValue("selectedCategory", data.category);
               setRepeat(data.repeat);
               setAlert(data.alert);
               setStatus(data.status);
@@ -237,14 +267,26 @@ export function Expense({
       <ScrollView>
         <View>
           <TitleTask>Nome*</TitleTask>
-          <Input value={name} onChangeText={setName} />
-          <TitleTask>Valor*</TitleTask>
-          <Input
-            value={valueTransaction}
-            keyboardType="numeric"
-            onChangeText={setValuetransaction}
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input onBlur={onBlur} onChangeText={onChange} value={value} />
+            )}
           />
-
+          <TitleTask>Valor*</TitleTask>
+          <Controller
+            control={control}
+            name="valueTransaction"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                value={value}
+                onChangeText={(value) => onChange(currencyMask(value))}
+                onBlur={onBlur}
+                keyboardType="numeric"
+              />
+            )}
+          />
           <TitleTask>
             Adicionar esse lançamento a sua lista de contas recorrente?{" "}
             <Span>(opicional)</Span>
@@ -266,7 +308,18 @@ export function Expense({
                 style={{ height: 50 }}
                 onPress={showDatePickerModal}
               >
-                <Input value={formattedDate} editable={false} />
+                <Controller
+                  control={control}
+                  name="formattedDate"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      editable={false}
+                    />
+                  )}
+                />
               </TouchableOpacity>
               {showDatePicker && (
                 <DateTimePicker
@@ -281,43 +334,49 @@ export function Expense({
                 Categorias <Span>(opicional)</Span>
               </TitleTask>
               <View style={{ height: 50 }}>
-                <RNPickerSelect
-                  onValueChange={(value) => setSelectedCategory(value)}
-                  items={[
-                    { label: "Investimentos", value: "Investimentos" },
-                    { label: "Contas", value: "Contas" },
-                    { label: "Compras", value: "Compras" },
-                    { label: "Faculdade", value: "Faculdade" },
-                    { label: "Internet", value: "Internet" },
-                    { label: "Academia", value: "Academia" },
-                    { label: "Emprestimo", value: "Emprestimo" },
-                    { label: "Comida", value: "Comida" },
-                    { label: "Telefone", value: "Telefone" },
-                    { label: "Entretenimento", value: "Entretenimento" },
-                    { label: "Educação", value: "Educacao" },
-                    { label: "Beleza", value: "beleza" },
-                    { label: "Esporte", value: "esporte" },
-                    { label: "Social", value: "social" },
-                    { label: "Transporte", value: "transporte" },
-                    { label: "Roupas", value: "roupas" },
-                    { label: "Carro", value: "carro" },
-                    { label: "Bebida", value: "bebida" },
-                    { label: "Cigarro", value: "cigarro" },
-                    { label: "Eletrônicos", value: "eletronicos" },
-                    { label: "Viagem", value: "viagem" },
-                    { label: "Saúde", value: "saude" },
-                    { label: "Estimação", value: "estimacao" },
-                    { label: "Reparar", value: "reparar" },
-                    { label: "Moradia", value: "moradia" },
-                    { label: "Presente", value: "presente" },
-                    { label: "Doações", value: "doacoes" },
-                    { label: "Loteria", value: "loteria" },
-                    { label: "Lanches", value: "lanches" },
-                    { label: "Filhos", value: "filhos" },
-                    { label: "Outros", value: "outros" },
-                  ]}
-                  value={selectedCategory}
-                  placeholder={{ label: "Selecione", value: "Selecione" }}
+                <Controller
+                  control={control}
+                  name="selectedCategory"
+                  render={({ field: { onChange, value } }) => (
+                    <RNPickerSelect
+                      value={value}
+                      onValueChange={(value) => onChange(value)}
+                      items={[
+                        { label: "Investimentos", value: "Investimentos" },
+                        { label: "Contas", value: "Contas" },
+                        { label: "Compras", value: "Compras" },
+                        { label: "Faculdade", value: "Faculdade" },
+                        { label: "Internet", value: "Internet" },
+                        { label: "Academia", value: "Academia" },
+                        { label: "Emprestimo", value: "Emprestimo" },
+                        { label: "Comida", value: "Comida" },
+                        { label: "Telefone", value: "Telefone" },
+                        { label: "Entretenimento", value: "Entretenimento" },
+                        { label: "Educação", value: "Educacao" },
+                        { label: "Beleza", value: "beleza" },
+                        { label: "Esporte", value: "esporte" },
+                        { label: "Social", value: "social" },
+                        { label: "Transporte", value: "transporte" },
+                        { label: "Roupas", value: "roupas" },
+                        { label: "Carro", value: "carro" },
+                        { label: "Bebida", value: "bebida" },
+                        { label: "Cigarro", value: "cigarro" },
+                        { label: "Eletrônicos", value: "eletronicos" },
+                        { label: "Viagem", value: "viagem" },
+                        { label: "Saúde", value: "saude" },
+                        { label: "Estimação", value: "estimacao" },
+                        { label: "Reparar", value: "reparar" },
+                        { label: "Moradia", value: "moradia" },
+                        { label: "Presente", value: "presente" },
+                        { label: "Doações", value: "doacoes" },
+                        { label: "Loteria", value: "loteria" },
+                        { label: "Lanches", value: "lanches" },
+                        { label: "Filhos", value: "filhos" },
+                        { label: "Outros", value: "outros" },
+                      ]}
+                      placeholder={{ label: "Selecione", value: "Selecione" }}
+                    />
+                  )}
                 />
               </View>
             </View>
@@ -352,25 +411,40 @@ export function Expense({
           <TitleTask>
             Descrição <Span>(opcional)</Span>
           </TitleTask>
-          <InputDescription
-            multiline
-            numberOfLines={5}
-            value={description}
-            onChangeText={setDescription}
-            textAlignVertical="top"
+          <Controller
+            control={control}
+            name="description"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <InputDescription
+                multiline
+                numberOfLines={5}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                textAlignVertical="top"
+                style={{ paddingHorizontal: 12, paddingVertical: 12 }}
+              />
+            )}
           />
         </View>
         <View style={{ marginBottom: 10, height: 200 }}>
           {showButtonSave && (
             <Button
               style={{ marginBottom: 10 }}
-              onPress={isEditing ? handleEditExpense : handleSaveExpense}
+              onPress={
+                isEditing
+                  ? handleSubmit(handleEditExpense, onInvalid)
+                  : handleSubmit(handleSaveExpense, onInvalid)
+              }
             >
               <TitleTask>{isEditing ? "Editar" : "Salvar"}</TitleTask>
             </Button>
           )}
           {showButtonEdit && (
-            <Button style={{ marginBottom: 10 }} onPress={handleEditExpense}>
+            <Button
+              style={{ marginBottom: 10 }}
+              onPress={handleSubmit(handleEditExpense, onInvalid)}
+            >
               <TitleTask>Editar</TitleTask>
             </Button>
           )}
