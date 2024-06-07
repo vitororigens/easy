@@ -11,7 +11,7 @@ import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 
 const formSchema = z.object({
-  email: z.string().email("Formato inválido").min(1, "Email é obrigatório"),
+  email: z.string().min(1, "Email é obrigatório").email("Formato inválido"),
   password: z.string().min(1, "Senha é obrigatória"),
 });
 

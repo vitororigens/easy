@@ -32,3 +32,13 @@ export const Text = styled.Text`
     margin-bottom: 40px;
     margin-top: 20px;
 `;
+
+export const TextError = styled.Text`
+    font-size: ${({theme}) => theme.FONTE_SIZE.SM}px;
+    font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
+    color: ${({theme}) => theme.COLORS.GRAY_400};
+    text-align: center;
+    align-self: flex-start;
+    margin-top: -6px;
+    margin-left: 4px;
+`;
