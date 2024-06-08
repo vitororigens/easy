@@ -28,7 +28,6 @@ type DefaultContainerProps = {
 export function DefaultContainer({ children, newNotes = false, newItemMarketplace = false, showHeader = false, backButton = false, monthButton = false, addButton = false, newItem = false, newLaunch = false, listButtom = false, hasHeader = true }: DefaultContainerProps) {
     const navigation = useNavigation();
     const { selectedMonth, setSelectedMonth } = useMonth();
-    console.log('Mês atual', selectedMonth)
     const [showNewTaskModal, setShowNewTaskModal] = useState(false);
     const [showNewItemModal, setShowNewItemModal] = useState(false);
     const [showNotesModal, setShowNotesModal] = useState(false);

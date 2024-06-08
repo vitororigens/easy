@@ -4,7 +4,7 @@ import {
   Modal,
   Platform,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { Container } from "../../components/Container";
@@ -16,12 +16,13 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { Button, Content, Divider, Header, NavBar, Title } from "./styles";
 
-import { format } from "date-fns";
+import { format, getMonth, parse } from "date-fns";
 import { useTheme } from "styled-components/native";
 import { FinishTasks } from "../../components/FinishTasks";
 import { HistoryTaskModal } from "../../components/HistoryTaskModal";
 import { ItemTask } from "../../components/ItemTask";
 import { Items } from "../../components/Items";
+import { useMonth } from "../../context/MonthProvider";
 import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
 import { NewItemTask } from "../NewItemTask";
 type SelectedItems = {
@@ -31,6 +32,8 @@ type SelectedItems = {
 const modalBottom = Platform.OS === "ios" ? 90 : 70;
 
 export function ListTask() {
+  const { selectedMonth } = useMonth();
+
   const [activeButton, setActiveButton] = useState("tarefas");
   const [selectedItems, setSelectedItems] = useState<{
     [key: string]: boolean;
@@ -60,6 +63,12 @@ export function ListTask() {
   );
 
   const historyUser = historyData.filter((item) => item.uid === uid);
+
+  const historyUserMonth = historyUser.filter((item) => {
+    const month =
+      getMonth(parse(item.finishedDate, "dd/MM/yyyy", new Date())) + 1;
+    return month === selectedMonth;
+  });
 
   const handleButtonClick = (buttonName: string) => {
     if (buttonName === "tarefas") {
@@ -185,7 +194,7 @@ export function ListTask() {
   }
 
   return (
-    <DefaultContainer newItem>
+    <DefaultContainer newItem monthButton>
       <Container type="SECONDARY" title="Lista de tarefas">
         <Content>
           <Header>
@@ -235,7 +244,7 @@ export function ListTask() {
 
           {activeButton === "historico" && (
             <FlatList
-              data={historyUser}
+              data={historyUserMonth}
               ListEmptyComponent={
                 <LoadData
                   image="PRIMARY"
