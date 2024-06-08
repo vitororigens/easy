@@ -3,13 +3,25 @@ import { useEffect, useState } from "react";
 import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 //
-import { Button, ButtonClose, Content, Divider, Header, Input, Title } from "./styles";
+import {
+  Button,
+  ButtonClose,
+  Content,
+  Divider,
+  Header,
+  Input,
+  Title,
+} from "./styles";
 //
 import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
 //
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { database } from '../../services';
+import { database } from "../../services";
+import { currencyMask, currencyUnMask } from "../../utils/currency";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -18,49 +30,71 @@ type Props = {
   showButtonSave?: boolean;
   showButtonRemove?: boolean;
   selectedItemId?: string;
-}
+};
 
-export function NewLaunch({ closeBottomSheet, onCloseModal, showButtonEdit, showButtonSave, showButtonRemove, selectedItemId }: Props) {
-  const [valueItem, setValueItem] = useState('0');
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('');
+const formSchema = z.object({
+  name: z.string().min(1, "Nome da Tarefa é obrigatório"),
+  valueItem: z.string().min(1, "Valor é obrigatório"),
+  formattedDate: z.string().min(1, "Data é obrigatória"),
+  description: z.string().optional(),
+});
+
+type FormSchemaType = z.infer<typeof formSchema>;
+
+export function NewLaunch({
+  closeBottomSheet,
+  onCloseModal,
+  showButtonEdit,
+  showButtonSave,
+  showButtonRemove,
+  selectedItemId,
+}: Props) {
+  // States
   const user = useUserAuth();
   const uid = user?.uid;
   const [isEditing, setIsEditing] = useState(false);
-  console.log(uid)
   const [date, setDate] = useState(new Date());
-  const [formattedDate, setFormattedDate] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Hooks
+  const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      valueItem: "",
+      formattedDate: "",
+      description: "",
+    },
+  });
+
+  // Functions
 
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     setShowDatePicker(false);
     const currentDate = selectedDate || date;
     setDate(currentDate);
-    const formattedDateString = currentDate.toLocaleDateString('pt-BR');
-    setFormattedDate(formattedDateString);
-
+    const formattedDateString = currentDate.toLocaleDateString("pt-BR");
+    setValue("formattedDate", formattedDateString);
   };
 
   const showDatePickerModal = () => {
     setShowDatePicker(true);
   };
 
-
-
-  const handleSaveItem = () => {
-    if (name === '') {
-      Alert.alert('Atenção!', 'Por favor, preencha todos os campos obriatórios antes de salvar.');
-      return;
-    }
-
-    const [day, month, year] = formattedDate.split('/');
+  const handleSaveItem = ({
+    name,
+    valueItem,
+    formattedDate,
+    description,
+  }: FormSchemaType) => {
+    const [day, month, year] = formattedDate.split("/");
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
     database
-      .collection('PiggyBank')
+      .collection("PiggyBank")
       .doc()
       .set({
-        valueItem: parseFloat(valueItem as string),
+        valueItem: currencyUnMask(valueItem),
         name,
         description,
         uid: uid,
@@ -68,49 +102,52 @@ export function NewLaunch({ closeBottomSheet, onCloseModal, showButtonEdit, show
         date: formattedDate,
       })
       .then(() => {
-        Toast.show('Item adicionado!', { type: 'success' });
-        setDescription('')
-        setName('')
-        setValueItem('')
-        onCloseModal && onCloseModal();
-      })
-      .catch(error => {
-        console.error('Erro ao adicionar o item: ', error);
-      });
-  }
-
-
-  const handleDeleteExpense = () => {
-    if (!selectedItemId) {
-      console.error('Nenhum documento selecionado para exclusão!');
-      return;
-    }
-
-    const expenseRef = database.collection('PiggyBank').doc(selectedItemId);
-    expenseRef.delete()
-      .then(() => {
-        Toast.show('Item Excluido!', { type: 'success' });
+        Toast.show("Item adicionado!", { type: "success" });
+        reset();
         onCloseModal && onCloseModal();
       })
       .catch((error) => {
-        console.error('Erro ao excluir o documento de item:', error);
+        console.error("Erro ao adicionar o item: ", error);
       });
   };
 
-  const handleEditExpense = () => {
+  const handleDeleteExpense = () => {
     if (!selectedItemId) {
-      console.error('Nenhum documento selecionado para edição!');
+      console.error("Nenhum documento selecionado para exclusão!");
       return;
     }
-    const [day, month, year] = formattedDate.split('/');
+
+    const expenseRef = database.collection("PiggyBank").doc(selectedItemId);
+    expenseRef
+      .delete()
+      .then(() => {
+        Toast.show("Item Excluido!", { type: "success" });
+        onCloseModal && onCloseModal();
+      })
+      .catch((error) => {
+        console.error("Erro ao excluir o documento de item:", error);
+      });
+  };
+
+  const handleEditExpense = ({
+    name,
+    description,
+    valueItem,
+    formattedDate,
+  }: FormSchemaType) => {
+    if (!selectedItemId) {
+      console.error("Nenhum documento selecionado para edição!");
+      return;
+    }
+    const [day, month, year] = formattedDate.split("/");
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
 
     database
-      .collection('PiggyBank')
+      .collection("PiggyBank")
       .doc(selectedItemId)
       .set({
-        valueItem: parseFloat(valueItem as string),
+        valueItem: currencyUnMask(valueItem),
         name,
         description,
         uid: uid,
@@ -118,47 +155,58 @@ export function NewLaunch({ closeBottomSheet, onCloseModal, showButtonEdit, show
         date: formattedDate,
       })
       .then(() => {
-        Toast.show('Item adicionado!', { type: 'success' });
-        setDescription('')
-        setName('')
-        setValueItem('')
+        Toast.show("Item adicionado!", { type: "success" });
+        reset();
         onCloseModal && onCloseModal();
       })
-      .catch(error => {
-        console.error('Erro ao adicionar o item: ', error);
+      .catch((error) => {
+        console.error("Erro ao adicionar o item: ", error);
       });
   };
 
+  const onInvalid = () => {
+    Alert.alert(
+      "Atenção!",
+      "Por favor, preencha todos os campos obriatórios antes de salvar."
+    );
+  };
 
   useEffect(() => {
     if (selectedItemId) {
-      database.collection('PiggyBank').doc(selectedItemId).get().then((doc) => {
-        if (doc.exists) {
-          const data = doc.data();
-          if (data) {
-            setValueItem(data.valueItem);
-            setDescription(data.description);
-            setName(data.name);
-            setIsEditing(true);
-            setDate(new Date(data.date));
+      database
+        .collection("PiggyBank")
+        .doc(selectedItemId)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            if (data) {
+              setValue("valueItem", data.valueItem);
+              setValue("description", data.description);
+              setValue("name", data.name);
+              setIsEditing(true);
+              setDate(new Date(data.date));
+            } else {
+              console.log("Dados do documento estão vazios!");
+            }
           } else {
-            console.log('Dados do documento estão vazios!');
+            console.log("Nenhum documento encontrado!");
           }
-        } else {
-          console.log('Nenhum documento encontrado!');
-        }
-      }).catch((error) => {
-        console.error('Erro ao obter o documento:', error);
-      });
+        })
+        .catch((error) => {
+          console.error("Erro ao obter o documento:", error);
+        });
     }
   }, [selectedItemId]);
 
   return (
     <>
-
       <DefaultContainer hasHeader={false}>
-        <ButtonClose onPress={closeBottomSheet} style={{alignSelf: "flex-end", marginBottom: 32}}>
-          <Title style={{ color: 'white' }}>Fechar</Title>
+        <ButtonClose
+          onPress={closeBottomSheet}
+          style={{ alignSelf: "flex-end", marginBottom: 32 }}
+        >
+          <Title style={{ color: "white" }}>Fechar</Title>
         </ButtonClose>
         <ScrollView
           keyboardShouldPersistTaps="always"
@@ -169,28 +217,46 @@ export function NewLaunch({ closeBottomSheet, onCloseModal, showButtonEdit, show
               <Divider />
             </Header>
             <Content>
-
-              <Title>
-                Nome*
-              </Title>
-              <Input
-                value={name}
-                onChangeText={setName}
+              <Title>Nome*</Title>
+              <Controller
+                control={control}
+                name="name"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                )}
               />
 
-              <Title>
-                Valor
-              </Title>
-              <Input
-                placeholder="0,00"
-                value={valueItem}
-                keyboardType="numeric"
-                onChangeText={setValueItem}
+              <Title>Valor</Title>
+              <Controller
+                control={control}
+                name="valueItem"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    value={value}
+                    onChangeText={(value) => onChange(currencyMask(value))}
+                    onBlur={onBlur}
+                    placeholder="0,00"
+                    keyboardType="numeric"
+                  />
+                )}
               />
               <View>
                 <Title>Data*</Title>
-                <TouchableOpacity style={{ height: 50 }} onPress={showDatePickerModal}>
-                  <Input value={formattedDate} editable={false} />
+                <TouchableOpacity
+                  style={{ height: 50 }}
+                  onPress={showDatePickerModal}
+                >
+                  <Controller
+                    control={control}
+                    name="formattedDate"
+                    render={({ field: { value } }) => (
+                      <Input value={value} editable={false} />
+                    )}
+                  />
                 </TouchableOpacity>
                 {showDatePicker && (
                   <DateTimePicker
@@ -201,21 +267,36 @@ export function NewLaunch({ closeBottomSheet, onCloseModal, showButtonEdit, show
                 )}
               </View>
 
-              <Title>
-                Descrição
-              </Title>
-              <Input
-                value={description}
-                onChangeText={setDescription}
+              <Title>Descrição</Title>
+              <Controller
+                control={control}
+                name="description"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                  />
+                )}
               />
               <View style={{ marginBottom: 10, height: 150 }}>
                 {showButtonSave && (
-                  <Button style={{ marginBottom: 10 }} onPress={isEditing ? handleEditExpense : handleSaveItem}>
-                    <Title>{isEditing ? 'Editar' : 'Salvar'}</Title>
+                  <Button
+                    style={{ marginBottom: 10 }}
+                    onPress={
+                      isEditing
+                        ? handleSubmit(handleEditExpense, onInvalid)
+                        : handleSubmit(handleSaveItem, onInvalid)
+                    }
+                  >
+                    <Title>{isEditing ? "Editar" : "Salvar"}</Title>
                   </Button>
                 )}
                 {showButtonRemove && (
-                  <Button style={{ marginBottom: 10 }} onPress={handleDeleteExpense}>
+                  <Button
+                    style={{ marginBottom: 10 }}
+                    onPress={handleDeleteExpense}
+                  >
                     <Title>Excluir</Title>
                   </Button>
                 )}

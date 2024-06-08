@@ -47,7 +47,7 @@ export function NewItem({
   const [isEditing, setIsEditing] = useState(false);
 
   // Hooks
-  const { control, handleSubmit, reset, setValue, formState: {errors} } = useForm<FormSchemaType>({
+  const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       description: "",
