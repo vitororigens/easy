@@ -181,11 +181,14 @@ export function NewLaunch({
           if (doc.exists) {
             const data = doc.data();
             if (data) {
-              setValue("valueItem", data.valueItem);
-              setValue("description", data.description);
+              setValue("valueItem", currencyMask(data.valueItem.toString())); // Ensure valueItem is a string and masked correctly
+              setValue("description", data.description || "");
               setValue("name", data.name);
               setIsEditing(true);
-              setDate(new Date(data.date));
+              const [day, month, year] = data.date.split("/");
+              const formattedDate = `${day}/${month}/${year}`;
+              setValue("formattedDate", formattedDate);
+              setDate(new Date(year, month - 1, day));
             } else {
               console.log("Dados do documento estão vazios!");
             }
@@ -198,6 +201,7 @@ export function NewLaunch({
         });
     }
   }, [selectedItemId]);
+  
 
   return (
     <>
