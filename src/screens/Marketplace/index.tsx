@@ -1,3 +1,4 @@
+import { getMonth, parse } from "date-fns";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
@@ -17,7 +18,10 @@ import { ItemMarketplace } from "../../components/ItemMarketplace";
 import { Items } from "../../components/Items";
 import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
-import useHistoryMarketplaceCollections, { HistoryMarketplaceData } from "../../hooks/useHistoryMarketplaceCollection";
+import { useMonth } from "../../context/MonthProvider";
+import useHistoryMarketplaceCollections, {
+  HistoryMarketplaceData,
+} from "../../hooks/useHistoryMarketplaceCollection";
 import useMarketplaceCollections, {
   MarketplaceData,
 } from "../../hooks/useMarketplaceCollections";
@@ -30,19 +34,19 @@ import { Button, Content, Divider, Header, NavBar, Title } from "./styles";
 const modalBottom = Platform.OS === "ios" ? 90 : 70;
 
 export function Marketplace() {
+  const { selectedMonth } = useMonth();
   const [activeButton, setActiveButton] = useState("items");
   const [confirmItemVisible, setConfirmItemVisible] = useState(false);
   const [modalActive, setModalActive] = useState(false);
-  const [selectedListData, setSelectedListData] = useState<HistoryMarketplaceData | null>(
-    null
-  );
+  const [selectedListData, setSelectedListData] =
+    useState<HistoryMarketplaceData | null>(null);
   const [selectedItemData, setSelectedItemData] = useState("");
   const [selectedItems, setSelectedItems] = useState<MarketplaceData[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
   const data = useMarketplaceCollections("Marketplace");
-  const selectedItemsId = selectedItems.map((item) => item.id)
+  const selectedItemsId = selectedItems.map((item) => item.id);
 
   const user = useUserAuth();
   const uid = user?.uid;
@@ -51,6 +55,12 @@ export function Marketplace() {
   const history = useHistoryMarketplaceCollections("HistoryMarketplace").filter(
     (item) => item.uid === uid
   );
+
+  const historyMonth = history.filter((item) => {
+    const month =
+      getMonth(parse(item.finishedDate, "dd/MM/yyyy", new Date())) + 1;
+    return month === selectedMonth;
+  });
 
   const totalAmount = selectedItems.reduce(
     (total, item) => total + item.amount,
@@ -86,7 +96,7 @@ export function Marketplace() {
       ]);
     }
   };
-  
+
   const handleRemoveItem = (item: MarketplaceData) => {
     const itemIndex = selectedItems.findIndex(
       (selectedItem) => selectedItem.id === item.id
@@ -165,7 +175,7 @@ export function Marketplace() {
       Toast.show("Lista de compras adicionada!", { type: "success" });
       setModalActive(false);
       setSelectedItems([]);
-      closeModals()
+      closeModals();
     } catch (error) {
       console.error("Erro ao adicionar Lista de compras: ", error);
     }
@@ -209,7 +219,7 @@ export function Marketplace() {
       Toast.show("Lista de compras adicionada!", { type: "success" });
       setModalActive(false);
       setSelectedItems([]);
-      removeItemsMarketplace(selectedItemsId)
+      removeItemsMarketplace(selectedItemsId);
     } catch (error) {
       console.error("Erro ao adicionar lista de compras: ", error);
     }
@@ -228,11 +238,9 @@ export function Marketplace() {
       batch.delete(docRef);
     });
 
-    batch
-      .commit()
-      .catch((error) => {
-        console.error("Erro ao excluir os produtos: ", error);
-      });
+    batch.commit().catch((error) => {
+      console.error("Erro ao excluir os produtos: ", error);
+    });
   }
 
   const handleListSelected = (item: any) => {
@@ -312,7 +320,7 @@ export function Marketplace() {
 
           {activeButton === "items" && (
             <FlatList
-              data={history}
+              data={historyMonth}
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => handleListSelected(item)}>
                   <Items
