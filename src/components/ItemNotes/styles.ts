@@ -1,6 +1,6 @@
+import { Entypo } from '@expo/vector-icons';
 import { TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
-import { Entypo } from '@expo/vector-icons';
 
 export const Container = styled(TouchableOpacity)`
     max-height: 80px;
@@ -26,6 +26,12 @@ export const SubTitle = styled.Text`
     font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
 `;
 
+export const DateNote = styled.Text`
+    font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+    color: ${({ theme }) => theme.COLORS.TEAL_600};
+    font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+    margin-top: 4px;
+`;
 
 export const Button = styled(TouchableOpacity)`
     flex-direction: row;

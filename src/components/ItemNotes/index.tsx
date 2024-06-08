@@ -1,26 +1,43 @@
 import { TouchableOpacity, View } from "react-native";
-import { Button, Container, ContainerMenu, Icon, SubTitle, Title } from "./styles";
-import { Popover } from 'react-native-popper';
+import { Popover } from "react-native-popper";
+import {
+  Button,
+  Container,
+  ContainerMenu,
+  DateNote,
+  Icon,
+  SubTitle,
+  Title,
+} from "./styles";
 
 type ItemNotesProps = {
   title: string;
   description: string;
+  date?: string;
   onDelete: () => void;
   onEdit: () => void;
 };
 
-export function ItemNotes({ description, title, onDelete, onEdit }: ItemNotesProps) {
+export function ItemNotes({
+  description,
+  title,
+  onDelete,
+  onEdit,
+  date,
+}: ItemNotesProps) {
   return (
     <Container onPress={onEdit}>
       <View style={{ flex: 1 }}>
-        <Title>
-          {title}
-        </Title>
+        <Title>{title}</Title>
         <SubTitle>
-          {description ? (description.length > 10 ? description.substring(0, 10) + '...' : description) : ""}
+          {description
+            ? description.length > 10
+              ? description.substring(0, 10) + "..."
+              : description
+            : ""}
         </SubTitle>
       </View>
-      <View>
+      <View style={{ alignItems: "flex-end" }}>
         <Popover
           trigger={
             <TouchableOpacity>
@@ -30,7 +47,7 @@ export function ItemNotes({ description, title, onDelete, onEdit }: ItemNotesPro
         >
           <Popover.Backdrop />
           <Popover.Content>
-            <ContainerMenu>
+            <ContainerMenu style={{ alignSelf: "flex-end" }}>
               <Button onPress={onDelete}>
                 <Icon name="trash" />
                 <Title>Excluir</Title>
@@ -42,6 +59,7 @@ export function ItemNotes({ description, title, onDelete, onEdit }: ItemNotesPro
             </ContainerMenu>
           </Popover.Content>
         </Popover>
+        {!!date && <DateNote>{date}</DateNote>}
       </View>
     </Container>
   );

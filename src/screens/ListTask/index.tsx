@@ -16,7 +16,7 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { Button, Content, Divider, Header, NavBar, Title } from "./styles";
 
-import { format, subDays } from "date-fns";
+import { format } from "date-fns";
 import { useTheme } from "styled-components/native";
 import { FinishTasks } from "../../components/FinishTasks";
 import { HistoryTaskModal } from "../../components/HistoryTaskModal";
@@ -155,7 +155,7 @@ export function ListTask() {
       .set({
         uid,
         tasks,
-        finishedDate: format(subDays(new Date(), 1), "dd/MM/yyyy"),
+        finishedDate: format(new Date(), "dd/MM/yyyy"),
       })
       .then(() => {
         handleDeleteMultipleItems(taskIds);

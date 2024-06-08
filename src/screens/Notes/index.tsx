@@ -38,6 +38,7 @@ export function Notes() {
       });
   }
 
+
   return (
     <DefaultContainer newNotes>
       <Container type="SECONDARY" title="Notas">
@@ -53,6 +54,7 @@ export function Notes() {
                 onDelete={() => handleDeleteItem(item.id)}
                 onEdit={() => handleEditItem(item.id)}
                 title={item.name}
+                date={item.createdAt}
                 description={item.description}
               />
             )}

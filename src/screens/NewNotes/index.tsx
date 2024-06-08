@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollView, View } from "react-native";
@@ -63,6 +64,7 @@ export function NewNotes({
       .set({
         name,
         description,
+        createdAt: format(new Date(), "dd/MM/yyyy"),
         uid: uid,
       })
       .then(() => {

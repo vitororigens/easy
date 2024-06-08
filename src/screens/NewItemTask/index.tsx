@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format, subDays } from "date-fns";
+import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollView, View } from "react-native";
@@ -39,16 +39,10 @@ export function NewItemTask({
   const uid = user?.uid;
   const [isEditing, setIsEditing] = useState(false);
 
-  const now = new Date();
-  const formattedDate = format(subDays(now, 1), "dd/MM/yyyy");
-
+  const formattedDate = format(new Date(), "dd/MM/yyyy");
+  
   // Hooks
-  const {
-    control,
-    handleSubmit,
-    reset,
-    setValue
-  } = useForm<FormSchemaType>({
+  const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -67,7 +61,7 @@ export function NewItemTask({
       })
       .then(() => {
         Toast.show("Item adicionado!", { type: "success" });
-        reset()
+        reset();
         onCloseModal && onCloseModal();
       })
       .catch((error) => {
@@ -105,7 +99,7 @@ export function NewItemTask({
         Toast.show("Item adicionado!", { type: "success" });
         reset();
         onCloseModal && onCloseModal();
-        !!closeBottomSheet && closeBottomSheet()
+        !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
         console.error("Erro ao adicionar o item: ", error);
@@ -113,8 +107,11 @@ export function NewItemTask({
   };
 
   const onInvalid = () => {
-    Alert.alert(isEditing ? "Nenhum documento selecionado para edição!" : 'Atenção!', 'Por favor, preencha todos os campos obriatórios antes de salvar.');
-  }
+    Alert.alert(
+      isEditing ? "Nenhum documento selecionado para edição!" : "Atenção!",
+      "Por favor, preencha todos os campos obriatórios antes de salvar."
+    );
+  };
 
   useEffect(() => {
     if (selectedItemId) {
@@ -161,7 +158,11 @@ export function NewItemTask({
                 control={control}
                 name="name"
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <Input onBlur={onBlur} onChangeText={onChange} value={value} />
+                  <Input
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
                 )}
               />
 
@@ -169,7 +170,11 @@ export function NewItemTask({
                 {showButtonSave && (
                   <Button
                     style={{ marginBottom: 10 }}
-                    onPress={isEditing ? handleSubmit(handleEditExpense, onInvalid) : handleSubmit(handleSaveItem, onInvalid)}
+                    onPress={
+                      isEditing
+                        ? handleSubmit(handleEditExpense, onInvalid)
+                        : handleSubmit(handleSaveItem, onInvalid)
+                    }
                   >
                     <Title>{isEditing ? "Editar" : "Salvar"}</Title>
                   </Button>
