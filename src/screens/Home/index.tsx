@@ -120,7 +120,7 @@ export function Home() {
                       onEdit={() => handleRevenueConfirmation(item.id)}
                         showItemTaskRevenue
                         type={item.type}
-                        category={item.category}
+                        category={item.name}
                         date={item.date}
                         repeat={item.repeat}
                         valueTransaction={formatCurrency(item.valueTransaction)}
@@ -151,7 +151,7 @@ export function Home() {
                         showItemTask
                         status={item.status}
                         type={item.type}
-                        category={item.category}
+                        category={item.name}
                         date={item.date}
                         repeat={item.repeat}
                         valueTransaction={formatCurrency(item.valueTransaction)}

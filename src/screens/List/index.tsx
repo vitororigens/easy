@@ -50,7 +50,7 @@ export function List({ closeBottomSheet, onCloseModal, showButtonEdit, showButto
             </Header>
             <Content>
 
-            {expense.filter(item => item.uid === uid && item.repeat === null).length === 0 ? (
+            {expense.filter(item => item.uid === uid && item.repeat === true).length === 0 ? (
                 <ScrollView>
                   <LoadData image='SECONDARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de saídas! Comece lanaçando uma nova saida.' />
                 </ScrollView>

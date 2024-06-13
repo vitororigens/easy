@@ -43,7 +43,7 @@ export const Button = styled(TouchableOpacity)`
 
 export const Icon = styled(Entypo).attrs(({ theme }) => ({
     color: theme.COLORS.TEAL_600,
-    size: theme.FONTE_SIZE.GG
+    size: theme.FONTE_SIZE.XL,
 }))`
     margin-right: 5px;
 `

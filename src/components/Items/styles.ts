@@ -20,11 +20,11 @@ export const Container = styled.View`
 export const Icon = styled.View<Props>`
     width: 13%;
     height: 45px;
-    background-color: ${({theme, type}) => type === 'PRIMARY' 
-    ? theme.COLORS.GREEN_700
-    : type === 'SECONDARY'
-    ? theme.COLORS.RED_700
-    : theme.COLORS.YELLOW_700};
+    background-color: ${({ theme, type }) => type === 'PRIMARY'
+        ? theme.COLORS.GREEN_700
+        : type === 'SECONDARY'
+            ? theme.COLORS.RED_700
+            : theme.COLORS.YELLOW_700};
     align-items: center;
     justify-content: center;
     border-radius: 10px;
@@ -32,27 +32,27 @@ export const Icon = styled.View<Props>`
 `;
 
 export const Title = styled.Text<Props>`
-    font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
-    font-size: ${({theme}) => theme.FONTE_SIZE.LG}px;
-    color: ${({theme, type}) => type === 'PRIMARY' 
-    ? theme.COLORS.GREEN_700
-    : type === 'SECONDARY'
-    ? theme.COLORS.RED_700
-    : theme.COLORS.YELLOW_700};
+    font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+    font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+    color: ${({ theme, type }) => type === 'PRIMARY'
+        ? theme.COLORS.GREEN_700
+        : type === 'SECONDARY'
+            ? theme.COLORS.RED_700
+            : theme.COLORS.YELLOW_700};
 `;
 
 
 export const SubTitle = styled.Text`
-    font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
-    font-size: ${({theme}) => theme.FONTE_SIZE.SM}px;
-    color: ${({theme}) => theme.COLORS.GRAY_400};
+    font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+    font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+    color: ${({ theme }) => theme.COLORS.GRAY_400};
 
 `;
 
 export const Divider = styled.View`
     width: 100%;
     height: 2px;
-    background-color: ${({theme}) => theme.COLORS.GRAY_400};
+    background-color: ${({ theme }) => theme.COLORS.GRAY_400};
 `;
 
 
@@ -69,12 +69,12 @@ export const ContentItems = styled.View`
 
 
 export const IconMenu = styled(Entypo).attrs<Props>(({ theme, type }) => ({
-    color: type === 'PRIMARY' 
+    color: type === 'PRIMARY'
         ? theme.COLORS.GREEN_700
         : type === 'SECONDARY'
-        ? theme.COLORS.RED_700
-        : theme.COLORS.YELLOW_700,
-    size: theme.FONTE_SIZE.GG,
+            ? theme.COLORS.RED_700
+            : theme.COLORS.YELLOW_700,
+    size: theme.FONTE_SIZE.XL,
 }))``;
 
 export const ContainerMenu = styled.View`

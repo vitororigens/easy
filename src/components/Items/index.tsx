@@ -50,7 +50,7 @@ export function Items({
   hasEdit = true,
   hasAction = true,
 }: ItemsProps) {
-  const transactionType = repeat ? "Despesa fixa" : "Despesa variável";
+  const transactionType = repeat ? "Renda fixa" : "Renda variável";
   const { COLORS } = useTheme();
   const textStatus = customStatusText
     ? customStatusText
