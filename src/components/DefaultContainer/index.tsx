@@ -69,7 +69,7 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
     }
 
     function handleList() {
-        navigation.navigate('list')
+        navigation.navigate('historic')
     }
 
 
@@ -107,12 +107,14 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                         <Button style={{
                             alignItems: 'center',
                             flexDirection: 'row',
-                            height: 60
+                            height: 60,
+                            width: '33%',
+                           
                         }} onPress={handleList}>
 
                             <Icon name="list" />
                             <Title>
-                                Lista
+                                Histórico
                             </Title>
                         </Button>
                     }
@@ -129,7 +131,8 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                     {monthButton &&
                         <ContainerMonth style={{
                             height: 60,
-                            justifyContent: backButton ? 'flex-start' : 'center'
+                            justifyContent: backButton ? 'flex-start' : 'center',
+                            width: '41%'
                         }}>
                             <RNPickerSelect
                                 onValueChange={(value) => setSelectedMonth(value)}
@@ -172,7 +175,9 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                         <Button style={{
                             alignItems: 'center',
                             flexDirection: 'row',
-                            height: 60
+                            height: 60,
+                            width: '25%',
+                           
                         }} onPress={handleNewTask}>
                             <Title>
                                 Novo
@@ -185,7 +190,8 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                         <Button style={{
                             alignItems: 'center',
                             flexDirection: 'row',
-                            height: 60
+                            height: 60,
+                            width: '25%',
                         }} onPress={handleNewItem}>
                             <Title>
                                 Novo
@@ -197,7 +203,8 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                         <Button style={{
                             alignItems: 'center',
                             flexDirection: 'row',
-                            height: 60
+                            height: 60,
+                            width: '25%',
                         }} onPress={handleNewLaunch}>
                             <Title>
                                 Novo
@@ -209,7 +216,8 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                         <Button style={{
                             alignItems: 'center',
                             flexDirection: 'row',
-                            height: 60
+                            height: 60,
+                            width: '25%',
                         }} onPress={handleNewItemMarketplace}>
                             <Title>
                                 Novo

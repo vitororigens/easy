@@ -3,11 +3,11 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-    Alert,
-    ScrollView,
-    Switch,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  Switch,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
@@ -16,13 +16,15 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask } from "../../utils/currency";
 import {
-    Button,
-    DividerTask,
-    Input,
-    InputDescription,
-    Span,
-    TitleTask,
+  Button,
+  DividerTask,
+  Input,
+  InputDescription,
+  Span,
+  Title,
+  TitleTask,
 } from "./styles";
+import { MaterialIcons } from '@expo/vector-icons';
 
 type RevenueProps = {
   selectedItemId?: string;
@@ -34,7 +36,7 @@ type RevenueProps = {
 
 const formSchema = z.object({
   name: z.string().min(1, "Nome da Tarefa é obrigatório"),
-  valueTransaction: z.string().min(1, "Valor é obrigatório"),
+  valueTransaction: z.string().optional(),
   formattedDate: z.string().min(1, "Data é obrigatória"),
   description: z.string().optional(),
   selectedCategory: z.string().optional(),
@@ -55,7 +57,7 @@ export function Revenue({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [repeat, setRepeat] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const uid = user?.uid;
 
   // Hooks
@@ -63,10 +65,10 @@ export function Revenue({
     resolver: zodResolver(formSchema),
     defaultValues: {
       description: "",
-      formattedDate: "",
+      formattedDate: date.toLocaleDateString("pt-BR"),
       name: "",
       selectedCategory: "Outros",
-      valueTransaction: "",
+      valueTransaction: "0",
     },
   });
 
@@ -220,6 +222,11 @@ export function Revenue({
     );
   };
 
+
+  function handleShowAdvanced() {
+    setShowAdvanced((prevState) => !prevState);
+  }
+
   useEffect(() => {
     if (selectedItemId) {
       database
@@ -266,7 +273,7 @@ export function Revenue({
               <Input onBlur={onBlur} onChangeText={onChange} value={value} />
             )}
           />
-          <TitleTask>Valor* </TitleTask>
+          <TitleTask>Valor <Span>(opicional)</Span></TitleTask>
           <Controller
             control={control}
             name="valueTransaction"
@@ -280,99 +287,120 @@ export function Revenue({
             )}
           />
         </View>
-        <View style={{ flexDirection: "row", marginBottom: 10 }}>
-          <View style={{ width: "50%" }}>
-            <View>
-              <TitleTask>Data*</TitleTask>
-              <TouchableOpacity
-                style={{ height: 50 }}
-                onPress={showDatePickerModal}
-              >
-                <Controller
-                  control={control}
-                  name="formattedDate"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      editable={false}
+        <View style={{ marginTop: 40, marginBottom: 20 }}>
+          <TouchableOpacity
+            onPress={handleShowAdvanced}
+            style={{
+              width: '100%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+            <Title>{showAdvanced ? "Mostrar menos" : "Mostrar mais"}</Title>
+            <MaterialIcons
+              name={showAdvanced ? "arrow-drop-up" : "arrow-drop-down"}
+              size={24}
+              color="black"
+            />
+          </TouchableOpacity>
+        </View>
+        {showAdvanced &&
+          <>
+            <View style={{ flexDirection: "row", marginBottom: 10 }}>
+              <View style={{ width: "50%" }}>
+                <View>
+                  <TitleTask>Data*</TitleTask>
+                  <TouchableOpacity
+                    style={{ height: 50 }}
+                    onPress={showDatePickerModal}
+                  >
+                    <Controller
+                      control={control}
+                      name="formattedDate"
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <Input
+                          value={value}
+                          onChangeText={onChange}
+                          onBlur={onBlur}
+                          editable={false}
+                        />
+                      )}
+                    />
+                  </TouchableOpacity>
+                  {showDatePicker && (
+                    <DateTimePicker
+                      value={date}
+                      mode="date"
+                      display="calendar"
+                      onChange={handleDateChange}
                     />
                   )}
-                />
-              </TouchableOpacity>
-              {showDatePicker && (
-                <DateTimePicker
-                  value={date}
-                  mode="date"
-                  display="calendar"
-                  onChange={handleDateChange}
-                />
-              )}
-            </View>
-            <View>
-              <TitleTask style={{ marginTop: 20 }}>
-                Categorias <Span>(opicional)</Span>{" "}
-              </TitleTask>
-              <View style={{ height: 50 }}>
-                <Controller
-                  control={control}
-                  name="selectedCategory"
-                  defaultValue="Outros"
-                  render={({ field: { onChange, value } }) => (
-                    <RNPickerSelect
-                      value={value}
-                      onValueChange={(value) => onChange(value)}
-                      items={[
-                        { label: "Salário", value: "salario" },
-                        { label: "Vendas", value: "vendas" },
-                        { label: "Investimentos", value: "investimentos" },
-                        { label: "Comissão", value: "Comissão" },
-                        { label: "Adiantamentos", value: "Adiantamentos" },
-                        { label: "Outros", value: "Outros" },
-                      ]}
-                      placeholder={{ label: "Selecione", value: "Selecione" }}
+                </View>
+                <View>
+                  <TitleTask style={{ marginTop: 20 }}>
+                    Categorias <Span>(opicional)</Span>{" "}
+                  </TitleTask>
+                  <View style={{ height: 50 }}>
+                    <Controller
+                      control={control}
+                      name="selectedCategory"
+                      defaultValue="Outros"
+                      render={({ field: { onChange, value } }) => (
+                        <RNPickerSelect
+                          value={value}
+                          onValueChange={(value) => onChange(value)}
+                          items={[
+                            { label: "Salário", value: "salario" },
+                            { label: "Vendas", value: "vendas" },
+                            { label: "Investimentos", value: "investimentos" },
+                            { label: "Comissão", value: "Comissão" },
+                            { label: "Adiantamentos", value: "Adiantamentos" },
+                            { label: "Outros", value: "Outros" },
+                          ]}
+                          placeholder={{ label: "Selecione", value: "Selecione" }}
+                        />
+                      )}
                     />
-                  )}
+                  </View>
+                </View>
+              </View>
+              <DividerTask />
+              <View style={{ width: "40%" }}>
+                <TitleTask>
+                  Repetir essa receita? <Span>(opicional)</Span>
+                </TitleTask>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#81b0ff" }}
+                  thumbColor={repeat ? "#f5dd4b" : "#f4f3f4"}
+                  ios_backgroundColor="#3e3e3e"
+                  onValueChange={() => setRepeat(!repeat)}
+                  value={repeat}
+                  style={{ width: 50 }}
                 />
               </View>
             </View>
-          </View>
-          <DividerTask />
-          <View style={{ width: "40%" }}>
-            <TitleTask>
-              Repetir essa receita? <Span>(opicional)</Span>
-            </TitleTask>
-            <Switch
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
-              thumbColor={repeat ? "#f5dd4b" : "#f4f3f4"}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={() => setRepeat(!repeat)}
-              value={repeat}
-              style={{ width: 50 }}
-            />
-          </View>
-        </View>
-        <View style={{ marginBottom: 5 }}>
-          <TitleTask>
-            Descrição <Span>(opcional)</Span>
-          </TitleTask>
-          <Controller
-            control={control}
-            name="description"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <InputDescription
-                multiline
-                numberOfLines={5}
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                textAlignVertical="top"
-                style={{ paddingHorizontal: 12, paddingVertical: 12 }}
+            <View style={{ marginBottom: 5 }}>
+              <TitleTask>
+                Descrição <Span>(opcional)</Span>
+              </TitleTask>
+              <Controller
+                control={control}
+                name="description"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputDescription
+                    multiline
+                    numberOfLines={5}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    textAlignVertical="top"
+                    style={{ paddingHorizontal: 12, paddingVertical: 12 }}
+                  />
+                )}
               />
-            )}
-          />
-        </View>
+            </View>
+          </>
+        }
         <View style={{ marginBottom: 10, height: 200 }}>
           {showButtonSave && (
             <Button

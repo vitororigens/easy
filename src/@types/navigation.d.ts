@@ -12,6 +12,7 @@ export declare global{
             marketplace: undefined;
             perfil: undefined;
             piggybank: undefined;
+            historic: undefined;
         }
     }
 }

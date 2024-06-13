@@ -21,8 +21,10 @@ import {
   Input,
   InputDescription,
   Span,
+  Title,
   TitleTask,
 } from "./styles";
+import { MaterialIcons } from '@expo/vector-icons';
 
 export type ExpenseProps = {
   selectedItemId?: string;
@@ -30,11 +32,12 @@ export type ExpenseProps = {
   onCloseModal?: () => void;
   showButtonEdit?: boolean;
   showButtonSave?: boolean;
+  showAdvanced?: boolean;
 };
 
 const formSchema = z.object({
   name: z.string().min(1, "Nome da Tarefa é obrigatório"),
-  valueTransaction: z.string().min(1, "Valor é obrigatório"),
+  valueTransaction: z.string().optional(),
   formattedDate: z.string().min(1, "Data é obrigatória"),
   description: z.string().optional(),
   selectedCategory: z.string().optional(),
@@ -54,9 +57,11 @@ export function Expense({
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [repeat, setRepeat] = useState(false);
+  const [income, setIncome] = useState(false);
   const [status, setStatus] = useState(false);
   const [alert, setAlert] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const uid = user?.uid;
 
@@ -65,15 +70,14 @@ export function Expense({
     resolver: zodResolver(formSchema),
     defaultValues: {
       description: "",
-      formattedDate: "",
+      formattedDate: date.toLocaleDateString("pt-BR"),
       name: "",
       selectedCategory: "outros",
-      valueTransaction: "",
+      valueTransaction: "0",
     },
   });
 
   // Functions
-
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     setShowDatePicker(false);
     const currentDate = selectedDate || date;
@@ -97,11 +101,13 @@ export function Expense({
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
 
+    const transactionValue = valueTransaction ?? "0"; // Ensure valueTransaction is a string
+
     const expenseData = {
       name: name,
       category: selectedCategory,
       date: formattedDate,
-      valueTransaction: currencyUnMask(valueTransaction),
+      valueTransaction: currencyUnMask(transactionValue),
       description: description,
       repeat: repeat,
       status: status,
@@ -109,9 +115,10 @@ export function Expense({
       type: "output",
       uid: uid,
       month: monthNumber,
+      income
     };
 
-    // Salva o lançamento de despesa para o mês atual
+    // Save the expense for the current month
     database
       .collection("Expense")
       .add(expenseData)
@@ -120,16 +127,16 @@ export function Expense({
         setRepeat(false);
         setAlert(false);
         setStatus(false);
+        setIncome(false);
         reset();
       })
       .catch((error) => {
         console.error("Erro ao adicionar a transação: ", error);
       });
 
-    // Se o interruptor de repetição estiver ativado, cria cópias para os próximos 11 meses
+    // If the repeat switch is on, create copies for the next 11 months
     if (repeat) {
       for (let i = 1; i <= 11; i++) {
-        // Obtém o próximo mês e ano
         let nextMonth = monthNumber + i;
         let nextYear: any = year;
 
@@ -189,6 +196,8 @@ export function Expense({
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
 
+    const transactionValue = valueTransaction ?? "0"; // Ensure valueTransaction is a string
+
     database
       .collection("Expense")
       .doc(selectedItemId)
@@ -196,7 +205,7 @@ export function Expense({
         name: name,
         category: selectedCategory,
         date: formattedDate,
-        valueTransaction: currencyUnMask(valueTransaction),
+        valueTransaction: currencyUnMask(transactionValue),
         description: description,
         repeat: repeat,
         status: status,
@@ -204,12 +213,14 @@ export function Expense({
         type: "output",
         uid: uid,
         month: monthNumber,
+        income
       })
       .then(() => {
         Toast.show("Transação editada!", { type: "success" });
         setRepeat(false);
         setAlert(false);
         setStatus(false);
+        setIncome(false);
         reset();
         onCloseModal && onCloseModal();
       })
@@ -224,6 +235,11 @@ export function Expense({
       "Por favor, preencha todos os campos obrigatórios antes de salvar."
     );
   };
+
+  function handleShowAdvanced() {
+    setShowAdvanced((prevState) => !prevState);
+  }
+
 
   useEffect(() => {
     if (selectedItemId) {
@@ -249,6 +265,7 @@ export function Expense({
               setStatus(data.status);
               setDate(new Date(data.date));
               setIsEditing(true);
+              setIncome(data.income)
             } else {
               console.log("Dados do documento estão vazios!");
             }
@@ -264,7 +281,7 @@ export function Expense({
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <TitleTask>Nome*</TitleTask>
           <Controller
@@ -274,19 +291,31 @@ export function Expense({
               <Input onBlur={onBlur} onChangeText={onChange} value={value} />
             )}
           />
-          <TitleTask>Valor*</TitleTask>
-          <Controller
-            control={control}
-            name="valueTransaction"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                value={value}
-                onChangeText={(value) => onChange(currencyMask(value))}
-                onBlur={onBlur}
-                keyboardType="numeric"
-              />
-            )}
-          />
+          <TitleTask>Data* </TitleTask>
+          <TouchableOpacity
+            style={{ height: 50 }}
+            onPress={showDatePickerModal}
+          >
+            <Controller
+              control={control}
+              name="formattedDate"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  editable={false}
+                />
+              )}
+            />
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              onChange={handleDateChange}
+            />
+          )}
           <TitleTask>
             Adicionar esse lançamento a sua lista de contas recorrente?{" "}
             <Span>(opicional)</Span>
@@ -300,133 +329,163 @@ export function Expense({
             style={{ width: 50, marginBottom: 20 }}
           />
         </View>
-        <View style={{ flexDirection: "row", marginBottom: 10 }}>
-          <View style={{ width: "50%" }}>
-            <View>
-              <TitleTask>Data* </TitleTask>
-              <TouchableOpacity
-                style={{ height: 50 }}
-                onPress={showDatePickerModal}
-              >
-                <Controller
-                  control={control}
-                  name="formattedDate"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      editable={false}
+        <View style={{
+          marginTop: 30,
+          marginBottom: 30
+        }}>
+
+          <View >
+            <TouchableOpacity
+              onPress={handleShowAdvanced}
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+              <Title>{showAdvanced ? "Mostrar menos" : "Mostrar mais"}</Title>
+              <MaterialIcons
+                name={showAdvanced ? "arrow-drop-up" : "arrow-drop-down"}
+                size={24}
+                color="black"
+              />
+            </TouchableOpacity>
+          </View>
+
+
+        </View>
+        {showAdvanced &&
+          <>
+            <View style={{ flexDirection: "row", marginBottom: 10 }}>
+              <View style={{ width: "50%" }}>
+                <View>
+                  <TitleTask>Valor*</TitleTask>
+                  <Controller
+                    control={control}
+                    name="valueTransaction"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <Input
+                        value={value}
+                        onChangeText={(value) => onChange(currencyMask(value))}
+                        onBlur={onBlur}
+                        keyboardType="numeric"
+                      />
+                    )}
+                  />
+
+                </View>
+                <View>
+                  <TitleTask style={{ marginTop: 20 }}>
+                    Categorias <Span>(opicional)</Span>
+                  </TitleTask>
+                  <View style={{ height: 50 }}>
+                    <Controller
+                      control={control}
+                      name="selectedCategory"
+                      render={({ field: { onChange, value } }) => (
+                        <RNPickerSelect
+                          value={value}
+                          onValueChange={(value) => onChange(value)}
+                          items={[
+                            { label: "Investimentos", value: "Investimentos" },
+                            { label: "Contas", value: "Contas" },
+                            { label: "Compras", value: "Compras" },
+                            { label: "Faculdade", value: "Faculdade" },
+                            { label: "Internet", value: "Internet" },
+                            { label: "Academia", value: "Academia" },
+                            { label: "Emprestimo", value: "Emprestimo" },
+                            { label: "Comida", value: "Comida" },
+                            { label: "Telefone", value: "Telefone" },
+                            { label: "Entretenimento", value: "Entretenimento" },
+                            { label: "Educação", value: "Educacao" },
+                            { label: "Beleza", value: "beleza" },
+                            { label: "Esporte", value: "esporte" },
+                            { label: "Social", value: "social" },
+                            { label: "Transporte", value: "transporte" },
+                            { label: "Roupas", value: "roupas" },
+                            { label: "Carro", value: "carro" },
+                            { label: "Bebida", value: "bebida" },
+                            { label: "Cigarro", value: "cigarro" },
+                            { label: "Eletrônicos", value: "eletronicos" },
+                            { label: "Viagem", value: "viagem" },
+                            { label: "Saúde", value: "saude" },
+                            { label: "Estimação", value: "estimacao" },
+                            { label: "Reparar", value: "reparar" },
+                            { label: "Moradia", value: "moradia" },
+                            { label: "Presente", value: "presente" },
+                            { label: "Doações", value: "doacoes" },
+                            { label: "Loteria", value: "loteria" },
+                            { label: "Lanches", value: "lanches" },
+                            { label: "Filhos", value: "filhos" },
+                            { label: "Outros", value: "outros" },
+                          ]}
+                          placeholder={{ label: "Selecione", value: "Selecione" }}
+                        />
+                      )}
                     />
-                  )}
+                  </View>
+                </View>
+              </View>
+              <DividerTask />
+              <View style={{ width: "50%" }}>
+                <TitleTask>
+                  Essa conta já está paga? <Span>(opicional)</Span>
+                </TitleTask>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#81b0ff" }}
+                  thumbColor={status ? "#f5dd4b" : "#f4f3f4"}
+                  ios_backgroundColor="#3e3e3e"
+                  onValueChange={() => setStatus(!status)}
+                  value={status}
+                  style={{ width: 50 }}
                 />
-              </TouchableOpacity>
-              {showDatePicker && (
-                <DateTimePicker
-                  value={date}
-                  mode="date"
-                  onChange={handleDateChange}
+                <TitleTask>
+                  Lembrete? <Span>(opicional)</Span>
+                </TitleTask>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#81b0ff" }}
+                  thumbColor={alert ? "#f5dd4b" : "#f4f3f4"}
+                  ios_backgroundColor="#3e3e3e"
+                  onValueChange={() => setAlert(!alert)}
+                  value={alert}
+                  style={{ width: 50 }}
                 />
-              )}
-            </View>
-            <View>
-              <TitleTask style={{ marginTop: 20 }}>
-                Categorias <Span>(opicional)</Span>
-              </TitleTask>
-              <View style={{ height: 50 }}>
-                <Controller
-                  control={control}
-                  name="selectedCategory"
-                  render={({ field: { onChange, value } }) => (
-                    <RNPickerSelect
-                      value={value}
-                      onValueChange={(value) => onChange(value)}
-                      items={[
-                        { label: "Investimentos", value: "Investimentos" },
-                        { label: "Contas", value: "Contas" },
-                        { label: "Compras", value: "Compras" },
-                        { label: "Faculdade", value: "Faculdade" },
-                        { label: "Internet", value: "Internet" },
-                        { label: "Academia", value: "Academia" },
-                        { label: "Emprestimo", value: "Emprestimo" },
-                        { label: "Comida", value: "Comida" },
-                        { label: "Telefone", value: "Telefone" },
-                        { label: "Entretenimento", value: "Entretenimento" },
-                        { label: "Educação", value: "Educacao" },
-                        { label: "Beleza", value: "beleza" },
-                        { label: "Esporte", value: "esporte" },
-                        { label: "Social", value: "social" },
-                        { label: "Transporte", value: "transporte" },
-                        { label: "Roupas", value: "roupas" },
-                        { label: "Carro", value: "carro" },
-                        { label: "Bebida", value: "bebida" },
-                        { label: "Cigarro", value: "cigarro" },
-                        { label: "Eletrônicos", value: "eletronicos" },
-                        { label: "Viagem", value: "viagem" },
-                        { label: "Saúde", value: "saude" },
-                        { label: "Estimação", value: "estimacao" },
-                        { label: "Reparar", value: "reparar" },
-                        { label: "Moradia", value: "moradia" },
-                        { label: "Presente", value: "presente" },
-                        { label: "Doações", value: "doacoes" },
-                        { label: "Loteria", value: "loteria" },
-                        { label: "Lanches", value: "lanches" },
-                        { label: "Filhos", value: "filhos" },
-                        { label: "Outros", value: "outros" },
-                      ]}
-                      placeholder={{ label: "Selecione", value: "Selecione" }}
-                    />
-                  )}
+                <TitleTask>
+                  Despesa fixa? <Span>(opicional)</Span>
+                </TitleTask>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#81b0ff" }}
+                  thumbColor={income ? "#f5dd4b" : "#f4f3f4"}
+                  ios_backgroundColor="#3e3e3e"
+                  onValueChange={() => setIncome(!income)}
+                  value={income}
+                  style={{ width: 50 }}
                 />
               </View>
             </View>
-          </View>
-          <DividerTask />
-          <View style={{ width: "50%" }}>
-            <TitleTask>
-              Essa conta ja está paga? <Span>(opicional)</Span>
-            </TitleTask>
-            <Switch
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
-              thumbColor={status ? "#f5dd4b" : "#f4f3f4"}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={() => setStatus(!status)}
-              value={status}
-              style={{ width: 50 }}
-            />
-            <TitleTask>
-              Lembrete? <Span>(opicional)</Span>
-            </TitleTask>
-            <Switch
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
-              thumbColor={alert ? "#f5dd4b" : "#f4f3f4"}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={() => setAlert(!alert)}
-              value={alert}
-              style={{ width: 50 }}
-            />
-          </View>
-        </View>
-        <View style={{ marginBottom: 5 }}>
-          <TitleTask>
-            Descrição <Span>(opcional)</Span>
-          </TitleTask>
-          <Controller
-            control={control}
-            name="description"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <InputDescription
-                multiline
-                numberOfLines={5}
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                textAlignVertical="top"
-                style={{ paddingHorizontal: 12, paddingVertical: 12 }}
+            <View style={{ marginBottom: 5 }}>
+              <TitleTask>
+                Descrição <Span>(opcional)</Span>
+              </TitleTask>
+              <Controller
+                control={control}
+                name="description"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputDescription
+                    multiline
+                    numberOfLines={5}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    textAlignVertical="top"
+                    style={{ paddingHorizontal: 12, paddingVertical: 12 }}
+                  />
+                )}
               />
-            )}
-          />
-        </View>
+            </View>
+
+          </>
+        }
         <View style={{ marginBottom: 10, height: 200 }}>
           {showButtonSave && (
             <Button

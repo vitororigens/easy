@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
@@ -11,6 +11,7 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
 import { Button, ButtonClose, Content, Input, Span, Title } from "./styles";
+import { MaterialIcons } from '@expo/vector-icons';
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -45,6 +46,7 @@ export function NewItem({
 
   // States
   const [isEditing, setIsEditing] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Hooks
   const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
@@ -53,8 +55,8 @@ export function NewItem({
       description: "",
       name: "",
       selectedCategory: "",
-      amount: "",
-      valueItem: "",
+      amount: "1",
+      valueItem: "0",
       selectedMeasurements: "un",
     },
   });
@@ -157,6 +159,10 @@ export function NewItem({
     );
   };
 
+  function handleShowAdvanced() {
+    setShowAdvanced((prevState) => !prevState);
+  }
+
   useEffect(() => {
     if (selectedItemId) {
       database
@@ -208,137 +214,158 @@ export function NewItem({
                 <Input onBlur={onBlur} onChangeText={onChange} value={value} />
               )}
             />
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <View
+            <View style={{ marginTop: 40, marginBottom: 20 }}>
+              <TouchableOpacity
+                onPress={handleShowAdvanced}
                 style={{
-                  width: "50%",
-                  paddingRight: 15,
-                }}
-              >
+                  width: '100%',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                <Title>{showAdvanced ? "Mostrar menos" : "Mostrar mais"}</Title>
+                <MaterialIcons
+                  name={showAdvanced ? "arrow-drop-up" : "arrow-drop-down"}
+                  size={24}
+                  color="black"
+                />
+              </TouchableOpacity>
+            </View>
+            {showAdvanced &&
+              <>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%",
+                  }}
+                >
+                  <View
+                    style={{
+                      width: "50%",
+                      paddingRight: 15,
+                    }}
+                  >
+                    <Title>
+                      Quantidade<Span> (opicional)</Span>
+                    </Title>
+                    <Controller
+                      control={control}
+                      name="amount"
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <Input
+                          keyboardType="numeric"
+                          value={formatQuantity(value ?? "")}
+                          onChangeText={onChange}
+                          onBlur={onBlur}
+                        />
+                      )}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      width: 100,
+                    }}
+                  >
+                    <Controller
+                      control={control}
+                      name="selectedMeasurements"
+                      render={({ field: { onChange, value } }) => (
+                        <RNPickerSelect
+                          onValueChange={onChange}
+                          items={[
+                            { label: "un", value: "unidade" },
+                            { label: "kg", value: "kilo" },
+                            { label: "g", value: "gramas" },
+                            { label: "l", value: "litro" },
+                            { label: "ml", value: "milimetros" },
+                          ]}
+                          value={value}
+                          placeholder={{ label: "un", value: "un" }}
+                        />
+                      )}
+                    />
+                  </View>
+                </View>
                 <Title>
-                  Quantidade<Span> (opicional)</Span>
+                  Preço <Span> (opicional)</Span>
                 </Title>
                 <Controller
                   control={control}
-                  name="amount"
+                  name="valueItem"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <Input
-                      keyboardType="numeric"
-                      value={formatQuantity(value ?? "")}
-                      onChangeText={onChange}
+                      value={value}
+                      onChangeText={(value) => onChange(currencyMask(value))}
                       onBlur={onBlur}
+                      placeholder="0,00"
+                      keyboardType="numeric"
                     />
                   )}
                 />
-              </View>
-              <View
-                style={{
-                  width: 100,
-                }}
-              >
+
+                <Title>
+                  Categoria <Span> (opicional)</Span>
+                </Title>
+
                 <Controller
                   control={control}
-                  name="selectedMeasurements"
-                  render={({ field: { onChange, value } }) => (
+                  name="selectedCategory"
+                  render={({ field: { onChange, onBlur, value } }) => (
                     <RNPickerSelect
                       onValueChange={onChange}
                       items={[
-                        { label: "un", value: "unidade" },
-                        { label: "kg", value: "kilo" },
-                        { label: "g", value: "gramas" },
-                        { label: "l", value: "litro" },
-                        { label: "ml", value: "milimetros" },
+                        {
+                          label: "Ovos, Verduras e Frutas",
+                          value: "ovos, verduras e frutas",
+                        },
+                        { label: "Carnes", value: "carnes" },
+                        { label: "Laticínios", value: "laticinios" },
+                        { label: "Padaria", value: "padaria" },
+                        { label: "Bebidas", value: "bebidas" },
+                        {
+                          label: "Produtos de Limpeza",
+                          value: "produtos de limpeza",
+                        },
+                        { label: "Higiene Pessoal", value: "higiene pessoal" },
+                        { label: "Hortifruti", value: "hortifruti" },
+                        { label: "Congelados", value: "congelados" },
+                        { label: "Açougue", value: "acougue" },
+                        { label: "Peixaria", value: "peixaria" },
+                        {
+                          label: "Bebidas Alcoólicas",
+                          value: "bebidas alcoolicas",
+                        },
+                        { label: "Pet Shop", value: "pet shop" },
+                        {
+                          label: "Utensílios Domésticos",
+                          value: "utensilios domesticos",
+                        },
+                        { label: "Bebês e Crianças", value: "bebes e criancas" },
+                        { label: "Eletronicos", value: "Eletronicos" },
+                        { label: "Carro", value: "Carro" },
+                        { label: "Ferramentas", value: "Ferramentas" },
                       ]}
                       value={value}
-                      placeholder={{ label: "un", value: "un" }}
+                      placeholder={{ label: "Selecione", value: "Selecione" }}
                     />
                   )}
                 />
-              </View>
-            </View>
-            <Title>
-              Preço <Span> (opicional)</Span>
-            </Title>
-            <Controller
-              control={control}
-              name="valueItem"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  value={value}
-                  onChangeText={(value) => onChange(currencyMask(value))}
-                  onBlur={onBlur}
-                  placeholder="0,00"
-                  keyboardType="numeric"
+
+                <Title>
+                  Observação <Span> (opicional)</Span>
+                </Title>
+                <Controller
+                  control={control}
+                  name="description"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input value={value} onChangeText={onChange} onBlur={onBlur} />
+                  )}
                 />
-              )}
-            />
 
-            <Title>
-              Categoria <Span> (opicional)</Span>
-            </Title>
-
-            <Controller
-              control={control}
-              name="selectedCategory"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <RNPickerSelect
-                  onValueChange={onChange}
-                  items={[
-                    {
-                      label: "Ovos, Verduras e Frutas",
-                      value: "ovos, verduras e frutas",
-                    },
-                    { label: "Carnes", value: "carnes" },
-                    { label: "Laticínios", value: "laticinios" },
-                    { label: "Padaria", value: "padaria" },
-                    { label: "Bebidas", value: "bebidas" },
-                    {
-                      label: "Produtos de Limpeza",
-                      value: "produtos de limpeza",
-                    },
-                    { label: "Higiene Pessoal", value: "higiene pessoal" },
-                    { label: "Hortifruti", value: "hortifruti" },
-                    { label: "Congelados", value: "congelados" },
-                    { label: "Açougue", value: "acougue" },
-                    { label: "Peixaria", value: "peixaria" },
-                    {
-                      label: "Bebidas Alcoólicas",
-                      value: "bebidas alcoolicas",
-                    },
-                    { label: "Pet Shop", value: "pet shop" },
-                    {
-                      label: "Utensílios Domésticos",
-                      value: "utensilios domesticos",
-                    },
-                    { label: "Bebês e Crianças", value: "bebes e criancas" },
-                    { label: "Eletronicos", value: "Eletronicos" },
-                    { label: "Carro", value: "Carro" },
-                    { label: "Ferramentas", value: "Ferramentas" },
-                  ]}
-                  value={value}
-                  placeholder={{ label: "Selecione", value: "Selecione" }}
-                />
-              )}
-            />
-
-            <Title>
-              Observação <Span> (opicional)</Span>
-            </Title>
-            <Controller
-              control={control}
-              name="description"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input value={value} onChangeText={onChange} onBlur={onBlur} />
-              )}
-            />
-
+              </>
+            }
             <View style={{ marginBottom: 10, height: 150 }}>
               {showButtonSave && (
                 <Button
