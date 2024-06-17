@@ -4,15 +4,15 @@ import { Popover } from "react-native-popper";
 import { useTheme } from "styled-components/native";
 import { Button } from "../ItemTask/styles";
 import {
-    Container,
-    ContainerMenu,
-    Content,
-    ContentItems,
-    Divider,
-    Icon,
-    IconMenu,
-    SubTitle,
-    Title,
+  Container,
+  ContainerMenu,
+  Content,
+  ContentItems,
+  Divider,
+  Icon,
+  IconMenu,
+  SubTitle,
+  Title,
 } from "./styles";
 
 type ItemsProps = {
@@ -59,7 +59,6 @@ export function Items({
     : "Pendente";
   const typeMode = type === "input" ? transactionType : textStatus;
   const dateToday = formatDate(new Date());
-  console.log(dateToday);
 
   function formatDate(date: Date): string {
     const day = date.getDate().toString().padStart(2, "0");
@@ -68,10 +67,16 @@ export function Items({
     return `${day}/${month}/${year}`;
   }
 
+  function isPastDue(date: string): boolean {
+    const [day, month, year] = date.split("/").map(Number);
+    const itemDate = new Date(year, month - 1, day);
+    return itemDate < new Date() && !status;
+  }
+
   return (
     <>
       <Container>
-        {showItemTask && date && date <= dateToday && !status && (
+        {showItemTask && isPastDue(date ?? new Date().toISOString()) && (
           <>
             <Icon type="SECONDARY">
               <AntDesign name="infocirlce" size={24} color="white" />
@@ -114,46 +119,47 @@ export function Items({
             </Popover>
           </>
         )}
-        {showItemTask && date && date >= dateToday && !status && (
-          <>
-            <Icon type="TERTIARY">
-              <AntDesign name="infocirlce" size={24} color="white" />
-            </Icon>
-            <Content>
-              <ContentItems>
-                <Title type="TERTIARY">{category}</Title>
-                <Title type="TERTIARY">{valueTransaction}</Title>
-              </ContentItems>
-              <Divider />
-              <ContentItems>
-                <SubTitle>{date}</SubTitle>
-                <SubTitle>{typeMode}</SubTitle>
-              </ContentItems>
-            </Content>
-
-            <Popover
-              trigger={
-                <TouchableOpacity>
-                  <IconMenu type="TERTIARY" name="dots-three-vertical" />
-                </TouchableOpacity>
-              }
-            >
-              <Popover.Backdrop />
-              <Popover.Content>
-                <ContainerMenu>
-                  <Button onPress={onDelete}>
-                    <IconMenu type="TERTIARY" name="trash" />
-                    <Title type="TERTIARY">Excluir</Title>
-                  </Button>
-                  <Button onPress={onEdit}>
-                    <IconMenu type="TERTIARY" name="pencil" />
-                    <Title type="TERTIARY">Editar</Title>
-                  </Button>
-                </ContainerMenu>
-              </Popover.Content>
-            </Popover>
-          </>
-        )}
+        {showItemTask &&
+          !isPastDue(date ?? new Date().toISOString()) &&
+          !status && (
+            <>
+              <Icon type="TERTIARY">
+                <AntDesign name="infocirlce" size={24} color="white" />
+              </Icon>
+              <Content>
+                <ContentItems>
+                  <Title type="TERTIARY">{category}</Title>
+                  <Title type="TERTIARY">{valueTransaction}</Title>
+                </ContentItems>
+                <Divider />
+                <ContentItems>
+                  <SubTitle>{date}</SubTitle>
+                  <SubTitle>{typeMode}</SubTitle>
+                </ContentItems>
+              </Content>
+              <Popover
+                trigger={
+                  <TouchableOpacity>
+                    <IconMenu type="TERTIARY" name="dots-three-vertical" />
+                  </TouchableOpacity>
+                }
+              >
+                <Popover.Backdrop />
+                <Popover.Content>
+                  <ContainerMenu>
+                    <Button onPress={onDelete}>
+                      <IconMenu type="TERTIARY" name="trash" />
+                      <Title type="TERTIARY">Excluir</Title>
+                    </Button>
+                    <Button onPress={onEdit}>
+                      <IconMenu type="TERTIARY" name="pencil" />
+                      <Title type="TERTIARY">Editar</Title>
+                    </Button>
+                  </ContainerMenu>
+                </Popover.Content>
+              </Popover>
+            </>
+          )}
         {showItemTask && status && (
           <>
             <Icon type="PRIMARY">
@@ -213,7 +219,6 @@ export function Items({
                 <SubTitle>{transactionType}</SubTitle>
               </ContentItems>
             </Content>
-
             <Popover
               trigger={
                 <TouchableOpacity>
@@ -258,7 +263,6 @@ export function Items({
               <SubTitle>Economizou</SubTitle>
             </ContentItems>
           </Content>
-
           <Popover
             trigger={
               <TouchableOpacity>

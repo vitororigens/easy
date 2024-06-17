@@ -1,5 +1,5 @@
-import styled from "styled-components/native";
 import { Image } from "react-native";
+import styled from "styled-components/native";
 
 export const Container = styled.View`
     flex: 1;
@@ -14,6 +14,7 @@ export const Title = styled.Text`
     font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
     color: ${({theme}) => theme.COLORS.PURPLE_600};
     text-align: center;
+    margin-top: 16px;
 `;
 
 export const SubTitle = styled.Text`
@@ -21,6 +22,8 @@ export const SubTitle = styled.Text`
     font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
     color: ${({theme}) => theme.COLORS.TEAL_600};
     text-align: center;
+    padding-right: 12px;
+    padding-left: 12px;
 `;
 
 export const StyledImage = styled(Image)`

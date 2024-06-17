@@ -1,5 +1,5 @@
-import { Button, Container, Content, ContentItems, Divider, Icon, ItemsTypeStyleProps, SubTitle, Title } from "./styles";
 import { useTheme } from "styled-components/native";
+import { Button, Container, Content, ContentItems, Divider, Icon, SubTitle, Title } from "./styles";
 
 type ItemsProps = {
     category?: string;

@@ -1,6 +1,6 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 export type ItemsTypeStyleProps = 'PRIMARY' | 'SECONDARY' | 'TERTIARY';
 

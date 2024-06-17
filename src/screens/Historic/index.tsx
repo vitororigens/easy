@@ -14,28 +14,50 @@ import { useTotalValue } from "../../hooks/useTotalValue";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { Button, ButtonClose, ContainerItems, Content, Divider, Header, HeaderItems, NavBar, SubTitle, Title, TitleItems } from "./styles";
-
+import {
+  Button,
+  ButtonClose,
+  ContainerItems,
+  Content,
+  Divider,
+  Header,
+  HeaderItems,
+  NavBar,
+  SubTitle,
+  Title,
+  TitleItems,
+} from "./styles";
 
 export function Historic() {
   const user = useUserAuth();
   const [activeButton, setActiveButton] = useState("receitas");
-  const { selectedMonth } = useMonth()
+  const { selectedMonth } = useMonth();
   const uid = user?.uid;
-  const revenue = useFirestoreCollection('Revenue');
-  const expense = useFirestoreCollection('Expense');
+  const revenue = useFirestoreCollection("Revenue");
+  const expense = useFirestoreCollection("Expense");
 
-  const { tolalRevenueMunth, totalExpenseMunth } = useTotalValue(uid || 'Não foi possivel encontrar o uid');
+  const { tolalRevenueMunth, totalExpenseMunth } = useTotalValue(
+    uid || "Não foi possivel encontrar o uid"
+  );
   const [confirmRevenueVisible, setConfirmRevenueVisible] = useState(false);
   const [confirmExpenseVisible, setConfirmExpenseVisible] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState('');
+  const [selectedItemId, setSelectedItemId] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const formattedRevenue = tolalRevenueMunth.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  const formattedExpense = totalExpenseMunth.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  const totalValue = tolalRevenueMunth - totalExpenseMunth
-  const formattedTotalValue = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  console.log(expense.filter(item => item.uid === uid))
+  const formattedRevenue = tolalRevenueMunth.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+  const formattedExpense = totalExpenseMunth.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+  const totalValue = tolalRevenueMunth - totalExpenseMunth;
+  const formattedTotalValue = totalValue.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+  console.log(expense.filter((item) => item.uid === uid));
 
   function handleRevenueConfirmation(documentId: string) {
     setConfirmRevenueVisible(true);
@@ -52,22 +74,28 @@ export function Historic() {
   };
 
   function handleDeleteRevenue(documentId: string) {
-    database.collection('Revenue').doc(documentId).delete()
+    database
+      .collection("Revenue")
+      .doc(documentId)
+      .delete()
       .then(() => {
-        Toast.show('Nota excluída!', { type: 'success' });
+        Toast.show("Nota excluída!", { type: "success" });
       })
-      .catch(error => {
-        console.error('Erro ao excluir a nota: ', error);
+      .catch((error) => {
+        console.error("Erro ao excluir a nota: ", error);
       });
   }
 
   function handleDeleteExpense(documentId: string) {
-    database.collection('Expense').doc(documentId).delete()
+    database
+      .collection("Expense")
+      .doc(documentId)
+      .delete()
       .then(() => {
-        Toast.show('Nota excluída!', { type: 'success' });
+        Toast.show("Nota excluída!", { type: "success" });
       })
-      .catch(error => {
-        console.error('Erro ao excluir a nota: ', error);
+      .catch((error) => {
+        console.error("Erro ao excluir a nota: ", error);
       });
   }
   useEffect(() => {
@@ -84,10 +112,19 @@ export function Historic() {
 
   return (
     <DefaultContainer addButton monthButton backButton>
-      <Container type="PRIMARY" name="file-invoice-dollar" title={formattedTotalValue}>
+      <Container
+        type="PRIMARY"
+        name="file-invoice-dollar"
+        title={formattedTotalValue}
+      >
         <Content>
           <Header>
-            <Divider style={{ alignSelf: activeButton === "receitas" ? "flex-start" : "flex-end" }} />
+            <Divider
+              style={{
+                alignSelf:
+                  activeButton === "receitas" ? "flex-start" : "flex-end",
+              }}
+            />
             <NavBar>
               <Button onPress={() => handleButtonClick("receitas")}>
                 <Title>Receitas</Title>
@@ -104,20 +141,26 @@ export function Historic() {
               <HeaderItems type="PRIMARY">
                 <TitleItems>Histórico</TitleItems>
               </HeaderItems>
-              {revenue.filter(item => item.uid === uid).length === 0 ? (
+              {revenue.filter((item) => item.uid === uid).length === 0 ? (
                 <ScrollView>
-                  <LoadData image='PRIMARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de entradas! Comece adicionando uma nova entrada.' />
+                  <LoadData
+                    image="PRIMARY"
+                    title="Desculpe!"
+                    subtitle="Você ainda não possui lançamentos de entradas! Comece adicionando uma nova entrada."
+                  />
                 </ScrollView>
               ) : (
-
                 <FlatList
-                  data={revenue.filter(item => item.uid === uid && item.month === selectedMonth)}
+                  data={revenue.filter(
+                    (item) => item.uid === uid && item.month === selectedMonth
+                  )}
                   renderItem={({ item }) => (
-
-                    <TouchableOpacity onPress={() => handleRevenueConfirmation(item.id)}>
+                    <TouchableOpacity
+                      onPress={() => handleRevenueConfirmation(item.id)}
+                    >
                       <Items
-                      onDelete={() => handleDeleteRevenue(item.id)}
-                      onEdit={() => handleRevenueConfirmation(item.id)}
+                        onDelete={() => handleDeleteRevenue(item.id)}
+                        onEdit={() => handleRevenueConfirmation(item.id)}
                         showItemTaskRevenue
                         type={item.type}
                         category={item.name}
@@ -136,18 +179,29 @@ export function Historic() {
               <HeaderItems type="SECONDARY">
                 <TitleItems>Histórico</TitleItems>
               </HeaderItems>
-              {expense.filter(item => item.uid === uid).length === 0 ? (
+              {expense.filter((item) => item.uid === uid).length === 0 ? (
                 <ScrollView>
-                  <LoadData image='SECONDARY' title='Desculpe!' subtitle='Você ainda não possui lançamentos de saídas! Comece lanaçando uma nova saida.' />
+                  <LoadData
+                    image="SECONDARY"
+                    title="Desculpe!"
+                    subtitle="Você ainda não possui lançamentos de saídas! Comece lançando uma nova saída."
+                  />
                 </ScrollView>
               ) : (
                 <FlatList
-                  data={expense.filter(item => item.uid === uid && item.month === selectedMonth)}
+                  data={expense.filter(
+                    (item) =>
+                      item.uid === uid &&
+                      ((item.repeat === true && item.month === selectedMonth) ||
+                        (item.repeat === false && item.month === selectedMonth))
+                  )}
                   renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => handleExpenseConfirmation(item.id)}>
+                    <TouchableOpacity
+                      onPress={() => handleExpenseConfirmation(item.id)}
+                    >
                       <Items
-                       onDelete={() => handleDeleteExpense(item.id)}
-                       onEdit={() => handleRevenueConfirmation(item.id)}
+                        onDelete={() => handleDeleteExpense(item.id)}
+                        onEdit={() => handleRevenueConfirmation(item.id)}
                         showItemTask
                         status={item.status}
                         type={item.type}
@@ -158,7 +212,7 @@ export function Historic() {
                       />
                     </TouchableOpacity>
                   )}
-
+                  keyExtractor={(item) => item.id} // Adicionei esta linha para garantir que cada item tenha uma chave única
                 />
               )}
             </ContainerItems>
@@ -166,25 +220,45 @@ export function Historic() {
         </Content>
       </Container>
 
-      <Modal visible={confirmRevenueVisible} onRequestClose={() => setConfirmRevenueVisible(false)}>
-
+      <Modal
+        visible={confirmRevenueVisible}
+        onRequestClose={() => setConfirmRevenueVisible(false)}
+      >
         <DefaultContainer hasHeader={false}>
-          <ButtonClose onPress={() => setConfirmRevenueVisible(false)} style={{alignSelf: "flex-end", marginBottom: 32}}>
-            <Title style={{ color: 'white' }}>Fechar</Title>
+          <ButtonClose
+            onPress={() => setConfirmRevenueVisible(false)}
+            style={{ alignSelf: "flex-end", marginBottom: 32 }}
+          >
+            <Title style={{ color: "white" }}>Fechar</Title>
           </ButtonClose>
-          <Container title={'Editar Entrada'}>
-            <Revenue selectedItemId={selectedItemId} showButtonRemove onCloseModal={() => setConfirmRevenueVisible(false)} showButtonEdit />
+          <Container title={"Editar Entrada"}>
+            <Revenue
+              selectedItemId={selectedItemId}
+              showButtonRemove
+              onCloseModal={() => setConfirmRevenueVisible(false)}
+              showButtonEdit
+            />
           </Container>
         </DefaultContainer>
       </Modal>
-      <Modal visible={confirmExpenseVisible} onRequestClose={() => setConfirmExpenseVisible(false)}>
-
+      <Modal
+        visible={confirmExpenseVisible}
+        onRequestClose={() => setConfirmExpenseVisible(false)}
+      >
         <DefaultContainer hasHeader={false}>
-          <ButtonClose onPress={() => setConfirmExpenseVisible(false)} style={{alignSelf: "flex-end", marginBottom: 32}}>
-            <Title style={{ color: 'white' }}>Fechar</Title>
+          <ButtonClose
+            onPress={() => setConfirmExpenseVisible(false)}
+            style={{ alignSelf: "flex-end", marginBottom: 32 }}
+          >
+            <Title style={{ color: "white" }}>Fechar</Title>
           </ButtonClose>
-          <Container type="SECONDARY" title={'Editar Saida'}>
-            <Expense selectedItemId={selectedItemId} showButtonRemove onCloseModal={() => setConfirmExpenseVisible(false)} showButtonEdit />
+          <Container type="SECONDARY" title={"Editar Saida"}>
+            <Expense
+              selectedItemId={selectedItemId}
+              showButtonRemove
+              onCloseModal={() => setConfirmExpenseVisible(false)}
+              showButtonEdit
+            />
           </Container>
         </DefaultContainer>
       </Modal>

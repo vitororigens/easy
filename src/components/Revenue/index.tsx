@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from "@hookform/resolvers/zod";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
@@ -14,7 +15,7 @@ import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
-import { currencyMask } from "../../utils/currency";
+import { currencyMask, currencyUnMask } from "../../utils/currency";
 import {
   Button,
   DividerTask,
@@ -24,7 +25,6 @@ import {
   Title,
   TitleTask,
 } from "./styles";
-import { MaterialIcons } from '@expo/vector-icons';
 
 type RevenueProps = {
   selectedItemId?: string;
@@ -68,7 +68,7 @@ export function Revenue({
       formattedDate: date.toLocaleDateString("pt-BR"),
       name: "",
       selectedCategory: "Outros",
-      valueTransaction: "0",
+      valueTransaction: "",
     },
   });
 
@@ -102,7 +102,7 @@ export function Revenue({
       category: selectedCategory,
       uid: uid,
       date: formattedDate,
-      valueTransaction: valueTransaction,
+      valueTransaction: !!valueTransaction?.length ? currencyUnMask(valueTransaction) : "0",
       description: description,
       repeat: repeat,
       type: "input",
@@ -175,7 +175,7 @@ export function Revenue({
         category: selectedCategory,
         uid: uid,
         date: formattedDate,
-        valueTransaction: valueTransaction,
+        valueTransaction: !!valueTransaction?.length ? currencyUnMask(valueTransaction) : "0",
         description: description,
         repeat: repeat,
         type: "input",
@@ -283,6 +283,7 @@ export function Revenue({
                 onChangeText={(value) => onChange(currencyMask(value))}
                 onBlur={onBlur}
                 keyboardType="numeric"
+                placeholder='0,00'
               />
             )}
           />
@@ -419,7 +420,7 @@ export function Revenue({
               style={{ marginBottom: 10 }}
               onPress={handleSubmit(handleEditRevenue, onInvalid)}
             >
-              <TitleTask>Editar</TitleTask>
+              <TitleTask>Salvar</TitleTask>
             </Button>
           )}
           {showButtonRemove && (

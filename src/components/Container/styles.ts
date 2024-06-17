@@ -1,5 +1,5 @@
-import styled from "styled-components/native";
 import { FontAwesome5 } from '@expo/vector-icons';
+import styled from "styled-components/native";
 
 export type ContainerTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
@@ -31,6 +31,12 @@ export const Title = styled.Text`
     font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
     font-size: ${({theme}) => theme.FONTE_SIZE.XL}px;
     color: ${({theme}) => theme.COLORS.WHITE};
+`;
+
+export const SubTitle = styled.Text`
+    font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
+    font-size: ${({theme}) => theme.FONTE_SIZE.LG}px;
+    color: ${({theme}) => theme.COLORS.GRAY_400};
 `;
 
 

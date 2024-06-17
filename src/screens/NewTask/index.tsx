@@ -13,7 +13,7 @@ type Props = {
 }
 
 export function NewTask({ closeBottomSheet }: Props) {
-  const [activeButton, setActiveButton] = useState("receitas");
+  const [activeButton, setActiveButton] = useState("despesas");
 
 
   const handleButtonClick = (buttonName: string) => {

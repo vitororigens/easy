@@ -110,6 +110,7 @@ export function NewNotes({
         name,
         uid,
         description,
+        createdAt: format(new Date(), "dd/MM/yyyy"),
       })
       .then(() => {
         Toast.show("Nota editada!", { type: "success" });
@@ -208,7 +209,7 @@ export function NewNotes({
                         : handleSubmit(handleSaveItem, onInvalid)
                     }
                   >
-                    <Title>{isEditing ? "Editar" : "Salvar"}</Title>
+                    <Title>Salvar</Title>
                   </Button>
                 )}
                 {showButtonRemove && (
