@@ -99,8 +99,8 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
             <Container>
                 <Header
                 style={{
-                    justifyContent:backButton ? 'flex-start' : 'flex-end',
-                    display: hasHeader ? "flex" : "none"
+                    justifyContent:backButton ? 'flex-start' : listButtom ? "space-between" : 'flex-end',
+                    display: hasHeader ? "flex" : "none",
                 }}
                 >
                     {listButtom &&
@@ -108,13 +108,13 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                             alignItems: 'center',
                             flexDirection: 'row',
                             height: 60,
-                            width: '33%',
+                            width: '50%',
                            
                         }} onPress={handleList}>
 
                             <Icon name="list" />
-                            <Title>
-                                Histórico
+                            <Title style={{textAlign: "center"}}>
+                                Visualização Avançada
                             </Title>
                         </Button>
                     }
@@ -132,7 +132,10 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                         <ContainerMonth style={{
                             height: 60,
                             justifyContent: backButton ? 'flex-start' : 'center',
-                            width: '41%'
+                            width: '40%',
+                            position: listButtom ? "absolute" : "relative",
+                            left: listButtom ? "50%" : 0,
+                            transform: [{ translateX: listButtom ? -34 : 0 }]
                         }}>
                             <RNPickerSelect
                                 onValueChange={(value) => setSelectedMonth(value)}
@@ -161,8 +164,8 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                                         paddingRight: 30,
                                     },
                                     iconContainer: {
-                                        top: 15,
-                                        right: 9,
+                                        top: 16,
+                                        right: listButtom ? 45 : 35,
                                     },
                                 }}
                                 Icon={() => {
@@ -176,11 +179,11 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                             alignItems: 'center',
                             flexDirection: 'row',
                             height: 60,
-                            width: '25%',
+                            width: '35%',
                            
                         }} onPress={handleNewTask}>
                             <Title>
-                                Novo
+                                Adicione
                             </Title>
                             <Icon name="add" />
                         </Button>
@@ -191,10 +194,10 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                             alignItems: 'center',
                             flexDirection: 'row',
                             height: 60,
-                            width: '25%',
+                            width: '35%',
                         }} onPress={handleNewItem}>
                             <Title>
-                                Novo
+                                Adicione
                             </Title>
                             <Icon name="add" />
                         </Button>
@@ -204,10 +207,10 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                             alignItems: 'center',
                             flexDirection: 'row',
                             height: 60,
-                            width: '25%',
+                            width: '35%',
                         }} onPress={handleNewLaunch}>
                             <Title>
-                                Novo
+                                Adicione
                             </Title>
                             <Icon name="add" />
                         </Button>
@@ -217,10 +220,10 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                             alignItems: 'center',
                             flexDirection: 'row',
                             height: 60,
-                            width: '25%',
+                            width: '35%',
                         }} onPress={handleNewItemMarketplace}>
                             <Title>
-                                Novo
+                                Adicione
                             </Title>
                             <Icon name="add" />
                         </Button>
@@ -233,7 +236,7 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                             height: 60
                         }} onPress={handleNewNotes}>
                             <Title>
-                                Novo
+                                Adicione
                             </Title>
                             <Icon name="add" />
                         </Button>

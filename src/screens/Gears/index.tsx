@@ -1,21 +1,15 @@
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Container } from "../../components/Container";
-import { Content, Divider, Header, SubTitle, Title, Items, ContentItems, ButtonIcon, Icon } from "./styles";
-import { Button } from "../../components/Button";
-import { useState } from "react";
+import { Entypo, FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import auth from "@react-native-firebase/auth";
-import { CustomModal } from "../../components/CustomModal";
-import { LogoUser } from "../../components/LogoUser";
-import { ScrollView, View } from "react-native";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { Loading } from "../../components/Loading";
-import LogoLineChart from '../../assets/Icones/icones_brokerx_cinza-07.svg';
-import LogoPiggBank from '../../assets/Icones/icones_brokerx_cinza-01.svg';
-import { useTheme } from "styled-components/native";
 import { useNavigation } from "@react-navigation/native";
-import { FontAwesome } from '@expo/vector-icons';
-import { FontAwesome5 } from '@expo/vector-icons';
-import { Entypo } from '@expo/vector-icons';
+import { useState } from "react";
+import { ScrollView, View } from "react-native";
+import { useTheme } from "styled-components/native";
+import { Container } from "../../components/Container";
+import { CustomModal } from "../../components/CustomModal";
+import { DefaultContainer } from "../../components/DefaultContainer";
+import { Loading } from "../../components/Loading";
+import { useUserAuth } from "../../hooks/useUserAuth";
+import { ButtonIcon, Content, ContentItems, Divider, Header, Icon, Items, Title } from "./styles";
 
 
 export function Gears() {
@@ -72,7 +66,7 @@ export function Gears() {
                   <ButtonIcon onPress={handleGraphics}>
                     <Items>
                       <Title>
-                        Grafícos
+                        Gráficos
                       </Title>
                      <Icon>
                      <FontAwesome name="line-chart" size={30} color={COLORS.PURPLE_800} />
@@ -101,7 +95,7 @@ export function Gears() {
                       </Icon>
                     </Items>
                   </ButtonIcon>
-                  <ButtonIcon onPress={handleDeleteUser}>
+                  <ButtonIcon onPress={handleDeleteUserConfirmation}>
                     <Items>
                       <Title>
                         Deletar Conta
@@ -112,7 +106,7 @@ export function Gears() {
 
                     </Items>
                   </ButtonIcon>
-                  <ButtonIcon onPress={handleLogout}>
+                  <ButtonIcon onPress={handleLogoutConfirmation}>
                     <Items>
                       <Title>
                         Sair

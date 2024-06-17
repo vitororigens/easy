@@ -1,8 +1,7 @@
-import styled from "styled-components/native";
-import { ImageBackground } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native';
+import { ImageBackground, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import styled from "styled-components/native";
 
 import backgroundImage from "../../assets/background.png";
 
