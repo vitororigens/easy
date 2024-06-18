@@ -496,7 +496,7 @@ export function Expense({
                   : handleSubmit(handleSaveExpense, onInvalid)
               }
             >
-              <TitleTask>{isEditing ? "Editar" : "Salvar"}</TitleTask>
+              <TitleTask>{isEditing ? "Salvar" : "Salvar"}</TitleTask>
             </Button>
           )}
           {showButtonEdit && (

@@ -412,7 +412,7 @@ export function Revenue({
                   : handleSubmit(handleSaveRevenue, onInvalid)
               }
             >
-              <TitleTask>{isEditing ? "Editar" : "Salvar"}</TitleTask>
+              <TitleTask>{isEditing ? "Salvar" : "Salvar"}</TitleTask>
             </Button>
           )}
           {showButtonEdit && (

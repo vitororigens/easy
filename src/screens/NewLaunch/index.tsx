@@ -293,7 +293,7 @@ export function NewLaunch({
                         : handleSubmit(handleSaveItem, onInvalid)
                     }
                   >
-                    <Title>{isEditing ? "Editar" : "Salvar"}</Title>
+                    <Title>{isEditing ? "Salvar" : "Salvar"}</Title>
                   </Button>
                 )}
                 {showButtonRemove && (

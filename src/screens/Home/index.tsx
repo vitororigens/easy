@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FlatList, Modal, TouchableOpacity } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { Container } from "../../components/Container";
@@ -11,6 +11,7 @@ import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { ButtonClose, Content, Title } from "./styles";
+import { Loading } from "../../components/Loading";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -32,6 +33,7 @@ export function Home() {
   const [selectedItems, setSelectedItems] = useState<{
     [key: string]: boolean;
   }>({});
+  const [isLoaded, setIsLoaded] = useState(false);
 
   function handleExpenseConfirmation(documentId: string) {
     setConfirmExpenseVisible(true);
@@ -46,7 +48,7 @@ export function Home() {
       .update({
         status: !selected?.status,
       })
-      .then(() => {})
+      .then(() => { })
       .catch(() => {
         Toast.show("Erro ao atualizar despesa", { type: "error" });
       });
@@ -57,6 +59,17 @@ export function Home() {
     .map(([key]) => key);
 
   // console.log(expense.filter((item) => item.uid === uid));
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!isLoaded || uid === undefined) {
+    return <Loading />;
+  }
 
   return (
     <>
