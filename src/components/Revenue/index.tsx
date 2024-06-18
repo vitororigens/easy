@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
@@ -16,6 +16,7 @@ import { z } from "zod";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
+import { LoadingIndicator } from "../Loading/style";
 import {
   Button,
   DividerTask,
@@ -57,6 +58,7 @@ export function Revenue({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [repeat, setRepeat] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const uid = user?.uid;
 
@@ -93,6 +95,8 @@ export function Revenue({
     description,
     selectedCategory,
   }: FormSchemaType) {
+    setLoading(true);
+
     const [day, month, year] = formattedDate.split("/");
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
@@ -102,7 +106,9 @@ export function Revenue({
       category: selectedCategory,
       uid: uid,
       date: formattedDate,
-      valueTransaction: !!valueTransaction?.length ? currencyUnMask(valueTransaction) : "0",
+      valueTransaction: !!valueTransaction?.length
+        ? currencyUnMask(valueTransaction)
+        : "0",
       description: description,
       repeat: repeat,
       type: "input",
@@ -117,8 +123,10 @@ export function Revenue({
         Toast.show("Transação adicionada!", { type: "success" });
         setRepeat(false);
         reset();
+        setLoading(false);
       })
       .catch((error) => {
+        setLoading(false);
         console.error("Erro ao adicionar a transação: ", error);
       });
 
@@ -175,7 +183,9 @@ export function Revenue({
         category: selectedCategory,
         uid: uid,
         date: formattedDate,
-        valueTransaction: !!valueTransaction?.length ? currencyUnMask(valueTransaction) : "0",
+        valueTransaction: !!valueTransaction?.length
+          ? currencyUnMask(valueTransaction)
+          : "0",
         description: description,
         repeat: repeat,
         type: "input",
@@ -221,7 +231,6 @@ export function Revenue({
       "Por favor, preencha os campos obrigatórios antes de salvar."
     );
   };
-
 
   function handleShowAdvanced() {
     setShowAdvanced((prevState) => !prevState);
@@ -273,7 +282,9 @@ export function Revenue({
               <Input onBlur={onBlur} onChangeText={onChange} value={value} />
             )}
           />
-          <TitleTask>Valor <Span>(opicional)</Span></TitleTask>
+          <TitleTask>
+            Valor <Span>(opicional)</Span>
+          </TitleTask>
           <Controller
             control={control}
             name="valueTransaction"
@@ -283,7 +294,7 @@ export function Revenue({
                 onChangeText={(value) => onChange(currencyMask(value))}
                 onBlur={onBlur}
                 keyboardType="numeric"
-                placeholder='0,00'
+                placeholder="0,00"
               />
             )}
           />
@@ -292,11 +303,12 @@ export function Revenue({
           <TouchableOpacity
             onPress={handleShowAdvanced}
             style={{
-              width: '100%',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
+              width: "100%",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Title>{showAdvanced ? "Mostrar menos" : "Mostrar mais"}</Title>
             <MaterialIcons
               name={showAdvanced ? "arrow-drop-up" : "arrow-drop-down"}
@@ -305,7 +317,7 @@ export function Revenue({
             />
           </TouchableOpacity>
         </View>
-        {showAdvanced &&
+        {showAdvanced && (
           <>
             <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <View style={{ width: "50%" }}>
@@ -358,7 +370,10 @@ export function Revenue({
                             { label: "Adiantamentos", value: "Adiantamentos" },
                             { label: "Outros", value: "Outros" },
                           ]}
-                          placeholder={{ label: "Selecione", value: "Selecione" }}
+                          placeholder={{
+                            label: "Selecione",
+                            value: "Selecione",
+                          }}
                         />
                       )}
                     />
@@ -401,11 +416,17 @@ export function Revenue({
               />
             </View>
           </>
-        }
+        )}
         <View style={{ marginBottom: 10, height: 200 }}>
           {showButtonSave && (
             <Button
-              style={{ marginBottom: 10 }}
+              style={{
+                marginBottom: 10,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 12,
+              }}
               onPress={
                 isEditing
                   ? handleSubmit(handleEditRevenue, onInvalid)
@@ -413,6 +434,7 @@ export function Revenue({
               }
             >
               <TitleTask>{isEditing ? "Salvar" : "Salvar"}</TitleTask>
+              {loading && <LoadingIndicator style={{ marginTop: 2 }} />}
             </Button>
           )}
           {showButtonEdit && (
