@@ -27,7 +27,7 @@ export function NewTask({ closeBottomSheet }: Props) {
         <Title style={{ color: 'white' }}>Fechar</Title>
       </ButtonClose>
       
-          <Container type="SECONDARY" title="NOVO LANÇAMENTO">
+          <Container type="SECONDARY" title="Adicione LANÇAMENTO">
             <Content>
               <Header>
                 <Divider style={{ alignSelf: activeButton === "receitas" ? "flex-start" : "flex-end" }} />

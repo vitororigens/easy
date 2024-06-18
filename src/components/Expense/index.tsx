@@ -504,7 +504,7 @@ export function Expense({
               style={{ marginBottom: 10 }}
               onPress={handleSubmit(handleEditExpense, onInvalid)}
             >
-              <TitleTask>Editar</TitleTask>
+              <TitleTask>Salvar</TitleTask>
             </Button>
           )}
           {showButtonRemove && (

@@ -70,7 +70,7 @@ export function Notes() {
             <LoadData
               image="PRIMARY"
               title="Desculpe!"
-              subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando uma nova anotação clicando em Novo +."
+              subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando uma nova anotação clicando em Adicione +."
             />
           }
         />

@@ -212,7 +212,7 @@ export function Historic() {
                       />
                     </TouchableOpacity>
                   )}
-                  keyExtractor={(item) => item.id} // Adicionei esta linha para garantir que cada item tenha uma chave única
+                  keyExtractor={(item) => item.id} 
                 />
               )}
             </ContainerItems>

@@ -236,7 +236,7 @@ export function ListTask() {
                 <LoadData
                   image="PRIMARY"
                   title="Desculpe!"
-                  subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando uma nova tarefa clicando em Novo +."
+                  subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando uma nova tarefa clicando em Adicione +."
                 />
               }
             />

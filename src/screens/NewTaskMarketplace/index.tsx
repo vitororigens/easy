@@ -26,7 +26,7 @@ export function NewTaskMarketplace({ closeBottomSheet }: Props) {
         <ButtonClose onPress={closeBottomSheet} style={{alignSelf: "flex-end", marginBottom: 32}}>
           <Title style={{ color: 'white' }}>Fechar</Title>
         </ButtonClose>
-          <Container type="SECONDARY" title="NOVO LANÇAMENTO">
+          <Container type="SECONDARY" title="Adicione LANÇAMENTO">
             <Content>
               <Header>
                 <Divider style={{ alignSelf: activeButton === "receitas" ? "flex-start" : "flex-end" }} />
@@ -38,7 +38,7 @@ export function NewTaskMarketplace({ closeBottomSheet }: Props) {
                   </ButtonBar>
                   <ButtonBar onPress={() => handleButtonClick("despesas")}>
                     <Title>
-                    Novo item de compra
+                    Adicione item de compra
                     </Title>
                   </ButtonBar>
                 </NavBar>

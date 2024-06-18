@@ -296,7 +296,7 @@ export function Marketplace() {
                 <LoadData
                   image="SECONDARY"
                   title="Desculpe!"
-                  subtitle='Não há itens disponíveis para exibir aqui! Clique em "Novo" e adicione um item!'
+                  subtitle='Não há itens disponíveis para exibir aqui! Clique em "Adicione" e adicione um item!'
                 />
               </ScrollView>
             ) : (
