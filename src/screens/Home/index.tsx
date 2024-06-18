@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FlatList, Modal, TouchableOpacity } from "react-native";
+import { Toast } from "react-native-toast-notifications";
 import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Expense } from "../../components/Expense";
@@ -8,6 +9,7 @@ import { LoadData } from "../../components/LoadData";
 import { useMonth } from "../../context/MonthProvider";
 import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { useUserAuth } from "../../hooks/useUserAuth";
+import { database } from "../../services";
 import { ButtonClose, Content, Title } from "./styles";
 
 type Props = {
@@ -37,17 +39,24 @@ export function Home() {
   }
 
   function handleStatus(itemId: string) {
-    setSelectedItems((prevSelectedItems) => ({
-      ...prevSelectedItems,
-      [itemId]: !prevSelectedItems[itemId],
-    }));
+    const docRef = database.collection("Expense").doc(itemId);
+    const selected = expense.find((item) => item.id === itemId);
+
+    docRef
+      .update({
+        status: !selected?.status,
+      })
+      .then(() => {})
+      .catch(() => {
+        Toast.show("Erro ao atualizar despesa", { type: "error" });
+      });
   }
 
   const selectedTrueItems = Object.entries(selectedItems)
     .filter(([key, value]) => value)
     .map(([key]) => key);
 
-  console.log(expense.filter((item) => item.uid === uid));
+  // console.log(expense.filter((item) => item.uid === uid));
 
   return (
     <>
@@ -77,13 +86,16 @@ export function Home() {
                   onPress={() => handleExpenseConfirmation(item.id)}
                 >
                   <ItemsAccounts
-                    selected={selectedItems[item.id] || false}
+                    selected={item.status}
                     status={item.status}
                     type={item.type}
                     category={item.name}
                     date={item.date}
                     income={item.income}
                     handleStatus={() => handleStatus(item.id)}
+                    handleExpenseConfirmation={() =>
+                      handleExpenseConfirmation(item.id)
+                    }
                   />
                 </TouchableOpacity>
               )}

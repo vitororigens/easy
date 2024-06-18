@@ -135,7 +135,7 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                             width: '40%',
                             position: listButtom ? "absolute" : "relative",
                             left: listButtom ? "50%" : 0,
-                            transform: [{ translateX: listButtom ? -34 : 0 }]
+                            transform: [{ translateX: listButtom ? -34 : 0 }],
                         }}>
                             <RNPickerSelect
                                 onValueChange={(value) => setSelectedMonth(value)}
@@ -193,8 +193,8 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                         <Button style={{
                             alignItems: 'center',
                             flexDirection: 'row',
-                            height: 60,
-                            width: '35%',
+                            justifyContent: backButton ? 'flex-start' : 'flex-end',
+                            height: 60
                         }} onPress={handleNewItem}>
                             <Title>
                                 Adicione
@@ -206,8 +206,8 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                         <Button style={{
                             alignItems: 'center',
                             flexDirection: 'row',
-                            height: 60,
-                            width: '35%',
+                            justifyContent: backButton ? 'flex-start' : 'flex-end',
+                            height: 60
                         }} onPress={handleNewLaunch}>
                             <Title>
                                 Adicione
@@ -219,8 +219,8 @@ export function DefaultContainer({ children, newNotes = false, newItemMarketplac
                         <Button style={{
                             alignItems: 'center',
                             flexDirection: 'row',
-                            height: 60,
-                            width: '35%',
+                            justifyContent: backButton ? 'flex-start' : 'flex-end',
+                            height: 60
                         }} onPress={handleNewItemMarketplace}>
                             <Title>
                                 Adicione
