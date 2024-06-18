@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -11,7 +12,6 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
 import { Button, ButtonClose, Content, Input, Span, Title } from "./styles";
-import { MaterialIcons } from '@expo/vector-icons';
 
 type Props = {
   closeBottomSheet?: () => void;

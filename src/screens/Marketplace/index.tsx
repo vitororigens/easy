@@ -1,4 +1,4 @@
-import { getMonth, parse } from "date-fns";
+import { format, getMonth, parse } from "date-fns";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
@@ -183,10 +183,8 @@ export function Marketplace() {
 
   const handleSaveList = async () => {
     const currentDate = new Date();
-    const day = currentDate.getDate();
     const month = currentDate.getMonth() + 1;
-    const year = currentDate.getFullYear();
-    const formattedDate = `${day}/${month}/${year}`;
+    const formattedDate = format(currentDate, "dd/MM/yyyy");
 
     const expenseRef = database.collection("Expense").doc();
     const historyMarketplaceRef = database
