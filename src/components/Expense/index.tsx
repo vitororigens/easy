@@ -1,3 +1,4 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
@@ -24,7 +25,6 @@ import {
   Title,
   TitleTask,
 } from "./styles";
-import { MaterialIcons } from '@expo/vector-icons';
 
 export type ExpenseProps = {
   selectedItemId?: string;
@@ -63,6 +63,8 @@ export function Expense({
   const [isEditing, setIsEditing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
+  console.log(selectedItemId)
+
   const uid = user?.uid;
 
   // Hooks
@@ -73,7 +75,7 @@ export function Expense({
       formattedDate: date.toLocaleDateString("pt-BR"),
       name: "",
       selectedCategory: "outros",
-      valueTransaction: "0",
+      valueTransaction: "",
     },
   });
 
@@ -115,7 +117,7 @@ export function Expense({
       type: "output",
       uid: uid,
       month: monthNumber,
-      income
+      income,
     };
 
     // Save the expense for the current month
@@ -213,7 +215,7 @@ export function Expense({
         type: "output",
         uid: uid,
         month: monthNumber,
-        income
+        income,
       })
       .then(() => {
         Toast.show("Transação editada!", { type: "success" });
@@ -240,7 +242,6 @@ export function Expense({
     setShowAdvanced((prevState) => !prevState);
   }
 
-
   useEffect(() => {
     if (selectedItemId) {
       database
@@ -265,7 +266,7 @@ export function Expense({
               setStatus(data.status);
               setDate(new Date(data.date));
               setIsEditing(true);
-              setIncome(data.income)
+              setIncome(data.income);
             } else {
               console.log("Dados do documento estão vazios!");
             }
@@ -291,6 +292,22 @@ export function Expense({
               <Input onBlur={onBlur} onChangeText={onChange} value={value} />
             )}
           />
+          <View>
+            <TitleTask>Valor*</TitleTask>
+            <Controller
+              control={control}
+              name="valueTransaction"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  value={value}
+                  onChangeText={(value) => onChange(currencyMask(value))}
+                  onBlur={onBlur}
+                  keyboardType="numeric"
+                  placeholder="0,00"
+                />
+              )}
+            />
+          </View>
           <TitleTask>Data* </TitleTask>
           <TouchableOpacity
             style={{ height: 50 }}
@@ -329,20 +346,22 @@ export function Expense({
             style={{ width: 50, marginBottom: 20 }}
           />
         </View>
-        <View style={{
-          marginTop: 30,
-          marginBottom: 30
-        }}>
-
-          <View >
+        <View
+          style={{
+            marginTop: 30,
+            marginBottom: 30,
+          }}
+        >
+          <View>
             <TouchableOpacity
               onPress={handleShowAdvanced}
               style={{
-                width: '100%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
+                width: "100%",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <Title>{showAdvanced ? "Mostrar menos" : "Mostrar mais"}</Title>
               <MaterialIcons
                 name={showAdvanced ? "arrow-drop-up" : "arrow-drop-down"}
@@ -351,29 +370,11 @@ export function Expense({
               />
             </TouchableOpacity>
           </View>
-
-
         </View>
-        {showAdvanced &&
+        {showAdvanced && (
           <>
             <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <View style={{ width: "50%" }}>
-                <View>
-                  <TitleTask>Valor*</TitleTask>
-                  <Controller
-                    control={control}
-                    name="valueTransaction"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <Input
-                        value={value}
-                        onChangeText={(value) => onChange(currencyMask(value))}
-                        onBlur={onBlur}
-                        keyboardType="numeric"
-                      />
-                    )}
-                  />
-
-                </View>
                 <View>
                   <TitleTask style={{ marginTop: 20 }}>
                     Categorias <Span>(opicional)</Span>
@@ -396,7 +397,10 @@ export function Expense({
                             { label: "Emprestimo", value: "Emprestimo" },
                             { label: "Comida", value: "Comida" },
                             { label: "Telefone", value: "Telefone" },
-                            { label: "Entretenimento", value: "Entretenimento" },
+                            {
+                              label: "Entretenimento",
+                              value: "Entretenimento",
+                            },
                             { label: "Educação", value: "Educacao" },
                             { label: "Beleza", value: "beleza" },
                             { label: "Esporte", value: "esporte" },
@@ -419,7 +423,10 @@ export function Expense({
                             { label: "Filhos", value: "filhos" },
                             { label: "Outros", value: "outros" },
                           ]}
-                          placeholder={{ label: "Selecione", value: "Selecione" }}
+                          placeholder={{
+                            label: "Selecione",
+                            value: "Selecione",
+                          }}
                         />
                       )}
                     />
@@ -483,9 +490,8 @@ export function Expense({
                 )}
               />
             </View>
-
           </>
-        }
+        )}
         <View style={{ marginBottom: 10, height: 200 }}>
           {showButtonSave && (
             <Button

@@ -28,10 +28,15 @@ export const NavBar = styled.View`
 
 `;
 
-export const Button = styled(TouchableOpacity)`
+type ButtonProps = {
+    active: boolean
+}
+
+export const Button = styled(TouchableOpacity)<ButtonProps>`
     align-items: center;
     justify-content: center;
     width: 50%;
+    background-color: ${({theme, active}) => active ? theme.COLORS.GRAY_300 : "transparent"};
 `;
 
 export const Title = styled.Text`
@@ -39,10 +44,14 @@ export const Title = styled.Text`
     font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
 `;
 
-export const Divider = styled.View`
+type DividerProps = {
+    active: boolean
+}
+
+export const Divider = styled.View<DividerProps>`
     width: 50%;
     height: 4px;
-    background-color: ${({theme}) => theme.COLORS.TEAL_600};
+    background-color: ${({theme, active}) => active ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_300};
 `;
 
 

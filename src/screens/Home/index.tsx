@@ -1,64 +1,109 @@
-import { useEffect, useState } from "react";
-import { FlatList, Modal, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  FlatList,
+  Modal,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Expense } from "../../components/Expense";
-import { ItemsAccounts } from "../../components/ItemsAccounts";
+import { Items } from "../../components/Items";
 import { LoadData } from "../../components/LoadData";
+import { Loading } from "../../components/Loading";
+import { Revenue } from "../../components/Revenue";
 import { useMonth } from "../../context/MonthProvider";
 import useFirestoreCollection from "../../hooks/useFirestoreCollection";
+import { useTotalValue } from "../../hooks/useTotalValue";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
-import { ButtonClose, Content, Title } from "./styles";
-import { Loading } from "../../components/Loading";
-
-type Props = {
-  closeBottomSheet?: () => void;
-  onCloseModal?: () => void;
-  showButtonEdit?: boolean;
-  showButtonSave?: boolean;
-  showButtonRemove?: boolean;
-};
+import { formatCurrency } from "../../utils/formatCurrency";
+import {
+  Button,
+  ButtonClose,
+  ContainerItems,
+  Content,
+  Divider,
+  Header,
+  HeaderItems,
+  NavBar,
+  SubTitle,
+  Title,
+  TitleItems,
+} from "./styles";
 
 export function Home() {
-  const { selectedMonth } = useMonth();
   const user = useUserAuth();
+  const [activeButton, setActiveButton] = useState("receitas");
+  const { selectedMonth } = useMonth();
   const uid = user?.uid;
-  const [status, setStatus] = useState(false);
   const revenue = useFirestoreCollection("Revenue");
   const expense = useFirestoreCollection("Expense");
+
+  const { tolalRevenueMunth, totalExpenseMunth } = useTotalValue(
+    uid || "Não foi possivel encontrar o uid"
+  );
+  const [confirmRevenueVisible, setConfirmRevenueVisible] = useState(false);
   const [confirmExpenseVisible, setConfirmExpenseVisible] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
-  const [selectedItems, setSelectedItems] = useState<{
-    [key: string]: boolean;
-  }>({});
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const formattedRevenue = tolalRevenueMunth.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+  const formattedExpense = totalExpenseMunth.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+  const totalValue = tolalRevenueMunth - totalExpenseMunth;
+  const formattedTotalValue = totalValue.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+  console.log(expense.filter((item) => item.uid === uid));
+
+  function handleRevenueConfirmation(documentId: string) {
+    setConfirmRevenueVisible(true);
+    setSelectedItemId(documentId);
+  }
 
   function handleExpenseConfirmation(documentId: string) {
     setConfirmExpenseVisible(true);
     setSelectedItemId(documentId);
   }
 
-  function handleStatus(itemId: string) {
-    const docRef = database.collection("Expense").doc(itemId);
-    const selected = expense.find((item) => item.id === itemId);
+  const handleButtonClick = (buttonName: string) => {
+    setActiveButton(buttonName);
+  };
 
-    docRef
-      .update({
-        status: !selected?.status,
+  function handleDeleteRevenue(documentId: string) {
+    database
+      .collection("Revenue")
+      .doc(documentId)
+      .delete()
+      .then(() => {
+        Toast.show("Nota excluída!", { type: "success" });
       })
-      .then(() => { })
-      .catch(() => {
-        Toast.show("Erro ao atualizar despesa", { type: "error" });
+      .catch((error) => {
+        console.error("Erro ao excluir a nota: ", error);
       });
   }
 
-  const selectedTrueItems = Object.entries(selectedItems)
-    .filter(([key, value]) => value)
-    .map(([key]) => key);
-
-  // console.log(expense.filter((item) => item.uid === uid));
+  function handleDeleteExpense(documentId: string) {
+    database
+      .collection("Expense")
+      .doc(documentId)
+      .delete()
+      .then(() => {
+        Toast.show("Nota excluída!", { type: "success" });
+      })
+      .catch((error) => {
+        console.error("Erro ao excluir a nota: ", error);
+      });
+  }
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
@@ -72,51 +117,152 @@ export function Home() {
   }
 
   return (
-    <>
-      <DefaultContainer monthButton addButton listButtom>
-        <Container
-          type="SECONDARY"
-          title="Lista de contas a pagar"
-          subtitle="Simplificada"
-        >
-          <Content>
-            <FlatList
-              ListEmptyComponent={
-                <LoadData
-                  image="SECONDARY"
-                  title="Desculpe!"
-                  subtitle="Você ainda não possui lançamentos de saídas! Comece lançando uma nova saída."
-                />
-              }
-              data={expense.filter(
-                (item) =>
-                  item.uid === uid &&
-                  ((item.repeat === true && item.month === selectedMonth) ||
-                    (item.repeat === false && item.month === selectedMonth))
-              )}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => handleExpenseConfirmation(item.id)}
-                >
-                  <ItemsAccounts
-                    selected={item.status}
-                    status={item.status}
-                    type={item.type}
-                    category={item.name}
-                    date={item.date}
-                    income={item.income}
-                    handleStatus={() => handleStatus(item.id)}
-                    handleExpenseConfirmation={() =>
-                      handleExpenseConfirmation(item.id)
-                    }
+    <DefaultContainer addButton monthButton>
+      <Container
+        type="PRIMARY"
+        name="file-invoice-dollar"
+        title={formattedTotalValue}
+      >
+        <Content>
+          <Header>
+            <View style={{ flexDirection: "row" }}>
+              <Divider
+                active={activeButton === "receitas"}
+                style={{
+                  alignSelf:
+                    activeButton === "tarefas" ? "flex-start" : "flex-end",
+                }}
+              />
+              <Divider
+                active={activeButton === "despesas"}
+                style={{
+                  alignSelf:
+                    activeButton === "tarefas" ? "flex-start" : "flex-end",
+                }}
+              />
+            </View>
+            <NavBar>
+              <Button
+                onPress={() => handleButtonClick("receitas")}
+                active={activeButton !== "receitas"}
+              >
+                <Title>Receitas</Title>
+                <SubTitle type="PRIMARY">{formattedRevenue}</SubTitle>
+              </Button>
+              <Button
+                onPress={() => handleButtonClick("despesas")}
+                active={activeButton !== "despesas"}
+              >
+                <Title>Despesas</Title>
+                <SubTitle type="SECONDARY">{formattedExpense}</SubTitle>
+              </Button>
+            </NavBar>
+          </Header>
+          {activeButton === "receitas" && (
+            <ContainerItems>
+              <HeaderItems type="PRIMARY">
+                <TitleItems>Histórico</TitleItems>
+              </HeaderItems>
+              {revenue.filter((item) => item.uid === uid).length === 0 ? (
+                <ScrollView>
+                  <LoadData
+                    image="PRIMARY"
+                    title="Desculpe!"
+                    subtitle="Você ainda não possui lançamentos de entradas! Comece adicionando uma nova entrada."
                   />
-                </TouchableOpacity>
+                </ScrollView>
+              ) : (
+                <FlatList
+                  data={revenue.filter(
+                    (item) => item.uid === uid && item.month === selectedMonth
+                  )}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      onPress={() => handleRevenueConfirmation(item.id)}
+                    >
+                      <Items
+                        onDelete={() => handleDeleteRevenue(item.id)}
+                        onEdit={() => handleRevenueConfirmation(item.id)}
+                        showItemTaskRevenue
+                        type={item.type}
+                        category={item.name}
+                        date={item.date}
+                        repeat={item.repeat}
+                        valueTransaction={formatCurrency(item.valueTransaction)}
+                      />
+                    </TouchableOpacity>
+                  )}
+                />
               )}
-            />
-          </Content>
-        </Container>
-      </DefaultContainer>
+            </ContainerItems>
+          )}
+          {activeButton === "despesas" && (
+            <ContainerItems>
+              <HeaderItems type="SECONDARY">
+                <TitleItems>Histórico</TitleItems>
+              </HeaderItems>
+              {expense.filter((item) => item.uid === uid).length === 0 ? (
+                <ScrollView>
+                  <LoadData
+                    image="SECONDARY"
+                    title="Desculpe!"
+                    subtitle="Você ainda não possui lançamentos de saídas! Comece lançando uma nova saída."
+                  />
+                </ScrollView>
+              ) : (
+                <FlatList
+                  data={expense.filter(
+                    (item) =>
+                      item.uid === uid &&
+                      ((item.repeat === true && item.month === selectedMonth) ||
+                        (item.repeat === false && item.month === selectedMonth))
+                  )}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      onPress={() => handleExpenseConfirmation(item.id)}
+                    >
+                      <Items
+                        onDelete={() => handleDeleteExpense(item.id)}
+                        onEdit={() => handleRevenueConfirmation(item.id)}
+                        showItemTask
+                        status={item.status}
+                        type={item.type}
+                        category={item.name}
+                        date={item.date}
+                        repeat={item.repeat}
+                        valueTransaction={formatCurrency(item.valueTransaction)}
+                      />
+                    </TouchableOpacity>
+                  )}
+                  keyExtractor={(item) => item.id}
+                />
+              )}
+            </ContainerItems>
+          )}
+        </Content>
+      </Container>
 
+      <Modal
+        visible={confirmRevenueVisible}
+        onRequestClose={() => setConfirmRevenueVisible(false)}
+      >
+        <DefaultContainer hasHeader={false}>
+          <ButtonClose
+            onPress={() => setConfirmRevenueVisible(false)}
+            style={{ alignSelf: "flex-end", marginBottom: 32 }}
+          >
+            <Title style={{ color: "white" }}>Fechar</Title>
+          </ButtonClose>
+          <Container title={"Editar Entrada"}>
+            <Revenue
+              selectedItemId={selectedItemId}
+              showButtonRemove
+              onCloseModal={() => setConfirmRevenueVisible(false)}
+              showButtonEdit
+            />
+          </Container>
+        </DefaultContainer>
+      </Modal>
       <Modal
         visible={confirmExpenseVisible}
         onRequestClose={() => setConfirmExpenseVisible(false)}
@@ -138,6 +284,6 @@ export function Home() {
           </Container>
         </DefaultContainer>
       </Modal>
-    </>
+    </DefaultContainer>
   );
 }

@@ -299,6 +299,34 @@ export function Revenue({
             )}
           />
         </View>
+        <View>
+          <TitleTask>Data*</TitleTask>
+          <TouchableOpacity
+            style={{ height: 50 }}
+            onPress={showDatePickerModal}
+          >
+            <Controller
+              control={control}
+              name="formattedDate"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  editable={false}
+                />
+              )}
+            />
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="calendar"
+              onChange={handleDateChange}
+            />
+          )}
+        </View>
         <View style={{ marginTop: 40, marginBottom: 20 }}>
           <TouchableOpacity
             onPress={handleShowAdvanced}
@@ -321,34 +349,6 @@ export function Revenue({
           <>
             <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <View style={{ width: "50%" }}>
-                <View>
-                  <TitleTask>Data*</TitleTask>
-                  <TouchableOpacity
-                    style={{ height: 50 }}
-                    onPress={showDatePickerModal}
-                  >
-                    <Controller
-                      control={control}
-                      name="formattedDate"
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <Input
-                          value={value}
-                          onChangeText={onChange}
-                          onBlur={onBlur}
-                          editable={false}
-                        />
-                      )}
-                    />
-                  </TouchableOpacity>
-                  {showDatePicker && (
-                    <DateTimePicker
-                      value={date}
-                      mode="date"
-                      display="calendar"
-                      onChange={handleDateChange}
-                    />
-                  )}
-                </View>
                 <View>
                   <TitleTask style={{ marginTop: 20 }}>
                     Categorias <Span>(opicional)</Span>{" "}

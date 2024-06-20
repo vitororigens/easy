@@ -274,16 +274,33 @@ export function Marketplace() {
       <Container type="SECONDARY" title="Lista de Mercado">
         <Content>
           <Header>
-            <Divider
-              style={{
-                alignSelf: activeButton === "lista" ? "flex-start" : "flex-end",
-              }}
-            />
+            <View style={{ flexDirection: "row" }}>
+              <Divider
+                active={activeButton === "lista"}
+                style={{
+                  alignSelf:
+                    activeButton === "lista" ? "flex-start" : "flex-end",
+                }}
+              />
+              <Divider
+                active={activeButton === "items"}
+                style={{
+                  alignSelf:
+                    activeButton === "lista" ? "flex-start" : "flex-end",
+                }}
+              />
+            </View>
             <NavBar>
-              <Button onPress={() => handleButtonClick("lista")}>
+              <Button
+                onPress={() => handleButtonClick("lista")}
+                active={activeButton !== "lista"}
+              >
                 <Title>Carrinho</Title>
               </Button>
-              <Button onPress={() => handleButtonClick("items")}>
+              <Button
+                onPress={() => handleButtonClick("items")}
+                active={activeButton !== "items"}
+              >
                 <Title>Histórico de compra</Title>
               </Button>
             </NavBar>

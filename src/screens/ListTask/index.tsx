@@ -198,17 +198,33 @@ export function ListTask() {
       <Container type="SECONDARY" title="Lista de tarefas">
         <Content>
           <Header>
-            <Divider
-              style={{
-                alignSelf:
-                  activeButton === "tarefas" ? "flex-start" : "flex-end",
-              }}
-            />
+            <View style={{ flexDirection: "row" }}>
+              <Divider
+                active={activeButton === "tarefas"}
+                style={{
+                  alignSelf:
+                    activeButton === "tarefas" ? "flex-start" : "flex-end",
+                }}
+              />
+              <Divider
+                active={activeButton === "historico"}
+                style={{
+                  alignSelf:
+                    activeButton === "tarefas" ? "flex-start" : "flex-end",
+                }}
+              />
+            </View>
             <NavBar>
-              <Button onPress={() => handleButtonClick("tarefas")}>
+              <Button
+                onPress={() => handleButtonClick("tarefas")}
+                active={activeButton !== "tarefas"}
+              >
                 <Title>Tarefas</Title>
               </Button>
-              <Button onPress={() => handleButtonClick("historico")}>
+              <Button
+                onPress={() => handleButtonClick("historico")}
+                active={activeButton !== "historico"}
+              >
                 <Title>Histórico de tarefas</Title>
               </Button>
             </NavBar>

@@ -1,9 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { BottomTabsNavigation } from './BottomTabsNavigation';
 import { Charts } from '../screens/Charts';
-import { PiggyBank } from '../screens/PiggyBank';
+import { Home } from '../screens/Home';
 import { Perfil } from '../screens/Perfil';
-import { Historic } from '../screens/Historic';
+import { PiggyBank } from '../screens/PiggyBank';
+import { BottomTabsNavigation } from './BottomTabsNavigation';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
@@ -30,7 +30,7 @@ export function StackPrivateNavigation() {
             />
             <Screen
                 name="historic"
-                component={Historic}
+                component={Home}
             />
         </Navigator>
     )

@@ -1,23 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Home } from "../screens/Home";
-import { useTheme } from "styled-components/native";
-import { FontAwesome } from '@expo/vector-icons';
-import { Charts } from '../screens/Charts';
-import { Marketplace } from '../screens/Marketplace';
-import { PiggyBank } from '../screens/PiggyBank';
-import { Gears } from '../screens/Gears';
+import { Entypo, FontAwesome } from '@expo/vector-icons';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { Loading } from '../components/Loading';
-import LogoHome from '../assets/Icones/icones_brokerx_cinza-19.svg';
-import LogoPiggBank from '../assets/Icones/icones_brokerx_cinza-01.svg';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React, { useEffect, useState } from 'react';
+import { useTheme } from "styled-components/native";
 import LogoClipBoard from '../assets/Icones/icones_brokerx_cinza-18.svg';
-import LogoLineChart from '../assets/Icones/icones_brokerx_cinza-07.svg';
+import LogoHome from '../assets/Icones/icones_brokerx_cinza-19.svg';
 import LogoCart from '../assets/Icones/icones_brokerx_cinza-25.svg';
-import LogoGears from '../assets/Icones/icones_brokerx_cinza-32.svg';
-import { Entypo } from '@expo/vector-icons';
+import { Loading } from '../components/Loading';
+import { Gears } from '../screens/Gears';
+import { Marketplace } from '../screens/Marketplace';
 
 import { Platform } from 'react-native';
+import { Home } from '../screens/Home';
 import { ListTask } from '../screens/ListTask';
 import { Notes } from '../screens/Notes';
 
