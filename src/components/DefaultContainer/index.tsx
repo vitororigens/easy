@@ -48,6 +48,7 @@ export function DefaultContainer({
 }: DefaultContainerProps) {
   const navigation = useNavigation();
   const { selectedMonth, setSelectedMonth } = useMonth();
+  console.log(selectedMonth)
   const [showNewTaskModal, setShowNewTaskModal] = useState(false);
   const [showNewItemModal, setShowNewItemModal] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);

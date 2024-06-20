@@ -20,7 +20,9 @@ type MonthProviderProps = {
 };
 
 export const MonthProvider = ({ children }: MonthProviderProps) => {
-  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  // Obter o mês atual (0-11) e adicionar 1 para obter o formato 1-12
+  const currentMonth = new Date().getMonth() + 1;
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(currentMonth);
 
   return (
     <MonthContext.Provider value={{ selectedMonth, setSelectedMonth }}>
