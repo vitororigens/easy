@@ -178,8 +178,8 @@ export function DefaultContainer({
             </Button>
           )}
           {!listButtom && (
-            <Button style={{ height: 60 }} onPress={handleGoBack}>
-              {backButton ? <Icon name="chevron-back-outline" /> : <Button />}
+            <Button style={{ height: 60, top: 5 }} onPress={handleGoBack}>
+              {backButton ? <Icon name="arrow-back" /> : <Button />}
             </Button>
           )}
 
@@ -189,9 +189,10 @@ export function DefaultContainer({
                 height: 60,
                 justifyContent: backButton ? "flex-start" : "center",
                 width: "40%",
+                top: backButton? 9 : 0,
                 position: listButtom ? "absolute" : "relative",
                 left: listButtom ? "50%" : 0,
-                transform: [{ translateX: listButtom ? -34 : 0 }],
+                transform: [{ translateX: listButtom ? -34 : 20 }],
               }}
             >
               <RNPickerSelect

@@ -96,13 +96,12 @@ export function PiggyBank() {
                   <View style={{
                     padding: 20
                   }}>
-                    <SubTitle style={{ textAlign: 'center', paddingBottom: 40 }} type="PRIMARY">Comece a economizar!</SubTitle>
+                    <SubTitle style={{ textAlign: 'center', paddingBottom: 40 }} type="PRIMARY">Transforme pequenas economias em grandes conquistas!
+                    </SubTitle>
                     <Title style={{ textAlign: 'center', width: '100%' }}>
-                      Comece a controlar e organizar suas finanças, comece guardando dinheiro em uma poupança e anote aqui para ter mais controle
+                    A função Cofrinho é perfeita para quem quer começar a economizar sem complicação. Insira os valores que você conseguir poupar e veja como pequenas economias podem fazer uma grande diferença no seu futuro financeiro.
                     </Title>
-                    <Title style={{ textAlign: 'center', width: '100%', marginBottom: 40 }}>
-                      Guarde em uma poupança para render mais.
-                    </Title>
+                   
                   </View>
                 </>
               )}
