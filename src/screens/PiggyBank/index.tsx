@@ -126,7 +126,7 @@ export function PiggyBank() {
                       valueTransaction={formatCurrency(item.valueItem)}
                     />
                   )}
-                />
+                  contentContainerStyle={{ paddingBottom: 90 }}                />
               )}
             </View>
           </View>

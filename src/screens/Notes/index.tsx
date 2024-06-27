@@ -66,6 +66,7 @@ export function Notes() {
             />
           )}
           keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 90 }}
           ListEmptyComponent={
             <LoadData
               image="PRIMARY"

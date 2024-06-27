@@ -7,7 +7,7 @@ import backgroundImage from "../../assets/background.png";
 
 export const Container = styled(SafeAreaView)`
         flex: 1;
-        padding: 20px;
+
 `;
 
 

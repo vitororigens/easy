@@ -35,7 +35,7 @@ const modalBottom = Platform.OS === "ios" ? 90 : 70;
 
 export function Marketplace() {
   const { selectedMonth } = useMonth();
-  const [activeButton, setActiveButton] = useState("items");
+  const [activeButton, setActiveButton] = useState("lista");
   const [confirmItemVisible, setConfirmItemVisible] = useState(false);
   const [modalActive, setModalActive] = useState(false);
   const [selectedListData, setSelectedListData] =
@@ -329,7 +329,7 @@ export function Marketplace() {
                     resetCountQuantity={!!selectedItems.length ? false : true}
                   />
                 )}
-                ListFooterComponent={<View style={{ marginBottom: 70 }} />}
+                contentContainerStyle={{ paddingBottom: 90 }}
               />
             ))}
 
@@ -349,6 +349,7 @@ export function Marketplace() {
                   />
                 </TouchableOpacity>
               )}
+              contentContainerStyle={{ paddingBottom: 90 }}
               ListEmptyComponent={
                 <LoadData
                   image="PRIMARY"

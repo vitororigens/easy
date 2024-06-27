@@ -247,6 +247,7 @@ export function ListTask() {
                   }}
                 />
               )}
+              contentContainerStyle={{ paddingBottom: 90 }}
               keyExtractor={(item) => item.id}
               ListEmptyComponent={
                 <LoadData
@@ -281,6 +282,7 @@ export function ListTask() {
                   />
                 </TouchableOpacity>
               )}
+              contentContainerStyle={{ paddingBottom: 90 }}
             />
           )}
         </Content>

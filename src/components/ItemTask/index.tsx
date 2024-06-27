@@ -14,11 +14,14 @@ type ItemNotesProps = {
 export function ItemTask({ title, onDelete, onEdit, isChecked, onToggle, hasActions = true }: ItemNotesProps) {
   return (
     <Container onPress={onToggle}>
-      <View style={{ 
+      <View style={{
         flex: 1,
-        flexDirection:'row',
-         }}>
-      <IconCheck type={isChecked ? 'PRIMARY' : 'SECONDARY'} name={isChecked ? "checkbox-marked-circle-outline" : "checkbox-blank-circle-outline"} />
+        flexDirection: 'row',
+      }}>
+        <IconCheck
+          type={isChecked ? 'PRIMARY' : 'SECONDARY'}
+          name={isChecked ? "checkbox-marked-circle-outline" : "checkbox-blank-circle-outline"}
+        />
         <Title type={isChecked ? 'PRIMARY' : 'SECONDARY'}>{title}</Title>
       </View>
       {hasActions && (

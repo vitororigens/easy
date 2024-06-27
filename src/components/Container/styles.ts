@@ -9,7 +9,6 @@ type Props = {
 
 export const Content  =  styled.View`
     flex: 1;
-    margin-bottom: 55px;
     background-color: ${({theme}) => theme.COLORS.WHITE};
     border-radius: 50px 50px  0px 0px;
 `;

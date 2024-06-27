@@ -86,6 +86,7 @@ export function HistoryMarketplaceModal({
               />
             )}
             keyExtractor={(item) => item.id}
+            contentContainerStyle={{ paddingBottom: 20 }}
           />
           <View>
             <TotalValue>

@@ -192,6 +192,7 @@ export function Home() {
                       />
                     </TouchableOpacity>
                   )}
+                  contentContainerStyle={{ paddingBottom: 90 }}
                 />
               )}
             </ContainerItems>
@@ -235,6 +236,7 @@ export function Home() {
                     </TouchableOpacity>
                   )}
                   keyExtractor={(item) => item.id}
+                  contentContainerStyle={{ paddingBottom: 90 }}
                 />
               )}
             </ContainerItems>
