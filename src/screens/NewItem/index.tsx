@@ -6,12 +6,11 @@ import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
-import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
-import { Button, ButtonClose, Content, Input, Span, Title } from "./styles";
+import { Button, Content, Input, Span, Title } from "./styles";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -193,14 +192,7 @@ export function NewItem({
   }, [selectedItemId]);
 
   return (
-    <DefaultContainer hasHeader={false}>
-      <ButtonClose
-        onPress={closeBottomSheet}
-        style={{ alignSelf: "flex-end", marginBottom: 32 }}
-      >
-        <Title style={{ color: "white" }}>Fechar</Title>
-      </ButtonClose>
-      <Container>
+    <DefaultContainer hasHeader={false} title='Adicionar novo item' closeModalFn={closeBottomSheet}>
         <ScrollView
           keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}
@@ -390,7 +382,6 @@ export function NewItem({
             </View>
           </Content>
         </ScrollView>
-      </Container>
     </DefaultContainer>
   );
 }

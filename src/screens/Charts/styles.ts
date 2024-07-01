@@ -10,10 +10,7 @@ type Props = {
 
 export const Content = styled.View`
     flex: 1;
-    background-color: ${({theme}) => theme.COLORS.WHITE};
 `;
-
-
 
 export const Header = styled.View`
     width: 100%;
@@ -28,11 +25,20 @@ export const NavBar = styled.View`
 
 `;
 
-export const Button = styled(TouchableOpacity)`
+type ButtonProps = {
+    active: boolean
+}
+
+export const Button = styled(TouchableOpacity)<ButtonProps>`
     align-items: center;
     justify-content: center;
     width: 50%;
+    border-top-width: 4px;
+    border-top-style: solid;
+    background-color: ${({theme, active}) => active ? theme.COLORS.GRAY_300 : "transparent"};
+    border-top-color: ${({theme, active}) => !active ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_300};
 `;
+
 export const Title = styled.Text`
     font-size: ${({theme}) => theme.FONTE_SIZE.LG}px;
     font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};

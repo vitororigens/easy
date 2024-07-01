@@ -2,7 +2,6 @@ import { getMonth, parse } from "date-fns";
 import { useState } from "react";
 import { Dimensions, FlatList, Modal } from "react-native";
 import { Toast } from "react-native-toast-notifications";
-import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { ItemNotes } from "../../components/ItemNotes";
 import { LoadData } from "../../components/LoadData";
@@ -52,30 +51,28 @@ export function Notes() {
   }
 
   return (
-    <DefaultContainer newNotes monthButton>
-      <Container type="SECONDARY" title="Notas">
-        <FlatList
-          data={notesUserMonth}
-          renderItem={({ item }) => (
-            <ItemNotes
-              onDelete={() => handleDeleteItem(item.id)}
-              onEdit={() => handleEditItem(item.id)}
-              title={item.name}
-              date={item.createdAt}
-              description={item.description}
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 90 }}
-          ListEmptyComponent={
-            <LoadData
-              image="PRIMARY"
-              title="Desculpe!"
-              subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando uma nova anotação clicando em Adicione +."
-            />
-          }
-        />
-      </Container>
+    <DefaultContainer newNotes monthButton title="Notas">
+      <FlatList
+        data={notesUserMonth}
+        renderItem={({ item }) => (
+          <ItemNotes
+            onDelete={() => handleDeleteItem(item.id)}
+            onEdit={() => handleEditItem(item.id)}
+            title={item.name}
+            date={item.createdAt}
+            description={item.description}
+          />
+        )}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingBottom: 90 }}
+        ListEmptyComponent={
+          <LoadData
+            image="PRIMARY"
+            title="Desculpe!"
+            subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando uma nova anotação clicando em Adicione +."
+          />
+        }
+      />
 
       <Modal
         animationType="slide"

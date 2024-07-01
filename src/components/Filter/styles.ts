@@ -7,6 +7,24 @@ type Props = {
     type: subTitleTypeStyleProps;
 }
 
+export const ContainerMonth = styled.View`
+  width: 80%;
+  height: 100%;
+  margin: 40px auto 16px auto;
+  background-color: ${({theme}) => theme.COLORS.GRAY_300};
+  border: 2px solid;
+  border-radius: 12px;
+  border-color: ${({theme}) => theme.COLORS.TEAL_600};
+  flex-direction: column;
+  position: relative;
+`;
+
+export const Label = styled.Text`
+    font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+    font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+    position: absolute;
+    top: -25px;
+`;
 
 export const Content = styled.View`
     flex: 1;

@@ -4,7 +4,6 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 import { useTheme } from "styled-components/native";
-import { Container } from "../../components/Container";
 import { CustomModal } from "../../components/CustomModal";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Loading } from "../../components/Loading";
@@ -52,8 +51,7 @@ export function Gears() {
 
 
   return (
-    <DefaultContainer>
-      <Container type="SECONDARY" title="Configurações">
+    <DefaultContainer title='Configurações'>
         <ScrollView showsVerticalScrollIndicator={false}>
           <Content>
             {user ?
@@ -123,7 +121,6 @@ export function Gears() {
             }
           </Content>
         </ScrollView>
-      </Container>
       <CustomModal
         animationType="slide"
         transparent={true}

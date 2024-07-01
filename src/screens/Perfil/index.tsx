@@ -1,21 +1,14 @@
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Container } from "../../components/Container";
-import { Content, Divider, Header, SubTitle, Title, Items, ContentItems, ButtonIcon } from "./styles";
-import { Button } from "../../components/Button";
-import { useState } from "react";
 import auth from "@react-native-firebase/auth";
-import { CustomModal } from "../../components/CustomModal";
-import { LogoUser } from "../../components/LogoUser";
-import { ScrollView, View } from "react-native";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { Loading } from "../../components/Loading";
-import LogoLineChart from '../../assets/Icones/icones_brokerx_cinza-07.svg';
-import LogoPiggBank from '../../assets/Icones/icones_brokerx_cinza-01.svg';
-import { useTheme } from "styled-components/native";
 import { useNavigation } from "@react-navigation/native";
-import { FontAwesome } from '@expo/vector-icons';
-import { FontAwesome5 } from '@expo/vector-icons';
-import { Entypo } from '@expo/vector-icons';
+import { useState } from "react";
+import { ScrollView, View } from "react-native";
+import { useTheme } from "styled-components/native";
+import { CustomModal } from "../../components/CustomModal";
+import { DefaultContainer } from "../../components/DefaultContainer";
+import { Loading } from "../../components/Loading";
+import { LogoUser } from "../../components/LogoUser";
+import { useUserAuth } from "../../hooks/useUserAuth";
+import { Content, ContentItems, Header, Items, SubTitle, Title } from "./styles";
 
 
 export function Perfil() {
@@ -55,14 +48,13 @@ export function Perfil() {
 
 
   return (
-    <DefaultContainer backButton>
-      <Container type="SECONDARY" title="Perfil">
+    <DefaultContainer backButton title="Perfil">
         <ScrollView showsVerticalScrollIndicator={false}>
           <Content>
             {user ?
               <View>
                 <Header>
-                  <Divider />
+                  {/* <Divider /> */}
                   <LogoUser title={user?.displayName || ""} />
                 </Header>
                 <ContentItems>
@@ -102,7 +94,6 @@ export function Perfil() {
             }
           </Content>
         </ScrollView>
-      </Container>
       <CustomModal
         animationType="slide"
         transparent={true}

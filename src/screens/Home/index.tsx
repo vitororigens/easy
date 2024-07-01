@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  FlatList,
-  Modal,
-  ScrollView,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, Modal, ScrollView, TouchableOpacity } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
@@ -24,14 +18,10 @@ import {
   Button,
   ButtonClose,
   ContainerItems,
-  Content,
-  Divider,
   Header,
-  HeaderItems,
   NavBar,
   SubTitle,
-  Title,
-  TitleItems,
+  Title
 } from "./styles";
 
 export function Home() {
@@ -117,132 +107,112 @@ export function Home() {
   }
 
   return (
-    <DefaultContainer addButton monthButton>
-      <Container
-        type="PRIMARY"
-        name="file-invoice-dollar"
-        title={formattedTotalValue}
-      >
-        <Content>
-          <Header>
-            <View style={{ flexDirection: "row" }}>
-              <Divider
-                active={activeButton === "receitas"}
-                style={{
-                  alignSelf:
-                    activeButton === "tarefas" ? "flex-start" : "flex-end",
-                }}
+    <DefaultContainer
+      addButton
+      monthButton
+      title={activeButton === "receitas" ? "Receitas" : "Despesas"}
+      type="SECONDARY"
+      subtitle={formattedTotalValue}
+    >
+      <Header>
+        <NavBar>
+          <Button
+            onPress={() => handleButtonClick("receitas")}
+            active={activeButton !== "receitas"}
+            style={{ borderTopLeftRadius: 40 }}
+          >
+            <Title>Receitas</Title>
+            <SubTitle type="PRIMARY">{formattedRevenue}</SubTitle>
+          </Button>
+          <Button
+            onPress={() => handleButtonClick("despesas")}
+            active={activeButton !== "despesas"}
+            style={{ borderTopRightRadius: 40 }}
+          >
+            <Title>Despesas</Title>
+            <SubTitle type="SECONDARY">{formattedExpense}</SubTitle>
+          </Button>
+        </NavBar>
+      </Header>
+      {activeButton === "receitas" && (
+        <ContainerItems>
+          {revenue.filter((item) => item.uid === uid).length === 0 ? (
+            <ScrollView>
+              <LoadData
+                image="PRIMARY"
+                title="Desculpe!"
+                subtitle="Você ainda não possui lançamentos de entradas! Comece adicionando uma nova entrada."
               />
-              <Divider
-                active={activeButton === "despesas"}
-                style={{
-                  alignSelf:
-                    activeButton === "tarefas" ? "flex-start" : "flex-end",
-                }}
+            </ScrollView>
+          ) : (
+            <FlatList
+              style={{ marginTop: 16 }}
+              data={revenue.filter(
+                (item) => item.uid === uid && item.month === selectedMonth
+              )}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => handleRevenueConfirmation(item.id)}
+                >
+                  <Items
+                    onDelete={() => handleDeleteRevenue(item.id)}
+                    onEdit={() => handleRevenueConfirmation(item.id)}
+                    showItemTaskRevenue
+                    type={item.type}
+                    category={item.name}
+                    date={item.date}
+                    repeat={item.repeat}
+                    valueTransaction={formatCurrency(item.valueTransaction)}
+                  />
+                </TouchableOpacity>
+              )}
+              contentContainerStyle={{ paddingBottom: 90 }}
+            />
+          )}
+        </ContainerItems>
+      )}
+      {activeButton === "despesas" && (
+        <ContainerItems>
+          {expense.filter((item) => item.uid === uid).length === 0 ? (
+            <ScrollView>
+              <LoadData
+                image="SECONDARY"
+                title="Desculpe!"
+                subtitle="Você ainda não possui lançamentos de saídas! Comece lançando uma nova saída."
               />
-            </View>
-            <NavBar>
-              <Button
-                onPress={() => handleButtonClick("receitas")}
-                active={activeButton !== "receitas"}
-              >
-                <Title>Receitas</Title>
-                <SubTitle type="PRIMARY">{formattedRevenue}</SubTitle>
-              </Button>
-              <Button
-                onPress={() => handleButtonClick("despesas")}
-                active={activeButton !== "despesas"}
-              >
-                <Title>Despesas</Title>
-                <SubTitle type="SECONDARY">{formattedExpense}</SubTitle>
-              </Button>
-            </NavBar>
-          </Header>
-          {activeButton === "receitas" && (
-            <ContainerItems>
-              <HeaderItems type="PRIMARY">
-                <TitleItems>Histórico</TitleItems>
-              </HeaderItems>
-              {revenue.filter((item) => item.uid === uid).length === 0 ? (
-                <ScrollView>
-                  <LoadData
-                    image="PRIMARY"
-                    title="Desculpe!"
-                    subtitle="Você ainda não possui lançamentos de entradas! Comece adicionando uma nova entrada."
-                  />
-                </ScrollView>
-              ) : (
-                <FlatList
-                  data={revenue.filter(
-                    (item) => item.uid === uid && item.month === selectedMonth
-                  )}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      onPress={() => handleRevenueConfirmation(item.id)}
-                    >
-                      <Items
-                        onDelete={() => handleDeleteRevenue(item.id)}
-                        onEdit={() => handleRevenueConfirmation(item.id)}
-                        showItemTaskRevenue
-                        type={item.type}
-                        category={item.name}
-                        date={item.date}
-                        repeat={item.repeat}
-                        valueTransaction={formatCurrency(item.valueTransaction)}
-                      />
-                    </TouchableOpacity>
-                  )}
-                  contentContainerStyle={{ paddingBottom: 90 }}
-                />
+            </ScrollView>
+          ) : (
+            <FlatList
+              style={{ marginTop: 16 }}
+              data={expense.filter(
+                (item) =>
+                  item.uid === uid &&
+                  ((item.repeat === true && item.month === selectedMonth) ||
+                    (item.repeat === false && item.month === selectedMonth))
               )}
-            </ContainerItems>
-          )}
-          {activeButton === "despesas" && (
-            <ContainerItems>
-              <HeaderItems type="SECONDARY">
-                <TitleItems>Histórico</TitleItems>
-              </HeaderItems>
-              {expense.filter((item) => item.uid === uid).length === 0 ? (
-                <ScrollView>
-                  <LoadData
-                    image="SECONDARY"
-                    title="Desculpe!"
-                    subtitle="Você ainda não possui lançamentos de saídas! Comece lançando uma nova saída."
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => handleExpenseConfirmation(item.id)}
+                >
+                  <Items
+                    onDelete={() => handleDeleteExpense(item.id)}
+                    onEdit={() => handleRevenueConfirmation(item.id)}
+                    showItemTask
+                    status={item.status}
+                    type={item.type}
+                    category={item.name}
+                    date={item.date}
+                    repeat={item.repeat}
+                    valueTransaction={formatCurrency(item.valueTransaction)}
                   />
-                </ScrollView>
-              ) : (
-                <FlatList
-                  data={expense.filter(
-                    (item) =>
-                      item.uid === uid &&
-                      ((item.repeat === true && item.month === selectedMonth) ||
-                        (item.repeat === false && item.month === selectedMonth))
-                  )}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      onPress={() => handleExpenseConfirmation(item.id)}
-                    >
-                      <Items
-                        onDelete={() => handleDeleteExpense(item.id)}
-                        onEdit={() => handleRevenueConfirmation(item.id)}
-                        showItemTask
-                        status={item.status}
-                        type={item.type}
-                        category={item.name}
-                        date={item.date}
-                        repeat={item.repeat}
-                        valueTransaction={formatCurrency(item.valueTransaction)}
-                      />
-                    </TouchableOpacity>
-                  )}
-                  keyExtractor={(item) => item.id}
-                  contentContainerStyle={{ paddingBottom: 90 }}
-                />
+                </TouchableOpacity>
               )}
-            </ContainerItems>
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={{ paddingBottom: 90 }}
+            />
           )}
-        </Content>
-      </Container>
+        </ContainerItems>
+      )}
 
       <Modal
         visible={confirmRevenueVisible}

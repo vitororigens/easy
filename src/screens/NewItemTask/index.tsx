@@ -5,11 +5,10 @@ import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollView, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
-import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
-import { Button, ButtonClose, Content, Input, Title } from "./styles";
+import { Button, Content, Input, Title } from "./styles";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -140,20 +139,13 @@ export function NewItemTask({
 
   return (
     <>
-      <DefaultContainer hasHeader={false}>
-        <ButtonClose
-          onPress={closeBottomSheet}
-          style={{ alignSelf: "flex-end", marginBottom: 32 }}
-        >
-          <Title style={{ color: "white" }}>Fechar</Title>
-        </ButtonClose>
-        <Container title={"Adicionar nova tarefa"}>
+      <DefaultContainer hasHeader={false} title="Adicionar nova tarefa" closeModalFn={closeBottomSheet}>
           <ScrollView
             keyboardShouldPersistTaps="always"
             showsVerticalScrollIndicator={false}
           >
             <Content>
-              <Title>Nome da tarefa</Title>
+              <Title>Nome da tarefa*</Title>
               <Controller
                 control={control}
                 name="name"
@@ -190,7 +182,6 @@ export function NewItemTask({
               </View>
             </Content>
           </ScrollView>
-        </Container>
       </DefaultContainer>
     </>
   );

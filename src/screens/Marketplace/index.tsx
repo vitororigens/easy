@@ -11,7 +11,6 @@ import {
 import { Toast } from "react-native-toast-notifications";
 import { useTheme } from "styled-components/native";
 import { Cart } from "../../components/Cart";
-import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { HistoryMarketplaceModal } from "../../components/HistoryMarketplace";
 import { ItemMarketplace } from "../../components/ItemMarketplace";
@@ -29,7 +28,7 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { NewItem } from "../NewItem";
-import { Button, Content, Divider, Header, NavBar, Title } from "./styles";
+import { Button, Header, NavBar, Title } from "./styles";
 
 const modalBottom = Platform.OS === "ios" ? 90 : 70;
 
@@ -270,97 +269,80 @@ export function Marketplace() {
   }
 
   return (
-    <DefaultContainer monthButton newItemMarketplace>
-      <Container type="SECONDARY" title="Lista de Mercado">
-        <Content>
-          <Header>
-            <View style={{ flexDirection: "row" }}>
-              <Divider
-                active={activeButton === "lista"}
-                style={{
-                  alignSelf:
-                    activeButton === "lista" ? "flex-start" : "flex-end",
-                }}
-              />
-              <Divider
-                active={activeButton === "items"}
-                style={{
-                  alignSelf:
-                    activeButton === "lista" ? "flex-start" : "flex-end",
-                }}
-              />
-            </View>
-            <NavBar>
-              <Button
-                onPress={() => handleButtonClick("lista")}
-                active={activeButton !== "lista"}
-              >
-                <Title>Carrinho</Title>
-              </Button>
-              <Button
-                onPress={() => handleButtonClick("items")}
-                active={activeButton !== "items"}
-              >
-                <Title>Histórico de compra</Title>
-              </Button>
-            </NavBar>
-          </Header>
-          {activeButton === "lista" &&
-            (data.filter((item) => item.uid === uid).length === 0 ? (
-              <ScrollView>
-                <LoadData
-                  image="SECONDARY"
-                  title="Desculpe!"
-                  subtitle='Não há itens disponíveis para exibir aqui! Clique em "Adicione" e adicione um item!'
-                />
-              </ScrollView>
-            ) : (
-              <FlatList
-                data={data.filter((item) => item.uid === uid)}
-                renderItem={({ item }) => (
-                  <ItemMarketplace
-                    onEditItem={() => handleEditItem(item.id)}
-                    removeItem={() => handleRemoveItem(item)}
-                    addItem={() => handleAddItem(item)}
-                    measurements={item.measurements}
-                    quantity={item.amount}
-                    title={item.name}
-                    value={item.valueItem}
-                    resetCountQuantity={!!selectedItems.length ? false : true}
-                  />
-                )}
-                contentContainerStyle={{ paddingBottom: 90 }}
-              />
-            ))}
-
-          {activeButton === "items" && (
-            <FlatList
-              data={historyMonth}
-              renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleListSelected(item)}>
-                  <Items
-                    showItemTask
-                    status={true}
-                    category="mercado"
-                    date={item.finishedDate}
-                    valueTransaction={formatCurrency(item.total)}
-                    onDelete={() => handleDeleteList(item.idExpense, item.id)}
-                    hasEdit={false}
-                  />
-                </TouchableOpacity>
-              )}
-              contentContainerStyle={{ paddingBottom: 90 }}
-              ListEmptyComponent={
-                <LoadData
-                  image="PRIMARY"
-                  title="Desculpe!"
-                  subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando itens no seu carrinho e crie sua lista de mercado."
-                />
-              }
+    <DefaultContainer monthButton newItemMarketplace title="Lista de Mercado" type="PRIMARY">
+      <Header>
+        <NavBar>
+          <Button
+            onPress={() => handleButtonClick("lista")}
+            active={activeButton !== "lista"}
+            style={{ borderTopLeftRadius: 40 }}
+          >
+            <Title>Carrinho</Title>
+          </Button>
+          <Button
+            onPress={() => handleButtonClick("items")}
+            active={activeButton !== "items"}
+            style={{ borderTopRightRadius: 40 }}
+          >
+            <Title>Histórico de compra</Title>
+          </Button>
+        </NavBar>
+      </Header>
+      {activeButton === "lista" &&
+        (data.filter((item) => item.uid === uid).length === 0 ? (
+          <ScrollView>
+            <LoadData
+              image="SECONDARY"
+              title="Desculpe!"
+              subtitle='Não há itens disponíveis para exibir aqui! Clique em "Adicione" e adicione um item!'
             />
+          </ScrollView>
+        ) : (
+          <FlatList
+            data={data.filter((item) => item.uid === uid)}
+            renderItem={({ item }) => (
+              <ItemMarketplace
+                onEditItem={() => handleEditItem(item.id)}
+                removeItem={() => handleRemoveItem(item)}
+                addItem={() => handleAddItem(item)}
+                measurements={item.measurements}
+                quantity={item.amount}
+                title={item.name}
+                value={item.valueItem}
+                resetCountQuantity={!!selectedItems.length ? false : true}
+              />
+            )}
+            contentContainerStyle={{ paddingBottom: 90 }}
+          />
+        ))}
+
+      {activeButton === "items" && (
+        <FlatList
+          style={{ marginTop: 16 }}
+          data={historyMonth}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handleListSelected(item)}>
+              <Items
+                showItemTask
+                status={true}
+                category="mercado"
+                date={item.finishedDate}
+                valueTransaction={formatCurrency(item.total)}
+                onDelete={() => handleDeleteList(item.idExpense, item.id)}
+                hasEdit={false}
+              />
+            </TouchableOpacity>
           )}
-        </Content>
-      </Container>
+          contentContainerStyle={{ paddingBottom: 90 }}
+          ListEmptyComponent={
+            <LoadData
+              image="PRIMARY"
+              title="Desculpe!"
+              subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando itens no seu carrinho e crie sua lista de mercado."
+            />
+          }
+        />
+      )}
 
       <Modal
         visible={confirmItemVisible}
@@ -393,7 +375,7 @@ export function Marketplace() {
           style={{
             position: "absolute",
             bottom: modalBottom,
-            left: 20,
+            left: 0,
             backgroundColor: COLORS.TEAL_600,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,

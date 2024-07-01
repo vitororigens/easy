@@ -10,7 +10,10 @@ type Props = {
 
 export const Content = styled.View`
     flex: 1;
-    background-color: ${({theme}) => theme.COLORS.WHITE};
+    border-top-width: 4px;
+    border-top-color: ${({theme}) => theme.COLORS.TEAL_600};
+    border-top-style: solid;
+    border-radius: 40px;
 `;
 
 

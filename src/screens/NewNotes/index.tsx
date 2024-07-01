@@ -5,17 +5,15 @@ import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollView, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
-import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import {
   Button,
-  ButtonClose,
   Content,
   Input,
   InputContainer,
-  Title,
+  Title
 } from "./styles";
 
 type Props = {
@@ -158,14 +156,7 @@ export function NewNotes({
 
   return (
     <>
-      <DefaultContainer hasHeader={false}>
-        <ButtonClose
-          onPress={closeBottomSheet}
-          style={{ alignSelf: "flex-end", marginBottom: 32 }}
-        >
-          <Title style={{ color: "white" }}>Fechar</Title>
-        </ButtonClose>
-        <Container title={"Adicionar nova nota"}>
+      <DefaultContainer hasHeader={false} title="Adicionar nova nota" closeModalFn={closeBottomSheet}>
           <ScrollView
             keyboardShouldPersistTaps="always"
             showsVerticalScrollIndicator={false}
@@ -223,7 +214,6 @@ export function NewNotes({
               </View>
             </Content>
           </ScrollView>
-        </Container>
       </DefaultContainer>
     </>
   );

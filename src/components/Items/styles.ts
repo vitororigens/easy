@@ -1,5 +1,5 @@
-import styled from "styled-components/native";
 import { Entypo } from '@expo/vector-icons';
+import styled from "styled-components/native";
 
 export type ItemsTypeStyleProps = 'PRIMARY' | 'SECONDARY' | 'TERTIARY';
 
@@ -13,8 +13,7 @@ export const Container = styled.View`
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 10px;
 `;
 
 export const Icon = styled.View<Props>`

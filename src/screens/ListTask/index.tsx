@@ -7,14 +7,13 @@ import {
   View,
 } from "react-native";
 import { Toast } from "react-native-toast-notifications";
-import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
 import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
-import { Button, Content, Divider, Header, NavBar, Title } from "./styles";
+import { Button, Header, NavBar, Title } from "./styles";
 
 import { format, getMonth, parse } from "date-fns";
 import { useTheme } from "styled-components/native";
@@ -194,99 +193,82 @@ export function ListTask() {
   }
 
   return (
-    <DefaultContainer newItem monthButton>
-      <Container type="SECONDARY" title="Lista de tarefas">
-        <Content>
-          <Header>
-            <View style={{ flexDirection: "row" }}>
-              <Divider
-                active={activeButton === "tarefas"}
-                style={{
-                  alignSelf:
-                    activeButton === "tarefas" ? "flex-start" : "flex-end",
-                }}
-              />
-              <Divider
-                active={activeButton === "historico"}
-                style={{
-                  alignSelf:
-                    activeButton === "tarefas" ? "flex-start" : "flex-end",
-                }}
-              />
-            </View>
-            <NavBar>
-              <Button
-                onPress={() => handleButtonClick("tarefas")}
-                active={activeButton !== "tarefas"}
-              >
-                <Title>Tarefas</Title>
-              </Button>
-              <Button
-                onPress={() => handleButtonClick("historico")}
-                active={activeButton !== "historico"}
-              >
-                <Title>Histórico de tarefas</Title>
-              </Button>
-            </NavBar>
-          </Header>
+    <DefaultContainer newItem monthButton title="Lista de Tarefas">
+      <Header>
+        <NavBar>
+          <Button
+            onPress={() => handleButtonClick("tarefas")}
+            active={activeButton !== "tarefas"}
+            style={{ borderTopLeftRadius: 40 }}
+          >
+            <Title>Tarefas</Title>
+          </Button>
+          <Button
+            onPress={() => handleButtonClick("historico")}
+            active={activeButton !== "historico"}
+            style={{ borderTopRightRadius: 40 }}
+          >
+            <Title>Histórico de tarefas</Title>
+          </Button>
+        </NavBar>
+      </Header>
 
-          {activeButton === "tarefas" && (
-            <FlatList
-              data={data.filter((item) => item.uid === uid)}
-              renderItem={({ item }) => (
-                <ItemTask
-                  onEdit={() => handleEditItem(item.id)}
-                  onDelete={() => handleDeleteItem(item.id)}
-                  title={item.name}
-                  isChecked={selectedItems[item.id] || false}
-                  onToggle={() => {
-                    setSelectedItems((prev) => ({
-                      ...prev,
-                      [item.id]: !prev[item.id],
-                    }));
-                  }}
-                />
-              )}
-              contentContainerStyle={{ paddingBottom: 90 }}
-              keyExtractor={(item) => item.id}
-              ListEmptyComponent={
-                <LoadData
-                  image="PRIMARY"
-                  title="Desculpe!"
-                  subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando uma nova tarefa clicando em Adicione +."
-                />
-              }
+      {activeButton === "tarefas" && (
+        <FlatList
+          data={data.filter((item) => item.uid === uid)}
+          renderItem={({ item }) => (
+            <ItemTask
+              onEdit={() => handleEditItem(item.id)}
+              onDelete={() => handleDeleteItem(item.id)}
+              title={item.name}
+              isChecked={selectedItems[item.id] || false}
+              onToggle={() => {
+                setSelectedItems((prev) => ({
+                  ...prev,
+                  [item.id]: !prev[item.id],
+                }));
+              }}
             />
           )}
-
-          {activeButton === "historico" && (
-            <FlatList
-              data={historyUserMonth}
-              ListEmptyComponent={
-                <LoadData
-                  image="PRIMARY"
-                  title="Desculpe!"
-                  subtitle="Você ainda não possui nenhuma lista de tarefas para exibir aqui! Comece finalizando tarefas e crie sua lista de tarefas."
-                />
-              }
-              renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => openModalHistoryTask(item.id)}>
-                  <Items
-                    showItemTask
-                    category="lista de tarefas"
-                    customStatusText="Finalizada"
-                    status={true}
-                    hasEdit={false}
-                    date={item.finishedDate}
-                    onDelete={() => handleDeleteHistoryTasks(item.id)}
-                  />
-                </TouchableOpacity>
-              )}
-              contentContainerStyle={{ paddingBottom: 90 }}
+          contentContainerStyle={{ paddingBottom: 90 }}
+          keyExtractor={(item) => item.id}
+          ListEmptyComponent={
+            <LoadData
+              image="PRIMARY"
+              title="Desculpe!"
+              subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando uma nova tarefa clicando em Adicione +."
             />
+          }
+        />
+      )}
+
+      {activeButton === "historico" && (
+        <FlatList
+          data={historyUserMonth}
+          ListEmptyComponent={
+            <LoadData
+              image="PRIMARY"
+              title="Desculpe!"
+              subtitle="Você ainda não possui nenhuma lista de tarefas para exibir aqui! Comece finalizando tarefas e crie sua lista de tarefas."
+            />
+          }
+          style={{ marginTop: 16 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => openModalHistoryTask(item.id)}>
+              <Items
+                showItemTask
+                category="lista de tarefas"
+                customStatusText="Finalizada"
+                status={true}
+                hasEdit={false}
+                date={item.finishedDate}
+                onDelete={() => handleDeleteHistoryTasks(item.id)}
+              />
+            </TouchableOpacity>
           )}
-        </Content>
-      </Container>
+          contentContainerStyle={{ paddingBottom: 90 }}
+        />
+      )}
 
       <Modal
         animationType="slide"
@@ -319,7 +301,6 @@ export function ListTask() {
           style={{
             position: "absolute",
             bottom: modalBottom,
-            left: 20,
             backgroundColor: COLORS.TEAL_600,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,

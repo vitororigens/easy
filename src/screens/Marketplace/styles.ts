@@ -13,8 +13,6 @@ export const Content = styled.View`
     background-color: ${({theme}) => theme.COLORS.WHITE};
 `;
 
-
-
 export const Header = styled.View`
     width: 100%;
 
@@ -25,7 +23,6 @@ export const NavBar = styled.View`
     height: 60px;
     flex-direction: row;
     justify-content: space-between;
-
 `;
 
 type ButtonProps = {
@@ -36,7 +33,10 @@ export const Button = styled(TouchableOpacity)<ButtonProps>`
     align-items: center;
     justify-content: center;
     width: 50%;
+    border-top-width: 4px;
+    border-top-style: solid;
     background-color: ${({theme, active}) => active ? theme.COLORS.GRAY_300 : "transparent"};
+    border-top-color: ${({theme, active}) => !active ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_300};
 `;
 
 export const Title = styled.Text`

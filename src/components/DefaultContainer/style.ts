@@ -1,52 +1,91 @@
-import { Ionicons } from '@expo/vector-icons';
-import { ImageBackground, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components/native";
 
-import backgroundImage from "../../assets/background.png";
+// import backgroundImage from "../../assets/background.png";
 
-export const Container = styled(SafeAreaView)`
-        flex: 1;
+type Props = {
+  type?: "PRIMARY" | "SECONDARY";
+}
 
+export const Container = styled(SafeAreaView)<Props>`
+  flex: 1;
+  background-color:  ${({ theme, type }) => type === "PRIMARY" ? theme.COLORS.PURPLE_800 : theme.COLORS.TEAL_600};
 `;
 
+export const Content = styled.View`
+  flex: 1;
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+`;
 
-export const Background = styled(ImageBackground).attrs({
-        source: backgroundImage,
-        resizeMode: "cover",
-})`
-        flex: 1;
- `;
+// export const Background = styled(ImageBackground).attrs({
+//   source: backgroundImage,
+//   resizeMode: "cover",
+// })`
+//   flex: 1;
+// `;
 
-export const Header = styled.View`
-        width: 100%;
-        flex-direction: row;
-        justify-content: start;
-
-` ;
+export const Header = styled.View<Props>`
+  width: 100%;
+  height: ${({ theme, type }) => type === "PRIMARY" ? "80px" : "120px"};
+  /* padding: 20px; */
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color:  ${({ theme, type }) => type === "PRIMARY" ? theme.COLORS.PURPLE_800 : theme.COLORS.TEAL_600};`;
 
 export const Button = styled(TouchableOpacity)`
-        height: 100%;
-        align-items: end;
-        justify-content: center;
-        width: 27%;
-        padding: 10px;
-
-`;
-export const ContainerMonth = styled.View`
-        width: 40%;
-        height: 100%;
+  height: 100%;
+  align-items: end;
+  justify-content: center;
+  width: 27%;
+  padding: 10px;
 `;
 
-export const Title = styled.Text`
-        color: ${({theme}) => theme.COLORS.WHITE};
-        font-size: ${({theme}) => theme.FONTE_SIZE.MD}px;
-        font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-        margin-right: 10px;
-        margin-left: 10px;
+export const ButtonClose = styled(TouchableOpacity)`
+  height: 100%;
+  align-items: end;
+  justify-content: center;
+  width: 27%;
+  position: absolute;
+  right: -16px;
 `;
+
+export const ButtonBack = styled(TouchableOpacity)`
+  height: 100%;
+  align-items: end;
+  justify-content: center;
+  width: 27%;
+  position: absolute;
+  left: -16px;
+`;
+
+export const Title = styled.Text<Props>`
+  color: ${({ theme }) => theme.COLORS.WHITE};
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  font-size: ${({ theme }) => theme.FONTE_SIZE.GG}px;
+  font-weight: 700;
+  text-align: center;
+  flex: ${({ theme, type }) => type === "PRIMARY" ? 1 : "none"}
+  
+`;
+
+export const SubTitle = styled.Text`
+  color: ${({ theme }) => theme.COLORS.WHITE};
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  font-size: ${({ theme }) => theme.FONTE_SIZE.XL}px;
+  font-weight: 700;
+`;
+
+export const ViewHomeCenter = styled.View`
+  margin-top: 20px;
+`
 
 export const Icon = styled(Ionicons).attrs(({ theme }) => ({
-        color: theme.COLORS.WHITE,
-        size: theme.FONTE_SIZE.XL,
+  color: theme.COLORS.WHITE,
+  size: theme.FONTE_SIZE.XL,
 }))``;
+
