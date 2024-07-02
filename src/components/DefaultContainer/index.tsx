@@ -156,6 +156,8 @@ export function DefaultContainer({
               alignItems: "center",
               flexDirection: "row",
               height: 60,
+              position: "absolute",
+              right: 0
             }}
             onPress={handleNewLaunch}
           >

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Dimensions, FlatList, Modal, ScrollView, View } from "react-native";
-import { useTheme } from "styled-components/native";
+import { FlatList, Modal, ScrollView, View } from "react-native";
 //
 import { Content, SubTitle, Title } from "./styles";
 //
@@ -17,8 +16,6 @@ import { database } from "../../services";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { NewLaunch } from "../NewLaunch";
 
-const screenWidth = Dimensions.get("window").width;
-
 export function PiggyBank() {
   const user = useUserAuth();
   const PiggyBankData = useFirestoreCollection('PiggyBank');
@@ -27,10 +24,6 @@ export function PiggyBank() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
-
-
-
-  const { COLORS } = useTheme();
 
   const userPiggyBankData = PiggyBankData.filter(item => item.uid === uid && item.month === selectedMonth);
   const valueTotal = userPiggyBankData.reduce((total, item) => total + parseFloat(item.valueItem), 0);
@@ -71,7 +64,7 @@ export function PiggyBank() {
   }
 
   return (
-    <DefaultContainer backButton title="Cofrinho">
+    <DefaultContainer backButton title="Cofrinho" newLaunch>
         <Content>
           <View style={{ top: 40 }}>
             <View>
@@ -108,6 +101,7 @@ export function PiggyBank() {
                 </ScrollView>
               ) : (
                 <FlatList
+                  style={{marginTop: -40}}
                   data={userPiggyBankData}
                   renderItem={({ item }) => (
                     <Items

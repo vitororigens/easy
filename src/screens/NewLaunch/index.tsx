@@ -5,15 +5,11 @@ import { Toast } from "react-native-toast-notifications";
 //
 import {
   Button,
-  ButtonClose,
   Content,
-  Divider,
-  Header,
   Input,
-  Title,
+  Title
 } from "./styles";
 //
-import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
 //
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -156,7 +152,6 @@ export function NewLaunch({
       })
       .then(() => {
         Toast.show("Item adicionado!", { type: "success" });
-        reset();
         onCloseModal && onCloseModal();
       })
       .catch((error) => {
@@ -205,21 +200,12 @@ export function NewLaunch({
 
   return (
     <>
-      <DefaultContainer hasHeader={false}>
-        <ButtonClose
-          onPress={closeBottomSheet}
-          style={{ alignSelf: "flex-end", marginBottom: 32 }}
-        >
-          <Title style={{ color: "white" }}>Fechar</Title>
-        </ButtonClose>
+      <DefaultContainer closeModalFn={closeBottomSheet} title="Quanto você economizou?" >
         <ScrollView
           keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}
         >
-          <Container type="SECONDARY" title="Quanto você economizou?">
-            <Header>
-              <Divider />
-            </Header>
+
             <Content>
               <Title>Nome*</Title>
               <Controller
@@ -306,7 +292,6 @@ export function NewLaunch({
                 )}
               </View>
             </Content>
-          </Container>
         </ScrollView>
       </DefaultContainer>
     </>
