@@ -6,7 +6,6 @@ import { useTheme } from "styled-components/native";
 import LogoClipBoard from "../assets/Icones/icones_brokerx_cinza-18.svg";
 import LogoHome from "../assets/Icones/icones_brokerx_cinza-19.svg";
 import LogoCart from "../assets/Icones/icones_brokerx_cinza-25.svg";
-import { Loading } from "../components/Loading";
 import { Gears } from "../screens/Gears";
 import { Marketplace } from "../screens/Marketplace";
 
@@ -31,9 +30,9 @@ export function BottomTabsNavigation() {
     return subscriber;
   }, []);
 
-  if (isLoading || user === null) {
-    return <Loading />;
-  }
+  // if (isLoading || user === null) {
+  //   return <Loading />;
+  // }
 
   return (
     <Navigator

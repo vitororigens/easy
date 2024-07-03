@@ -6,6 +6,7 @@ const storage = new MMKV({id: "easy-finances"});
 
 export function useUserAuth() {
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+
   
   useEffect(() => {
     // Recuperar dados do usuário do MMKV na inicialização
@@ -13,7 +14,7 @@ export function useUserAuth() {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-
+    
     // Subscrever às mudanças de autenticação do Firebase
     const subscriber = auth().onAuthStateChanged((user) => {
       if (user) {

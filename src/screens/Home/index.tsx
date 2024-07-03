@@ -53,7 +53,6 @@ export function Home() {
     style: "currency",
     currency: "BRL",
   });
-  console.log(expense.filter((item) => item.uid === uid));
 
   function handleRevenueConfirmation(documentId: string) {
     setConfirmRevenueVisible(true);

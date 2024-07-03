@@ -1,6 +1,6 @@
-import { Container, Content, ContentItems, Divider, Icon, ItemsTypeStyleProps, SubTitle, Title } from "./styles";
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from "styled-components/native";
+import { Container, Content, ContentItems, Divider, Icon, SubTitle, Title } from "./styles";
 
 type ItemsProps = {
     category?: string;
@@ -22,7 +22,6 @@ export function ItemsList({ handlewStatus, category, date, valueTransaction, rep
     const textStatus = status ? 'Pago' : 'Pendente';
     const typeMode = type === 'input' ? transactionType : textStatus;
     const dateToday = formatDate(new Date());
-    console.log(dateToday)
 
     function formatDate(date: Date): string {
         const day = date.getDate().toString().padStart(2, '0');

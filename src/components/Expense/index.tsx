@@ -63,8 +63,6 @@ export function Expense({
   const [isEditing, setIsEditing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  console.log(selectedItemId)
-
   const uid = user?.uid;
 
   // Hooks
