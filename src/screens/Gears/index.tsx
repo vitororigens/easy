@@ -39,10 +39,12 @@ export function Gears() {
       .then(() => {
         storage.delete("user");
         console.log("User signed out");
-        navigation.reset({
-          index: 0,
-          routes: [{name: "login"}]
-        });
+        setTimeout(() => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "login" }],
+          });
+        }, 1000); // Redireciona para "login" após 3 segundos
       })
       .catch((error) => {
         console.error("Error signing out: ", error);
