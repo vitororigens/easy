@@ -1,5 +1,6 @@
 import { TouchableOpacity, Image } from "react-native";
 import styled from "styled-components/native";
+import { FontAwesome } from '@expo/vector-icons';
 
 export type subTitleTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
@@ -93,3 +94,20 @@ export const StyledImage = styled(Image)`
     border-radius: 100px;
 `;
 
+export const ContainerIcon = styled(TouchableOpacity)`
+    width: 30px;
+    height: 30px;
+    background-color: ${({theme}) => theme.COLORS.PURPLE_600};
+    border-radius: 50px;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    top: 70px;
+    left: 75px;
+`;
+
+
+export const Icon = styled(FontAwesome).attrs(({theme}) => ({
+    color: theme.COLORS.WHITE,
+    size: 20,
+}))``

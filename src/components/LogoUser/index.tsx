@@ -15,18 +15,18 @@ export function LogoUser({ color }: LogoUserProps) {
   useEffect(() => {
     if (uid) {
       const unsubscribe = database.collection("Perfil").doc(uid).onSnapshot((doc) => {
+        console.log("Document snapshot received: ", doc.data());
         if (doc.exists) {
           const data = doc.data();
-          if (data?.image) {
-            setImage(data.image);
-          }
+          setImage(data?.image ?? null);
         }
       });
-
+  
       // Cleanup the listener on component unmount
       return () => unsubscribe();
     }
   }, [uid]);
+  
 
   function getInitials(name: string | undefined): string {
     if (!name) return "";
