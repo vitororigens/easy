@@ -20,7 +20,7 @@ export function useUserAuth() {
       if (user) {
         const userData = {
           uid: user.uid,
-          name: user.displayName,
+          displayName: user.displayName,
           email: user.email,
         };
         // @ts-ignore

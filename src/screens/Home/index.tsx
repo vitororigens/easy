@@ -26,9 +26,9 @@ import {
 
 export function Home() {
   const user = useUserAuth();
+  const uid = user?.uid;
   const [activeButton, setActiveButton] = useState("receitas");
   const { selectedMonth } = useMonth();
-  const uid = user?.uid;
   const revenue = useFirestoreCollection("Revenue");
   const expense = useFirestoreCollection("Expense");
 
@@ -96,14 +96,18 @@ export function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
-    }, 3000);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, []);
 
+  console.log(uid)
+
   if (!isLoaded || uid === undefined) {
     return <Loading />;
   }
+
+
 
   return (
     <DefaultContainer
