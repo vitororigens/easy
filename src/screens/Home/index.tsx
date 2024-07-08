@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, Modal, ScrollView, TouchableOpacity } from "react-native";
 import { Toast } from "react-native-toast-notifications";
-import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Expense } from "../../components/Expense";
 import { Items } from "../../components/Items";
@@ -16,12 +15,12 @@ import { database } from "../../services";
 import { formatCurrency } from "../../utils/formatCurrency";
 import {
   Button,
-  ButtonClose,
   ContainerItems,
+  Content,
   Header,
   NavBar,
   SubTitle,
-  Title
+  Title,
 } from "./styles";
 
 export function Home() {
@@ -101,13 +100,11 @@ export function Home() {
     return () => clearTimeout(timer);
   }, []);
 
-  console.log(uid)
+  console.log(uid);
 
   if (!isLoaded || uid === undefined) {
     return <Loading />;
   }
-
-
 
   return (
     <DefaultContainer
@@ -165,7 +162,11 @@ export function Home() {
                     category={item.name}
                     date={item.date}
                     repeat={item.repeat}
-                    valueTransaction={formatCurrency(item.valueTransaction)}
+                    valueTransaction={
+                      item.valueTransaction
+                        ? formatCurrency(item.valueTransaction ?? "0")
+                        : formatCurrency("0")
+                    }
                   />
                 </TouchableOpacity>
               )}
@@ -199,14 +200,18 @@ export function Home() {
                 >
                   <Items
                     onDelete={() => handleDeleteExpense(item.id)}
-                    onEdit={() => handleRevenueConfirmation(item.id)}
+                    onEdit={() => handleExpenseConfirmation(item.id)}
                     showItemTask
                     status={item.status}
                     type={item.type}
                     category={item.name}
                     date={item.date}
                     repeat={item.repeat}
-                    valueTransaction={formatCurrency(item.valueTransaction)}
+                    valueTransaction={
+                      item.valueTransaction
+                        ? formatCurrency(item.valueTransaction ?? "0")
+                        : formatCurrency("0")
+                    }
                   />
                 </TouchableOpacity>
               )}
@@ -221,42 +226,34 @@ export function Home() {
         visible={confirmRevenueVisible}
         onRequestClose={() => setConfirmRevenueVisible(false)}
       >
-        <DefaultContainer hasHeader={false}>
-          <ButtonClose
-            onPress={() => setConfirmRevenueVisible(false)}
-            style={{ alignSelf: "flex-end", marginBottom: 32 }}
-          >
-            <Title style={{ color: "white" }}>Fechar</Title>
-          </ButtonClose>
-          <Container title={"Editar Entrada"}>
+        <DefaultContainer
+          hasHeader={false}
+          title="Editar Entrada"
+          closeModalFn={() => setConfirmRevenueVisible(false)}
+        >
+          <Content>
             <Revenue
               selectedItemId={selectedItemId}
-              showButtonRemove
               onCloseModal={() => setConfirmRevenueVisible(false)}
+              showButtonRemove
               showButtonEdit
             />
-          </Container>
+          </Content>
         </DefaultContainer>
       </Modal>
       <Modal
         visible={confirmExpenseVisible}
         onRequestClose={() => setConfirmExpenseVisible(false)}
       >
-        <DefaultContainer hasHeader={false}>
-          <ButtonClose
-            onPress={() => setConfirmExpenseVisible(false)}
-            style={{ alignSelf: "flex-end", marginBottom: 32 }}
-          >
-            <Title style={{ color: "white" }}>Fechar</Title>
-          </ButtonClose>
-          <Container type="SECONDARY" title={"Editar Saida"}>
+        <DefaultContainer hasHeader={false} title="Editar Saída" closeModalFn={() => setConfirmExpenseVisible(false)}>
+          <Content>
             <Expense
               selectedItemId={selectedItemId}
               showButtonRemove
               onCloseModal={() => setConfirmExpenseVisible(false)}
               showButtonEdit
             />
-          </Container>
+          </Content>
         </DefaultContainer>
       </Modal>
     </DefaultContainer>

@@ -11,7 +11,7 @@ type Props = {
 };
 
 export function NewTask({ closeBottomSheet }: Props) {
-  const [activeButton, setActiveButton] = useState("despesas");
+  const [activeButton, setActiveButton] = useState("receitas");
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
@@ -43,8 +43,8 @@ export function NewTask({ closeBottomSheet }: Props) {
               </ButtonBar>
             </NavBar>
           </Header>
-          {activeButton === "receitas" && <Revenue showButtonSave />}
-          {activeButton === "despesas" && <Expense showButtonSave />}
+          {activeButton === "receitas" && <Revenue showButtonSave onCloseModal={closeBottomSheet} />}
+          {activeButton === "despesas" && <Expense showButtonSave onCloseModal={closeBottomSheet} />}
         </Content>
       </DefaultContainer>
     </>

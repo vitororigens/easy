@@ -5,7 +5,6 @@ import { useTheme } from "styled-components/native";
 //
 import { Container, Span, TextError, Title } from "./styles";
 //
-import { database } from "../../services";
 //
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
@@ -87,19 +86,6 @@ export function SingUp() {
           .then(() => {
             Toast.show("Conta cadastrada com sucesso!", { type: "success" });
             handleLogout();
-            database
-              .collection("Tasks")
-              .doc(uid)
-              .set({
-                revenue: 0,
-                expense: 0,
-              })
-              .then(() => {
-                console.log("Task adicionada!");
-              })
-              .catch((error) => {
-                console.error("Erro ao adicionar a tarefa: ", error);
-              });
           });
       })
       .catch((error) => {

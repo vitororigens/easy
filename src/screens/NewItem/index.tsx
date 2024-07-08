@@ -91,7 +91,7 @@ export function NewItem({
       .then(() => {
         Toast.show("Item adicionado!", { type: "success" });
         reset();
-        onCloseModal && onCloseModal();
+        !!closeBottomSheet && closeBottomSheet()
       })
       .catch((error) => {
         console.error("Erro ao adicionar o item: ", error);
@@ -175,7 +175,10 @@ export function NewItem({
               setValue("name", data.name);
               setValue("selectedCategory", data.category);
               setValue("selectedMeasurements", data.measurements);
-              setValue("valueItem", currencyMask(data.valueItem.toString()));
+              setValue("valueItem", data.valueItem.toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }));
               setValue("amount", data.amount.toString());
               setIsEditing(true);
             } else {

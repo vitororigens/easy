@@ -215,6 +215,7 @@ export function ListTask() {
 
       {activeButton === "tarefas" && (
         <FlatList
+          style={{ marginTop: 16 }}
           data={data.filter((item) => item.uid === uid)}
           renderItem={({ item }) => (
             <ItemTask

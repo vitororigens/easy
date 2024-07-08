@@ -327,7 +327,7 @@ export function Marketplace() {
                 status={true}
                 category="mercado"
                 date={item.finishedDate}
-                valueTransaction={formatCurrency(item.total)}
+                valueTransaction={item.total ? formatCurrency(item.total) : "R$ 0,00"}
                 onDelete={() => handleDeleteList(item.idExpense, item.id)}
                 hasEdit={false}
               />

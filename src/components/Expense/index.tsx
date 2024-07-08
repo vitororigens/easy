@@ -101,13 +101,15 @@ export function Expense({
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
 
-    const transactionValue = valueTransaction ?? "0"; // Ensure valueTransaction is a string
+    const transactionValue = valueTransaction
+      ? currencyUnMask(valueTransaction)
+      : 0;
 
     const expenseData = {
       name: name,
       category: selectedCategory,
       date: formattedDate,
-      valueTransaction: currencyUnMask(transactionValue),
+      valueTransaction: transactionValue,
       description: description,
       repeat: repeat,
       status: status,
@@ -129,6 +131,7 @@ export function Expense({
         setStatus(false);
         setIncome(false);
         reset();
+        !!onCloseModal && onCloseModal();
       })
       .catch((error) => {
         console.error("Erro ao adicionar a transação: ", error);
@@ -196,7 +199,9 @@ export function Expense({
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
 
-    const transactionValue = valueTransaction ?? "0"; // Ensure valueTransaction is a string
+    const transactionValue = valueTransaction
+      ? currencyUnMask(valueTransaction)
+      : 0;
 
     database
       .collection("Expense")
@@ -205,7 +210,7 @@ export function Expense({
         name: name,
         category: selectedCategory,
         date: formattedDate,
-        valueTransaction: currencyUnMask(transactionValue),
+        valueTransaction: transactionValue,
         description: description,
         repeat: repeat,
         status: status,
@@ -221,8 +226,7 @@ export function Expense({
         setAlert(false);
         setStatus(false);
         setIncome(false);
-        reset();
-        onCloseModal && onCloseModal();
+        !!onCloseModal && onCloseModal();
       })
       .catch((error) => {
         console.error("Erro ao editar a transação: ", error);
@@ -249,12 +253,14 @@ export function Expense({
         .then((doc) => {
           if (doc.exists) {
             const data = doc.data();
-            console.log(data);
             if (data) {
               setValue("name", data.name);
               setValue(
                 "valueTransaction",
-                currencyMask(String(data.valueTransaction))
+                data.valueTransaction.toLocaleString("pt-BR", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
               );
               setValue("description", data.description);
               setValue("formattedDate", data.date);

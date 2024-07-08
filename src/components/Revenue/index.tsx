@@ -101,19 +101,23 @@ export function Revenue({
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
 
+    const transactionValue = valueTransaction
+      ? currencyUnMask(valueTransaction)
+      : 0;
+
     const revenueData = {
       name: name,
       category: selectedCategory,
       uid: uid,
       date: formattedDate,
-      valueTransaction: !!valueTransaction?.length
-        ? currencyUnMask(valueTransaction)
-        : "0",
+      valueTransaction: transactionValue,
       description: description,
       repeat: repeat,
       type: "input",
       month: monthNumber,
     };
+
+    console.log(revenueData);
 
     // Salva o lançamento de receita para o mês atual
     database
@@ -124,6 +128,7 @@ export function Revenue({
         setRepeat(false);
         reset();
         setLoading(false);
+        !!onCloseModal && onCloseModal();
       })
       .catch((error) => {
         setLoading(false);
@@ -175,6 +180,10 @@ export function Revenue({
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
 
+    const transactionValue = valueTransaction
+      ? currencyUnMask(valueTransaction)
+      : 0;
+
     database
       .collection("Revenue")
       .doc(selectedItemId)
@@ -183,9 +192,7 @@ export function Revenue({
         category: selectedCategory,
         uid: uid,
         date: formattedDate,
-        valueTransaction: !!valueTransaction?.length
-          ? currencyUnMask(valueTransaction)
-          : "0",
+        valueTransaction: transactionValue,
         description: description,
         repeat: repeat,
         type: "input",
@@ -195,10 +202,7 @@ export function Revenue({
         Toast.show("Transação editada!", { type: "success" });
         setRepeat(false);
         setIsEditing(false);
-        reset();
-        if (onCloseModal) {
-          onCloseModal();
-        }
+        !!onCloseModal && onCloseModal();
       })
       .catch((error) => {
         console.error("Erro ao editar a transação: ", error);
@@ -249,7 +253,10 @@ export function Revenue({
               setValue("name", data.name);
               setValue(
                 "valueTransaction",
-                currencyMask(String(data.valueTransaction))
+                data.valueTransaction.toLocaleString("pt-BR", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
               );
               setValue("description", data.description);
               setValue("formattedDate", data.date);

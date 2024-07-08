@@ -1,14 +1,12 @@
-import { useState } from "react";
 import { FlatList, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import useHistoryMarketplaceCollections from "../../hooks/useHistoryMarketplaceCollection";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { Container } from "../Container";
 import { DefaultContainer } from "../DefaultContainer";
 import { Items } from "../Items";
-import { Button, ButtonClose, Title, TotalValue } from "./styles";
+import { Button, Content, Title, TotalValue } from "./styles";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -19,14 +17,8 @@ type Props = {
 export function HistoryMarketplaceModal({
   closeBottomSheet,
   selectedItemId,
-  onSaveListAgain,
 }: Props) {
-  const [selectedItems, setSelectedItems] = useState<{
-    [key: string]: boolean;
-  }>({});
-
   const user = useUserAuth();
-  const uid = user?.uid;
 
   const historyData = useHistoryMarketplaceCollections("HistoryMarketplace");
   const selectedListMarketplace = historyData.find(
@@ -35,10 +27,10 @@ export function HistoryMarketplaceModal({
   const items = selectedListMarketplace?.items;
 
   const handleSaveListAgain = () => {
-    if(!items || items.length === 0) return
+    if (!items || items.length === 0) return;
 
     const batch = database.batch(); // Usar batch para executar múltiplas operações de uma vez
-  
+
     items.forEach((item) => {
       const itemRef = database.collection("Marketplace").doc(); // Referência para cada novo documento
       batch.set(itemRef, {
@@ -51,8 +43,9 @@ export function HistoryMarketplaceModal({
         uid: item.uid,
       });
     });
-  
-    batch.commit()
+
+    batch
+      .commit()
       .then(() => {
         Toast.show("Itens adicionados!", { type: "success" });
         !!closeBottomSheet && closeBottomSheet();
@@ -64,14 +57,8 @@ export function HistoryMarketplaceModal({
 
   return (
     <>
-      <DefaultContainer hasHeader={false}>
-        <ButtonClose
-          onPress={closeBottomSheet}
-          style={{ alignSelf: "flex-end", marginBottom: 32 }}
-        >
-          <Title style={{ color: "white" }}>Fechar</Title>
-        </ButtonClose>
-        <Container title={"Produtos"}>
+      <DefaultContainer hasHeader={false} title="Produtos" closeModalFn={closeBottomSheet}>
+        <Content>
           <FlatList
             data={items}
             renderItem={({ item }) => (
@@ -90,7 +77,7 @@ export function HistoryMarketplaceModal({
           />
           <View>
             <TotalValue>
-              Valor total: {formatCurrency(selectedListMarketplace?.total)}
+              Valor total: {selectedListMarketplace?.total ? formatCurrency(selectedListMarketplace?.total) : "R$ 0,00"}
             </TotalValue>
           </View>
           <View style={{ marginBottom: 0, height: 60 }}>
@@ -98,7 +85,7 @@ export function HistoryMarketplaceModal({
               <Title>Usar lista novamente</Title>
             </Button>
           </View>
-        </Container>
+        </Content>
       </DefaultContainer>
     </>
   );

@@ -61,7 +61,7 @@ export function NewItemTask({
       .then(() => {
         Toast.show("Item adicionado!", { type: "success" });
         reset();
-        onCloseModal && onCloseModal();
+        !!closeBottomSheet && closeBottomSheet()
       })
       .catch((error) => {
         console.error("Erro ao adicionar o item: ", error);

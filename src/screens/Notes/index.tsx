@@ -10,6 +10,7 @@ import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { NewNotes } from "../NewNotes";
+import { Content } from "./styles";
 
 const screenWidth = Dimensions.get("screen").width;
 
@@ -52,27 +53,29 @@ export function Notes() {
 
   return (
     <DefaultContainer newNotes monthButton title="Notas">
-      <FlatList
-        data={notesUserMonth}
-        renderItem={({ item }) => (
-          <ItemNotes
-            onDelete={() => handleDeleteItem(item.id)}
-            onEdit={() => handleEditItem(item.id)}
-            title={item.name}
-            date={item.createdAt}
-            description={item.description}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 90 }}
-        ListEmptyComponent={
-          <LoadData
-            image="PRIMARY"
-            title="Desculpe!"
-            subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando uma nova anotação clicando em Adicione +."
-          />
-        }
-      />
+      <Content>
+        <FlatList
+          data={notesUserMonth}
+          renderItem={({ item }) => (
+            <ItemNotes
+              onDelete={() => handleDeleteItem(item.id)}
+              onEdit={() => handleEditItem(item.id)}
+              title={item.name}
+              date={item.createdAt}
+              description={item.description}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 90 }}
+          ListEmptyComponent={
+            <LoadData
+              image="PRIMARY"
+              title="Desculpe!"
+              subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando uma nova anotação clicando em Adicione +."
+            />
+          }
+        />
+      </Content>
 
       <Modal
         animationType="slide"

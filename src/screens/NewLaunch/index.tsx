@@ -100,7 +100,7 @@ export function NewLaunch({
       .then(() => {
         Toast.show("Item adicionado!", { type: "success" });
         reset();
-        onCloseModal && onCloseModal();
+        !!closeBottomSheet && closeBottomSheet()
       })
       .catch((error) => {
         console.error("Erro ao adicionar o item: ", error);
@@ -152,7 +152,7 @@ export function NewLaunch({
       })
       .then(() => {
         Toast.show("Item adicionado!", { type: "success" });
-        onCloseModal && onCloseModal();
+        !!closeBottomSheet && closeBottomSheet()
       })
       .catch((error) => {
         console.error("Erro ao adicionar o item: ", error);
@@ -176,7 +176,10 @@ export function NewLaunch({
           if (doc.exists) {
             const data = doc.data();
             if (data) {
-              setValue("valueItem", currencyMask(data.valueItem.toString())); // Ensure valueItem is a string and masked correctly
+              setValue("valueItem", data.valueItem.toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }));
               setValue("description", data.description || "");
               setValue("name", data.name);
               setIsEditing(true);

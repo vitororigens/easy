@@ -13,8 +13,6 @@ import {
   ButtonIcon,
   Content,
   ContentItems,
-  Divider,
-  Header,
   Icon,
   Items,
   Title,
@@ -44,7 +42,7 @@ export function Gears() {
             index: 0,
             routes: [{ name: "login" }],
           });
-        }, 1000); // Redireciona para "login" após 3 segundos
+        }, 1000);
       })
       .catch((error) => {
         console.error("Error signing out: ", error);
@@ -56,7 +54,21 @@ export function Gears() {
   }
 
   function handleDeleteUser() {
-    auth().currentUser?.delete();
+    auth()
+      .currentUser?.delete()
+      .then(() => {
+        storage.delete("user");
+        console.log("User deleted account");
+        setTimeout(() => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "login" }],
+          });
+        }, 1000);
+      })
+      .catch((error) => {
+        console.error("Error delete account: ", error);
+      });
   }
 
   function handlePiggyBank() {
@@ -76,9 +88,6 @@ export function Gears() {
         <Content>
           {user ? (
             <View>
-              <Header>
-                <Divider />
-              </Header>
               <ContentItems>
                 <ButtonIcon onPress={handleGraphics}>
                   <Items>

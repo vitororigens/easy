@@ -128,7 +128,7 @@ export function ListaDeContas() {
           >
             <Title style={{ color: "white" }}>Fechar</Title>
           </ButtonClose>
-          <Container type="SECONDARY" title={"Editar Saida"}>
+          <Container type="SECONDARY" title={"Editar Saída"}>
             <Expense
               selectedItemId={selectedItemId}
               showButtonRemove
