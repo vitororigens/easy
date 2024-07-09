@@ -23,7 +23,8 @@ export const Header = styled.View`
 
 export const NavBar = styled.View`
     width: 100%;
-    height: 60px;
+    min-height: 60px;
+    max-height: 80px;
     flex-direction: row;
     justify-content: space-between;
 

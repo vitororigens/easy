@@ -66,7 +66,8 @@ export const Items = styled.View`
   width: 100%;
   flex-direction: row;
   justify-content: space-between;
-  height: 40px;
+  min-height: 40px;
+  max-height: 80px;
   align-items: center;
   padding: 10px;
   margin-bottom: 5px;
