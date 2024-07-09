@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Modal, ScrollView, View } from "react-native";
+import { FlatList, Modal, View } from "react-native";
 //
 import { Content, SubTitle, Title } from "./styles";
 //
 import { DefaultContainer } from "../../components/DefaultContainer";
-import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
 //
 import { Toast } from "react-native-toast-notifications";
@@ -117,13 +116,7 @@ export function PiggyBank() {
 
           <View>
             {PiggyBankData.filter((item) => item.uid === uid).length === 0 ? (
-              <ScrollView>
-                <LoadData
-                  image="PRIMARY"
-                  title="Desculpe!"
-                  subtitle="Você ainda não possui lançamentos de entradas! Comece adicionando uma nova entrada."
-                />
-              </ScrollView>
+              null
             ) : (
               <FlatList
                 style={{ marginTop: -40 }}

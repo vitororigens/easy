@@ -286,7 +286,7 @@ export function Expense({
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView>
         <View>
           <TitleTask>Nome*</TitleTask>
           <Controller
@@ -296,22 +296,22 @@ export function Expense({
               <Input onBlur={onBlur} onChangeText={onChange} value={value} />
             )}
           />
-          <View>
-            <TitleTask>Valor*</TitleTask>
-            <Controller
-              control={control}
-              name="valueTransaction"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  value={value}
-                  onChangeText={(value) => onChange(currencyMask(value))}
-                  onBlur={onBlur}
-                  keyboardType="numeric"
-                  placeholder="0,00"
-                />
-              )}
-            />
-          </View>
+          <TitleTask>Valor*</TitleTask>
+          <Controller
+            control={control}
+            name="valueTransaction"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                value={value}
+                onChangeText={(value) => onChange(currencyMask(value))}
+                onBlur={onBlur}
+                keyboardType="numeric"
+                placeholder="0,00"
+              />
+            )}
+          />
+        </View>
+        <View>
           <TitleTask>Data* </TitleTask>
           <TouchableOpacity
             style={{ height: 50 }}
@@ -337,6 +337,8 @@ export function Expense({
               onChange={handleDateChange}
             />
           )}
+        </View>
+        <View style={{ marginTop: 40, marginBottom: 20 }}>
           <TitleTask>
             Adicionar esse lançamento a sua lista de contas recorrente?{" "}
             <Span>(opicional)</Span>
@@ -349,13 +351,7 @@ export function Expense({
             value={repeat}
             style={{ width: 50, marginBottom: 20 }}
           />
-        </View>
-        <View
-          style={{
-            marginTop: 30,
-            marginBottom: 30,
-          }}
-        >
+
           <View>
             <TouchableOpacity
               onPress={handleShowAdvanced}

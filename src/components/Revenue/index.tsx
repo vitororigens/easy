@@ -290,7 +290,7 @@ export function Revenue({
             )}
           />
           <TitleTask>
-            Valor <Span>(opicional)</Span>
+            Valor <Span>(opcional)</Span>
           </TitleTask>
           <Controller
             control={control}
