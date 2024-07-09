@@ -15,6 +15,7 @@ import {
   InputContainer,
   Title
 } from "./styles";
+import { LoadingIndicator } from "../../components/Loading/style";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -44,6 +45,7 @@ export function NewNotes({
   const user = useUserAuth();
   const uid = user?.uid;
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Hooks
   const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
@@ -56,6 +58,7 @@ export function NewNotes({
 
   // Functions
   const handleSaveItem = ({ name, description }: FormSchemaType) => {
+    setLoading(true)
     database
       .collection("Notes")
       .doc()
@@ -66,12 +69,14 @@ export function NewNotes({
         uid: uid,
       })
       .then(() => {
+        setLoading(false)
         Toast.show("Nota adicionada!", { type: "success" });
         reset();
         onCloseModal && onCloseModal();
         !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
+        setLoading(false)
         console.error("Erro ao adicionar o item: ", error);
       });
   };
@@ -81,16 +86,19 @@ export function NewNotes({
       console.error("Nenhum documento selecionado para exclusão!");
       return;
     }
+    setLoading(true)
 
     const expenseRef = database.collection("Notes").doc(selectedItemId);
     expenseRef
       .delete()
       .then(() => {
         Toast.show("Nota Excluída!", { type: "success" });
+        setLoading(false)
         onCloseModal && onCloseModal();
         !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
+        setLoading(false)
         console.error("Erro ao excluir o documento de item:", error);
       });
   };
@@ -100,6 +108,8 @@ export function NewNotes({
       console.error("Nenhum documento selecionado para edição!");
       return;
     }
+
+    setLoading(true)
 
     database
       .collection("Notes")
@@ -112,11 +122,13 @@ export function NewNotes({
       })
       .then(() => {
         Toast.show("Nota editada!", { type: "success" });
+        setLoading(false)
         reset();
         onCloseModal && onCloseModal();
         !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
+        setLoading(false)
         console.error("Erro ao adicionar o item: ", error);
       });
   };
@@ -200,7 +212,7 @@ export function NewNotes({
                         : handleSubmit(handleSaveItem, onInvalid)
                     }
                   >
-                    <Title>Salvar</Title>
+                    {loading ? <LoadingIndicator/> : <Title>Salvar</Title>}
                   </Button>
                 )}
                 {showButtonRemove && (

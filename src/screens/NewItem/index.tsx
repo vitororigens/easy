@@ -11,6 +11,8 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
 import { Button, Content, Input, Span, Title } from "./styles";
+import { Loading } from '../../components/Loading';
+import { LoadingIndicator } from '../../components/Loading/style';
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -46,6 +48,7 @@ export function NewItem({
   // States
   const [isEditing, setIsEditing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Hooks
   const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
@@ -55,7 +58,7 @@ export function NewItem({
       name: "",
       selectedCategory: "",
       amount: "1",
-      valueItem: "0",
+      valueItem: "",
       selectedMeasurements: "un",
     },
   });
@@ -76,6 +79,7 @@ export function NewItem({
     selectedMeasurements,
     valueItem,
   }: FormSchemaType) => {
+    setLoading(true)
     database
       .collection("Marketplace")
       .doc()
@@ -90,6 +94,7 @@ export function NewItem({
       })
       .then(() => {
         Toast.show("Item adicionado!", { type: "success" });
+        setLoading(false)
         reset();
         !!closeBottomSheet && closeBottomSheet()
       })
@@ -103,11 +108,13 @@ export function NewItem({
       console.error("Nenhum documento selecionado para exclusão!");
       return;
     }
+    setLoading(true)
 
     const expenseRef = database.collection("Marketplace").doc(selectedItemId);
     expenseRef
       .delete()
       .then(() => {
+        setLoading(false)
         Toast.show("Item Excluido!", { type: "success" });
         onCloseModal && onCloseModal();
       })
@@ -128,6 +135,7 @@ export function NewItem({
       console.error("Nenhum documento selecionado para edição!");
       return;
     }
+    setLoading(true)
 
     database
       .collection("Marketplace")
@@ -142,6 +150,7 @@ export function NewItem({
         uid,
       })
       .then(() => {
+        setLoading(false)
         Toast.show("Item adicionado!", { type: "success" });
         reset();
         onCloseModal && onCloseModal();
@@ -371,7 +380,7 @@ export function NewItem({
                       : handleSubmit(handleSaveItem, onInvalid)
                   }
                 >
-                  <Title>{isEditing ? "Salvar" : "Salvar"}</Title>
+                  <Title>{loading ? <LoadingIndicator/> : "Salvar"}</Title>
                 </Button>
               )}
               {showButtonRemove && (

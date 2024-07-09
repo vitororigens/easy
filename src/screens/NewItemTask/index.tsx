@@ -9,6 +9,7 @@ import { DefaultContainer } from "../../components/DefaultContainer";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { Button, Content, Input, Title } from "./styles";
+import { LoadingIndicator } from "../../components/Loading/style";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -37,6 +38,7 @@ export function NewItemTask({
   const user = useUserAuth();
   const uid = user?.uid;
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const formattedDate = format(new Date(), "dd/MM/yyyy");
   
@@ -50,6 +52,7 @@ export function NewItemTask({
 
   // Functions
   const handleSaveItem = ({ name }: FormSchemaType) => {
+    setLoading(true)
     database
       .collection("Task")
       .doc()
@@ -59,11 +62,13 @@ export function NewItemTask({
         createdAt: formattedDate,
       })
       .then(() => {
+        setLoading(false)
         Toast.show("Item adicionado!", { type: "success" });
         reset();
         !!closeBottomSheet && closeBottomSheet()
       })
       .catch((error) => {
+        setLoading(false)
         console.error("Erro ao adicionar o item: ", error);
       });
   };
@@ -73,20 +78,24 @@ export function NewItemTask({
       console.error("Nenhum documento selecionado para exclusão!");
       return;
     }
+    setLoading(true)
 
     const expenseRef = database.collection("Marketplace").doc(selectedItemId);
     expenseRef
       .delete()
       .then(() => {
+        setLoading(false)
         Toast.show("Item Excluido!", { type: "success" });
         onCloseModal && onCloseModal();
       })
       .catch((error) => {
+        setLoading(false)
         console.error("Erro ao excluir o documento de item:", error);
       });
   };
 
   const handleEditExpense = ({ name }: FormSchemaType) => {
+    setLoading(true)
     database
       .collection("Task")
       .doc(selectedItemId)
@@ -95,12 +104,14 @@ export function NewItemTask({
         uid: uid,
       })
       .then(() => {
+        setLoading(false)
         Toast.show("Item adicionado!", { type: "success" });
         reset();
         onCloseModal && onCloseModal();
         !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
+        setLoading(false)
         console.error("Erro ao adicionar o item: ", error);
       });
   };
@@ -168,7 +179,7 @@ export function NewItemTask({
                         : handleSubmit(handleSaveItem, onInvalid)
                     }
                   >
-                    <Title>{isEditing ? "Salvar" : "Salvar"}</Title>
+                    <Title>{loading ? <LoadingIndicator/> : "Salvar"}</Title>
                   </Button>
                 )}
                 {showButtonRemove && (

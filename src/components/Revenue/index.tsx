@@ -441,8 +441,7 @@ export function Revenue({
                   : handleSubmit(handleSaveRevenue, onInvalid)
               }
             >
-              <TitleTask>{isEditing ? "Salvar" : "Salvar"}</TitleTask>
-              {loading && <LoadingIndicator style={{ marginTop: 2 }} />}
+              <TitleTask>{loading ? <LoadingIndicator /> : "Salvar"}</TitleTask>
             </Button>
           )}
           {showButtonEdit && (

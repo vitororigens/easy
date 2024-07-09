@@ -25,6 +25,7 @@ import {
   Title,
   TitleTask,
 } from "./styles";
+import { LoadingIndicator } from "../Loading/style";
 
 export type ExpenseProps = {
   selectedItemId?: string;
@@ -45,6 +46,7 @@ const formSchema = z.object({
 
 type FormSchemaType = z.infer<typeof formSchema>;
 
+
 export function Expense({
   selectedItemId,
   showButtonRemove,
@@ -62,7 +64,7 @@ export function Expense({
   const [alert, setAlert] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const uid = user?.uid;
 
   // Hooks
@@ -97,6 +99,8 @@ export function Expense({
     description,
     selectedCategory,
   }: FormSchemaType) => {
+    setLoading(true);
+
     const [day, month, year] = formattedDate.split("/");
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
@@ -126,6 +130,7 @@ export function Expense({
       .add(expenseData)
       .then(() => {
         Toast.show("Transação adicionada!", { type: "success" });
+        setLoading(false);
         setRepeat(false);
         setAlert(false);
         setStatus(false);
@@ -134,6 +139,7 @@ export function Expense({
         !!onCloseModal && onCloseModal();
       })
       .catch((error) => {
+        setLoading(false);
         console.error("Erro ao adicionar a transação: ", error);
       });
 
@@ -194,6 +200,8 @@ export function Expense({
       console.error("Nenhum documento selecionado para edição!");
       return;
     }
+    setLoading(true);
+
 
     const [day, month, year] = formattedDate.split("/");
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
@@ -222,6 +230,7 @@ export function Expense({
       })
       .then(() => {
         Toast.show("Transação editada!", { type: "success" });
+        setLoading(false);
         setRepeat(false);
         setAlert(false);
         setStatus(false);
@@ -229,6 +238,7 @@ export function Expense({
         !!onCloseModal && onCloseModal();
       })
       .catch((error) => {
+        setLoading(false);
         console.error("Erro ao editar a transação: ", error);
       });
   };
@@ -505,7 +515,7 @@ export function Expense({
                   : handleSubmit(handleSaveExpense, onInvalid)
               }
             >
-              <TitleTask>{isEditing ? "Salvar" : "Salvar"}</TitleTask>
+              <TitleTask>{loading ? <LoadingIndicator /> : "Salvar"}</TitleTask>
             </Button>
           )}
           {showButtonEdit && (
@@ -514,6 +524,7 @@ export function Expense({
               onPress={handleSubmit(handleEditExpense, onInvalid)}
             >
               <TitleTask>Salvar</TitleTask>
+
             </Button>
           )}
           {showButtonRemove && (
