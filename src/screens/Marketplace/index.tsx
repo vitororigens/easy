@@ -290,7 +290,7 @@ export function Marketplace() {
       </Header>
       {activeButton === "lista" &&
         (data.filter((item) => item.uid === uid).length === 0 ? (
-          <ScrollView>
+          <ScrollView showsVerticalScrollIndicator={false}>
             <LoadData
               image="SECONDARY"
               title="Desculpe!"

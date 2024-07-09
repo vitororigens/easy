@@ -137,7 +137,7 @@ export function Home() {
       {activeButton === "receitas" && (
         <ContainerItems>
           {revenue.filter((item) => item.uid === uid).length === 0 ? (
-            <ScrollView>
+            <ScrollView showsVerticalScrollIndicator={false}>
               <LoadData
                 image="PRIMARY"
                 title="Desculpe!"
@@ -178,7 +178,7 @@ export function Home() {
       {activeButton === "despesas" && (
         <ContainerItems>
           {expense.filter((item) => item.uid === uid).length === 0 ? (
-            <ScrollView>
+            <ScrollView showsVerticalScrollIndicator={false}>
               <LoadData
                 image="SECONDARY"
                 title="Desculpe!"

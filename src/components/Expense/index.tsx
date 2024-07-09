@@ -299,7 +299,7 @@ export function Expense({
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <TitleTask>Nome*</TitleTask>
           <Controller
