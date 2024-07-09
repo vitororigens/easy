@@ -263,12 +263,15 @@ export function Expense({
                 })
               );
               setValue("description", data.description);
+
+              const [day, month, year] = data.date.split("/");
               setValue("formattedDate", data.date);
+
               setValue("selectedCategory", data.category);
               setRepeat(data.repeat);
               setAlert(data.alert);
               setStatus(data.status);
-              setDate(new Date(data.date));
+              setDate(new Date(year, month - 1, day));
               setIsEditing(true);
               setIncome(data.income);
             } else {
@@ -341,7 +344,7 @@ export function Expense({
         <View style={{ marginTop: 40, marginBottom: 20 }}>
           <TitleTask>
             Adicionar esse lançamento a sua lista de contas recorrente?{" "}
-            <Span>(opicional)</Span>
+            <Span>(opcional)</Span>
           </TitleTask>
           <Switch
             trackColor={{ false: "#767577", true: "#81b0ff" }}

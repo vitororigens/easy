@@ -259,10 +259,11 @@ export function Revenue({
                 })
               );
               setValue("description", data.description);
+              const [day, month, year] = data.date.split("/");
               setValue("formattedDate", data.date);
               setValue("selectedCategory", data.category);
               setRepeat(data.repeat);
-              setDate(new Date(data.date));
+              setDate(new Date(year, month - 1, day));
               setIsEditing(true);
             } else {
               console.log("Dados do documento estão vazios!");
