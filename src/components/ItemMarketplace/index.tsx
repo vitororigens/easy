@@ -12,6 +12,8 @@ import {
     ViewLeft,
     ViewRight,
 } from "./styles";
+import { formatCurrency } from "../../utils/formatCurrency";
+import { currencyMask } from "../../utils/currency";
 
 type ItemMarketplaceProps = {
   title: string;
@@ -106,7 +108,7 @@ export function ItemMarketplace({
               <Icon name="circle-with-plus" />
             </Button>
           )}
-          <Title style={{ textAlign: "center", width: 100 }}>R$ {value}</Title>
+          <Title style={{ textAlign: "center", width: 100 }}> {formatCurrency(String(value ?? "0"))}</Title>
         </Contant>
       </ViewRight>
     </Container>
