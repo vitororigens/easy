@@ -58,7 +58,7 @@ export function NewLaunch({
     defaultValues: {
       name: "",
       valueItem: "",
-      formattedDate: "",
+      formattedDate: date.toLocaleDateString("pt-BR"),
       description: "",
     },
   });
@@ -199,7 +199,7 @@ export function NewLaunch({
         });
     }
   }, [selectedItemId]);
-  
+
 
   return (
     <>
@@ -209,92 +209,98 @@ export function NewLaunch({
           showsVerticalScrollIndicator={false}
         >
 
-            <Content>
-              <Title>Nome*</Title>
-              <Controller
-                control={control}
-                name="name"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                  />
-                )}
-              />
+          <Content>
+            <Title>Nome*</Title>
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                />
+              )}
+            />
 
-              <Title>Valor</Title>
-              <Controller
-                control={control}
-                name="valueItem"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    value={value}
-                    onChangeText={(value) => onChange(currencyMask(value))}
-                    onBlur={onBlur}
-                    placeholder="0,00"
-                    keyboardType="numeric"
-                  />
-                )}
-              />
-              <View>
-                <Title>Data*</Title>
-                <TouchableOpacity
-                  style={{ height: 50 }}
-                  onPress={showDatePickerModal}
+            <Title>Valor</Title>
+            <Controller
+              control={control}
+              name="valueItem"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  value={value}
+                  onChangeText={(value) => onChange(currencyMask(value))}
+                  onBlur={onBlur}
+                  placeholder="0,00"
+                  keyboardType="numeric"
+                />
+              )}
+            />
+            <View>
+              <Title>Data*</Title>
+              <TouchableOpacity
+                style={{ height: 50 }}
+                onPress={showDatePickerModal}
+              >
+                <Controller
+                  control={control}
+                  name="formattedDate"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      editable={false}
+                    />
+                  )}
+                />
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={date}
+                  display="inline"
+                  mode="date"
+                  onChange={handleDateChange}
+                />
+              )}
+            </View>
+
+            <Title>Descrição</Title>
+            <Controller
+              control={control}
+              name="description"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                />
+              )}
+            />
+            <View style={{ marginBottom: 10, height: 150 }}>
+              {showButtonSave && (
+                <Button
+                  style={{ marginBottom: 10 }}
+                  onPress={
+                    isEditing
+                      ? handleSubmit(handleEditExpense, onInvalid)
+                      : handleSubmit(handleSaveItem, onInvalid)
+                  }
                 >
-                  <Controller
-                    control={control}
-                    name="formattedDate"
-                    render={({ field: { value } }) => (
-                      <Input value={value} editable={false} />
-                    )}
-                  />
-                </TouchableOpacity>
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={date}
-                    mode="date"
-                    onChange={handleDateChange}
-                  />
-                )}
-              </View>
-
-              <Title>Descrição</Title>
-              <Controller
-                control={control}
-                name="description"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                  />
-                )}
-              />
-              <View style={{ marginBottom: 10, height: 150 }}>
-                {showButtonSave && (
-                  <Button
-                    style={{ marginBottom: 10 }}
-                    onPress={
-                      isEditing
-                        ? handleSubmit(handleEditExpense, onInvalid)
-                        : handleSubmit(handleSaveItem, onInvalid)
-                    }
-                  >
-                    <Title>{isEditing ? "Salvar" : "Salvar"}</Title>
-                  </Button>
-                )}
-                {showButtonRemove && (
-                  <Button
-                    style={{ marginBottom: 10 }}
-                    onPress={handleDeleteExpense}
-                  >
-                    <Title>Excluir</Title>
-                  </Button>
-                )}
-              </View>
-            </Content>
+                  <Title>{isEditing ? "Salvar" : "Salvar"}</Title>
+                </Button>
+              )}
+              {showButtonRemove && (
+                <Button
+                  style={{ marginBottom: 10 }}
+                  onPress={handleDeleteExpense}
+                >
+                  <Title>Excluir</Title>
+                </Button>
+              )}
+            </View>
+          </Content>
         </ScrollView>
       </DefaultContainer>
     </>

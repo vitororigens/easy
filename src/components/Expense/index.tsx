@@ -148,24 +148,24 @@ export function Expense({
       for (let i = 1; i <= 11; i++) {
         let nextMonth = monthNumber + i;
         let nextYear: any = year;
-    
+
         if (nextMonth > 12) {
           nextMonth -= 12;
           nextYear++;
         }
-    
+
         // Adiciona verificação para garantir que não passe do ano corrente
         if (nextYear > year) {
           break;
         }
-    
+
         const nextDate = `${day}/${nextMonth}/${nextYear}`;
         const nextMonthExpenseData = {
           ...expenseData,
           date: nextDate,
           month: nextMonth,
         };
-    
+
         database
           .collection("Expense")
           .add(nextMonthExpenseData)
@@ -331,25 +331,29 @@ export function Expense({
         </View>
         <View>
           <TitleTask>Data* </TitleTask>
-          <TouchableOpacity
-            style={{ height: 50 }}
-            onPress={showDatePickerModal}
-          >
-            <Controller
-              control={control}
-              name="formattedDate"
-              render={({ field: { onChange, onBlur, value } }) => (
+
+          <Controller
+            control={control}
+            name="formattedDate"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TouchableOpacity
+                style={{ height: 50, }}
+                onPress={showDatePickerModal}
+              >
                 <Input
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
                   editable={false}
+                  onFocus={showDatePickerModal} 
                 />
-              )}
-            />
-          </TouchableOpacity>
+              </TouchableOpacity>
+            )}
+          />
+
           {showDatePicker && (
             <DateTimePicker
+              display="inline"
               value={date}
               mode="date"
               onChange={handleDateChange}
@@ -397,7 +401,7 @@ export function Expense({
                   <TitleTask style={{ marginTop: 20 }}>
                     Categorias <Span>(opcional)</Span>
                   </TitleTask>
-                  <View style={{ height: 50 }}>
+                  <View style={{ height: 50, justifyContent: 'center' }}>
                     <Controller
                       control={control}
                       name="selectedCategory"

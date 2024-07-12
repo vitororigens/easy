@@ -333,7 +333,7 @@ export function Revenue({
             <DateTimePicker
               value={date}
               mode="date"
-              display="calendar"
+              display="inline"
               onChange={handleDateChange}
             />
           )}
@@ -364,7 +364,7 @@ export function Revenue({
                   <TitleTask style={{ marginTop: 20 }}>
                     Categorias <Span>(opicional)</Span>{" "}
                   </TitleTask>
-                  <View style={{ height: 50 }}>
+                  <View style={{ height: 50, justifyContent: 'center' }}>
                     <Controller
                       control={control}
                       name="selectedCategory"

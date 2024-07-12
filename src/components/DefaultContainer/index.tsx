@@ -1,11 +1,12 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { ReactNode, useState } from "react";
-import { Modal } from "react-native";
+import { Modal, Platform, View } from "react-native";
 import { NewItem } from "../../screens/NewItem";
 import { NewItemTask } from "../../screens/NewItemTask";
 import { NewLaunch } from "../../screens/NewLaunch";
 import { NewNotes } from "../../screens/NewNotes";
 import { Filter } from "../Filter";
+
 import {
   Button,
   ButtonBack,
@@ -18,6 +19,7 @@ import {
   Title,
   ViewHomeCenter,
 } from "./style";
+import { useTheme } from "styled-components/native";
 
 type DefaultContainerProps = {
   children: ReactNode;
@@ -57,6 +59,7 @@ export function DefaultContainer({
   hasHeader = true,
 }: DefaultContainerProps) {
   const navigation = useNavigation();
+  const {COLORS} = useTheme()
   const [showNewItemModal, setShowNewItemModal] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [showNewItemMarketplace, setShowNewItemMarketplace] = useState(false);
@@ -215,7 +218,13 @@ export function DefaultContainer({
         visible={showFilterPickerModal}
         onRequestClose={closeModals}
       >
-        <Filter closeBottomSheet={closeModals} />
+        <View style={{
+          flex: 1,
+          paddingTop: Platform.OS === 'ios' ? 20 : 0,
+          backgroundColor: COLORS.PURPLE_800
+        }}>
+          <Filter closeBottomSheet={closeModals} />
+        </View>
       </Modal>
 
       <Modal
@@ -224,7 +233,12 @@ export function DefaultContainer({
         visible={showNewItemModal}
         onRequestClose={closeModals}
       >
-        <NewItemTask showButtonSave closeBottomSheet={closeModals} />
+        <View style={{
+          flex: 1,
+          paddingTop: Platform.OS === 'ios' ? 20 : 0
+        }}>
+          <NewItemTask showButtonSave closeBottomSheet={closeModals} />
+        </View>
       </Modal>
       <Modal
         animationType="slide"
@@ -232,7 +246,12 @@ export function DefaultContainer({
         visible={showNewLaunchModal}
         onRequestClose={closeModals}
       >
-        <NewLaunch closeBottomSheet={closeModals} showButtonSave />
+        <View style={{
+          flex: 1,
+          paddingTop: Platform.OS === 'ios' ? 20 : 0
+        }}>
+          <NewLaunch closeBottomSheet={closeModals} showButtonSave />
+        </View>
       </Modal>
       <Modal
         animationType="slide"
@@ -240,7 +259,13 @@ export function DefaultContainer({
         visible={showNewItemMarketplace}
         onRequestClose={closeModals}
       >
-        <NewItem showButtonSave closeBottomSheet={closeModals} />
+        <View style={{
+          flex: 1,
+          paddingTop: Platform.OS === 'ios' ? 20 : 0
+        }}>
+          <NewItem showButtonSave closeBottomSheet={closeModals} />
+
+        </View>
       </Modal>
       <Modal
         animationType="slide"
@@ -248,7 +273,12 @@ export function DefaultContainer({
         visible={showNotesModal}
         onRequestClose={closeModals}
       >
-        <NewNotes showButtonSave closeBottomSheet={closeModals} />
+        <View style={{
+          flex: 1,
+          paddingTop: Platform.OS === 'ios' ? 20 : 0
+        }}>
+          <NewNotes showButtonSave closeBottomSheet={closeModals} />
+        </View>
       </Modal>
     </Container>
   );

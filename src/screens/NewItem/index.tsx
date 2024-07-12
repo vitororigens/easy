@@ -312,6 +312,10 @@ export function NewItem({
                   Categoria <Span> (opcional)</Span>
                 </Title>
 
+                <View style={{
+                  height: 50,
+                  justifyContent: 'center'
+                }}>
                 <Controller
                   control={control}
                   name="selectedCategory"
@@ -355,6 +359,7 @@ export function NewItem({
                     />
                   )}
                 />
+                </View>
 
                 <Title>
                   Observação <Span> (opcional)</Span>

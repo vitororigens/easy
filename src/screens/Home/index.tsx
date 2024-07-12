@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Modal, ScrollView, TouchableOpacity } from "react-native";
+import { FlatList, Modal, Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Expense } from "../../components/Expense";
@@ -23,10 +23,12 @@ import {
   SubTitle,
   Title,
 } from "./styles";
+import { useTheme } from "styled-components/native";
 
 export function Home() {
   const user = useUserAuth();
   const uid = user?.uid;
+  const {COLORS} = useTheme()
   const [activeButton, setActiveButton] = useState("receitas");
   const { selectedMonth } = useMonth();
   const revenue = useFirestoreCollection("Revenue");
@@ -235,7 +237,13 @@ export function Home() {
         visible={showNewTaskModal}
         onRequestClose={closeNewTaskModal}
       >
+        <View style={{
+          flex: 1,
+          paddingTop: Platform.OS === 'ios' ? 20 : 0,
+          backgroundColor: COLORS.PURPLE_800
+        }}>
         <NewTask closeBottomSheet={closeNewTaskModal} initialActiveButton={activeButton}  />
+        </View>
       </Modal>
       <Modal
         visible={confirmRevenueVisible}
