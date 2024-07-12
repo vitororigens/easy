@@ -13,6 +13,7 @@ import {
 import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
+import { useMonth } from "../../context/MonthProvider";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
@@ -46,7 +47,6 @@ const formSchema = z.object({
 
 type FormSchemaType = z.infer<typeof formSchema>;
 
-
 export function Expense({
   selectedItemId,
   showButtonRemove,
@@ -56,12 +56,14 @@ export function Expense({
 }: ExpenseProps) {
   // States
   const user = useUserAuth();
+  const { selectedMonth } = useMonth()
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [repeat, setRepeat] = useState(false);
   const [income, setIncome] = useState(false);
   const [status, setStatus] = useState(false);
   const [alert, setAlert] = useState(false);
+  const [removeRepeat, setRemoveRepeat] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -194,7 +196,7 @@ export function Expense({
       });
   };
 
-  const handleEditExpense = ({
+  const handleEditExpense = async ({
     formattedDate,
     name,
     valueTransaction,
@@ -206,48 +208,64 @@ export function Expense({
       return;
     }
     setLoading(true);
-
-
+  
     const [day, month, year] = formattedDate.split("/");
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
-
+  
     const transactionValue = valueTransaction
       ? currencyUnMask(valueTransaction)
       : 0;
-
-    database
-      .collection("Expense")
-      .doc(selectedItemId)
-      .set({
-        name: name,
+  
+    try {
+      const expenseData = {
+        name,
         category: selectedCategory,
         date: formattedDate,
         valueTransaction: transactionValue,
-        description: description,
-        repeat: repeat,
-        status: status,
-        alert: alert,
+        description,
+        repeat: removeRepeat ? false : repeat,
+        status,
+        alert,
         type: "output",
-        uid: uid,
+        uid,
         month: monthNumber,
         income,
-      })
-      .then(() => {
-        Toast.show("Transação editada!", { type: "success" });
-        setLoading(false);
-        setRepeat(false);
-        setAlert(false);
-        setStatus(false);
-        setIncome(false);
-        !!onCloseModal && onCloseModal();
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.error("Erro ao editar a transação: ", error);
-      });
+      };
+  
+      await database.collection("Expense").doc(selectedItemId).set(expenseData);
+      Toast.show("Transação editada!", { type: "success" });
+  
+      if (removeRepeat) {
+        const expensesSnapshot = await database
+          .collection("Expense")
+          .where("uid", "==", uid)
+          .where("name", "==", name)
+          .get();
+  
+        const batch = database.batch();
+        expensesSnapshot.forEach((doc) => {
+          const expenseMonth = doc.data().month;
+          if (expenseMonth !== selectedMonth) {
+            batch.delete(doc.ref);
+          }
+        });
+  
+        await batch.commit();
+      }
+  
+      setLoading(false);
+      setRepeat(false);
+      setAlert(false);
+      setStatus(false);
+      setIncome(false);
+      !!onCloseModal && onCloseModal();
+    } catch (error) {
+      setLoading(false);
+      console.error("Erro ao editar a transação: ", error);
+    }
   };
-
+  
   const onInvalid = () => {
     Alert.alert(
       "Atenção!",
@@ -337,7 +355,7 @@ export function Expense({
             name="formattedDate"
             render={({ field: { onChange, onBlur, value } }) => (
               <TouchableOpacity
-                style={{ height: 50, }}
+                style={{ height: 50 }}
                 onPress={showDatePickerModal}
               >
                 <Input
@@ -345,7 +363,7 @@ export function Expense({
                   onChangeText={onChange}
                   onBlur={onBlur}
                   editable={false}
-                  onFocus={showDatePickerModal} 
+                  onFocus={showDatePickerModal}
                 />
               </TouchableOpacity>
             )}
@@ -361,18 +379,38 @@ export function Expense({
           )}
         </View>
         <View style={{ marginTop: 40, marginBottom: 20 }}>
-          <TitleTask>
-            Adicionar esse lançamento a sua lista de contas recorrente?{" "}
-            <Span>(opcional)</Span>
-          </TitleTask>
-          <Switch
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={repeat ? "#f5dd4b" : "#f4f3f4"}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={() => setRepeat(!repeat)}
-            value={repeat}
-            style={{ width: 50, marginBottom: 20 }}
-          />
+          {!isEditing && (
+            <>
+              <TitleTask>
+                Adicionar esse lançamento a sua lista de contas recorrentes?{" "}
+                <Span>(opcional)</Span>
+              </TitleTask>
+              <Switch
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={repeat ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={() => setRepeat(!repeat)}
+                value={repeat}
+                style={{ width: 50, marginBottom: 20 }}
+              />
+            </>
+          )}
+
+          {isEditing && repeat && (
+            <>
+              <TitleTask>
+                Remover da lista de despesas recorrentes <Span>(opcional)</Span>
+              </TitleTask>
+              <Switch
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={removeRepeat ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={() => setRemoveRepeat(!removeRepeat)}
+                value={removeRepeat}
+                style={{ width: 50 }}
+              />
+            </>
+          )}
 
           <View>
             <TouchableOpacity
@@ -398,10 +436,10 @@ export function Expense({
             <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <View style={{ width: "50%" }}>
                 <View>
-                  <TitleTask style={{ marginTop: 20 }}>
+                  <TitleTask>
                     Categorias <Span>(opcional)</Span>
                   </TitleTask>
-                  <View style={{ height: 50, justifyContent: 'center' }}>
+                  <View style={{ height: 50, justifyContent: "center" }}>
                     <Controller
                       control={control}
                       name="selectedCategory"
@@ -533,7 +571,6 @@ export function Expense({
               onPress={handleSubmit(handleEditExpense, onInvalid)}
             >
               <TitleTask>Salvar</TitleTask>
-
             </Button>
           )}
           {showButtonRemove && (

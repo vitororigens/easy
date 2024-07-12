@@ -13,6 +13,7 @@ import {
 import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
+import { useMonth } from "../../context/MonthProvider";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
@@ -54,12 +55,14 @@ export function Revenue({
 }: RevenueProps) {
   // States
   const user = useUserAuth();
+  const { selectedMonth } = useMonth();
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [repeat, setRepeat] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [removeRepeat, setRemoveRepeat] = useState(false);
   const uid = user?.uid;
 
   // Hooks
@@ -112,12 +115,10 @@ export function Revenue({
       date: formattedDate,
       valueTransaction: transactionValue,
       description: description,
-      repeat: repeat,
+      repeat,
       type: "input",
       month: monthNumber,
     };
-
-    console.log(revenueData);
 
     // Salva o lançamento de receita para o mês atual
     database
@@ -167,7 +168,7 @@ export function Revenue({
     }
   }
 
-  function handleEditRevenue({
+  async function handleEditRevenue({
     formattedDate,
     name,
     valueTransaction,
@@ -187,29 +188,48 @@ export function Revenue({
       ? currencyUnMask(valueTransaction)
       : 0;
 
-    database
-      .collection("Revenue")
-      .doc(selectedItemId)
-      .set({
-        name: name,
+    try {
+      const revenueData = {
+        name,
         category: selectedCategory,
         uid: uid,
         date: formattedDate,
         valueTransaction: transactionValue,
         description: description,
-        repeat: repeat,
+        repeat: removeRepeat ? false : repeat,
         type: "input",
         month: monthNumber,
-      })
-      .then(() => {
-        Toast.show("Transação editada!", { type: "success" });
-        setRepeat(false);
-        setIsEditing(false);
-        !!onCloseModal && onCloseModal();
-      })
-      .catch((error) => {
-        console.error("Erro ao editar a transação: ", error);
-      });
+      };
+
+      await database.collection("Revenue").doc(selectedItemId).set(revenueData);
+      Toast.show("Transação editada!", { type: "success" });
+
+      if (removeRepeat) {
+        const revenuesSnapshot = await database
+          .collection("Revenue")
+          .where("uid", "==", uid)
+          .where("name", "==", name)
+          .get();
+
+        const batch = database.batch();
+        revenuesSnapshot.forEach((doc) => {
+          const revenueMonth = doc.data().month;
+          if (revenueMonth !== selectedMonth) {
+            batch.delete(doc.ref);
+          }
+        });
+
+        await batch.commit();
+      }
+
+      setLoading(false);
+      setRepeat(false);
+      setIsEditing(false);
+      !!onCloseModal && onCloseModal();
+    } catch (error) {
+      setLoading(false);
+      console.error("Erro ao editar a transação: ", error);
+    }
   }
 
   function handleDeleteRevenue() {
@@ -333,7 +353,7 @@ export function Revenue({
             <DateTimePicker
               value={date}
               mode="date"
-              display="inline"
+              display="calendar"
               onChange={handleDateChange}
             />
           )}
@@ -361,10 +381,10 @@ export function Revenue({
             <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <View style={{ width: "50%" }}>
                 <View>
-                  <TitleTask style={{ marginTop: 20 }}>
+                  <TitleTask>
                     Categorias <Span>(opicional)</Span>{" "}
                   </TitleTask>
-                  <View style={{ height: 50, justifyContent: 'center' }}>
+                  <View style={{ height: 50 }}>
                     <Controller
                       control={control}
                       name="selectedCategory"
@@ -392,19 +412,38 @@ export function Revenue({
                 </View>
               </View>
               <DividerTask />
-              <View style={{ width: "40%" }}>
-                <TitleTask>
-                  Repetir essa receita? <Span>(opicional)</Span>
-                </TitleTask>
-                <Switch
-                  trackColor={{ false: "#767577", true: "#81b0ff" }}
-                  thumbColor={repeat ? "#f5dd4b" : "#f4f3f4"}
-                  ios_backgroundColor="#3e3e3e"
-                  onValueChange={() => setRepeat(!repeat)}
-                  value={repeat}
-                  style={{ width: 50 }}
-                />
-              </View>
+              {(!isEditing || !repeat) && (
+                <View style={{ width: "40%" }}>
+                  <TitleTask>
+                    Repetir essa receita? <Span>(opicional)</Span>
+                  </TitleTask>
+                  <Switch
+                    trackColor={{ false: "#767577", true: "#81b0ff" }}
+                    thumbColor={repeat ? "#f5dd4b" : "#f4f3f4"}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={() => setRepeat(!repeat)}
+                    value={repeat}
+                    style={{ width: 50 }}
+                  />
+                </View>
+              )}
+
+              {isEditing && repeat && (
+                <View style={{ width: "40%" }}>
+                  <TitleTask>
+                    Remover da lista de receitas recorrentes{" "}
+                    <Span>(opcional)</Span>
+                  </TitleTask>
+                  <Switch
+                    trackColor={{ false: "#767577", true: "#81b0ff" }}
+                    thumbColor={removeRepeat ? "#f5dd4b" : "#f4f3f4"}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={() => setRemoveRepeat(!removeRepeat)}
+                    value={removeRepeat}
+                    style={{ width: 50 }}
+                  />
+                </View>
+              )}
             </View>
             <View style={{ marginBottom: 5 }}>
               <TitleTask>
