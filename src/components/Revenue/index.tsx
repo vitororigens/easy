@@ -135,16 +135,19 @@ export function Revenue({
         console.error("Erro ao adicionar a transação: ", error);
       });
 
-    // Se o interruptor de repetição estiver ativado, cria cópias para os próximos 11 meses
     if (repeat) {
       for (let i = 1; i <= 11; i++) {
-        // Obtém o próximo mês e ano
         let nextMonth = monthNumber + i;
         let nextYear: any = year;
 
         if (nextMonth > 12) {
           nextMonth -= 12;
           nextYear++;
+        }
+
+        // Adiciona verificação para garantir que não passe do ano corrente
+        if (nextYear > year) {
+          break;
         }
 
         const nextDate = `${day}/${nextMonth}/${nextYear}`;
@@ -280,7 +283,7 @@ export function Revenue({
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView>
         <View>
           <TitleTask>Nome*</TitleTask>
           <Controller
@@ -441,7 +444,8 @@ export function Revenue({
                   : handleSubmit(handleSaveRevenue, onInvalid)
               }
             >
-              <TitleTask>{loading ? <LoadingIndicator /> : "Salvar"}</TitleTask>
+              <TitleTask>{isEditing ? "Salvar" : "Salvar"}</TitleTask>
+              {loading && <LoadingIndicator style={{ marginTop: 2 }} />}
             </Button>
           )}
           {showButtonEdit && (

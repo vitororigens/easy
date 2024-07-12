@@ -5,7 +5,6 @@ import { NewItem } from "../../screens/NewItem";
 import { NewItemTask } from "../../screens/NewItemTask";
 import { NewLaunch } from "../../screens/NewLaunch";
 import { NewNotes } from "../../screens/NewNotes";
-import { NewTask } from "../../screens/NewTask";
 import { Filter } from "../Filter";
 import {
   Button,
@@ -36,6 +35,7 @@ type DefaultContainerProps = {
   subtitle?: string;
   type?: "PRIMARY" | "SECONDARY";
   closeModalFn?: () => void;
+  addActionFn?: () => void
 };
 
 export function DefaultContainer({
@@ -43,6 +43,7 @@ export function DefaultContainer({
   title,
   subtitle,
   closeModalFn,
+  addActionFn,
   type = "PRIMARY",
   newNotes = false,
   newItemMarketplace = false,
@@ -56,7 +57,6 @@ export function DefaultContainer({
   hasHeader = true,
 }: DefaultContainerProps) {
   const navigation = useNavigation();
-  const [showNewTaskModal, setShowNewTaskModal] = useState(false);
   const [showNewItemModal, setShowNewItemModal] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [showNewItemMarketplace, setShowNewItemMarketplace] = useState(false);
@@ -65,7 +65,6 @@ export function DefaultContainer({
   const [showFilterPickerModal, setShowFilterPickerModal] = useState(false);
 
   function closeModals() {
-    setShowNewTaskModal(false);
     setShowNewItemModal(false);
     setShowNewLaunchModal(false);
     setShowNewItemMarketplace(false);
@@ -76,10 +75,6 @@ export function DefaultContainer({
 
   function handleGoBack() {
     navigation.goBack();
-  }
-
-  function handleNewTask() {
-    setShowNewTaskModal(true);
   }
 
   function handleNewItem() {
@@ -124,20 +119,6 @@ export function DefaultContainer({
           </ViewHomeCenter>
         )}
 
-        {addButton && (
-          <Button
-            style={{
-              alignItems: "center",
-              flexDirection: "row",
-              height: 60,
-              width: "35%",
-            }}
-            onPress={handleNewTask}
-          >
-            <Icon name="add-outline" />
-          </Button>
-        )}
-
         {newItem && (
           <Button
             style={{
@@ -150,6 +131,18 @@ export function DefaultContainer({
             <Icon name="add-outline" />
           </Button>
         )}
+        {addActionFn && (
+          <Button
+            style={{
+              alignItems: "center",
+              flexDirection: "row",
+              height: 60,
+            }}
+            onPress={addActionFn}
+          >
+            <Icon name="add-outline" />
+          </Button>
+        )}
         {newLaunch && (
           <Button
             style={{
@@ -157,7 +150,7 @@ export function DefaultContainer({
               flexDirection: "row",
               height: 60,
               position: "absolute",
-              right: 0
+              right: 0,
             }}
             onPress={handleNewLaunch}
           >
@@ -224,14 +217,7 @@ export function DefaultContainer({
       >
         <Filter closeBottomSheet={closeModals} />
       </Modal>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showNewTaskModal}
-        onRequestClose={closeModals}
-      >
-        <NewTask closeBottomSheet={closeModals} />
-      </Modal>
+
       <Modal
         animationType="slide"
         transparent={true}

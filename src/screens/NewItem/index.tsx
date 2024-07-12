@@ -7,12 +7,11 @@ import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
 import { DefaultContainer } from "../../components/DefaultContainer";
+import { LoadingIndicator } from '../../components/Loading/style';
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
 import { Button, Content, Input, Span, Title } from "./styles";
-import { Loading } from '../../components/Loading';
-import { LoadingIndicator } from '../../components/Loading/style';
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -252,7 +251,7 @@ export function NewItem({
                     }}
                   >
                     <Title>
-                      Quantidade<Span> (opicional)</Span>
+                      Quantidade<Span> (opcional)</Span>
                     </Title>
                     <Controller
                       control={control}
@@ -293,7 +292,7 @@ export function NewItem({
                   </View>
                 </View>
                 <Title>
-                  Preço <Span> (opicional)</Span>
+                  Preço <Span> (opcional)</Span>
                 </Title>
                 <Controller
                   control={control}
@@ -310,7 +309,7 @@ export function NewItem({
                 />
 
                 <Title>
-                  Categoria <Span> (opicional)</Span>
+                  Categoria <Span> (opcional)</Span>
                 </Title>
 
                 <Controller
@@ -358,7 +357,7 @@ export function NewItem({
                 />
 
                 <Title>
-                  Observação <Span> (opicional)</Span>
+                  Observação <Span> (opcional)</Span>
                 </Title>
                 <Controller
                   control={control}

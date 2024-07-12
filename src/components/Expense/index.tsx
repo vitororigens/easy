@@ -16,6 +16,7 @@ import { z } from "zod";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
+import { LoadingIndicator } from "../Loading/style";
 import {
   Button,
   DividerTask,
@@ -25,7 +26,6 @@ import {
   Title,
   TitleTask,
 } from "./styles";
-import { LoadingIndicator } from "../Loading/style";
 
 export type ExpenseProps = {
   selectedItemId?: string;
@@ -148,19 +148,24 @@ export function Expense({
       for (let i = 1; i <= 11; i++) {
         let nextMonth = monthNumber + i;
         let nextYear: any = year;
-
+    
         if (nextMonth > 12) {
           nextMonth -= 12;
           nextYear++;
         }
-
+    
+        // Adiciona verificação para garantir que não passe do ano corrente
+        if (nextYear > year) {
+          break;
+        }
+    
         const nextDate = `${day}/${nextMonth}/${nextYear}`;
         const nextMonthExpenseData = {
           ...expenseData,
           date: nextDate,
           month: nextMonth,
         };
-
+    
         database
           .collection("Expense")
           .add(nextMonthExpenseData)
@@ -390,7 +395,7 @@ export function Expense({
               <View style={{ width: "50%" }}>
                 <View>
                   <TitleTask style={{ marginTop: 20 }}>
-                    Categorias <Span>(opicional)</Span>
+                    Categorias <Span>(opcional)</Span>
                   </TitleTask>
                   <View style={{ height: 50 }}>
                     <Controller
@@ -449,7 +454,7 @@ export function Expense({
               <DividerTask />
               <View style={{ width: "50%" }}>
                 <TitleTask>
-                  Essa conta já está paga? <Span>(opicional)</Span>
+                  Essa conta já está paga? <Span>(opcional)</Span>
                 </TitleTask>
                 <Switch
                   trackColor={{ false: "#767577", true: "#81b0ff" }}
@@ -460,7 +465,7 @@ export function Expense({
                   style={{ width: 50 }}
                 />
                 <TitleTask>
-                  Lembrete? <Span>(opicional)</Span>
+                  Lembrete? <Span>(opcional)</Span>
                 </TitleTask>
                 <Switch
                   trackColor={{ false: "#767577", true: "#81b0ff" }}
@@ -471,7 +476,7 @@ export function Expense({
                   style={{ width: 50 }}
                 />
                 <TitleTask>
-                  Despesa fixa? <Span>(opicional)</Span>
+                  Despesa fixa? <Span>(opcional)</Span>
                 </TitleTask>
                 <Switch
                   trackColor={{ false: "#767577", true: "#81b0ff" }}

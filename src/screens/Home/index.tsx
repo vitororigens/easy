@@ -13,6 +13,7 @@ import { useTotalValue } from "../../hooks/useTotalValue";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { NewTask } from "../NewTask";
 import {
   Button,
   ContainerItems,
@@ -34,6 +35,7 @@ export function Home() {
   const { tolalRevenueMunth, totalExpenseMunth } = useTotalValue(
     uid || "Não foi possivel encontrar o uid"
   );
+  const [showNewTaskModal, setShowNewTaskModal] = useState(false);
   const [confirmRevenueVisible, setConfirmRevenueVisible] = useState(false);
   const [confirmExpenseVisible, setConfirmExpenseVisible] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
@@ -52,6 +54,14 @@ export function Home() {
     style: "currency",
     currency: "BRL",
   });
+
+  function handleNewTaskModal() {
+    setShowNewTaskModal(true);
+  }
+
+  function closeNewTaskModal() {
+    setShowNewTaskModal(false);
+  }
 
   function handleRevenueConfirmation(documentId: string) {
     setConfirmRevenueVisible(true);
@@ -100,19 +110,17 @@ export function Home() {
     return () => clearTimeout(timer);
   }, []);
 
-  console.log(uid);
-
   if (!isLoaded || uid === undefined) {
     return <Loading />;
   }
 
   return (
     <DefaultContainer
-      addButton
       monthButton
       title={activeButton === "receitas" ? "Receitas" : "Despesas"}
       type="SECONDARY"
       subtitle={formattedTotalValue}
+      addActionFn={handleNewTaskModal}
     >
       <Header>
         <NavBar>
@@ -221,7 +229,14 @@ export function Home() {
           )}
         </ContainerItems>
       )}
-
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showNewTaskModal}
+        onRequestClose={closeNewTaskModal}
+      >
+        <NewTask closeBottomSheet={closeNewTaskModal} initialActiveButton={activeButton}  />
+      </Modal>
       <Modal
         visible={confirmRevenueVisible}
         onRequestClose={() => setConfirmRevenueVisible(false)}
@@ -245,7 +260,11 @@ export function Home() {
         visible={confirmExpenseVisible}
         onRequestClose={() => setConfirmExpenseVisible(false)}
       >
-        <DefaultContainer hasHeader={false} title="Editar Saída" closeModalFn={() => setConfirmExpenseVisible(false)}>
+        <DefaultContainer
+          hasHeader={false}
+          title="Editar Saída"
+          closeModalFn={() => setConfirmExpenseVisible(false)}
+        >
           <Content>
             <Expense
               selectedItemId={selectedItemId}

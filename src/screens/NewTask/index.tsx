@@ -8,10 +8,11 @@ import { Revenue } from "../../components/Revenue";
 
 type Props = {
   closeBottomSheet?: () => void;
+  initialActiveButton: string
 };
 
-export function NewTask({ closeBottomSheet }: Props) {
-  const [activeButton, setActiveButton] = useState("receitas");
+export function NewTask({ closeBottomSheet, initialActiveButton }: Props) {
+  const [activeButton, setActiveButton] = useState(initialActiveButton);
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
