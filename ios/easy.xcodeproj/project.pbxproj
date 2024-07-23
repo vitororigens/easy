@@ -383,11 +383,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = easy/easy.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 2Q36QR99W2;
+				DEVELOPMENT_TEAM = QACJF6C2W5;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -411,7 +409,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.easy.io.app;
 				PRODUCT_NAME = easy;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "*[expo] com.easy.io.app AppStore 2024-07-15T23:25:33.713Z";
 				SWIFT_OBJC_BRIDGING_HEADER = "easy/easy-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -428,11 +425,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = easy/easy.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 2Q36QR99W2;
+				DEVELOPMENT_TEAM = QACJF6C2W5;
 				INFOPLIST_FILE = easy/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Easy - Finanças Pessoais";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
@@ -451,7 +446,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.easy.io.app;
 				PRODUCT_NAME = easy;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "*[expo] com.easy.io.app AppStore 2024-07-15T23:25:33.713Z";
 				SWIFT_OBJC_BRIDGING_HEADER = "easy/easy-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
