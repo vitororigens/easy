@@ -26,6 +26,7 @@ import { useMonth } from "../../context/MonthProvider";
 import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
 import theme from "../../theme";
 import { NewItemTask } from "../NewItemTask";
+import { useNavigation } from "@react-navigation/native";
 
 type SelectedItems = {
   [key: string]: boolean;
@@ -35,7 +36,7 @@ const modalBottom = Platform.OS === "ios" ? 90 : 70;
 
 export function ListTask() {
   const { selectedMonth } = useMonth();
-
+  const navigation = useNavigation()
   const [activeButton, setActiveButton] = useState("tarefas");
   const [selectedItems, setSelectedItems] = useState<{
     [key: string]: boolean;
@@ -78,15 +79,6 @@ export function ListTask() {
     setActiveButton(buttonName);
   };
 
-  // function handleCheckAll() {
-  //   const newSelectedItems = {};
-  //   data.forEach((item) => {
-  //     if (item.uid === uid) {
-  //       newSelectedItems[item.id] = true;
-  //     }
-  //   });
-  //   setSelectedItems(newSelectedItems);
-  // }
 
   function handleUncheckAll() {
     setSelectedItems({});
@@ -103,8 +95,8 @@ export function ListTask() {
   }
 
   function handleEditItem(documentId: string) {
-    setShowTaskModal(true);
-    setSelectedItemId(documentId);
+    navigation.navigate("newitemtask", { selectedItemId: documentId });
+    console.log(selectedItemId)
   }
 
   function handleDeleteItem(documentId: string) {

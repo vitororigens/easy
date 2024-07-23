@@ -10,6 +10,7 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { Button, Content, Input, Title } from "./styles";
 import { LoadingIndicator } from "../../components/Loading/style";
+import { useRoute } from "@react-navigation/native";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -31,14 +32,16 @@ export function NewItemTask({
   onCloseModal,
   showButtonEdit,
   showButtonSave,
-  showButtonRemove,
-  selectedItemId,
+  showButtonRemove
 }: Props) {
   // State
   const user = useUserAuth();
   const uid = user?.uid;
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const route = useRoute();
+const { selectedItemId } = route.params as { selectedItemId?: string };
+
 
   const formattedDate = format(new Date(), "dd/MM/yyyy");
   
@@ -150,7 +153,7 @@ export function NewItemTask({
 
   return (
     <>
-      <DefaultContainer hasHeader={false} title="Adicionar nova tarefa" closeModalFn={closeBottomSheet}>
+      <DefaultContainer hasHeader={false} title="Adicionar nova tarefa" closeModalFn={closeBottomSheet} backButton>
           <ScrollView
             keyboardShouldPersistTaps="always"
             showsVerticalScrollIndicator={false}

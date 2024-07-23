@@ -68,6 +68,7 @@ export function DefaultContainer({
   const [showListModal, setShowListModal] = useState(false);
   const [showNewLaunchModal, setShowNewLaunchModal] = useState(false);
   const [showFilterPickerModal, setShowFilterPickerModal] = useState(false);
+  const [selectedItemId, setSelectItemId] = useState('');
 
   function closeModals() {
     setShowNewItemModal(false);
@@ -82,8 +83,8 @@ export function DefaultContainer({
     navigation.goBack();
   }
 
-  function handleNewItem() {
-    setShowNewItemModal(true);
+  function handleNewItemTask(documentId: string) {
+    navigation.navigate('newitemtask', { selectedItemId: documentId });
   }
 
   function handleNewNotes() {
@@ -131,7 +132,7 @@ export function DefaultContainer({
               flexDirection: "row",
               height: 60,
             }}
-            onPress={handleNewItem}
+            onPress={() => handleNewItemTask(selectedItemId)}
           >
             <Icon name="add-outline" />
           </Button>
