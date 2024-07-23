@@ -2,7 +2,7 @@
   "expo": {
     "name": "easy",
     "slug": "easy",
-    "version": "1.1.0",
+    "version": "1.5.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -18,7 +18,7 @@
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.easy.io.app",
-      "buildNumber": "3",
+      "buildNumber": "5",
       "runtimeVersion": {
         "policy": "appVersion"
       }
@@ -30,8 +30,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 3,
-      "runtimeVersion": "1.1.0"
+      "versionCode": 5,
+      "runtimeVersion": "1.5.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"
