@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Modal, Platform, ScrollView, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  Modal,
+  Platform,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Toast } from "react-native-toast-notifications";
+import { useTheme } from "styled-components/native";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Expense } from "../../components/Expense";
 import { Items } from "../../components/Items";
@@ -23,12 +30,15 @@ import {
   SubTitle,
   Title,
 } from "./styles";
-import { useTheme } from "styled-components/native";
+
+import ExpensePersonImage from "../../assets/illustrations/expense.png";
+import RevenuePersonImage from "../../assets/illustrations/revenue.png";
+import theme from "../../theme";
 
 export function Home() {
   const user = useUserAuth();
   const uid = user?.uid;
-  const {COLORS} = useTheme()
+  const { COLORS } = useTheme();
   const [activeButton, setActiveButton] = useState("receitas");
   const { selectedMonth } = useMonth();
   const revenue = useFirestoreCollection("Revenue");
@@ -123,6 +133,7 @@ export function Home() {
       type="SECONDARY"
       subtitle={formattedTotalValue}
       addActionFn={handleNewTaskModal}
+      customBg={theme.COLORS.TEAL_50}
     >
       <Header>
         <NavBar>
@@ -146,15 +157,7 @@ export function Home() {
       </Header>
       {activeButton === "receitas" && (
         <ContainerItems>
-          {revenue.filter((item) => item.uid === uid).length === 0 ? (
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <LoadData
-                image="PRIMARY"
-                title="Desculpe!"
-                subtitle="Você ainda não possui lançamentos de entradas! Comece adicionando uma nova entrada."
-              />
-            </ScrollView>
-          ) : (
+          {revenue.filter((item) => item.uid === uid).length === 0 ? null : (
             <FlatList
               style={{ marginTop: 16 }}
               data={revenue.filter(
@@ -181,21 +184,21 @@ export function Home() {
                 </TouchableOpacity>
               )}
               contentContainerStyle={{ paddingBottom: 90 }}
+              ListEmptyComponent={
+                <LoadData
+                  imageSrc={RevenuePersonImage}
+                  title="Comece agora!"
+                  subtitle="Adicione uma receita clicando em +"
+                  width={300}
+                />
+              }
             />
           )}
         </ContainerItems>
       )}
       {activeButton === "despesas" && (
         <ContainerItems>
-          {expense.filter((item) => item.uid === uid).length === 0 ? (
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <LoadData
-                image="SECONDARY"
-                title="Desculpe!"
-                subtitle="Você ainda não possui lançamentos de saídas! Comece lançando uma nova saída."
-              />
-            </ScrollView>
-          ) : (
+          {expense.filter((item) => item.uid === uid).length === 0 ? null : (
             <FlatList
               style={{ marginTop: 16 }}
               data={expense.filter(
@@ -227,6 +230,14 @@ export function Home() {
               )}
               keyExtractor={(item) => item.id}
               contentContainerStyle={{ paddingBottom: 90 }}
+              ListEmptyComponent={
+                <LoadData
+                  imageSrc={ExpensePersonImage}
+                  title="Comece agora!"
+                  subtitle="Adicione uma despesa clicando em +"
+                  width={300}
+                />
+              }
             />
           )}
         </ContainerItems>
@@ -237,12 +248,17 @@ export function Home() {
         visible={showNewTaskModal}
         onRequestClose={closeNewTaskModal}
       >
-        <View style={{
-          flex: 1,
-          paddingTop: Platform.OS === 'ios' ? 20 : 0,
-          backgroundColor: COLORS.PURPLE_800
-        }}>
-        <NewTask closeBottomSheet={closeNewTaskModal} initialActiveButton={activeButton}  />
+        <View
+          style={{
+            flex: 1,
+            paddingTop: Platform.OS === "ios" ? 20 : 0,
+            backgroundColor: COLORS.PURPLE_800,
+          }}
+        >
+          <NewTask
+            closeBottomSheet={closeNewTaskModal}
+            initialActiveButton={activeButton}
+          />
         </View>
       </Modal>
       <Modal

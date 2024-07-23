@@ -7,6 +7,7 @@ import { NewLaunch } from "../../screens/NewLaunch";
 import { NewNotes } from "../../screens/NewNotes";
 import { Filter } from "../Filter";
 
+import { useTheme } from "styled-components/native";
 import {
   Button,
   ButtonBack,
@@ -19,7 +20,6 @@ import {
   Title,
   ViewHomeCenter,
 } from "./style";
-import { useTheme } from "styled-components/native";
 
 type DefaultContainerProps = {
   children: ReactNode;
@@ -35,6 +35,7 @@ type DefaultContainerProps = {
   hasHeader?: boolean;
   title?: string;
   subtitle?: string;
+  customBg?: string
   type?: "PRIMARY" | "SECONDARY";
   closeModalFn?: () => void;
   addActionFn?: () => void
@@ -46,6 +47,7 @@ export function DefaultContainer({
   subtitle,
   closeModalFn,
   addActionFn,
+  customBg,
   type = "PRIMARY",
   newNotes = false,
   newItemMarketplace = false,
@@ -177,7 +179,6 @@ export function DefaultContainer({
             style={{
               alignItems: "center",
               flexDirection: "row",
-              width: "35%",
             }}
             onPress={handleNewNotes}
           >
@@ -211,7 +212,7 @@ export function DefaultContainer({
           </ButtonBack>
         )}
       </Header>
-      <Content>{children}</Content>
+      <Content customBg={customBg}>{children}</Content>
       <Modal
         animationType="slide"
         transparent={true}

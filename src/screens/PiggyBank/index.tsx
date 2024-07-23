@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Modal, View } from "react-native";
+import { FlatList, Modal, Platform, View } from "react-native";
 //
 import { Content, SubTitle, Title } from "./styles";
 //
@@ -115,9 +115,8 @@ export function PiggyBank() {
           </View>
 
           <View>
-            {PiggyBankData.filter((item) => item.uid === uid).length === 0 ? (
-              null
-            ) : (
+            {PiggyBankData.filter((item) => item.uid === uid).length ===
+            0 ? null : (
               <FlatList
                 style={{ marginTop: -40 }}
                 data={userPiggyBankData}
@@ -148,12 +147,19 @@ export function PiggyBank() {
         visible={showNotesModal}
         onRequestClose={closeModals}
       >
-        <NewLaunch
-          selectedItemId={selectedItemId}
-          showButtonSave
-          showButtonRemove
-          closeBottomSheet={closeModals}
-        />
+        <View
+          style={{
+            flex: 1,
+            paddingTop: Platform.OS === "ios" ? 20 : 0,
+          }}
+        >
+          <NewLaunch
+            selectedItemId={selectedItemId}
+            showButtonSave
+            showButtonRemove
+            closeBottomSheet={closeModals}
+          />
+        </View>
       </Modal>
     </DefaultContainer>
   );

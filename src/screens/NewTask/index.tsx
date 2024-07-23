@@ -5,6 +5,7 @@ import { ButtonBar, Content, Header, NavBar, Title } from "./styles";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Expense } from "../../components/Expense";
 import { Revenue } from "../../components/Revenue";
+import theme from "../../theme";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -24,6 +25,7 @@ export function NewTask({ closeBottomSheet, initialActiveButton }: Props) {
         hasHeader={false}
         title="Adicionar Lançamento"
         closeModalFn={closeBottomSheet}
+        customBg={theme.COLORS.TEAL_50}
       >
         <Content>
           <Header>

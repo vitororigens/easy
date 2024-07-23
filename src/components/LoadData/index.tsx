@@ -1,29 +1,37 @@
-import {Container, StyledImage, SubTitle, Title,   } from "./styles";
-import PersonBlack from '../../assets/personblack.png'
-import PersonWhite from '../../assets/personwhite.png'
+import { ImageSourcePropType } from "react-native";
+import PersonBlack from "../../assets/personblack.png";
+import PersonWhite from "../../assets/personwhite.png";
+import { Container, StyledImage, SubTitle, Title } from "./styles";
 
-type ImageTypeProps = 'PRIMARY' | 'SECONDARY';
+type ImageTypeProps = "PRIMARY" | "SECONDARY";
 
-type LoadDataProps ={
-    title?: string;
-    subtitle?: string;
-    image?: ImageTypeProps;
-}
+type LoadDataProps = {
+  title?: string;
+  subtitle?: string;
+  image?: ImageTypeProps;
+  imageSrc?: ImageSourcePropType;
+  width?: number
+  height?: number
+};
 
+export function LoadData({
+  image = "PRIMARY",
+  title,
+  subtitle,
+  imageSrc,
+  width = 400,
+  height = 300
+}: LoadDataProps) {
+  return (
+    <Container>
+      <Title>{title}</Title>
+      {!!image && !imageSrc && (
+        <StyledImage source={image === "PRIMARY" ? PersonWhite : PersonBlack} />
+      )}
 
-export function LoadData({image = 'PRIMARY', title, subtitle}: LoadDataProps){
-    
+      {!!imageSrc && <StyledImage width={width} height={height} source={imageSrc} />}
 
-    return(
-        <Container>
-             <Title>
-                {title}
-            </Title>
-            <StyledImage source={image === 'PRIMARY' ? PersonWhite : PersonBlack}/>
-           
-            <SubTitle>
-                {subtitle}
-            </SubTitle>
-        </Container>
-    )
+      <SubTitle>{subtitle}</SubTitle>
+    </Container>
+  );
 }

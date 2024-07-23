@@ -17,13 +17,16 @@ import { Button, Header, NavBar, Title } from "./styles";
 
 import { format, getMonth, parse } from "date-fns";
 import { useTheme } from "styled-components/native";
+import PersonImage from "../../assets/illustrations/tasks.png";
 import { FinishTasks } from "../../components/FinishTasks";
 import { HistoryTaskModal } from "../../components/HistoryTaskModal";
 import { ItemTask } from "../../components/ItemTask";
 import { Items } from "../../components/Items";
 import { useMonth } from "../../context/MonthProvider";
 import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
+import theme from "../../theme";
 import { NewItemTask } from "../NewItemTask";
+
 type SelectedItems = {
   [key: string]: boolean;
 };
@@ -193,7 +196,12 @@ export function ListTask() {
   }
 
   return (
-    <DefaultContainer newItem monthButton title="Lista de Tarefas">
+    <DefaultContainer
+      newItem
+      monthButton
+      title="Lista de Tarefas"
+      customBg={theme.COLORS.TEAL_50}
+    >
       <Header>
         <NavBar>
           <Button
@@ -215,7 +223,11 @@ export function ListTask() {
 
       {activeButton === "tarefas" && (
         <FlatList
-          style={{ marginTop: 16 }}
+          style={{
+            marginTop: !!data.filter((item) => item.uid === uid).length
+              ? 16
+              : 0,
+          }}
           data={data.filter((item) => item.uid === uid)}
           renderItem={({ item }) => (
             <ItemTask
@@ -235,9 +247,10 @@ export function ListTask() {
           keyExtractor={(item) => item.id}
           ListEmptyComponent={
             <LoadData
-              image="PRIMARY"
-              title="Desculpe!"
-              subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando uma nova tarefa clicando em Adicione +."
+              imageSrc={PersonImage}
+              title="Comece agora!"
+              subtitle="Adicione uma tarefa clicando em +"
+              width={300}
             />
           }
         />
@@ -245,15 +258,8 @@ export function ListTask() {
 
       {activeButton === "historico" && (
         <FlatList
+          style={{ marginTop: !!historyUserMonth.length ? 16 : 0 }}
           data={historyUserMonth}
-          ListEmptyComponent={
-            <LoadData
-              image="PRIMARY"
-              title="Desculpe!"
-              subtitle="Você ainda não possui nenhuma lista de tarefas para exibir aqui! Comece finalizando tarefas e crie sua lista de tarefas."
-            />
-          }
-          style={{ marginTop: 16 }}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => openModalHistoryTask(item.id)}>
               <Items
@@ -268,6 +274,14 @@ export function ListTask() {
             </TouchableOpacity>
           )}
           contentContainerStyle={{ paddingBottom: 90 }}
+          ListEmptyComponent={
+            <LoadData
+              imageSrc={PersonImage}
+              title="Oops!"
+              subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando tarefas e crie sua lista de tartefas"
+              width={300}
+            />
+          }
         />
       )}
 
@@ -277,12 +291,19 @@ export function ListTask() {
         visible={showTaskModal}
         onRequestClose={closeModals}
       >
-        <NewItemTask
-          selectedItemId={selectedItemId}
-          showButtonSave
-          showButtonRemove
-          closeBottomSheet={closeModals}
-        />
+        <View
+          style={{
+            flex: 1,
+            paddingTop: Platform.OS === "ios" ? 20 : 0,
+          }}
+        >
+          <NewItemTask
+            selectedItemId={selectedItemId}
+            showButtonSave
+            showButtonRemove
+            closeBottomSheet={closeModals}
+          />
+        </View>
       </Modal>
 
       <Modal
@@ -291,10 +312,17 @@ export function ListTask() {
         visible={showHistoryTask}
         onRequestClose={closeModals}
       >
-        <HistoryTaskModal
-          selectedItemId={selectedListTaskId}
-          closeBottomSheet={closeModals}
-        />
+        <View
+          style={{
+            flex: 1,
+            paddingTop: Platform.OS === "ios" ? 20 : 0,
+          }}
+        >
+          <HistoryTaskModal
+            selectedItemId={selectedListTaskId}
+            closeBottomSheet={closeModals}
+          />
+        </View>
       </Modal>
 
       {modalActive && (

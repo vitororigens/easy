@@ -4,12 +4,12 @@ import {
   FlatList,
   Modal,
   Platform,
-  ScrollView,
   TouchableOpacity,
   View,
 } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { useTheme } from "styled-components/native";
+import PersonImage from "../../assets/illustrations/marketplace.png";
 import { Cart } from "../../components/Cart";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { HistoryMarketplaceModal } from "../../components/HistoryMarketplace";
@@ -26,6 +26,7 @@ import useMarketplaceCollections, {
 } from "../../hooks/useMarketplaceCollections";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
+import theme from "../../theme";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { NewItem } from "../NewItem";
 import { Button, Header, NavBar, Title } from "./styles";
@@ -269,7 +270,13 @@ export function Marketplace() {
   }
 
   return (
-    <DefaultContainer monthButton newItemMarketplace title="Lista de Mercado" type="PRIMARY">
+    <DefaultContainer
+      monthButton
+      newItemMarketplace
+      title="Lista de Mercado"
+      type="PRIMARY"
+      customBg={theme.COLORS.TEAL_50}
+    >
       <Header>
         <NavBar>
           <Button
@@ -288,37 +295,35 @@ export function Marketplace() {
           </Button>
         </NavBar>
       </Header>
-      {activeButton === "lista" &&
-        (data.filter((item) => item.uid === uid).length === 0 ? (
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <LoadData
-              image="SECONDARY"
-              title="Desculpe!"
-              subtitle='Não há itens disponíveis para exibir aqui! Clique em "Adicione" e adicione um item!'
+      {activeButton === "lista" && (
+        <FlatList
+          data={data.filter((item) => item.uid === uid)}
+          renderItem={({ item }) => (
+            <ItemMarketplace
+              onEditItem={() => handleEditItem(item.id)}
+              removeItem={() => handleRemoveItem(item)}
+              addItem={() => handleAddItem(item)}
+              measurements={item.measurements}
+              quantity={item.amount}
+              title={item.name}
+              value={item.valueItem}
+              resetCountQuantity={!!selectedItems.length ? false : true}
             />
-          </ScrollView>
-        ) : (
-          <FlatList
-            data={data.filter((item) => item.uid === uid)}
-            renderItem={({ item }) => (
-              <ItemMarketplace
-                onEditItem={() => handleEditItem(item.id)}
-                removeItem={() => handleRemoveItem(item)}
-                addItem={() => handleAddItem(item)}
-                measurements={item.measurements}
-                quantity={item.amount}
-                title={item.name}
-                value={item.valueItem}
-                resetCountQuantity={!!selectedItems.length ? false : true}
-              />
-            )}
-            contentContainerStyle={{ paddingBottom: 90 }}
-          />
-        ))}
+          )}
+          contentContainerStyle={{ paddingBottom: 90 }}
+          ListEmptyComponent={
+            <LoadData
+              imageSrc={PersonImage}
+              title="Comece agora!"
+              subtitle="Adicione um item clicando em +"
+            />
+          }
+        />
+      )}
 
       {activeButton === "items" && (
         <FlatList
-          style={{ marginTop: 16 }}
+          style={{ marginTop: !!historyMonth.length ? 16 : 0 }}
           data={historyMonth}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => handleListSelected(item)}>
@@ -327,7 +332,9 @@ export function Marketplace() {
                 status={true}
                 category="mercado"
                 date={item.finishedDate}
-                valueTransaction={item.total ? formatCurrency(item.total) : "R$ 0,00"}
+                valueTransaction={
+                  item.total ? formatCurrency(item.total) : "R$ 0,00"
+                }
                 onDelete={() => handleDeleteList(item.idExpense, item.id)}
                 hasEdit={false}
               />
@@ -336,8 +343,8 @@ export function Marketplace() {
           contentContainerStyle={{ paddingBottom: 90 }}
           ListEmptyComponent={
             <LoadData
-              image="PRIMARY"
-              title="Desculpe!"
+              imageSrc={PersonImage}
+              title="Oops!"
               subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando itens no seu carrinho e crie sua lista de mercado."
             />
           }
@@ -348,13 +355,20 @@ export function Marketplace() {
         visible={confirmItemVisible}
         onRequestClose={() => setConfirmItemVisible(false)}
       >
-        <NewItem
-          selectedItemId={selectedItemData}
-          closeBottomSheet={() => setConfirmItemVisible(false)}
-          onCloseModal={() => setConfirmItemVisible(false)}
-          showButtonSave
-          showButtonRemove
-        />
+        <View
+          style={{
+            flex: 1,
+            paddingTop: Platform.OS === "ios" ? 20 : 0,
+          }}
+        >
+          <NewItem
+            selectedItemId={selectedItemData}
+            closeBottomSheet={() => setConfirmItemVisible(false)}
+            onCloseModal={() => setConfirmItemVisible(false)}
+            showButtonSave
+            showButtonRemove
+          />
+        </View>
       </Modal>
 
       <Modal

@@ -1,6 +1,6 @@
 import { getMonth, parse } from "date-fns";
 import { useState } from "react";
-import { Dimensions, FlatList, Modal } from "react-native";
+import { Dimensions, FlatList, Modal, Platform, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { ItemNotes } from "../../components/ItemNotes";
@@ -11,6 +11,8 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { NewNotes } from "../NewNotes";
 import { Content } from "./styles";
+
+import PersonImage from "../../assets/illustrations/notes.png";
 
 const screenWidth = Dimensions.get("screen").width;
 
@@ -52,7 +54,7 @@ export function Notes() {
   }
 
   return (
-    <DefaultContainer newNotes monthButton title="Notas">
+    <DefaultContainer newNotes monthButton title="Bloco de Notas">
       <Content>
         <FlatList
           data={notesUserMonth}
@@ -68,11 +70,13 @@ export function Notes() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 90 }}
           ListEmptyComponent={
-            <LoadData
-              image="PRIMARY"
-              title="Desculpe!"
-              subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando uma nova anotação clicando em Adicione +."
-            />
+            <View style={{ marginTop: 60 }}>
+              <LoadData
+                imageSrc={PersonImage}
+                title="Comece agora!"
+                subtitle="Adicione uma nota clicando em +"
+              />
+            </View>
           }
         />
       </Content>
@@ -83,12 +87,19 @@ export function Notes() {
         visible={showNotesModal}
         onRequestClose={closeModals}
       >
-        <NewNotes
-          selectedItemId={selectedItemId}
-          showButtonSave
-          showButtonRemove
-          closeBottomSheet={closeModals}
-        />
+        <View
+          style={{
+            flex: 1,
+            paddingTop: Platform.OS === "ios" ? 20 : 0,
+          }}
+        >
+          <NewNotes
+            selectedItemId={selectedItemId}
+            showButtonSave
+            showButtonRemove
+            closeBottomSheet={closeModals}
+          />
+        </View>
       </Modal>
     </DefaultContainer>
   );

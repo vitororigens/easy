@@ -11,6 +11,8 @@ import useFirestoreCollection, {
 } from "./../../hooks/useFirestoreCollection";
 import { Button, Content, Header, NavBar, Title } from "./styles";
 
+import PersonImage from "../../assets/illustrations/charts.png";
+
 const screenWidth = Dimensions.get("screen").width;
 
 export function Charts() {
@@ -158,8 +160,8 @@ export function Charts() {
           </ScrollView>
         ) : (
           <LoadData
-            image="PRIMARY"
-            title="Desculpe!"
+            imageSrc={PersonImage}
+            title="Oops!"
             subtitle="Você ainda não possui dados para exibir aqui!"
           />
         )}

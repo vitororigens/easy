@@ -14,9 +14,13 @@ export const Container = styled(SafeAreaView)<Props>`
   background-color:  ${({ theme, type }) => type === "PRIMARY" ? theme.COLORS.PURPLE_800 : theme.COLORS.TEAL_600};
 `;
 
-export const Content = styled.View`
+type ContentProps = {
+  customBg?: string
+}
+
+export const Content = styled.View<ContentProps>`
   flex: 1;
-  background-color: ${({ theme }) => theme.COLORS.WHITE};
+  background-color: ${({ theme, customBg }) => !!customBg ? customBg : theme.COLORS.WHITE};
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
 `;
