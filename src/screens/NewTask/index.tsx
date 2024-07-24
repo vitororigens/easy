@@ -1,7 +1,5 @@
-import React, { useState } from "react";
-//
+import React, { useState, useEffect } from "react";
 import { ButtonBar, Content, Header, NavBar, Title } from "./styles";
-//
 import { useRoute } from "@react-navigation/native";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Expense } from "../../components/Expense";
@@ -14,7 +12,14 @@ export function NewTask() {
     selectedItemId?: string;
     initialActiveButton?: string;
   };
-  const [activeButton, setActiveButton] = useState(initialActiveButton);
+
+  const [activeButton, setActiveButton] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (initialActiveButton) {
+      setActiveButton(initialActiveButton);
+    }
+  }, [initialActiveButton]);
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
@@ -47,8 +52,8 @@ export function NewTask() {
               </ButtonBar>
             </NavBar>
           </Header>
-          {activeButton === "receitas" && <Revenue showButtonSave />}
-          {activeButton === "despesas" && <Expense showButtonSave />}
+          {activeButton === "receitas" && <Revenue selectedItemId={selectedItemId} showButtonSave />}
+          {activeButton === "despesas" && <Expense selectedItemId={selectedItemId} showButtonSave />}
         </Content>
       </DefaultContainer>
     </>

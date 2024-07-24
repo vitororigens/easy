@@ -78,15 +78,16 @@ export function Home() {
     setShowNewTaskModal(false);
   }
 
-  function handleRevenueConfirmation(documentId: string) {
-    setConfirmRevenueVisible(true);
-    setSelectedItemId(documentId);
-  }
+  function handleRevenueEdit(documentId: string, initialActiveButton: string) {
+    // @ts-ignore
+  navigation.navigate("newtask", { selectedItemId: documentId, initialActiveButton });
+}
 
-  function handleExpenseConfirmation(documentId: string) {
-    setConfirmExpenseVisible(true);
-    setSelectedItemId(documentId);
-  }
+
+  function handleExpenseEdit(documentId: string, initialActiveButton: string) {
+    // @ts-ignore
+  navigation.navigate("newtask", { selectedItemId: documentId, initialActiveButton });
+}
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
@@ -174,11 +175,11 @@ export function Home() {
               )}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  onPress={() => handleRevenueConfirmation(item.id)}
+                  onPress={() => handleRevenueEdit(item.id, activeButton)}
                 >
                   <Items
                     onDelete={() => handleDeleteRevenue(item.id)}
-                    onEdit={() => handleRevenueConfirmation(item.id)}
+                    onEdit={() => handleRevenueEdit(item.id, activeButton)}
                     showItemTaskRevenue
                     type={item.type}
                     category={item.name}
@@ -218,11 +219,11 @@ export function Home() {
               )}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  onPress={() => handleExpenseConfirmation(item.id)}
+                  onPress={() => handleExpenseEdit(item.id, activeButton)}
                 >
                   <Items
                     onDelete={() => handleDeleteExpense(item.id)}
-                    onEdit={() => handleExpenseConfirmation(item.id)}
+                    onEdit={() => handleExpenseEdit(item.id, activeButton)}
                     showItemTask
                     status={item.status}
                     type={item.type}
@@ -251,63 +252,6 @@ export function Home() {
           )}
         </ContainerItems>
       )}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showNewTaskModal}
-        onRequestClose={closeNewTaskModal}
-      >
-        <View
-          style={{
-            flex: 1,
-            paddingTop: Platform.OS === "ios" ? 20 : 0,
-            backgroundColor: COLORS.PURPLE_800,
-          }}
-        >
-          <NewTask
-            closeBottomSheet={closeNewTaskModal}
-            initialActiveButton={activeButton}
-          />
-        </View>
-      </Modal>
-      <Modal
-        visible={confirmRevenueVisible}
-        onRequestClose={() => setConfirmRevenueVisible(false)}
-      >
-        <DefaultContainer
-          hasHeader={false}
-          title="Editar Entrada"
-          closeModalFn={() => setConfirmRevenueVisible(false)}
-        >
-          <Content>
-            <Revenue
-              selectedItemId={selectedItemId}
-              onCloseModal={() => setConfirmRevenueVisible(false)}
-              showButtonRemove
-              showButtonEdit
-            />
-          </Content>
-        </DefaultContainer>
-      </Modal>
-      <Modal
-        visible={confirmExpenseVisible}
-        onRequestClose={() => setConfirmExpenseVisible(false)}
-      >
-        <DefaultContainer
-          hasHeader={false}
-          title="Editar Saída"
-          closeModalFn={() => setConfirmExpenseVisible(false)}
-        >
-          <Content>
-            <Expense
-              selectedItemId={selectedItemId}
-              showButtonRemove
-              onCloseModal={() => setConfirmExpenseVisible(false)}
-              showButtonEdit
-            />
-          </Content>
-        </DefaultContainer>
-      </Modal>
     </DefaultContainer>
   );
 }

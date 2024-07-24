@@ -21,6 +21,9 @@ export declare global{
             newitem: { selectedItemId?: string };
             historytask: { selectedItemId?: string };
             historymarketplace: { selectedItemId?: string };
+            newexpense: { selectedItemId?: string };
+            newrevenue: { selectedItemId?: string };
+            
         }
     }
 }

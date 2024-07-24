@@ -12,6 +12,8 @@ import { NewTask } from "../screens/NewTask";
 import { Perfil } from "../screens/Perfil";
 import { PiggyBank } from "../screens/PiggyBank";
 import { BottomTabsNavigation } from "./BottomTabsNavigation";
+import { Expense } from "../components/Expense";
+import { Revenue } from "../components/Revenue";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
@@ -32,6 +34,8 @@ export function StackPrivateNavigation() {
       <Screen name="newitem" component={NewItem} />
       <Screen name="historymarketplace" component={HistoryMarketplaceModal} />
       <Screen name="filter" component={Filter} />
+      <Screen name="newexpense" component={Expense} />
+      <Screen name="newrevenue" component={Revenue} />
     </Navigator>
   );
 }

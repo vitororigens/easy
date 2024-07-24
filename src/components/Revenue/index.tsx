@@ -378,13 +378,13 @@ export function Revenue({
         </View>
         {showAdvanced && (
           <>
-            <View style={{ flexDirection: "row", marginBottom: 10 }}>
+            <View style={{ flexDirection: "row", marginBottom: 10 }}> 
               <View style={{ width: "50%" }}>
                 <View>
                   <TitleTask>
                     Categorias <Span>(opicional)</Span>{" "}
                   </TitleTask>
-                  <View style={{ height: 50 }}>
+                  <View style={{ height: 50, justifyContent: "center" }}>
                     <Controller
                       control={control}
                       name="selectedCategory"
