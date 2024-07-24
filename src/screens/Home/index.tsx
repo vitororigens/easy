@@ -31,6 +31,7 @@ import {
   Title,
 } from "./styles";
 
+import { useNavigation } from "@react-navigation/native";
 import ExpensePersonImage from "../../assets/illustrations/expense.png";
 import RevenuePersonImage from "../../assets/illustrations/revenue.png";
 import theme from "../../theme";
@@ -52,6 +53,8 @@ export function Home() {
   const [confirmExpenseVisible, setConfirmExpenseVisible] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const navigation = useNavigation()
 
   const formattedRevenue = tolalRevenueMunth.toLocaleString("pt-BR", {
     style: "currency",
@@ -114,6 +117,12 @@ export function Home() {
         console.error("Erro ao excluir a nota: ", error);
       });
   }
+
+  function handleCreateItem(documentId: string, initialActiveButton: string) {
+    // @ts-ignore
+    navigation.navigate("newtask", { selectedItemId: documentId, initialActiveButton });
+  }
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
@@ -132,7 +141,7 @@ export function Home() {
       title={activeButton === "receitas" ? "Receitas" : "Despesas"}
       type="SECONDARY"
       subtitle={formattedTotalValue}
-      addActionFn={handleNewTaskModal}
+      addActionFn={() => handleCreateItem(selectedItemId, activeButton)}
       customBg={theme.COLORS.TEAL_50}
     >
       <Header>

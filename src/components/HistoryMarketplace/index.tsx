@@ -1,3 +1,4 @@
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { FlatList, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import useHistoryMarketplaceCollections from "../../hooks/useHistoryMarketplaceCollection";
@@ -8,17 +9,13 @@ import { DefaultContainer } from "../DefaultContainer";
 import { Items } from "../Items";
 import { Button, Content, Title, TotalValue } from "./styles";
 
-type Props = {
-  closeBottomSheet?: () => void;
-  selectedItemId?: string;
-  onSaveListAgain?: () => void;
-};
-
-export function HistoryMarketplaceModal({
-  closeBottomSheet,
-  selectedItemId,
-}: Props) {
+export function HistoryMarketplaceModal() {
   const user = useUserAuth();
+  const route = useRoute()
+
+  const { selectedItemId } = route.params as { selectedItemId?: string };
+
+  const navigation = useNavigation()
 
   const historyData = useHistoryMarketplaceCollections("HistoryMarketplace");
   const selectedListMarketplace = historyData.find(
@@ -48,7 +45,7 @@ export function HistoryMarketplaceModal({
       .commit()
       .then(() => {
         Toast.show("Itens adicionados!", { type: "success" });
-        !!closeBottomSheet && closeBottomSheet();
+        navigation.goBack()
       })
       .catch((error) => {
         console.error("Erro ao adicionar os itens:", error);
@@ -57,7 +54,7 @@ export function HistoryMarketplaceModal({
 
   return (
     <>
-      <DefaultContainer hasHeader={false} title="Produtos" closeModalFn={closeBottomSheet}>
+      <DefaultContainer hasHeader={false} title="Produtos" backButton>
         <Content>
           <FlatList
             data={items}

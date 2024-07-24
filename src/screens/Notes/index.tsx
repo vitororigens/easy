@@ -12,6 +12,7 @@ import { database } from "../../services";
 import { NewNotes } from "../NewNotes";
 import { Content } from "./styles";
 
+import { useNavigation } from "@react-navigation/native";
 import PersonImage from "../../assets/illustrations/notes.png";
 
 const screenWidth = Dimensions.get("screen").width;
@@ -19,11 +20,12 @@ const screenWidth = Dimensions.get("screen").width;
 export function Notes() {
   const { selectedMonth } = useMonth();
   const [showNotesModal, setShowNotesModal] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState("");
   const data = useMarketplaceCollections("Notes");
   const user = useUserAuth();
   const uid = user?.uid;
   const notesUser = data.filter((item) => item.uid === uid);
+
+  const navigation = useNavigation();
 
   const notesUserMonth = notesUser.filter((item) => {
     const month =
@@ -36,8 +38,7 @@ export function Notes() {
   }
 
   function handleEditItem(documentId: string) {
-    setShowNotesModal(true);
-    setSelectedItemId(documentId);
+    navigation.navigate("newnotes", { selectedItemId: documentId });
   }
 
   function handleDeleteItem(documentId: string) {
@@ -93,12 +94,7 @@ export function Notes() {
             paddingTop: Platform.OS === "ios" ? 20 : 0,
           }}
         >
-          <NewNotes
-            selectedItemId={selectedItemId}
-            showButtonSave
-            showButtonRemove
-            closeBottomSheet={closeModals}
-          />
+          <NewNotes closeBottomSheet={closeModals} />
         </View>
       </Modal>
     </DefaultContainer>

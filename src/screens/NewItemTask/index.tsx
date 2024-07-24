@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -6,11 +7,10 @@ import { Alert, ScrollView, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
 import { DefaultContainer } from "../../components/DefaultContainer";
+import { LoadingIndicator } from "../../components/Loading/style";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { Button, Content, Input, Title } from "./styles";
-import { LoadingIndicator } from "../../components/Loading/style";
-import { useRoute } from "@react-navigation/native";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -27,24 +27,18 @@ const formSchema = z.object({
 
 type FormSchemaType = z.infer<typeof formSchema>;
 
-export function NewItemTask({
-  closeBottomSheet,
-  onCloseModal,
-  showButtonEdit,
-  showButtonSave,
-  showButtonRemove
-}: Props) {
+export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
   // State
+  const navigation = useNavigation()
   const user = useUserAuth();
   const uid = user?.uid;
+  const route = useRoute();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const route = useRoute();
-const { selectedItemId } = route.params as { selectedItemId?: string };
-
+  const { selectedItemId } = route.params as { selectedItemId?: string };
 
   const formattedDate = format(new Date(), "dd/MM/yyyy");
-  
+
   // Hooks
   const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -55,7 +49,7 @@ const { selectedItemId } = route.params as { selectedItemId?: string };
 
   // Functions
   const handleSaveItem = ({ name }: FormSchemaType) => {
-    setLoading(true)
+    setLoading(true);
     database
       .collection("Task")
       .doc()
@@ -65,13 +59,14 @@ const { selectedItemId } = route.params as { selectedItemId?: string };
         createdAt: formattedDate,
       })
       .then(() => {
-        setLoading(false)
+        setLoading(false);
         Toast.show("Item adicionado!", { type: "success" });
         reset();
-        !!closeBottomSheet && closeBottomSheet()
+        navigation.goBack()
+        !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
-        setLoading(false)
+        setLoading(false);
         console.error("Erro ao adicionar o item: ", error);
       });
   };
@@ -81,24 +76,25 @@ const { selectedItemId } = route.params as { selectedItemId?: string };
       console.error("Nenhum documento selecionado para exclusão!");
       return;
     }
-    setLoading(true)
+    setLoading(true);
 
-    const expenseRef = database.collection("Marketplace").doc(selectedItemId);
+    const expenseRef = database.collection("Task").doc(selectedItemId);
     expenseRef
       .delete()
       .then(() => {
-        setLoading(false)
+        setLoading(false);
         Toast.show("Item Excluido!", { type: "success" });
+        navigation.goBack()
         onCloseModal && onCloseModal();
       })
       .catch((error) => {
-        setLoading(false)
+        setLoading(false);
         console.error("Erro ao excluir o documento de item:", error);
       });
   };
 
   const handleEditExpense = ({ name }: FormSchemaType) => {
-    setLoading(true)
+    setLoading(true);
     database
       .collection("Task")
       .doc(selectedItemId)
@@ -107,14 +103,14 @@ const { selectedItemId } = route.params as { selectedItemId?: string };
         uid: uid,
       })
       .then(() => {
-        setLoading(false)
+        setLoading(false);
         Toast.show("Item adicionado!", { type: "success" });
-        reset();
         onCloseModal && onCloseModal();
+        navigation.goBack()
         !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
-        setLoading(false)
+        setLoading(false);
         console.error("Erro ao adicionar o item: ", error);
       });
   };
@@ -153,49 +149,48 @@ const { selectedItemId } = route.params as { selectedItemId?: string };
 
   return (
     <>
-      <DefaultContainer hasHeader={false} title="Adicionar nova tarefa" closeModalFn={closeBottomSheet} backButton>
-          <ScrollView
-            keyboardShouldPersistTaps="always"
-            showsVerticalScrollIndicator={false}
-          >
-            <Content>
-              <Title>Nome da tarefa*</Title>
-              <Controller
-                control={control}
-                name="name"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                  />
-                )}
-              />
+      <DefaultContainer
+        hasHeader={false}
+        title="Adicionar nova tarefa"
+        closeModalFn={closeBottomSheet}
+        backButton
+      >
+        <ScrollView
+          keyboardShouldPersistTaps="always"
+          showsVerticalScrollIndicator={false}
+        >
+          <Content>
+            <Title>Nome da tarefa*</Title>
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input onBlur={onBlur} onChangeText={onChange} value={value} />
+              )}
+            />
 
-              <View style={{ marginBottom: 10, height: 150 }}>
-                {showButtonSave && (
-                  <Button
-                    style={{ marginBottom: 10 }}
-                    onPress={
-                      isEditing
-                        ? handleSubmit(handleEditExpense, onInvalid)
-                        : handleSubmit(handleSaveItem, onInvalid)
-                    }
-                  >
-                    <Title>{loading ? <LoadingIndicator/> : "Salvar"}</Title>
-                  </Button>
-                )}
-                {showButtonRemove && (
-                  <Button
-                    style={{ marginBottom: 10 }}
-                    onPress={handleDeleteExpense}
-                  >
-                    <Title>Excluir</Title>
-                  </Button>
-                )}
-              </View>
-            </Content>
-          </ScrollView>
+            <View style={{ marginBottom: 10, height: 150 }}>
+              <Button
+                style={{ marginBottom: 10 }}
+                onPress={
+                  isEditing
+                    ? handleSubmit(handleEditExpense, onInvalid)
+                    : handleSubmit(handleSaveItem, onInvalid)
+                }
+              >
+                <Title>{loading ? <LoadingIndicator /> : "Salvar"}</Title>
+              </Button>
+              {!!selectedItemId && (
+                <Button
+                  style={{ marginBottom: 10 }}
+                  onPress={handleDeleteExpense}
+                >
+                  <Title>Excluir</Title>
+                </Button>
+              )}
+            </View>
+          </Content>
+        </ScrollView>
       </DefaultContainer>
     </>
   );

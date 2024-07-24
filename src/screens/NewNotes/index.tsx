@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -6,6 +7,7 @@ import { Alert, ScrollView, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
 import { DefaultContainer } from "../../components/DefaultContainer";
+import { LoadingIndicator } from "../../components/Loading/style";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import {
@@ -15,15 +17,10 @@ import {
   InputContainer,
   Title
 } from "./styles";
-import { LoadingIndicator } from "../../components/Loading/style";
 
 type Props = {
   closeBottomSheet?: () => void;
   onCloseModal?: () => void;
-  showButtonEdit?: boolean;
-  showButtonSave?: boolean;
-  showButtonRemove?: boolean;
-  selectedItemId?: string;
 };
 
 const formSchema = z.object({
@@ -36,18 +33,17 @@ type FormSchemaType = z.infer<typeof formSchema>;
 export function NewNotes({
   closeBottomSheet,
   onCloseModal,
-  showButtonEdit,
-  showButtonSave,
-  showButtonRemove,
-  selectedItemId,
 }: Props) {
   // States
   const user = useUserAuth();
   const uid = user?.uid;
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  
   // Hooks
+  const route = useRoute()
+  const navigation = useNavigation()
+
   const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,6 +51,8 @@ export function NewNotes({
       name: "",
     },
   });
+
+  const { selectedItemId } = route.params as { selectedItemId?: string };
 
   // Functions
   const handleSaveItem = ({ name, description }: FormSchemaType) => {
@@ -72,6 +70,7 @@ export function NewNotes({
         setLoading(false)
         Toast.show("Nota adicionada!", { type: "success" });
         reset();
+        navigation.goBack()
         onCloseModal && onCloseModal();
         !!closeBottomSheet && closeBottomSheet();
       })
@@ -94,6 +93,7 @@ export function NewNotes({
       .then(() => {
         Toast.show("Nota Excluída!", { type: "success" });
         setLoading(false)
+        navigation.goBack()
         onCloseModal && onCloseModal();
         !!closeBottomSheet && closeBottomSheet();
       })
@@ -124,6 +124,7 @@ export function NewNotes({
         Toast.show("Nota editada!", { type: "success" });
         setLoading(false)
         reset();
+        navigation.goBack()
         onCloseModal && onCloseModal();
         !!closeBottomSheet && closeBottomSheet();
       })
@@ -168,7 +169,7 @@ export function NewNotes({
 
   return (
     <>
-      <DefaultContainer hasHeader={false} title="Adicionar nova nota" closeModalFn={closeBottomSheet}>
+      <DefaultContainer backButton hasHeader={false} title="Adicionar nova nota" closeModalFn={closeBottomSheet}>
           <ScrollView
             keyboardShouldPersistTaps="always"
             showsVerticalScrollIndicator={false}
@@ -203,7 +204,6 @@ export function NewNotes({
               />
 
               <View style={{ marginBottom: 10, height: 150 }}>
-                {showButtonSave && (
                   <Button
                     style={{ marginBottom: 10 }}
                     onPress={
@@ -214,8 +214,7 @@ export function NewNotes({
                   >
                     {loading ? <LoadingIndicator/> : <Title>Salvar</Title>}
                   </Button>
-                )}
-                {showButtonRemove && (
+                {!!selectedItemId && (
                   <Button
                     style={{ marginBottom: 10 }}
                     onPress={handleDeleteExpense}

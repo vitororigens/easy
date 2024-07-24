@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import { format, getMonth, parse } from "date-fns";
 import React, { useEffect, useState } from "react";
 import {
@@ -12,7 +13,6 @@ import { useTheme } from "styled-components/native";
 import PersonImage from "../../assets/illustrations/marketplace.png";
 import { Cart } from "../../components/Cart";
 import { DefaultContainer } from "../../components/DefaultContainer";
-import { HistoryMarketplaceModal } from "../../components/HistoryMarketplace";
 import { ItemMarketplace } from "../../components/ItemMarketplace";
 import { Items } from "../../components/Items";
 import { LoadData } from "../../components/LoadData";
@@ -47,6 +47,8 @@ export function Marketplace() {
 
   const data = useMarketplaceCollections("Marketplace");
   const selectedItemsId = selectedItems.map((item) => item.id);
+
+  const navigation = useNavigation();
 
   const user = useUserAuth();
   const uid = user?.uid;
@@ -224,8 +226,7 @@ export function Marketplace() {
   };
 
   function handleEditItem(documentId: string) {
-    setConfirmItemVisible(true);
-    setSelectedItemData(documentId);
+    navigation.navigate("newitem", { selectedItemId: documentId });
   }
 
   function removeItemsMarketplace(documentIds: string[]) {
@@ -241,9 +242,8 @@ export function Marketplace() {
     });
   }
 
-  const handleListSelected = (item: any) => {
-    setSelectedListData(item);
-    setShowHistory(true);
+  const handleListSelected = (documentId: string) => {
+    navigation.navigate("historymarketplace", { selectedItemId: documentId });
   };
 
   const closeModals = () => {
@@ -326,7 +326,7 @@ export function Marketplace() {
           style={{ marginTop: !!historyMonth.length ? 16 : 0 }}
           data={historyMonth}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handleListSelected(item)}>
+            <TouchableOpacity onPress={() => handleListSelected(item.id)}>
               <Items
                 showItemTask
                 status={true}
@@ -369,19 +369,6 @@ export function Marketplace() {
             showButtonRemove
           />
         </View>
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showHistory}
-        onRequestClose={closeModals}
-      >
-        <HistoryMarketplaceModal
-          selectedItemId={selectedListData?.id}
-          closeBottomSheet={closeModals}
-          onSaveListAgain={handleSaveListAgain}
-        />
       </Modal>
 
       {modalActive && (

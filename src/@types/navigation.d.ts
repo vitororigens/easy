@@ -13,11 +13,14 @@ export declare global{
             perfil: undefined;
             piggybank: undefined;
             historic: undefined;
+            filter: undefined;
             newnotes: { selectedItemId?: string };
             newtask: { selectedItemId?: string };
             newlaunch: { selectedItemId?: string };
             newitemtask: { selectedItemId?: string };
             newitem: { selectedItemId?: string };
+            historytask: { selectedItemId?: string };
+            historymarketplace: { selectedItemId?: string };
         }
     }
 }

@@ -1,5 +1,6 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
@@ -7,7 +8,7 @@ import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
 import { DefaultContainer } from "../../components/DefaultContainer";
-import { LoadingIndicator } from '../../components/Loading/style';
+import { LoadingIndicator } from "../../components/Loading/style";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
@@ -36,10 +37,7 @@ type FormSchemaType = z.infer<typeof formSchema>;
 export function NewItem({
   closeBottomSheet,
   onCloseModal,
-  showButtonEdit,
-  showButtonSave,
   showButtonRemove,
-  selectedItemId,
 }: Props) {
   const user = useUserAuth();
   const uid = user?.uid;
@@ -50,6 +48,9 @@ export function NewItem({
   const [loading, setLoading] = useState(false);
 
   // Hooks
+  const navigation = useNavigation()
+  const route = useRoute();
+
   const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,6 +62,8 @@ export function NewItem({
       selectedMeasurements: "un",
     },
   });
+
+  const { selectedItemId } = route.params as { selectedItemId?: string };
 
   // Functions
   function formatQuantity(quantity: string) {
@@ -78,7 +81,7 @@ export function NewItem({
     selectedMeasurements,
     valueItem,
   }: FormSchemaType) => {
-    setLoading(true)
+    setLoading(true);
     database
       .collection("Marketplace")
       .doc()
@@ -93,9 +96,10 @@ export function NewItem({
       })
       .then(() => {
         Toast.show("Item adicionado!", { type: "success" });
-        setLoading(false)
+        setLoading(false);
         reset();
-        !!closeBottomSheet && closeBottomSheet()
+        navigation.goBack()
+        !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
         console.error("Erro ao adicionar o item: ", error);
@@ -107,14 +111,15 @@ export function NewItem({
       console.error("Nenhum documento selecionado para exclusão!");
       return;
     }
-    setLoading(true)
+    setLoading(true);
 
     const expenseRef = database.collection("Marketplace").doc(selectedItemId);
     expenseRef
       .delete()
       .then(() => {
-        setLoading(false)
+        setLoading(false);
         Toast.show("Item Excluido!", { type: "success" });
+        navigation.goBack()
         onCloseModal && onCloseModal();
       })
       .catch((error) => {
@@ -134,7 +139,7 @@ export function NewItem({
       console.error("Nenhum documento selecionado para edição!");
       return;
     }
-    setLoading(true)
+    setLoading(true);
 
     database
       .collection("Marketplace")
@@ -149,9 +154,10 @@ export function NewItem({
         uid,
       })
       .then(() => {
-        setLoading(false)
+        setLoading(false);
         Toast.show("Item adicionado!", { type: "success" });
         reset();
+        navigation.goBack()
         onCloseModal && onCloseModal();
       })
       .catch((error) => {
@@ -183,10 +189,13 @@ export function NewItem({
               setValue("name", data.name);
               setValue("selectedCategory", data.category);
               setValue("selectedMeasurements", data.measurements);
-              setValue("valueItem", data.valueItem.toLocaleString("pt-BR", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }));
+              setValue(
+                "valueItem",
+                data.valueItem.toLocaleString("pt-BR", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              );
               setValue("amount", data.amount.toString());
               setIsEditing(true);
             } else {
@@ -203,119 +212,127 @@ export function NewItem({
   }, [selectedItemId]);
 
   return (
-    <DefaultContainer hasHeader={false} title='Adicionar novo item' closeModalFn={closeBottomSheet}>
-        <ScrollView
-          keyboardShouldPersistTaps="always"
-          showsVerticalScrollIndicator={false}
-        >
-          <Content>
-            <Title>Nome*</Title>
-            <Controller
-              control={control}
-              name="name"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input onBlur={onBlur} onChangeText={onChange} value={value} />
-              )}
-            />
-            <View style={{ marginTop: 40, marginBottom: 20 }}>
-              <TouchableOpacity
-                onPress={handleShowAdvanced}
+    <DefaultContainer
+      hasHeader={false}
+      title="Adicionar novo item"
+      closeModalFn={closeBottomSheet}
+      backButton
+    >
+      <ScrollView
+        keyboardShouldPersistTaps="always"
+        showsVerticalScrollIndicator={false}
+      >
+        <Content>
+          <Title>Nome*</Title>
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input onBlur={onBlur} onChangeText={onChange} value={value} />
+            )}
+          />
+          <View style={{ marginTop: 40, marginBottom: 20 }}>
+            <TouchableOpacity
+              onPress={handleShowAdvanced}
+              style={{
+                width: "100%",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Title>{showAdvanced ? "Mostrar menos" : "Mostrar mais"}</Title>
+              <MaterialIcons
+                name={showAdvanced ? "arrow-drop-up" : "arrow-drop-down"}
+                size={24}
+                color="black"
+              />
+            </TouchableOpacity>
+          </View>
+          {showAdvanced && (
+            <>
+              <View
                 style={{
-                  width: '100%',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                <Title>{showAdvanced ? "Mostrar menos" : "Mostrar mais"}</Title>
-                <MaterialIcons
-                  name={showAdvanced ? "arrow-drop-up" : "arrow-drop-down"}
-                  size={24}
-                  color="black"
-                />
-              </TouchableOpacity>
-            </View>
-            {showAdvanced &&
-              <>
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
                 <View
                   style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
+                    width: "50%",
+                    paddingRight: 15,
                   }}
                 >
-                  <View
-                    style={{
-                      width: "50%",
-                      paddingRight: 15,
-                    }}
-                  >
-                    <Title>
-                      Quantidade<Span> (opcional)</Span>
-                    </Title>
-                    <Controller
-                      control={control}
-                      name="amount"
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <Input
-                          keyboardType="numeric"
-                          value={formatQuantity(value ?? "")}
-                          onChangeText={onChange}
-                          onBlur={onBlur}
-                        />
-                      )}
-                    />
-                  </View>
-                  <View
-                    style={{
-                      width: 100,
-                    }}
-                  >
-                    <Controller
-                      control={control}
-                      name="selectedMeasurements"
-                      render={({ field: { onChange, value } }) => (
-                        <RNPickerSelect
-                          onValueChange={onChange}
-                          items={[
-                            { label: "un", value: "unidade" },
-                            { label: "kg", value: "kilo" },
-                            { label: "g", value: "gramas" },
-                            { label: "l", value: "litro" },
-                            { label: "ml", value: "milimetros" },
-                          ]}
-                          value={value}
-                          placeholder={{ label: "un", value: "un" }}
-                        />
-                      )}
-                    />
-                  </View>
+                  <Title>
+                    Quantidade<Span> (opcional)</Span>
+                  </Title>
+                  <Controller
+                    control={control}
+                    name="amount"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <Input
+                        keyboardType="numeric"
+                        value={formatQuantity(value ?? "")}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                      />
+                    )}
+                  />
                 </View>
-                <Title>
-                  Preço <Span> (opcional)</Span>
-                </Title>
-                <Controller
-                  control={control}
-                  name="valueItem"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      value={value}
-                      onChangeText={(value) => onChange(currencyMask(value))}
-                      onBlur={onBlur}
-                      placeholder="0,00"
-                      keyboardType="numeric"
-                    />
-                  )}
-                />
+                <View
+                  style={{
+                    width: 100,
+                  }}
+                >
+                  <Controller
+                    control={control}
+                    name="selectedMeasurements"
+                    render={({ field: { onChange, value } }) => (
+                      <RNPickerSelect
+                        onValueChange={onChange}
+                        items={[
+                          { label: "un", value: "unidade" },
+                          { label: "kg", value: "kilo" },
+                          { label: "g", value: "gramas" },
+                          { label: "l", value: "litro" },
+                          { label: "ml", value: "milimetros" },
+                        ]}
+                        value={value}
+                        placeholder={{ label: "un", value: "un" }}
+                      />
+                    )}
+                  />
+                </View>
+              </View>
+              <Title>
+                Preço <Span> (opcional)</Span>
+              </Title>
+              <Controller
+                control={control}
+                name="valueItem"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    value={value}
+                    onChangeText={(value) => onChange(currencyMask(value))}
+                    onBlur={onBlur}
+                    placeholder="0,00"
+                    keyboardType="numeric"
+                  />
+                )}
+              />
 
-                <Title>
-                  Categoria <Span> (opcional)</Span>
-                </Title>
+              <Title>
+                Categoria <Span> (opcional)</Span>
+              </Title>
 
-                <View style={{
+              <View
+                style={{
                   height: 50,
-                  justifyContent: 'center'
-                }}>
+                  justifyContent: "center",
+                }}
+              >
                 <Controller
                   control={control}
                   name="selectedCategory"
@@ -349,7 +366,10 @@ export function NewItem({
                           label: "Utensílios Domésticos",
                           value: "utensilios domesticos",
                         },
-                        { label: "Bebês e Crianças", value: "bebes e criancas" },
+                        {
+                          label: "Bebês e Crianças",
+                          value: "bebes e criancas",
+                        },
                         { label: "Eletronicos", value: "Eletronicos" },
                         { label: "Carro", value: "Carro" },
                         { label: "Ferramentas", value: "Ferramentas" },
@@ -359,45 +379,46 @@ export function NewItem({
                     />
                   )}
                 />
-                </View>
+              </View>
 
-                <Title>
-                  Observação <Span> (opcional)</Span>
-                </Title>
-                <Controller
-                  control={control}
-                  name="description"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input value={value} onChangeText={onChange} onBlur={onBlur} />
-                  )}
-                />
-
-              </>
-            }
-            <View style={{ marginBottom: 10, height: 150 }}>
-              {showButtonSave && (
-                <Button
-                  style={{ marginBottom: 10 }}
-                  onPress={
-                    isEditing
-                      ? handleSubmit(handleEditExpense, onInvalid)
-                      : handleSubmit(handleSaveItem, onInvalid)
-                  }
-                >
-                  <Title>{loading ? <LoadingIndicator/> : "Salvar"}</Title>
-                </Button>
-              )}
-              {showButtonRemove && (
-                <Button
-                  style={{ marginBottom: 10 }}
-                  onPress={handleDeleteExpense}
-                >
-                  <Title>Excluir</Title>
-                </Button>
-              )}
-            </View>
-          </Content>
-        </ScrollView>
+              <Title>
+                Observação <Span> (opcional)</Span>
+              </Title>
+              <Controller
+                control={control}
+                name="description"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                  />
+                )}
+              />
+            </>
+          )}
+          <View style={{ marginBottom: 10, height: 150 }}>
+            <Button
+              style={{ marginBottom: 10 }}
+              onPress={
+                isEditing
+                  ? handleSubmit(handleEditExpense, onInvalid)
+                  : handleSubmit(handleSaveItem, onInvalid)
+              }
+            >
+              <Title>{loading ? <LoadingIndicator /> : "Salvar"}</Title>
+            </Button>
+            {!!selectedItemId && (
+              <Button
+                style={{ marginBottom: 10 }}
+                onPress={handleDeleteExpense}
+              >
+                <Title>Excluir</Title>
+              </Button>
+            )}
+          </View>
+        </Content>
+      </ScrollView>
     </DefaultContainer>
   );
 }

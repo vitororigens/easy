@@ -15,18 +15,17 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { Button, Header, NavBar, Title } from "./styles";
 
+import { useNavigation } from "@react-navigation/native";
 import { format, getMonth, parse } from "date-fns";
 import { useTheme } from "styled-components/native";
 import PersonImage from "../../assets/illustrations/tasks.png";
 import { FinishTasks } from "../../components/FinishTasks";
-import { HistoryTaskModal } from "../../components/HistoryTaskModal";
 import { ItemTask } from "../../components/ItemTask";
 import { Items } from "../../components/Items";
 import { useMonth } from "../../context/MonthProvider";
 import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
 import theme from "../../theme";
 import { NewItemTask } from "../NewItemTask";
-import { useNavigation } from "@react-navigation/native";
 
 type SelectedItems = {
   [key: string]: boolean;
@@ -84,9 +83,8 @@ export function ListTask() {
     setSelectedItems({});
   }
 
-  function openModalHistoryTask(id: string) {
-    setShowHistoryTask(true);
-    setSelectedListTaskId(id);
+  function openModalHistoryTask(documentId: string) {
+    navigation.navigate("historytask", { selectedItemId: documentId });
   }
 
   function closeModals() {
@@ -96,7 +94,6 @@ export function ListTask() {
 
   function handleEditItem(documentId: string) {
     navigation.navigate("newitemtask", { selectedItemId: documentId });
-    console.log(selectedItemId)
   }
 
   function handleDeleteItem(documentId: string) {
@@ -293,25 +290,6 @@ export function ListTask() {
             selectedItemId={selectedItemId}
             showButtonSave
             showButtonRemove
-            closeBottomSheet={closeModals}
-          />
-        </View>
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showHistoryTask}
-        onRequestClose={closeModals}
-      >
-        <View
-          style={{
-            flex: 1,
-            paddingTop: Platform.OS === "ios" ? 20 : 0,
-          }}
-        >
-          <HistoryTaskModal
-            selectedItemId={selectedListTaskId}
             closeBottomSheet={closeModals}
           />
         </View>

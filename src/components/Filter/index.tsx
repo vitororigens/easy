@@ -8,10 +8,6 @@ import RNPickerSelect from "react-native-picker-select";
 import { useMonth } from "../../context/MonthProvider";
 //
 
-type Props = {
-  closeBottomSheet?: () => void;
-};
-
 // Vars
 const months = [
   { id: 1, name: "Janeiro" },
@@ -32,7 +28,7 @@ const currentDate = new Date();
 
 const currentMonth = currentDate.getMonth() + 1;
 
-export function Filter({ closeBottomSheet }: Props) {
+export function Filter() {
   // State
   const { selectedMonth, setSelectedMonth } = useMonth();
 
@@ -46,7 +42,7 @@ export function Filter({ closeBottomSheet }: Props) {
       <DefaultContainer
         hasHeader={false}
         title="Filtrar"
-        closeModalFn={closeBottomSheet}
+        backButton
       >
         <ContainerMonth
           style={{

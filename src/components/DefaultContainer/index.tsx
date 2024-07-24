@@ -4,8 +4,6 @@ import { Modal, Platform, View } from "react-native";
 import { NewItem } from "../../screens/NewItem";
 import { NewItemTask } from "../../screens/NewItemTask";
 import { NewLaunch } from "../../screens/NewLaunch";
-import { NewNotes } from "../../screens/NewNotes";
-import { Filter } from "../Filter";
 
 import { useTheme } from "styled-components/native";
 import {
@@ -87,12 +85,16 @@ export function DefaultContainer({
     navigation.navigate('newitemtask', { selectedItemId: documentId });
   }
 
-  function handleNewNotes() {
-    setShowNotesModal(true);
+  function handleNewNotes(documentId: string) {
+    navigation.navigate('newnotes', { selectedItemId: documentId });
   }
 
-  function handleNewItemMarketplace() {
-    setShowNewItemMarketplace(true);
+  function handleNewItemMarketplace(documentId: string) {
+    navigation.navigate('newitem', { selectedItemId: documentId });
+  }
+
+  function handleShowFilter() {
+    navigation.navigate('filter');
   }
 
   function handleNewLaunch() {
@@ -110,7 +112,7 @@ export function DefaultContainer({
               height: 60,
               width: "35%",
             }}
-            onPress={() => setShowFilterPickerModal(true)}
+            onPress={handleShowFilter}
           >
             <Icon name="filter-outline" />
           </Button>
@@ -170,7 +172,7 @@ export function DefaultContainer({
               flexDirection: "row",
               height: 60,
             }}
-            onPress={handleNewItemMarketplace}
+            onPress={() => handleNewItemMarketplace(selectedItemId)}
           >
             <Icon name="add-outline" />
           </Button>
@@ -181,7 +183,7 @@ export function DefaultContainer({
               alignItems: "center",
               flexDirection: "row",
             }}
-            onPress={handleNewNotes}
+            onPress={() => handleNewNotes(selectedItemId)}
           >
             <Icon name="add-outline" />
           </Button>
@@ -214,21 +216,6 @@ export function DefaultContainer({
         )}
       </Header>
       <Content customBg={customBg}>{children}</Content>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showFilterPickerModal}
-        onRequestClose={closeModals}
-      >
-        <View style={{
-          flex: 1,
-          paddingTop: Platform.OS === 'ios' ? 20 : 0,
-          backgroundColor: COLORS.PURPLE_800
-        }}>
-          <Filter closeBottomSheet={closeModals} />
-        </View>
-      </Modal>
-
       <Modal
         animationType="slide"
         transparent={true}
@@ -267,19 +254,6 @@ export function DefaultContainer({
         }}>
           <NewItem showButtonSave closeBottomSheet={closeModals} />
 
-        </View>
-      </Modal>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showNotesModal}
-        onRequestClose={closeModals}
-      >
-        <View style={{
-          flex: 1,
-          paddingTop: Platform.OS === 'ios' ? 20 : 0
-        }}>
-          <NewNotes showButtonSave closeBottomSheet={closeModals} />
         </View>
       </Modal>
     </Container>

@@ -2,17 +2,18 @@ import React, { useState } from "react";
 //
 import { ButtonBar, Content, Header, NavBar, Title } from "./styles";
 //
+import { useRoute } from "@react-navigation/native";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Expense } from "../../components/Expense";
 import { Revenue } from "../../components/Revenue";
 import theme from "../../theme";
 
-type Props = {
-  closeBottomSheet?: () => void;
-  initialActiveButton: string
-};
-
-export function NewTask({ closeBottomSheet, initialActiveButton }: Props) {
+export function NewTask() {
+  const route = useRoute();
+  const { selectedItemId, initialActiveButton } = route.params as {
+    selectedItemId?: string;
+    initialActiveButton?: string;
+  };
   const [activeButton, setActiveButton] = useState(initialActiveButton);
 
   const handleButtonClick = (buttonName: string) => {
@@ -24,8 +25,8 @@ export function NewTask({ closeBottomSheet, initialActiveButton }: Props) {
       <DefaultContainer
         hasHeader={false}
         title="Adicionar Lançamento"
-        closeModalFn={closeBottomSheet}
         customBg={theme.COLORS.TEAL_50}
+        backButton
       >
         <Content>
           <Header>
@@ -46,8 +47,8 @@ export function NewTask({ closeBottomSheet, initialActiveButton }: Props) {
               </ButtonBar>
             </NavBar>
           </Header>
-          {activeButton === "receitas" && <Revenue showButtonSave onCloseModal={closeBottomSheet} />}
-          {activeButton === "despesas" && <Expense showButtonSave onCloseModal={closeBottomSheet} />}
+          {activeButton === "receitas" && <Revenue showButtonSave />}
+          {activeButton === "despesas" && <Expense showButtonSave />}
         </Content>
       </DefaultContainer>
     </>
