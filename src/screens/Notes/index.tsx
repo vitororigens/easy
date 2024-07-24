@@ -1,6 +1,6 @@
 import { getMonth, parse } from "date-fns";
-import { useState } from "react";
-import { Dimensions, FlatList, Modal, Platform, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Dimensions, FlatList, Modal, Platform, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { ItemNotes } from "../../components/ItemNotes";
@@ -14,6 +14,7 @@ import { Content } from "./styles";
 
 import { useNavigation } from "@react-navigation/native";
 import PersonImage from "../../assets/illustrations/notes.png";
+import { Loading } from "../../components/Loading";
 
 const screenWidth = Dimensions.get("screen").width;
 
@@ -24,6 +25,7 @@ export function Notes() {
   const user = useUserAuth();
   const uid = user?.uid;
   const notesUser = data.filter((item) => item.uid === uid);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const navigation = useNavigation();
 
@@ -52,6 +54,20 @@ export function Notes() {
       .catch((error) => {
         console.error("Erro ao excluir a nota: ", error);
       });
+  }
+
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+
+  if (!isLoaded || uid === undefined) {
+    return <Loading/>;
   }
 
   return (

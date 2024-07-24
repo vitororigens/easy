@@ -565,15 +565,7 @@ export function Expense({
               <TitleTask>{loading ? <LoadingIndicator /> : "Salvar"}</TitleTask>
             </Button>
           )}
-          {showButtonEdit && (
-            <Button
-              style={{ marginBottom: 10 }}
-              onPress={handleSubmit(handleEditExpense, onInvalid)}
-            >
-              <TitleTask>Salvar</TitleTask>
-            </Button>
-          )}
-          {showButtonRemove && (
+          {isEditing && (
             <Button style={{ marginBottom: 10 }} onPress={handleDeleteExpense}>
               <TitleTask>Excluir</TitleTask>
             </Button>

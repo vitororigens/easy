@@ -487,15 +487,7 @@ export function Revenue({
               {loading && <LoadingIndicator style={{ marginTop: 2 }} />}
             </Button>
           )}
-          {showButtonEdit && (
-            <Button
-              style={{ marginBottom: 10 }}
-              onPress={handleSubmit(handleEditRevenue, onInvalid)}
-            >
-              <TitleTask>Salvar</TitleTask>
-            </Button>
-          )}
-          {showButtonRemove && (
+          {isEditing && (
             <Button style={{ marginBottom: 10 }} onPress={handleDeleteRevenue}>
               <TitleTask>Excluir</TitleTask>
             </Button>
