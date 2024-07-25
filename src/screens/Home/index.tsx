@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
-  Modal,
-  Platform,
   TouchableOpacity,
   View,
 } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { useTheme } from "styled-components/native";
 import { DefaultContainer } from "../../components/DefaultContainer";
-import { Expense } from "../../components/Expense";
 import { Items } from "../../components/Items";
 import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
@@ -20,7 +17,6 @@ import { useTotalValue } from "../../hooks/useTotalValue";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { NewTask } from "../NewTask";
 import {
   Button,
   ContainerItems,
@@ -39,12 +35,10 @@ import theme from "../../theme";
 export function Home() {
   const user = useUserAuth();
   const uid = user?.uid;
-  const { COLORS } = useTheme();
   const [activeButton, setActiveButton] = useState("receitas");
   const { selectedMonth } = useMonth();
   const revenue = useFirestoreCollection("Revenue");
   const expense = useFirestoreCollection("Expense");
-
   const { tolalRevenueMunth, totalExpenseMunth } = useTotalValue(
     uid || "Não foi possivel encontrar o uid"
   );
@@ -79,15 +73,12 @@ export function Home() {
   }
 
   function handleRevenueEdit(documentId: string, initialActiveButton: string) {
-    // @ts-ignore
-  navigation.navigate("newtask", { selectedItemId: documentId, initialActiveButton });
-}
-
+    navigation.navigate("newtask", { selectedItemId: documentId, initialActiveButton });
+  }
 
   function handleExpenseEdit(documentId: string, initialActiveButton: string) {
-    // @ts-ignore
-  navigation.navigate("newtask", { selectedItemId: documentId, initialActiveButton });
-}
+    navigation.navigate("newtask", { selectedItemId: documentId, initialActiveButton });
+  }
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
@@ -120,7 +111,6 @@ export function Home() {
   }
 
   function handleCreateItem(documentId: string, initialActiveButton: string) {
-    // @ts-ignore
     navigation.navigate("newtask", { selectedItemId: documentId, initialActiveButton });
   }
 
@@ -135,6 +125,9 @@ export function Home() {
   if (!isLoaded || uid === undefined) {
     return <Loading />;
   }
+
+  const filteredRevenue = revenue.filter((item) => item.uid === uid && item.month === selectedMonth);
+  const filteredExpense = expense.filter((item) => item.uid === uid && item.month === selectedMonth);
 
   return (
     <DefaultContainer
@@ -167,12 +160,18 @@ export function Home() {
       </Header>
       {activeButton === "receitas" && (
         <ContainerItems>
-          {revenue.filter((item) => item.uid === uid).length === 0 ? null : (
+          {filteredRevenue.length === 0 ? (
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 120 }}>
+              <LoadData
+                imageSrc={RevenuePersonImage}
+                title="Comece agora!"
+                subtitle="Adicione uma receita clicando em +"
+              />
+            </View>
+          ) : (
             <FlatList
               style={{ marginTop: 16 }}
-              data={revenue.filter(
-                (item) => item.uid === uid && item.month === selectedMonth
-              )}
+              data={filteredRevenue}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={() => handleRevenueEdit(item.id, activeButton)}
@@ -194,29 +193,24 @@ export function Home() {
                 </TouchableOpacity>
               )}
               contentContainerStyle={{ paddingBottom: 90 }}
-              ListEmptyComponent={
-                <LoadData
-                  imageSrc={RevenuePersonImage}
-                  title="Comece agora!"
-                  subtitle="Adicione uma receita clicando em +"
-                  width={300}
-                />
-              }
             />
           )}
         </ContainerItems>
       )}
       {activeButton === "despesas" && (
         <ContainerItems>
-          {expense.filter((item) => item.uid === uid).length === 0 ? null : (
+          {filteredExpense.length === 0 ? (
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 120 }}>
+              <LoadData
+                imageSrc={ExpensePersonImage}
+                title="Comece agora!"
+                subtitle="Adicione uma despesa clicando em +"
+              />
+            </View>
+          ) : (
             <FlatList
               style={{ marginTop: 16 }}
-              data={expense.filter(
-                (item) =>
-                  item.uid === uid &&
-                  ((item.repeat === true && item.month === selectedMonth) ||
-                    (item.repeat === false && item.month === selectedMonth))
-              )}
+              data={filteredExpense}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={() => handleExpenseEdit(item.id, activeButton)}
@@ -240,14 +234,6 @@ export function Home() {
               )}
               keyExtractor={(item) => item.id}
               contentContainerStyle={{ paddingBottom: 90 }}
-              ListEmptyComponent={
-                <LoadData
-                  imageSrc={ExpensePersonImage}
-                  title="Comece agora!"
-                  subtitle="Adicione uma despesa clicando em +"
-                  width={300}
-                />
-              }
             />
           )}
         </ContainerItems>

@@ -5,7 +5,6 @@ export const Container = styled.View`
     flex: 1;
     align-items: center;
     justify-content: center;
-    width: 100%;
 `;
 
 export const Title = styled.Text`
@@ -13,7 +12,7 @@ export const Title = styled.Text`
     font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
     color: ${({theme}) => theme.COLORS.PURPLE_600};
     text-align: center;
-    margin-top: 42px;
+    margin-top: 20px;
 `;
 
 export const SubTitle = styled.Text`
@@ -25,15 +24,8 @@ export const SubTitle = styled.Text`
     padding-left: 12px;
 `;
 
-type StyledImageProps = {
-    width: number
-    height: number
-}
-
 export const StyledImage = styled(Image)`
     height: ${({height}) => height}px;
     width: ${({width}) => width}px;
     align-self: center; 
-    margin-bottom: 20px;
-    margin-top: -20px;
 `;

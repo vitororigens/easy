@@ -19,7 +19,7 @@ export function LoadData({
   title,
   subtitle,
   imageSrc,
-  width = 400,
+  width = 300,
   height = 300
 }: LoadDataProps) {
   return (
