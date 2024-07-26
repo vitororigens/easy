@@ -6,9 +6,9 @@ export default {
     RED_700: '#b91c1c',
     GREEN_700: '#15803d',
     TEAL_600: '#3dc1b3',
-    TEAL_50: '#f1fcf9',
+    TEAL_50: '#d1f6ef',
 
-    PURPLE_50: '#f9f6fe',
+    PURPLE_50: '#f1eafd',
     PURPLE_600: '#7201b5',
     PURPLE_800: '#492276',
     

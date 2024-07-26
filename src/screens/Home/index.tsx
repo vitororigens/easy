@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {
-  FlatList,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, TouchableOpacity, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
-import { useTheme } from "styled-components/native";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Items } from "../../components/Items";
 import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
-import { Revenue } from "../../components/Revenue";
 import { useMonth } from "../../context/MonthProvider";
 import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { useTotalValue } from "../../hooks/useTotalValue";
@@ -20,11 +14,10 @@ import { formatCurrency } from "../../utils/formatCurrency";
 import {
   Button,
   ContainerItems,
-  Content,
   Header,
   NavBar,
   SubTitle,
-  Title,
+  Title
 } from "./styles";
 
 import { useNavigation } from "@react-navigation/native";
@@ -48,7 +41,7 @@ export function Home() {
   const [selectedItemId, setSelectedItemId] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const formattedRevenue = tolalRevenueMunth.toLocaleString("pt-BR", {
     style: "currency",
@@ -73,11 +66,17 @@ export function Home() {
   }
 
   function handleRevenueEdit(documentId: string, initialActiveButton: string) {
-    navigation.navigate("newtask", { selectedItemId: documentId, initialActiveButton });
+    navigation.navigate("newtask", {
+      selectedItemId: documentId,
+      initialActiveButton,
+    });
   }
 
   function handleExpenseEdit(documentId: string, initialActiveButton: string) {
-    navigation.navigate("newtask", { selectedItemId: documentId, initialActiveButton });
+    navigation.navigate("newtask", {
+      selectedItemId: documentId,
+      initialActiveButton,
+    });
   }
 
   const handleButtonClick = (buttonName: string) => {
@@ -111,7 +110,10 @@ export function Home() {
   }
 
   function handleCreateItem(documentId: string, initialActiveButton: string) {
-    navigation.navigate("newtask", { selectedItemId: documentId, initialActiveButton });
+    navigation.navigate("newtask", {
+      selectedItemId: documentId,
+      initialActiveButton,
+    });
   }
 
   useEffect(() => {
@@ -126,8 +128,12 @@ export function Home() {
     return <Loading />;
   }
 
-  const filteredRevenue = revenue.filter((item) => item.uid === uid && item.month === selectedMonth);
-  const filteredExpense = expense.filter((item) => item.uid === uid && item.month === selectedMonth);
+  const filteredRevenue = revenue.filter(
+    (item) => item.uid === uid && item.month === selectedMonth
+  );
+  const filteredExpense = expense.filter(
+    (item) => item.uid === uid && item.month === selectedMonth
+  );
 
   return (
     <DefaultContainer
@@ -136,7 +142,7 @@ export function Home() {
       type="SECONDARY"
       subtitle={formattedTotalValue}
       addActionFn={() => handleCreateItem(selectedItemId, activeButton)}
-      customBg={theme.COLORS.TEAL_50}
+      customBg={activeButton === "receitas" ? theme.COLORS.TEAL_50 : theme.COLORS.PURPLE_50}
     >
       <Header>
         <NavBar>
@@ -161,7 +167,14 @@ export function Home() {
       {activeButton === "receitas" && (
         <ContainerItems>
           {filteredRevenue.length === 0 ? (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 120 }}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 120,
+              }}
+            >
               <LoadData
                 imageSrc={RevenuePersonImage}
                 title="Comece agora!"
@@ -200,7 +213,14 @@ export function Home() {
       {activeButton === "despesas" && (
         <ContainerItems>
           {filteredExpense.length === 0 ? (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 120 }}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 120,
+              }}
+            >
               <LoadData
                 imageSrc={ExpensePersonImage}
                 title="Comece agora!"

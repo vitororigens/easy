@@ -12,6 +12,7 @@ import useFirestoreCollection, {
 import { Button, Content, Header, NavBar, Title } from "./styles";
 
 import PersonImage from "../../assets/illustrations/charts.png";
+import theme from "../../theme";
 
 const screenWidth = Dimensions.get("screen").width;
 
@@ -127,7 +128,7 @@ export function Charts() {
   const chartWidth = Math.max(screenWidth, chartData.labels.length * 60);
 
   return (
-    <DefaultContainer title="Análise Gráfica" backButton>
+    <DefaultContainer title="Análise Gráfica" backButton customBg={activeButton === "receitas" ? theme.COLORS.TEAL_50 : theme.COLORS.PURPLE_50}>
       <Content>
         <Header>
           <NavBar>
