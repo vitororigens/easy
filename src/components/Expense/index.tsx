@@ -27,6 +27,8 @@ import {
   Title,
   TitleTask,
 } from "./styles";
+import notifee, { AndroidImportance, TimestampTrigger, TriggerType, EventType } from "@notifee/react-native";
+import { formatDate } from "date-fns";
 
 export type ExpenseProps = {
   selectedItemId?: string;
@@ -43,6 +45,8 @@ const formSchema = z.object({
   formattedDate: z.string().min(1, "Data é obrigatória"),
   description: z.string().optional(),
   selectedCategory: z.string().optional(),
+  selectedDateNotification: z.string().optional(),
+  selectedHourNotification: z.string().optional(),
 });
 
 type FormSchemaType = z.infer<typeof formSchema>;
@@ -68,6 +72,7 @@ export function Expense({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [loading, setLoading] = useState(false);
   const uid = user?.uid;
+  const { getValues } = useForm<FormSchemaType>();
 
   // Hooks
   const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
@@ -77,11 +82,78 @@ export function Expense({
       formattedDate: date.toLocaleDateString("pt-BR"),
       name: "",
       selectedCategory: "outros",
+      selectedDateNotification: "no dia",
+      selectedHourNotification: "08:00",
       valueTransaction: "",
     },
   });
 
   // Functions
+  const validateNotificationParams = () => {
+    const { selectedHourNotification, selectedDateNotification } = getValues();
+
+    if (!selectedHourNotification || !selectedDateNotification) {
+      return { isValid: false, errorMessage: 'Horário ou data de notificação não definido.' };
+    }
+
+    const [hour, minute] = selectedHourNotification.split(':');
+    if (isNaN(Number(hour)) || isNaN(Number(minute))) {
+      return { isValid: false, errorMessage: 'Hora ou minuto inválido.' };
+    }
+
+    const notificationDate = new Date(date);
+    notificationDate.setHours(Number(hour), Number(minute), 0, 0);
+
+    switch (selectedDateNotification) {
+      case 'um dia antes':
+        notificationDate.setDate(notificationDate.getDate() - 1);
+        break;
+      case 'tres dias antes':
+        notificationDate.setDate(notificationDate.getDate() - 3);
+        break;
+      case 'cinco dias antes':
+        notificationDate.setDate(notificationDate.getDate() - 5);
+        break;
+      default:
+        return { isValid: false, errorMessage: 'Data de notificação inválida.' };
+    }
+
+    if (notificationDate < new Date()) {
+      return { isValid: false, errorMessage: 'A data de notificação está no passado.' };
+    }
+
+    return { isValid: true, notificationDate };
+  };
+
+  const scheduleNotification = async (notificationDate) => {
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: notificationDate.getTime(),
+    };
+
+    try {
+      const channelId = await notifee.createChannel({
+        id: 'notificacao',
+        name: 'Expense Notification',
+        vibration: true,
+        importance: AndroidImportance.HIGH,
+      });
+
+      await notifee.createTriggerNotification(
+        {
+          title: "Boleto agendado!",
+          body: "Olá, você tem boletos prestes a vencer",
+          android: { channelId },
+        },
+        trigger
+      );
+    } catch (error) {
+      console.error('Erro ao agendar notificação:', error);
+    }
+  };
+
+
+
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     setShowDatePicker(false);
     const currentDate = selectedDate || date;
@@ -94,7 +166,7 @@ export function Expense({
     setShowDatePicker(true);
   };
 
-  const handleSaveExpense = ({
+  const handleSaveExpense = async ({
     formattedDate,
     name,
     valueTransaction,
@@ -102,100 +174,119 @@ export function Expense({
     selectedCategory,
   }: FormSchemaType) => {
     setLoading(true);
-
-    const [day, month, year] = formattedDate.split("/");
-    const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
-    const monthNumber = selectedDate.getMonth() + 1;
-
-    const transactionValue = valueTransaction
-      ? currencyUnMask(valueTransaction)
-      : 0;
-
-    const expenseData = {
-      name: name,
-      category: selectedCategory,
-      date: formattedDate,
-      valueTransaction: transactionValue,
-      description: description,
-      repeat: repeat,
-      status: status,
-      alert: alert,
-      type: "output",
-      uid: uid,
-      month: monthNumber,
-      income,
-    };
-
-    // Save the expense for the current month
-    database
-      .collection("Expense")
-      .add(expenseData)
-      .then(() => {
-        Toast.show("Transação adicionada!", { type: "success" });
-        setLoading(false);
-        setRepeat(false);
-        setAlert(false);
-        setStatus(false);
-        setIncome(false);
-        reset();
-        !!onCloseModal && onCloseModal();
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.error("Erro ao adicionar a transação: ", error);
-      });
-
-    // If the repeat switch is on, create copies for the next 11 months
-    if (repeat) {
-      for (let i = 1; i <= 11; i++) {
-        let nextMonth = monthNumber + i;
-        let nextYear: any = year;
-
-        if (nextMonth > 12) {
-          nextMonth -= 12;
-          nextYear++;
-        }
-
-        // Adiciona verificação para garantir que não passe do ano corrente
-        if (nextYear > year) {
-          break;
-        }
-
-        const nextDate = `${day}/${nextMonth}/${nextYear}`;
-        const nextMonthExpenseData = {
-          ...expenseData,
-          date: nextDate,
-          month: nextMonth,
-        };
-
-        database
-          .collection("Expense")
-          .add(nextMonthExpenseData)
-          .catch((error) => {
-            console.error("Erro ao adicionar a transação repetida: ", error);
-          });
+  
+    try {
+      const [day, month, year] = formattedDate.split("/");
+      const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
+      const monthNumber = selectedDate.getMonth() + 1;
+  
+      const transactionValue = valueTransaction
+        ? currencyUnMask(valueTransaction)
+        : 0;
+  
+      const expenseData = {
+        name: name,
+        category: selectedCategory,
+        date: formattedDate,
+        valueTransaction: transactionValue,
+        description: description,
+        repeat: repeat,
+        status: status,
+        alert: alert,
+        type: "output",
+        uid: uid,
+        month: monthNumber,
+        income,
+      };
+  
+      // Save the expense for the current month
+      await database.collection("Expense").add(expenseData);
+      Toast.show("Transação adicionada!", { type: "success" });
+  
+      await handleNotification();
+  
+      setLoading(false);
+      setRepeat(false);
+      setAlert(false);
+      setStatus(false);
+      setIncome(false);
+      reset();
+      if (onCloseModal) {
+        onCloseModal();
       }
+  
+      // If the repeat switch is on, create copies for the next 11 months
+      if (repeat) {
+        for (let i = 1; i <= 11; i++) {
+          let nextMonth = monthNumber + i;
+          let nextYear: any = year;
+  
+          if (nextMonth > 12) {
+            nextMonth -= 12;
+            nextYear++;
+          }
+  
+          // Adiciona verificação para garantir que não passe do ano corrente
+          if (nextYear > year) {
+            break;
+          }
+  
+          const nextDate = `${day}/${nextMonth}/${nextYear}`;
+          const nextMonthExpenseData = {
+            ...expenseData,
+            date: nextDate,
+            month: nextMonth,
+          };
+  
+          database
+            .collection("Expense")
+            .add(nextMonthExpenseData)
+            .catch((error) => {
+              console.error("Erro ao adicionar a transação repetida: ", error);
+            });
+        }
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("Erro ao adicionar a transação: ", error);
+      Toast.show("Erro ao adicionar a transação", { type: "danger" });
     }
   };
-
+  
   const handleDeleteExpense = () => {
     if (!selectedItemId) {
       console.error("Nenhum documento selecionado para exclusão!");
       return;
     }
-
+  
     const expenseRef = database.collection("Expense").doc(selectedItemId);
     expenseRef
       .delete()
       .then(() => {
         console.log("Documento de despesa excluído com sucesso.");
-        onCloseModal && onCloseModal();
+        if (onCloseModal) {
+          onCloseModal();
+        }
       })
       .catch((error) => {
         console.error("Erro ao excluir o documento de despesa:", error);
       });
   };
-
+  
+  async function handleNotification() {
+    try {
+      const validationResult = await validateNotificationParams();
+      if (validationResult.isValid) {
+        await scheduleNotification(validationResult.notificationDate);
+        console.log('Notificação agendada com sucesso!');
+      } else {
+        console.error(validationResult.errorMessage);
+      }
+    } catch (error) {
+      console.error('Erro inesperado:', error);
+    }
+  }
+  
   const handleEditExpense = async ({
     formattedDate,
     name,
@@ -208,15 +299,15 @@ export function Expense({
       return;
     }
     setLoading(true);
-  
+
     const [day, month, year] = formattedDate.split("/");
     const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
     const monthNumber = selectedDate.getMonth() + 1;
-  
+
     const transactionValue = valueTransaction
       ? currencyUnMask(valueTransaction)
       : 0;
-  
+
     try {
       const expenseData = {
         name,
@@ -232,17 +323,17 @@ export function Expense({
         month: monthNumber,
         income,
       };
-  
+
       await database.collection("Expense").doc(selectedItemId).set(expenseData);
       Toast.show("Transação editada!", { type: "success" });
-  
+
       if (removeRepeat) {
         const expensesSnapshot = await database
           .collection("Expense")
           .where("uid", "==", uid)
           .where("name", "==", name)
           .get();
-  
+
         const batch = database.batch();
         expensesSnapshot.forEach((doc) => {
           const expenseMonth = doc.data().month;
@@ -250,10 +341,10 @@ export function Expense({
             batch.delete(doc.ref);
           }
         });
-  
+
         await batch.commit();
       }
-  
+
       setLoading(false);
       setRepeat(false);
       setAlert(false);
@@ -265,7 +356,7 @@ export function Expense({
       console.error("Erro ao editar a transação: ", error);
     }
   };
-  
+
   const onInvalid = () => {
     Alert.alert(
       "Atenção!",
@@ -319,6 +410,33 @@ export function Expense({
         });
     }
   }, [selectedItemId]);
+
+  useEffect(() => {
+    const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
+      switch (type) {
+        case EventType.DISMISSED:
+          console.log('Usuário descartou a notificação');
+          break;
+
+        case EventType.ACTION_PRESS:
+          console.log('Usuário pressionou a notificação', detail.notification);
+          break;
+
+        default:
+          break;
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    return notifee.onBackgroundEvent(async ({ type, detail }) => {
+      if (type === EventType.PRESS) {
+        console.log("Usuário tocou na notificação", detail.notification);
+      }
+    })
+  }, [])
+
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
@@ -492,6 +610,61 @@ export function Expense({
                     />
                   </View>
                 </View>
+                {alert &&
+                  <>
+                    <TitleTask>
+                      Data da notificação
+                    </TitleTask>
+                    <View style={{ height: 50, justifyContent: "center" }}>
+                      <Controller
+                        control={control}
+                        name="selectedDateNotification"
+                        render={({ field: { onChange, value } }) => (
+                          <RNPickerSelect
+                            value={value}
+                            onValueChange={(value) => onChange(value)}
+                            items={[
+                              { label: "No dia", value: "no dia" },
+                              { label: "Um dia antes", value: "um dia antes" },
+                              { label: "Tres dia antes", value: "tres dia antes" },
+                              { label: "Cinco dia antes de vencer", value: "cinco dias antes de vencer" },
+
+                            ]}
+                            placeholder={{
+                              label: "Selecione",
+                              value: "Selecione",
+                            }}
+                          />
+                        )}
+                      />
+                    </View>
+                    <TitleTask>
+                      Hora da notificação
+                    </TitleTask>
+                    <View style={{ height: 50, justifyContent: "center" }}>
+                      <Controller
+                        control={control}
+                        name="selectedHourNotification"
+                        render={({ field: { onChange, value } }) => (
+                          <RNPickerSelect
+                            value={value}
+                            onValueChange={(value) => onChange(value)}
+                            items={[
+                              { label: "07:00", value: "07:00" },
+                              { label: "08:00", value: "08:00" },
+                              { label: "09:00", value: "09:00" },
+
+                            ]}
+                            placeholder={{
+                              label: "Selecione",
+                              value: "Selecione",
+                            }}
+                          />
+                        )}
+                      />
+                    </View>
+                  </>
+                }
               </View>
               <DividerTask />
               <View style={{ width: "50%" }}>

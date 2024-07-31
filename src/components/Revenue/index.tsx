@@ -79,6 +79,7 @@ export function Revenue({
 
   // Functions
 
+
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     setShowDatePicker(false);
     const currentDate = selectedDate || date;
@@ -378,7 +379,7 @@ export function Revenue({
         </View>
         {showAdvanced && (
           <>
-            <View style={{ flexDirection: "row", marginBottom: 10 }}> 
+            <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <View style={{ width: "50%" }}>
                 <View>
                   <TitleTask>
