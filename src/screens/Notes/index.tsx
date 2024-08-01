@@ -1,6 +1,6 @@
 import { getMonth, parse } from "date-fns";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Dimensions, FlatList, Modal, Platform, View } from "react-native";
+import { Dimensions, FlatList, Modal, Platform, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { ItemNotes } from "../../components/ItemNotes";
@@ -95,6 +95,8 @@ export function Notes() {
               />
             </View>
           }
+          ListFooterComponent={<View style={{ height: 60 }} />}
+
         />
       </Content>
 

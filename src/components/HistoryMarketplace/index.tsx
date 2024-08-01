@@ -11,11 +11,11 @@ import { Button, Content, Title, TotalValue } from "./styles";
 
 export function HistoryMarketplaceModal() {
   const user = useUserAuth();
-  const route = useRoute()
+  const route = useRoute();
 
   const { selectedItemId } = route.params as { selectedItemId?: string };
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const historyData = useHistoryMarketplaceCollections("HistoryMarketplace");
   const selectedListMarketplace = historyData.find(
@@ -45,7 +45,7 @@ export function HistoryMarketplaceModal() {
       .commit()
       .then(() => {
         Toast.show("Itens adicionados!", { type: "success" });
-        navigation.goBack()
+        navigation.goBack();
       })
       .catch((error) => {
         console.error("Erro ao adicionar os itens:", error);
@@ -71,10 +71,14 @@ export function HistoryMarketplaceModal() {
             )}
             keyExtractor={(item) => item.id}
             contentContainerStyle={{ paddingBottom: 20 }}
+            ListFooterComponent={<View style={{ height: 60 }} />}
           />
           <View>
             <TotalValue>
-              Valor total: {selectedListMarketplace?.total ? formatCurrency(selectedListMarketplace?.total) : "R$ 0,00"}
+              Valor total:{" "}
+              {selectedListMarketplace?.total
+                ? formatCurrency(selectedListMarketplace?.total)
+                : "R$ 0,00"}
             </TotalValue>
           </View>
           <View style={{ marginBottom: 0, height: 60 }}>

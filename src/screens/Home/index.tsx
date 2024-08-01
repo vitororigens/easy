@@ -17,13 +17,12 @@ import {
   Header,
   NavBar,
   SubTitle,
-  Title
+  Title,
 } from "./styles";
 
 import { useNavigation } from "@react-navigation/native";
 import ExpensePersonImage from "../../assets/illustrations/expense.png";
 import RevenuePersonImage from "../../assets/illustrations/revenue.png";
-import theme from "../../theme";
 
 export function Home() {
   const user = useUserAuth();
@@ -142,7 +141,6 @@ export function Home() {
       type="SECONDARY"
       subtitle={formattedTotalValue}
       addActionFn={() => handleCreateItem(selectedItemId, activeButton)}
-      
     >
       <Header>
         <NavBar>
@@ -206,6 +204,7 @@ export function Home() {
                 </TouchableOpacity>
               )}
               contentContainerStyle={{ paddingBottom: 90 }}
+              ListFooterComponent={<View style={{ height: 60 }} />}
             />
           )}
         </ContainerItems>
@@ -254,6 +253,7 @@ export function Home() {
               )}
               keyExtractor={(item) => item.id}
               contentContainerStyle={{ paddingBottom: 90 }}
+              ListFooterComponent={<View style={{ height: 60 }} />}
             />
           )}
         </ContainerItems>

@@ -24,7 +24,6 @@ import { ItemTask } from "../../components/ItemTask";
 import { Items } from "../../components/Items";
 import { useMonth } from "../../context/MonthProvider";
 import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
-import theme from "../../theme";
 import { NewItemTask } from "../NewItemTask";
 
 type SelectedItems = {
@@ -242,6 +241,7 @@ export function ListTask() {
               width={300}
             />
           }
+          ListFooterComponent={<View style={{ height: 60 }} />}
         />
       )}
 

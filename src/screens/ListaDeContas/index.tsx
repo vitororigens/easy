@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FlatList, Modal, TouchableOpacity } from "react-native";
+import { FlatList, Modal, TouchableOpacity, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
@@ -48,7 +48,7 @@ export function ListaDeContas() {
       .update({
         status: !selected?.status,
       })
-      .then(() => { })
+      .then(() => {})
       .catch(() => {
         Toast.show("Erro ao atualizar despesa", { type: "error" });
       });
@@ -81,13 +81,6 @@ export function ListaDeContas() {
         >
           <Content>
             <FlatList
-              ListEmptyComponent={
-                <LoadData
-                  image="SECONDARY"
-                  title="Desculpe!"
-                  subtitle="Você ainda não possui lançamentos de saídas! Comece lançando uma nova saída."
-                />
-              }
               data={expense.filter(
                 (item) =>
                   item.uid === uid &&
@@ -112,6 +105,14 @@ export function ListaDeContas() {
                   />
                 </TouchableOpacity>
               )}
+              ListEmptyComponent={
+                <LoadData
+                  image="SECONDARY"
+                  title="Desculpe!"
+                  subtitle="Você ainda não possui lançamentos de saídas! Comece lançando uma nova saída."
+                />
+              }
+              ListFooterComponent={<View style={{ height: 60 }} />}
             />
           </Content>
         </Container>

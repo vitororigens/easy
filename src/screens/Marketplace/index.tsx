@@ -26,7 +26,6 @@ import useMarketplaceCollections, {
 } from "../../hooks/useMarketplaceCollections";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
-import theme from "../../theme";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { NewItem } from "../NewItem";
 import { Button, Header, NavBar, Title } from "./styles";
@@ -311,6 +310,7 @@ export function Marketplace() {
             />
           )}
           contentContainerStyle={{ paddingBottom: 90 }}
+          ListFooterComponent={<View style={{ height: 60 }} />}
           ListEmptyComponent={
             <LoadData
               imageSrc={PersonImage}
@@ -341,6 +341,7 @@ export function Marketplace() {
             </TouchableOpacity>
           )}
           contentContainerStyle={{ paddingBottom: 90 }}
+          ListFooterComponent={<View style={{ height: 60 }} />}
           ListEmptyComponent={
             <LoadData
               imageSrc={PersonImage}

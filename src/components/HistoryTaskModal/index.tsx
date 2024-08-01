@@ -1,12 +1,12 @@
 import { useRoute } from "@react-navigation/native";
-import { FlatList } from "react-native";
+import { FlatList, View } from "react-native";
 import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
 import { DefaultContainer } from "../DefaultContainer";
 import { ItemTask } from "../ItemTask";
 import { Content } from "./styles";
 
 export function HistoryTaskModal() {
-  const route = useRoute()
+  const route = useRoute();
 
   const { selectedItemId } = route.params as { selectedItemId?: string };
 
@@ -19,11 +19,7 @@ export function HistoryTaskModal() {
 
   return (
     <>
-      <DefaultContainer
-        hasHeader={false}
-        title="Tarefas"
-        backButton
-      >
+      <DefaultContainer hasHeader={false} title="Tarefas" backButton>
         <Content>
           <FlatList
             data={tasks}
@@ -31,6 +27,7 @@ export function HistoryTaskModal() {
               <ItemTask title={item.name} isChecked={true} hasActions={false} />
             )}
             keyExtractor={(item) => item.id}
+            ListFooterComponent={<View style={{ height: 60 }} />}
           />
         </Content>
       </DefaultContainer>
