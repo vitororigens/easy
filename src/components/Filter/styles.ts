@@ -54,7 +54,7 @@ export const ButtonBar = styled(TouchableOpacity)<ButtonProps>`
     width: 50%;
     border-top-width: 4px;
     border-top-style: solid;
-    background-color: ${({theme, active}) => active ? theme.COLORS.GRAY_300 : "transparent"};
+   background-color: ${({theme}) => theme.COLORS.WHITE};
     border-top-color: ${({theme, active}) => !active ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_300};
 `;
 

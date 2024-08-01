@@ -142,7 +142,7 @@ export function Home() {
       type="SECONDARY"
       subtitle={formattedTotalValue}
       addActionFn={() => handleCreateItem(selectedItemId, activeButton)}
-      customBg={activeButton === "receitas" ? theme.COLORS.TEAL_50 : theme.COLORS.PURPLE_50}
+      
     >
       <Header>
         <NavBar>

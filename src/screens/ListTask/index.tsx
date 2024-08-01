@@ -189,7 +189,7 @@ export function ListTask() {
       newItem
       monthButton
       title="Lista de Tarefas"
-      customBg={activeButton === "tarefas" ? theme.COLORS.TEAL_50 : theme.COLORS.PURPLE_50}
+      
     >
       <Header>
         <NavBar>

@@ -111,24 +111,24 @@ export function Charts() {
       ? generateChartData(revenueData)
       : generateChartData(expenseData);
 
-  const chartConfig = {
-    backgroundGradientFrom: "#FFFFFF",
-    backgroundGradientFromOpacity: 0,
-    backgroundGradientTo: "#FFFFFF",
-    backgroundGradientToOpacity: 0.5,
-    color:
-      activeButton === "receitas"
-        ? (opacity = 1) => COLORS.TEAL_600
-        : (opacity = 1) => COLORS.PURPLE_600,
-    strokeWidth: 2,
-    barPercentage: 0.5,
-    useShadowColorFromDataset: false,
-  };
+      const chartConfig = {
+        backgroundGradientFrom: "#FFFFFF",
+        backgroundGradientFromOpacity: 0,
+        backgroundGradientTo: "#FFFFFF",
+        backgroundGradientToOpacity: 0.5,
+        color:
+          activeButton === "receitas"
+            ? (opacity = 1) => COLORS.TEAL_600
+            : (opacity = 1) => COLORS.PURPLE_600,
+        strokeWidth: 2,
+        barPercentage: 0.5,
+        useShadowColorFromDataset: false,
+      };
 
   const chartWidth = Math.max(screenWidth, chartData.labels.length * 60);
 
   return (
-    <DefaultContainer title="Análise Gráfica" backButton customBg={activeButton === "receitas" ? theme.COLORS.TEAL_50 : theme.COLORS.PURPLE_50}>
+    <DefaultContainer title="Análise Gráfica" backButton >
       <Content>
         <Header>
           <NavBar>

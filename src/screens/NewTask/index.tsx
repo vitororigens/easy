@@ -30,7 +30,7 @@ export function NewTask() {
       <DefaultContainer
         hasHeader={false}
         title="Adicionar Lançamento"
-        customBg={theme.COLORS.TEAL_50}
+       
         backButton
       >
         <Content>

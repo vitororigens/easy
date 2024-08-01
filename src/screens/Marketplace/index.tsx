@@ -275,7 +275,7 @@ export function Marketplace() {
       newItemMarketplace
       title="Lista de Mercado"
       type="PRIMARY"
-      customBg={activeButton === "lista" ? theme.COLORS.TEAL_50 :theme.COLORS.PURPLE_50}
+      
     >
       <Header>
         <NavBar>

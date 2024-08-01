@@ -40,7 +40,7 @@ export const Button = styled(TouchableOpacity)<ButtonProps>`
     width: 50%;
     border-top-width: 4px;
     border-top-style: solid;
-    background-color: ${({theme, active}) => active ? theme.COLORS.GRAY_300 : "transparent"};
+    background-color: ${({theme}) => theme.COLORS.WHITE};
     border-top-color: ${({theme, active}) => !active ? theme.COLORS.PURPLE_800 : theme.COLORS.GRAY_300};
 `;
 
