@@ -30,7 +30,7 @@ import { formatCurrency } from "../../utils/formatCurrency";
 import { NewItem } from "../NewItem";
 import { Button, Header, NavBar, Title } from "./styles";
 
-const modalBottom = Platform.OS === "ios" ? 90 : 70;
+const modalBottom = Platform.OS === "ios" ? 50 : 60;
 
 export function Marketplace() {
   const { selectedMonth } = useMonth();
@@ -310,7 +310,7 @@ export function Marketplace() {
             />
           )}
           contentContainerStyle={{ paddingBottom: 90 }}
-          ListFooterComponent={<View style={{ height: 60 }} />}
+          ListFooterComponent={<View style={{ height: 90 }} />}
           ListEmptyComponent={
             <LoadData
               imageSrc={PersonImage}
@@ -341,7 +341,7 @@ export function Marketplace() {
             </TouchableOpacity>
           )}
           contentContainerStyle={{ paddingBottom: 90 }}
-          ListFooterComponent={<View style={{ height: 60 }} />}
+          ListFooterComponent={<View style={{ height: 90 }} />}
           ListEmptyComponent={
             <LoadData
               imageSrc={PersonImage}

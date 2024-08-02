@@ -27,7 +27,7 @@ export function HistoryTaskModal() {
               <ItemTask title={item.name} isChecked={true} hasActions={false} />
             )}
             keyExtractor={(item) => item.id}
-            ListFooterComponent={<View style={{ height: 60 }} />}
+            ListFooterComponent={<View style={{ height: 90 }} />}
           />
         </Content>
       </DefaultContainer>

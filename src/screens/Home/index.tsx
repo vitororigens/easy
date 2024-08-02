@@ -204,7 +204,7 @@ export function Home() {
                 </TouchableOpacity>
               )}
               contentContainerStyle={{ paddingBottom: 90 }}
-              ListFooterComponent={<View style={{ height: 60 }} />}
+              ListFooterComponent={<View style={{ height: 90 }} />}
             />
           )}
         </ContainerItems>
@@ -253,7 +253,7 @@ export function Home() {
               )}
               keyExtractor={(item) => item.id}
               contentContainerStyle={{ paddingBottom: 90 }}
-              ListFooterComponent={<View style={{ height: 60 }} />}
+              ListFooterComponent={<View style={{ height: 90 }} />}
             />
           )}
         </ContainerItems>

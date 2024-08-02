@@ -241,7 +241,7 @@ export function ListTask() {
               width={300}
             />
           }
-          ListFooterComponent={<View style={{ height: 60 }} />}
+          ListFooterComponent={<View style={{ height: 90 }} />}
         />
       )}
 

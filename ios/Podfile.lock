@@ -2247,7 +2247,7 @@ PODS:
   - RecaptchaInterop (100.0.0)
   - RNCPicker (2.6.1):
     - React-Core
-  - RNDateTimePicker (7.6.1):
+  - RNDateTimePicker (7.7.0):
     - React-Core
   - RNFBApp (19.1.0):
     - Firebase/CoreOnly (= 10.23.0)
@@ -2270,6 +2270,11 @@ PODS:
     - Firebase/Storage (= 10.23.0)
     - React-Core
     - RNFBApp
+  - RNNotifee (7.8.2):
+    - React-Core
+    - RNNotifee/NotifeeCore (= 7.8.2)
+  - RNNotifee/NotifeeCore (7.8.2):
+    - React-Core
   - RNScreens (3.29.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
@@ -2356,6 +2361,7 @@ DEPENDENCIES:
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - "RNFBStorage (from `../node_modules/@react-native-firebase/storage`)"
+  - "RNNotifee (from `../node_modules/@notifee/react-native`)"
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -2536,6 +2542,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/messaging"
   RNFBStorage:
     :path: "../node_modules/@react-native-firebase/storage"
+  RNNotifee:
+    :path: "../node_modules/@notifee/react-native"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   RNSVG:
@@ -2637,12 +2645,13 @@ SPEC CHECKSUMS:
   ReactCommon: e168ee1704806f10f47ee8c7f825b5850b18eaea
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   RNCPicker: b18aaf30df596e9b1738e7c1f9ee55402a229dca
-  RNDateTimePicker: 8fb39263b721223e095248acaf6f406d5b7f6713
+  RNDateTimePicker: 4f3c4dbd4f908be32ec8c93f086e8924bd4a2e07
   RNFBApp: 909e1780a2c70abc89fa5a1375bbb31b2f6cd700
   RNFBAuth: 2306d743a4b3debad438be01258365ed565166e4
   RNFBFirestore: cbf8a06c8c5476a39e23a7824c0230ee00417d2c
   RNFBMessaging: 483682635ec294eb1fb58def54c847e0c52743fa
   RNFBStorage: 7554dac4e626a4129af6a69da1ae0b4f417c9a54
+  RNNotifee: 8e2d3df3f0e9ce8f5d1fe4c967431138190b6175
   RNScreens: a4d9ce8f68f833f4e42410140eafd88e38bba163
   RNSVG: 963a95f1f5d512a13d11ffd50d351c87fb5c6890
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17

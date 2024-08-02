@@ -112,7 +112,7 @@ export function ListaDeContas() {
                   subtitle="Você ainda não possui lançamentos de saídas! Comece lançando uma nova saída."
                 />
               }
-              ListFooterComponent={<View style={{ height: 60 }} />}
+              ListFooterComponent={<View style={{ height: 90 }} />}
             />
           </Content>
         </Container>
