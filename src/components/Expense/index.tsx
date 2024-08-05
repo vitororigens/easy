@@ -479,6 +479,7 @@ export function Expense({
               mode="date"
               display="calendar"
               onChange={handleDateChange}
+              accessibilityLanguage="pt-BR"
             />
             </View>
           </View>
@@ -511,6 +512,7 @@ export function Expense({
                 value={date}
                 mode="date"
                 onChange={handleDateChange}
+                locale="pt-BR"
               />
             )}
           </View>
@@ -624,6 +626,7 @@ export function Expense({
                             label: "Selecione",
                             value: "Selecione",
                           }}
+                          doneText="Pronto"
                         />
                       )}
                     />

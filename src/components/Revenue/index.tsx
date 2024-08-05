@@ -342,11 +342,12 @@ export function Revenue({
               width: 100,
               marginTop: 10
             }}>
-            <DateTimePicker
+                <DateTimePicker
               value={date}
               mode="date"
               display="calendar"
               onChange={handleDateChange}
+              accessibilityLanguage="pt-BR"
             />
             </View>
           </View>
@@ -379,6 +380,7 @@ export function Revenue({
                 value={date}
                 mode="date"
                 onChange={handleDateChange}
+                locale="pt-BR"
               />
             )}
           </View>
@@ -431,6 +433,7 @@ export function Revenue({
                             label: "Selecione",
                             value: "Selecione",
                           }}
+                          doneText="Pronto"
                         />
                       )}
                     />

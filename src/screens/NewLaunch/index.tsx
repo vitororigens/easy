@@ -246,11 +246,12 @@ export function NewLaunch({
               marginTop: 10,
               marginBottom: 10
             }}>
-            <DateTimePicker
+                <DateTimePicker
               value={date}
               mode="date"
               display="calendar"
               onChange={handleDateChange}
+              accessibilityLanguage="pt-BR"
             />
             </View>
           </View>
@@ -283,6 +284,7 @@ export function NewLaunch({
                 value={date}
                 mode="date"
                 onChange={handleDateChange}
+                locale="pt-BR"
               />
             )}
           </View>

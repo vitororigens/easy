@@ -297,10 +297,11 @@ export function NewItem({
                           { label: "kg", value: "kilo" },
                           { label: "g", value: "gramas" },
                           { label: "l", value: "litro" },
-                          { label: "ml", value: "milimetros" },
+                          { label: "ml", value: "mililitros" }, 
                         ]}
                         value={value}
                         placeholder={{ label: "un", value: "un" }}
+                        doneText="Pronto"
                       />
                     )}
                   />
