@@ -1,6 +1,6 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
+import { Alert, Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 //
 import {
@@ -237,34 +237,56 @@ export function NewLaunch({
                 />
               )}
             />
-            <View>
-              <Title>Data*</Title>
-              <TouchableOpacity
-                style={{ height: 50 }}
-                onPress={showDatePickerModal}
-              >
-                <Controller
-                  control={control}
-                  name="formattedDate"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      editable={false}
-                    />
-                  )}
-                />
-              </TouchableOpacity>
-              {showDatePicker && (
-                <DateTimePicker
-                  value={date}
-                  display="inline"
-                  mode="date"
-                  onChange={handleDateChange}
-                />
-              )}
+            
+        {Platform.OS === 'ios' ? (
+          <View>
+            <Title>Data*</Title>
+            <View style={{
+              width: 100,
+              marginTop: 10,
+              marginBottom: 10
+            }}>
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="calendar"
+              onChange={handleDateChange}
+            />
             </View>
+          </View>
+        ) : (
+          <View>
+            <Title>Data* </Title>
+
+            <Controller
+              control={control}
+              name="formattedDate"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TouchableOpacity
+                  style={{ height: 50 }}
+                  onPress={showDatePickerModal}
+                >
+                  <Input
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    editable={false}
+                    onFocus={showDatePickerModal}
+                  />
+                </TouchableOpacity>
+              )}
+            />
+
+            {showDatePicker && (
+              <DateTimePicker
+                display="inline"
+                value={date}
+                mode="date"
+                onChange={handleDateChange}
+              />
+            )}
+          </View>
+        )}
 
             <Title>Descrição</Title>
             <Controller

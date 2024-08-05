@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
+  Platform,
   ScrollView,
   Switch,
   TouchableOpacity,
@@ -465,37 +466,55 @@ export function Expense({
             )}
           />
         </View>
-        <View>
-          <TitleTask>Data* </TitleTask>
-
-          <Controller
-            control={control}
-            name="formattedDate"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TouchableOpacity
-                style={{ height: 50 }}
-                onPress={showDatePickerModal}
-              >
-                <Input
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  editable={false}
-                  onFocus={showDatePickerModal}
-                />
-              </TouchableOpacity>
-            )}
-          />
-
-          {showDatePicker && (
+      
+        {Platform.OS === 'ios' ? (
+          <View>
+            <TitleTask>Data*</TitleTask>
+            <View style={{
+              width: 100,
+              marginTop: 10
+            }}>
             <DateTimePicker
-              display="inline"
               value={date}
               mode="date"
+              display="calendar"
               onChange={handleDateChange}
             />
-          )}
-        </View>
+            </View>
+          </View>
+        ) : (
+          <View>
+            <TitleTask>Data* </TitleTask>
+
+            <Controller
+              control={control}
+              name="formattedDate"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TouchableOpacity
+                  style={{ height: 50 }}
+                  onPress={showDatePickerModal}
+                >
+                  <Input
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    editable={false}
+                    onFocus={showDatePickerModal}
+                  />
+                </TouchableOpacity>
+              )}
+            />
+
+            {showDatePicker && (
+              <DateTimePicker
+                display="inline"
+                value={date}
+                mode="date"
+                onChange={handleDateChange}
+              />
+            )}
+          </View>
+        )}
         <View style={{ marginTop: 40, marginBottom: 20 }}>
           {!isEditing && (
             <>
@@ -726,7 +745,7 @@ export function Expense({
           </View>
 
         )}
-        <View style={{ marginBottom: 10 }}>
+        <View style={{ marginBottom: 250, marginTop: Platform.OS === 'ios' && alert === true ? 90 : 0  }}>
           {showButtonSave && (
             <Button
               style={{ marginBottom: 10 }}
