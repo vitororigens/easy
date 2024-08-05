@@ -30,7 +30,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 6,
+      "versionCode": 7,
       "runtimeVersion": "1.7.0"
     },
     "web": {
