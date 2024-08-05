@@ -174,16 +174,16 @@ export function Expense({
     selectedCategory,
   }: FormSchemaType) => {
     setLoading(true);
-  
+
     try {
       const [day, month, year] = formattedDate.split("/");
       const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
       const monthNumber = selectedDate.getMonth() + 1;
-  
+
       const transactionValue = valueTransaction
         ? currencyUnMask(valueTransaction)
         : 0;
-  
+
       const expenseData = {
         name: name,
         category: selectedCategory,
@@ -198,13 +198,13 @@ export function Expense({
         month: monthNumber,
         income,
       };
-  
+
       // Save the expense for the current month
       await database.collection("Expense").add(expenseData);
       Toast.show("Transação adicionada!", { type: "success" });
-  
+
       await handleNotification();
-  
+
       setLoading(false);
       setRepeat(false);
       setAlert(false);
@@ -214,30 +214,30 @@ export function Expense({
       if (onCloseModal) {
         onCloseModal();
       }
-  
+
       // If the repeat switch is on, create copies for the next 11 months
       if (repeat) {
         for (let i = 1; i <= 11; i++) {
           let nextMonth = monthNumber + i;
           let nextYear: any = year;
-  
+
           if (nextMonth > 12) {
             nextMonth -= 12;
             nextYear++;
           }
-  
+
           // Adiciona verificação para garantir que não passe do ano corrente
           if (nextYear > year) {
             break;
           }
-  
+
           const nextDate = `${day}/${nextMonth}/${nextYear}`;
           const nextMonthExpenseData = {
             ...expenseData,
             date: nextDate,
             month: nextMonth,
           };
-  
+
           database
             .collection("Expense")
             .add(nextMonthExpenseData)
@@ -252,13 +252,13 @@ export function Expense({
       Toast.show("Erro ao adicionar a transação", { type: "danger" });
     }
   };
-  
+
   const handleDeleteExpense = () => {
     if (!selectedItemId) {
       console.error("Nenhum documento selecionado para exclusão!");
       return;
     }
-  
+
     const expenseRef = database.collection("Expense").doc(selectedItemId);
     expenseRef
       .delete()
@@ -272,7 +272,7 @@ export function Expense({
         console.error("Erro ao excluir o documento de despesa:", error);
       });
   };
-  
+
   async function handleNotification() {
     try {
       const validationResult = await validateNotificationParams();
@@ -286,7 +286,7 @@ export function Expense({
       console.error('Erro inesperado:', error);
     }
   }
-  
+
   const handleEditExpense = async ({
     formattedDate,
     name,
@@ -550,9 +550,9 @@ export function Expense({
           </View>
         </View>
         {showAdvanced && (
-          <>
-            <View style={{ flexDirection: "row", marginBottom: 10 }}>
-              <View style={{ width: "50%" }}>
+          <View>
+            <View style={{ flexDirection: "row", marginBottom: 10, justifyContent: 'space-between' }}>
+              <View >
                 <View>
                   <TitleTask>
                     Categorias <Span>(opcional)</Span>
@@ -667,7 +667,7 @@ export function Expense({
                 }
               </View>
               <DividerTask />
-              <View style={{ width: "50%" }}>
+              <View >
                 <TitleTask>
                   Essa conta já está paga? <Span>(opcional)</Span>
                 </TitleTask>
@@ -723,9 +723,10 @@ export function Expense({
                 )}
               />
             </View>
-          </>
+          </View>
+
         )}
-        <View style={{ marginBottom: 10, height: 200 }}>
+        <View style={{ marginBottom: 10 }}>
           {showButtonSave && (
             <Button
               style={{ marginBottom: 10 }}
@@ -745,6 +746,7 @@ export function Expense({
           )}
         </View>
       </ScrollView>
+
     </View>
   );
 }

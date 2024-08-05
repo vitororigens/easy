@@ -56,11 +56,9 @@ export const SubTitle = styled.Text<Props>`
 
 
 export const Button = styled(TouchableOpacity)`
-    flex: 1;
     min-height: 60px;
     max-height: 60px;
     background-color: ${({ theme }) => theme.COLORS.TEAL_600};
-    width: 100%;
     border-bottom-width: 5px; 
     border-bottom-color: ${({ theme }) => theme.COLORS.PURPLE_800};
     align-items: center;
