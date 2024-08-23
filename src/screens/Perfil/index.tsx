@@ -1,12 +1,9 @@
 import auth from "@react-native-firebase/auth";
-import { useNavigation } from "@react-navigation/native";
 import { useState, useEffect } from "react";
 import { ScrollView, View } from "react-native";
-import { useTheme } from "styled-components/native";
 import { CustomModal } from "../../components/CustomModal";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Loading } from "../../components/Loading";
-import { LogoUser } from "../../components/LogoUser";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { ContainerIcon, Content, ContentItems, Header, Icon, ImageContainer, Items, StyledImage, SubTitle, Title } from "./styles";
 import { MaterialIcons } from '@expo/vector-icons';

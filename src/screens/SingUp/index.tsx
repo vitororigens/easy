@@ -1,16 +1,15 @@
+import { useEffect, useState } from 'react';
 import auth from "@react-native-firebase/auth";
 import { ActivityIndicator } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { useTheme } from "styled-components/native";
-//
 import { Container, Span, TextError, Title } from "./styles";
-//
-//
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
+import { database } from '../../services';
 
 const formSchema = z
   .object({
@@ -25,10 +24,11 @@ const formSchema = z
           message: "O nome completo deve conter pelo menos um sobrenome.",
         }
       ),
+    userName: z.string().min(1, "Nome de usuario é obrigatorio"),
     email: z
       .string()
       .min(1, "O email é obrigatório.")
-      .email("Formato inválido"),
+      .email("Formato de email inválido"),
     password: z
       .string()
       .min(1, { message: "A senha é obrigatória." })
@@ -49,24 +49,45 @@ type FormSchemaType = z.infer<typeof formSchema>;
 
 export function SingUp() {
   const { COLORS } = useTheme();
+  const [usernameExists, setUsernameExists] = useState(false);
 
-  // Hooks
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
+    watch,
   } = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      userName: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
   });
 
-  // Functions
+  const checkUsernameExists = async (username: string) => {
+    const userRef = database.collection('User');
+    const snapshot = await userRef.where('userName', '==', username).get();
+    return !snapshot.empty; 
+  };
+
+  const userName = watch('userName'); // Watch the userName field
+
+  useEffect(() => {
+    const checkUsername = async () => {
+      if (userName) {
+        const exists = await checkUsernameExists(userName.trim());
+        setUsernameExists(exists);
+      } else {
+        setUsernameExists(false);
+      }
+    };
+
+    checkUsername();
+  }, [userName]);
 
   function handleLogout() {
     auth()
@@ -74,7 +95,12 @@ export function SingUp() {
       .then(() => console.log("User signed out"));
   }
 
-  function handleRegister({ name, email, password }: FormSchemaType) {
+  function handleRegister({ name, email, password, userName }: FormSchemaType) {
+    if (usernameExists) {
+      Toast.show("Nome de usuário já existe.", { type: "danger" });
+      return;
+    }
+  
     auth()
       .createUserWithEmailAndPassword(email.trim(), password.trim())
       .then((userCredential) => {
@@ -84,20 +110,27 @@ export function SingUp() {
             displayName: name.trim(),
           })
           .then(() => {
+            database.collection('User').doc(uid).set({
+              userName: userName.trim(),
+              // Add other user data if needed
+            });
             Toast.show("Conta cadastrada com sucesso!", { type: "success" });
-            handleLogout();
           });
       })
       .catch((error) => {
-        console.error("Erro ao criar conta:", error);
-        Toast.show("Não foi possível cadastrar sua conta, verifique.", {
-          type: "danger",
-        });
+        if (error.code === 'auth/email-already-in-use') {
+          Toast.show("O email já está em uso por outra conta.", { type: "danger" });
+        } else {
+          console.error("Erro ao criar conta:", error);
+          Toast.show("Não foi possível cadastrar sua conta, verifique.", { type: "danger" });
+        }
       })
       .finally(() => {
         reset();
       });
   }
+  
+
 
   return (
     <Container>
@@ -125,6 +158,37 @@ export function SingUp() {
           style={{ color: COLORS.RED_700, marginBottom: 20, marginLeft: 10 }}
         >
           {errors.name.message}
+        </TextError>
+      )}
+
+      <Controller
+        control={control}
+        name="userName"
+        render={({ field: { onChange, onBlur, value } }) => (
+          <Input
+            name="user"
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            showIcon
+            placeholder="Nome de Usuario*"
+          />
+        )}
+      />
+
+      {usernameExists && (
+        <TextError
+          style={{ color: COLORS.RED_700, marginBottom: 20, marginLeft: 10 }}
+        >
+          Nome de usuário já existe.
+        </TextError>
+      )}
+
+      {errors.userName && (
+        <TextError
+          style={{ color: COLORS.RED_700, marginBottom: 20, marginLeft: 10 }}
+        >
+          {errors.userName.message}
         </TextError>
       )}
 
@@ -198,10 +262,11 @@ export function SingUp() {
           {errors.confirmPassword.message}
         </TextError>
       )}
+
       <Button
         title={isSubmitting ? <ActivityIndicator /> : "Cadastrar"}
         onPress={handleSubmit(handleRegister)}
-        disabled={isSubmitting}
+        disabled={isSubmitting || usernameExists}
       />
     </Container>
   );
