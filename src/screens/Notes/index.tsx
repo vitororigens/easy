@@ -24,7 +24,9 @@ export function Notes() {
   const data = useMarketplaceCollections("Notes");
   const user = useUserAuth();
   const uid = user?.uid;
-  const notesUser = data.filter((item) => item.uid === uid);
+  const notesUser = data.filter((item) => 
+    item.sharedWith?.includes(uid ?? "") || item.uid === uid
+  );
   const [isLoaded, setIsLoaded] = useState(false);
 
   const navigation = useNavigation();

@@ -74,7 +74,7 @@ export function SingUp() {
     return !snapshot.empty; 
   };
 
-  const userName = watch('userName'); // Watch the userName field
+  const userName = watch('userName'); 
 
   useEffect(() => {
     const checkUsername = async () => {
@@ -112,7 +112,7 @@ export function SingUp() {
           .then(() => {
             database.collection('User').doc(uid).set({
               userName: userName.trim(),
-              // Add other user data if needed
+              uid
             });
             Toast.show("Conta cadastrada com sucesso!", { type: "success" });
           });

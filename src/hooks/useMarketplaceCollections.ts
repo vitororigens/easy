@@ -12,7 +12,8 @@ export interface MarketplaceData {
   valueItem: number;
   id:string;
   createdAt?:string;
-  totalValue?: number
+  totalValue?: number;
+  sharedWith?: string[];
 }
 
 const useMarketplaceCollections = (

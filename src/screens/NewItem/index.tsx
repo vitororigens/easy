@@ -12,7 +12,7 @@ import { LoadingIndicator } from "../../components/Loading/style";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
-import { Button, Content, Input, Span, Title } from "./styles";
+import { Button, ButtonPlus, Content, Input, Plus, Span, SubTitle, Title } from "./styles";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -176,6 +176,13 @@ export function NewItem({
     setShowAdvanced((prevState) => !prevState);
   }
 
+  function getInitials(name: string | undefined): string {
+    if (!name) return "";
+    const nameArray = name.split(" ");
+    const initials = nameArray.map((word) => word.charAt(0).toUpperCase()).join("");
+    return initials;
+  }
+
   useEffect(() => {
     if (selectedItemId) {
       database
@@ -297,7 +304,7 @@ export function NewItem({
                           { label: "kg", value: "kilo" },
                           { label: "g", value: "gramas" },
                           { label: "l", value: "litro" },
-                          { label: "ml", value: "mililitros" }, 
+                          { label: "ml", value: "mililitros" },
                         ]}
                         value={value}
                         placeholder={{ label: "un", value: "un" }}
@@ -396,6 +403,18 @@ export function NewItem({
                   />
                 )}
               />
+              <Title>Compartilhar</Title>
+              <View style={{
+                width: '100%',
+                flexDirection: 'row'
+              }}>
+                <ButtonPlus>
+                  <Plus name="plus" />
+                </ButtonPlus>
+                <ButtonPlus>
+                  <SubTitle>{getInitials(user?.displayName ?? "")}</SubTitle>
+                </ButtonPlus>
+              </View>
             </>
           )}
           <View style={{ marginBottom: 10, height: 150 }}>

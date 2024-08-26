@@ -1,5 +1,6 @@
 import { TextInput, TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export type subTitleTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
@@ -71,4 +72,28 @@ export const Span = styled.Text`
     font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
     font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
     color: ${({ theme }) => theme.COLORS.GRAY_600};
+`;
+
+export const ButtonPlus = styled(TouchableOpacity)`
+    height: 60px;
+    width: 60px;
+    background-color: ${({theme}) => theme.COLORS.GRAY_400};
+    border-radius: 100px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+`;
+
+export const Plus = styled(FontAwesome).attrs(({theme}) => ({
+    color: theme.COLORS.WHITE,
+    size: theme.FONTE_SIZE.GG
+}))``;
+
+
+export const SubTitle = styled.Text`
+    font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+    font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+    color: ${({ theme }) => theme.COLORS.WHITE};
 `;

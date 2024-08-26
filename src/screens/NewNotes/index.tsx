@@ -3,7 +3,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert, ScrollView, View, Text } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
 import { DefaultContainer } from "../../components/DefaultContainer";
@@ -12,11 +12,17 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import {
   Button,
+  ButtonPlus,
   Content,
   Input,
   InputContainer,
+  Plus,
+  SubTitle,
   Title
 } from "./styles";
+import { getInitials } from "../../utils/getInitials";
+import useFirestoreCollection from "../../hooks/useFirestoreCollection";
+import { EditshareModal } from "../../components/EditsshreModal";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -30,19 +36,19 @@ const formSchema = z.object({
 
 type FormSchemaType = z.infer<typeof formSchema>;
 
-export function NewNotes({
-  closeBottomSheet,
-  onCloseModal,
-}: Props) {
+export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
   // States
   const user = useUserAuth();
   const uid = user?.uid;
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [sharedUsers, setSharedUsers] = useState<any[]>([]); // Ensure correct type
+  const data = useFirestoreCollection("User");
+
   // Hooks
-  const route = useRoute()
-  const navigation = useNavigation()
+  const route = useRoute();
+  const navigation = useNavigation();
 
   const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -56,7 +62,7 @@ export function NewNotes({
 
   // Functions
   const handleSaveItem = ({ name, description }: FormSchemaType) => {
-    setLoading(true)
+    setLoading(true);
     database
       .collection("Notes")
       .doc()
@@ -65,17 +71,18 @@ export function NewNotes({
         description,
         createdAt: format(new Date(), "dd/MM/yyyy"),
         uid: uid,
+        sharedWith: sharedUsers.map(user => user.uid), // Ensure correct property
       })
       .then(() => {
-        setLoading(false)
+        setLoading(false);
         Toast.show("Nota adicionada!", { type: "success" });
         reset();
-        navigation.goBack()
+        navigation.goBack();
         onCloseModal && onCloseModal();
-        !!closeBottomSheet && closeBottomSheet();
+        closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
-        setLoading(false)
+        setLoading(false);
         console.error("Erro ao adicionar o item: ", error);
       });
   };
@@ -85,20 +92,20 @@ export function NewNotes({
       console.error("Nenhum documento selecionado para exclusão!");
       return;
     }
-    setLoading(true)
+    setLoading(true);
 
     const expenseRef = database.collection("Notes").doc(selectedItemId);
     expenseRef
       .delete()
       .then(() => {
         Toast.show("Nota Excluída!", { type: "success" });
-        setLoading(false)
-        navigation.goBack()
+        setLoading(false);
+        navigation.goBack();
         onCloseModal && onCloseModal();
-        !!closeBottomSheet && closeBottomSheet();
+        closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
-        setLoading(false)
+        setLoading(false);
         console.error("Erro ao excluir o documento de item:", error);
       });
   };
@@ -109,7 +116,7 @@ export function NewNotes({
       return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     database
       .collection("Notes")
@@ -119,17 +126,18 @@ export function NewNotes({
         uid,
         description,
         createdAt: format(new Date(), "dd/MM/yyyy"),
+        sharedWith: sharedUsers.map(user => user.uid), 
       })
       .then(() => {
         Toast.show("Nota editada!", { type: "success" });
-        setLoading(false)
+        setLoading(false);
         reset();
-        navigation.goBack()
+        navigation.goBack();
         onCloseModal && onCloseModal();
-        !!closeBottomSheet && closeBottomSheet();
+        closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
-        setLoading(false)
+        setLoading(false);
         console.error("Erro ao adicionar o item: ", error);
       });
   };
@@ -137,22 +145,41 @@ export function NewNotes({
   const onInvalid = () => {
     Alert.alert(
       "Atenção!",
-      "Por favor, preencha todos os campos obriatórios antes de salvar."
+      "Por favor, preencha todos os campos obrigatórios antes de salvar."
     );
+  };
+
+  const handleSelectUser = (selectedUser: any) => {
+    setSharedUsers((prev) => [...prev, selectedUser]); 
+    setIsModalVisible(false); 
   };
 
   useEffect(() => {
     if (selectedItemId) {
+      // Fetch note data
       database
         .collection("Notes")
         .doc(selectedItemId)
         .get()
-        .then((doc) => {
+        .then(async (doc) => {
           if (doc.exists) {
             const data = doc.data();
             if (data) {
               setValue("name", data.name);
               setValue("description", data.description);
+  
+          
+              if (data.sharedWith) {
+                const usersPromises = data.sharedWith.map(async (userId: string) => {
+                  const userDoc = await database.collection("User").doc(userId).get();
+                  return userDoc.data();
+                });
+  
+                const users = await Promise.all(usersPromises);
+                setSharedUsers(users); 
+              } else {
+                setSharedUsers([]); 
+              }
               setIsEditing(true);
             } else {
               console.log("Dados do documento estão vazios!");
@@ -166,65 +193,80 @@ export function NewNotes({
         });
     }
   }, [selectedItemId]);
+  
 
   return (
     <>
       <DefaultContainer backButton hasHeader={false} title="Adicionar nova nota" closeModalFn={closeBottomSheet}>
-          <ScrollView
-            keyboardShouldPersistTaps="always"
-            showsVerticalScrollIndicator={false}
-          >
-            <Content>
-              <Title>Nome da nota</Title>
-              <Controller
-                control={control}
-                name="name"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                  />
-                )}
-              />
-              <Title>Nota</Title>
-              <Controller
-                control={control}
-                name="description"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <InputContainer
-                    multiline
-                    numberOfLines={20}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    textAlignVertical="top"
-                  />
-                )}
-              />
+        <ScrollView keyboardShouldPersistTaps="always" showsVerticalScrollIndicator={false}>
+          <Content>
+            <Title>Nome da nota</Title>
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input onBlur={onBlur} onChangeText={onChange} value={value} />
+              )}
+            />
+            <Title>Nota</Title>
+            <Controller
+              control={control}
+              name="description"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <InputContainer
+                  multiline
+                  numberOfLines={20}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  textAlignVertical="top"
+                />
+              )}
+            />
+            <Title>Compartilhar</Title>
+            <View style={{ width: '100%', flexDirection: 'row' }}>
+              <ButtonPlus onPress={() => setIsModalVisible(true)}>
+                <Plus name="plus" />
+              </ButtonPlus>
+              {sharedUsers.map((user, index) => (
+                <ButtonPlus key={index}>
+                  <SubTitle>{getInitials(user.userName)}</SubTitle>
+                </ButtonPlus>
+              ))}
+            </View>
 
-              <View style={{ marginBottom: 10, height: 150 }}>
-                  <Button
-                    style={{ marginBottom: 10 }}
-                    onPress={
-                      isEditing
-                        ? handleSubmit(handleEditExpense, onInvalid)
-                        : handleSubmit(handleSaveItem, onInvalid)
-                    }
-                  >
-                    {loading ? <LoadingIndicator/> : <Title>Salvar</Title>}
-                  </Button>
-                {!!selectedItemId && (
-                  <Button
-                    style={{ marginBottom: 10 }}
-                    onPress={handleDeleteExpense}
-                  >
-                    <Title>Excluir</Title>
-                  </Button>
-                )}
-              </View>
-            </Content>
-          </ScrollView>
+            <View style={{ marginBottom: 10, height: 150 }}>
+              <Button
+                style={{ marginBottom: 10 }}
+                onPress={
+                  isEditing
+                    ? handleSubmit(handleEditExpense, onInvalid)
+                    : handleSubmit(handleSaveItem, onInvalid)
+                }
+              >
+                {loading ? <LoadingIndicator /> : <Title>Salvar</Title>}
+              </Button>
+              {!!selectedItemId && (
+                <Button
+                  style={{ marginBottom: 10 }}
+                  onPress={handleDeleteExpense}
+                >
+                  <Title>Excluir</Title>
+                </Button>
+              )}
+            </View>
+          </Content>
+        </ScrollView>
+
+        {isModalVisible && (
+          <EditshareModal
+            visible={isModalVisible}
+            onClose={() => setIsModalVisible(false)}
+            onSelectUser={handleSelectUser}
+            share="sharedWith" // Replace with actual field name if needed
+            uid={uid || ""} // Pass the correct user UID
+          />
+        )}
       </DefaultContainer>
     </>
   );
