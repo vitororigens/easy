@@ -5,6 +5,7 @@ import {
   FlatList,
   Modal,
   Platform,
+  ScrollView,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -28,7 +29,7 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { NewItem } from "../NewItem";
-import { Button, Header, NavBar, Title } from "./styles";
+import { Button, Container, ContentTitle, Divider, DividerContent, Header, Icon, NavBar, SubTitle, Title } from "./styles";
 
 const modalBottom = Platform.OS === "ios" ? 50 : 60;
 
@@ -37,13 +38,11 @@ export function Marketplace() {
   const [activeButton, setActiveButton] = useState("lista");
   const [confirmItemVisible, setConfirmItemVisible] = useState(false);
   const [modalActive, setModalActive] = useState(false);
-  const [selectedListData, setSelectedListData] =
-    useState<HistoryMarketplaceData | null>(null);
   const [selectedItemData, setSelectedItemData] = useState("");
   const [selectedItems, setSelectedItems] = useState<MarketplaceData[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
-
+  const [isMyListVisible, setIsMyListVisible] = useState(true);
+  const [isSharedListVisible, setIsSharedListVisible] = useState(false);
   const data = useMarketplaceCollections("Marketplace");
   const selectedItemsId = selectedItems.map((item) => item.id);
 
@@ -51,11 +50,18 @@ export function Marketplace() {
 
   const user = useUserAuth();
   const uid = user?.uid;
+  console.log('uid', uid)
   const { COLORS } = useTheme();
 
   const history = useHistoryMarketplaceCollections("HistoryMarketplace").filter(
     (item) => item.uid === uid
   );
+  useEffect(() => {
+    if (!uid) return;
+
+    const marketplaceShared = data.filter((item) => item.sharedWith?.includes(uid));
+    console.log("marketplaceShared:", marketplaceShared);
+  }, [uid, data]);
 
   const historyMonth = history.filter((item) => {
     const month =
@@ -138,50 +144,6 @@ export function Marketplace() {
     }
   };
 
-  const handleSaveListAgain = async () => {
-    const currentDate = new Date();
-    const day = currentDate.getDate();
-    const month = currentDate.getMonth() + 1;
-    const year = currentDate.getFullYear();
-    const formattedDate = `${day}/${month}/${year}`;
-
-    const expenseRef = database.collection("Expense").doc();
-    const historyMarketplaceRef = database
-      .collection("HistoryMarketplace")
-      .doc();
-
-    try {
-      await database.runTransaction(async (transaction) => {
-        transaction.set(expenseRef, {
-          category: "mercado",
-          uid: uid,
-          date: formattedDate,
-          valueTransaction: selectedListData?.total,
-          description: "",
-          repeat: false,
-          type: "output",
-          month: month,
-          status: true,
-        });
-
-        transaction.set(historyMarketplaceRef, {
-          idExpense: expenseRef.id,
-          finishedDate: formattedDate,
-          uid: uid,
-          items: selectedListData?.items,
-          total: selectedListData?.total,
-        });
-      });
-
-      Toast.show("Lista de compras adicionada!", { type: "success" });
-      setModalActive(false);
-      setSelectedItems([]);
-      closeModals();
-    } catch (error) {
-      console.error("Erro ao adicionar Lista de compras: ", error);
-    }
-  };
-
   const handleSaveList = async () => {
     const currentDate = new Date();
     const month = currentDate.getMonth() + 1;
@@ -245,10 +207,6 @@ export function Marketplace() {
     navigation.navigate("historymarketplace", { selectedItemId: documentId });
   };
 
-  const closeModals = () => {
-    setSelectedListData(null);
-    setShowHistory(false);
-  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -274,7 +232,7 @@ export function Marketplace() {
       newItemMarketplace
       title="Lista de Mercado"
       type="PRIMARY"
-      
+
     >
       <Header>
         <NavBar>
@@ -295,30 +253,85 @@ export function Marketplace() {
         </NavBar>
       </Header>
       {activeButton === "lista" && (
-        <FlatList
-          data={data.filter((item) => item.uid === uid)}
-          renderItem={({ item }) => (
-            <ItemMarketplace
-              onEditItem={() => handleEditItem(item.id)}
-              removeItem={() => handleRemoveItem(item)}
-              addItem={() => handleAddItem(item)}
-              measurements={item.measurements}
-              quantity={item.amount}
-              title={item.name}
-              value={item.valueItem}
-              resetCountQuantity={!!selectedItems.length ? false : true}
-            />
+        <>
+
+          <ContentTitle onPress={() => setIsMyListVisible(!isMyListVisible)}>
+            <Title>Minha lista de compras</Title>
+            <DividerContent />
+            <Icon name={isMyListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+          </ContentTitle>
+          {isMyListVisible && (
+            <Container>
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                data={data.filter((item) => item.uid === uid)}
+                renderItem={({ item }) => (
+                  <ItemMarketplace
+                    onEditItem={() => handleEditItem(item.id)}
+                    removeItem={() => handleRemoveItem(item)}
+                    addItem={() => handleAddItem(item)}
+                    measurements={item.measurements}
+                    quantity={item.amount}
+                    title={item.name}
+                    value={item.valueItem}
+                    resetCountQuantity={!!selectedItems.length ? false : true}
+                  />
+                )}
+                contentContainerStyle={{ paddingBottom: 90 }}
+                ListFooterComponent={<View style={{ height: 90 }} />}
+                ListEmptyComponent={
+                  <LoadData
+                    imageSrc={PersonImage}
+                    title="Comece agora!"
+                    subtitle="Adicione um item clicando em +"
+                  />
+                }
+              />
+            </Container>
           )}
-          contentContainerStyle={{ paddingBottom: 90 }}
-          ListFooterComponent={<View style={{ height: 90 }} />}
-          ListEmptyComponent={
-            <LoadData
-              imageSrc={PersonImage}
-              title="Comece agora!"
-              subtitle="Adicione um item clicando em +"
-            />
-          }
-        />
+
+
+          <ContentTitle onPress={() => setIsSharedListVisible(!isSharedListVisible)}>
+            <Title>Lista de compras compartilhada</Title>
+            <DividerContent />
+            <Icon name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+          </ContentTitle>
+          {isSharedListVisible && (
+              <Container>
+                <FlatList
+                showsVerticalScrollIndicator={false}
+                data={data.filter((item) =>
+                  item.sharedWith?.some((sharedUser) => sharedUser.uid === uid))}
+                renderItem={({ item }) => (
+                  <ItemMarketplace
+                    onEditItem={() => handleEditItem(item.id)}
+                    removeItem={() => handleRemoveItem(item)}
+                    addItem={() => handleAddItem(item)}
+                    measurements={item.measurements}
+                    quantity={item.amount}
+                    title={item.name}
+                    value={item.valueItem}
+                    resetCountQuantity={!!selectedItems.length ? false : true}
+                  />
+                )}
+                contentContainerStyle={{ paddingBottom: 90 }}
+                ListFooterComponent={<View style={{ height: 90 }} />}
+                ListEmptyComponent={
+                 <View style={{
+                  padding: 40,
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                 }}>
+                  <SubTitle>
+                  Você não possui produtos compartilhado com você
+                 </SubTitle>
+                 </View>
+                }
+              />
+              </Container>
+            )}
+        </>
+
       )}
 
       {activeButton === "items" && (

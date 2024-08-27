@@ -71,7 +71,10 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
         description,
         createdAt: format(new Date(), "dd/MM/yyyy"),
         uid: uid,
-        sharedWith: sharedUsers.map(user => user.uid), // Ensure correct property
+        sharedWith: sharedUsers.map(user => ({
+          uid: user.uid,
+          userName: user.userName, // Store both uid and userName
+        })),
       })
       .then(() => {
         setLoading(false);
@@ -86,6 +89,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
         console.error("Erro ao adicionar o item: ", error);
       });
   };
+  
 
   const handleDeleteExpense = () => {
     if (!selectedItemId) {
@@ -126,7 +130,10 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
         uid,
         description,
         createdAt: format(new Date(), "dd/MM/yyyy"),
-        sharedWith: sharedUsers.map(user => user.uid), 
+        sharedWith: sharedUsers.map(user => ({
+          uid: user.uid,
+          userName: user.userName, // Store both uid and userName
+        })),
       })
       .then(() => {
         Toast.show("Nota editada!", { type: "success" });
@@ -153,7 +160,6 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
     setSharedUsers((prev) => [...prev, selectedUser]); 
     setIsModalVisible(false); 
   };
-
   useEffect(() => {
     if (selectedItemId) {
       // Fetch note data
@@ -161,25 +167,19 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
         .collection("Notes")
         .doc(selectedItemId)
         .get()
-        .then(async (doc) => {
+        .then((doc) => {
           if (doc.exists) {
             const data = doc.data();
             if (data) {
               setValue("name", data.name);
               setValue("description", data.description);
   
-          
-              if (data.sharedWith) {
-                const usersPromises = data.sharedWith.map(async (userId: string) => {
-                  const userDoc = await database.collection("User").doc(userId).get();
-                  return userDoc.data();
-                });
-  
-                const users = await Promise.all(usersPromises);
-                setSharedUsers(users); 
+              if (data.sharedWith && Array.isArray(data.sharedWith)) {
+                setSharedUsers(data.sharedWith); // Directly set the sharedWith array
               } else {
-                setSharedUsers([]); 
+                setSharedUsers([]);
               }
+  
               setIsEditing(true);
             } else {
               console.log("Dados do documento estão vazios!");
@@ -193,6 +193,8 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
         });
     }
   }, [selectedItemId]);
+  
+  
   
 
   return (

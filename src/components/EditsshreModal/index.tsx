@@ -1,29 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, View, TextInput, FlatList, Text, TouchableOpacity } from 'react-native';
-import { useForm } from "react-hook-form";
+import { Modal, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { database } from "../../services";
-import { Toast } from "react-native-toast-notifications";
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { getInitials } from "../../utils/getInitials";
+import { Container, ModalContent, SharedUserContainer, SharedUser, Title, IconCheck, ButtonSelect } from './styles';
 
 interface EditshareModalProps {
   visible: boolean;
   onClose: () => void;
   onSelectUser: (user: any) => void;
   share: string;
-  initialValue: string | null;
+  initialValue?: string | null;
   uid: string;
 }
 
-export function EditshareModal({ visible, onClose, onSelectUser, share, initialValue, uid }: EditshareModalProps) {
-  const [value, setValue] = useState(initialValue || "");
+export function EditshareModal({ visible, onClose, onSelectUser }: EditshareModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [sharedUsers, setSharedUsers] = useState<any[]>([]);
-  const { handleSubmit } = useForm();
 
-  // Function to search for users by their username
   const searchUsers = async (username: string) => {
     if (!username) {
       setSearchResults([]);
@@ -43,75 +39,47 @@ export function EditshareModal({ visible, onClose, onSelectUser, share, initialV
     }
   };
 
-  // UseEffect to search for users when searchTerm changes
   useEffect(() => {
     searchUsers(searchTerm);
   }, [searchTerm]);
 
-  // Function to add the selected user's UID to the shared users list
   const addSharedUser = (user: any) => {
-    if (sharedUsers.find(u => u.uid === user.uid)) return; // avoid duplicates
+    if (sharedUsers.find(u => u.uid === user.uid)) return;
     setSharedUsers([...sharedUsers, user]);
     setSearchTerm("");
     setSearchResults([]);
-    onSelectUser(user); // Notify parent component about the selected user
-  };
-
-  const onSubmit = async () => {
-    try {
-      const sharedUserUids = sharedUsers.map(user => user.uid);
-      await database.collection("User").doc(uid).update({
-        [share]: {
-          value,
-          sharedWith: sharedUserUids
-        }
-      });
-      Toast.show(`${share} updated successfully!`, { type: "success" });
-      onClose();
-    } catch (error) {
-      console.error(`Error updating ${share}:`, error);
-      Toast.show(`Error updating ${share}.`, { type: "danger" });
-    }
+    onSelectUser(user);
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="slide"
-    >
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
-        <View style={{ width: 300, padding: 20, backgroundColor: 'white', borderRadius: 10 }}>
-
+    <Modal visible={visible} transparent={true} animationType="slide">
+      <Container>
+        <ModalContent>
           <Input
             name='user'
-            placeholder="Search user"
+            placeholder="Buscar usuários"
             value={searchTerm}
             onChangeText={(text) => setSearchTerm(text)}
-            style={{ marginBottom: 20, borderBottomWidth: 1, borderColor: '#ccc' }}
           />
           <FlatList
             data={searchResults}
             keyExtractor={(item) => item.uid}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => addSharedUser(item)}>
-                <Text style={{
-                  color: '#000'
-                }}>{item.userName}</Text>
-              </TouchableOpacity>
-            )}
+            renderItem={({ item }) => {
+              const isChecked = !!sharedUsers.find(u => u.uid === item.uid);
+              return (
+                <ButtonSelect onPress={() => addSharedUser(item)}>
+                  <Title type={isChecked ? 'PRIMARY' : 'SECONDARY'}>{item.userName}</Title>
+                  <IconCheck
+                    type={isChecked ? 'PRIMARY' : 'SECONDARY'}
+                    name={isChecked ? "checkbox-marked-circle-outline" : "checkbox-blank-circle-outline"}
+                  />
+                </ButtonSelect>
+              );
+            }}
           />
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 10 }}>
-            {sharedUsers.map(user => (
-              <View key={user.uid} style={{ marginRight: 10 }}>
-                <Text>{getInitials(user.userName)}</Text>
-              </View>
-            ))}
-          </View>
-          <Button title="Save" onPress={handleSubmit(onSubmit)} />
-          <Button title="Cancel" onPress={onClose} />
-        </View>
-      </View>
+          <Button title="Cancelar" onPress={onClose} />
+        </ModalContent>
+      </Container>
     </Modal>
   );
 }

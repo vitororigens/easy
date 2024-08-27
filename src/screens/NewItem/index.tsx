@@ -13,6 +13,8 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
 import { Button, ButtonPlus, Content, Input, Plus, Span, SubTitle, Title } from "./styles";
+import { EditshareModal } from "../../components/EditsshreModal";
+import { getInitials } from "../../utils/getInitials";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -46,6 +48,8 @@ export function NewItem({
   const [isEditing, setIsEditing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [sharedUsers, setSharedUsers] = useState<any[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   // Hooks
   const navigation = useNavigation()
@@ -82,18 +86,24 @@ export function NewItem({
     valueItem,
   }: FormSchemaType) => {
     setLoading(true);
-    database
-      .collection("Marketplace")
-      .doc()
-      .set({
-        category: selectedCategory ? selectedCategory : "geral",
-        measurements: selectedMeasurements,
-        valueItem: valueItem ? currencyUnMask(valueItem) : 0,
-        name,
-        amount: amount ? parseFloat(amount as string) : 1,
-        description,
-        uid,
-      })
+    const docRef = selectedItemId
+      ? database.collection('Marketplace').doc(selectedItemId)
+      : database.collection('Marketplace').doc();
+
+    docRef.set({
+
+      category: selectedCategory ? selectedCategory : "geral",
+      measurements: selectedMeasurements,
+      valueItem: valueItem ? currencyUnMask(valueItem) : 0,
+      name,
+      amount: amount ? parseFloat(amount as string) : 1,
+      description,
+      uid,
+      sharedWith: sharedUsers.map(user => ({
+        uid: user.uid,
+        userName: user.userName, // Store both uid and userName
+      })),
+    })
       .then(() => {
         Toast.show("Item adicionado!", { type: "success" });
         setLoading(false);
@@ -127,43 +137,7 @@ export function NewItem({
       });
   };
 
-  const handleEditExpense = ({
-    name,
-    amount,
-    description,
-    selectedCategory,
-    selectedMeasurements,
-    valueItem,
-  }: FormSchemaType) => {
-    if (!selectedItemId) {
-      console.error("Nenhum documento selecionado para edição!");
-      return;
-    }
-    setLoading(true);
 
-    database
-      .collection("Marketplace")
-      .doc(selectedItemId)
-      .set({
-        category: selectedCategory ? selectedCategory : "geral",
-        measurements: selectedMeasurements,
-        valueItem: valueItem ? currencyUnMask(valueItem) : 0,
-        name,
-        amount: amount ? parseFloat(amount as string) : 1,
-        description,
-        uid,
-      })
-      .then(() => {
-        setLoading(false);
-        Toast.show("Item adicionado!", { type: "success" });
-        reset();
-        navigation.goBack()
-        onCloseModal && onCloseModal();
-      })
-      .catch((error) => {
-        console.error("Erro ao adicionar o item: ", error);
-      });
-  };
 
   const onInvalid = () => {
     Alert.alert(
@@ -176,20 +150,17 @@ export function NewItem({
     setShowAdvanced((prevState) => !prevState);
   }
 
-  function getInitials(name: string | undefined): string {
-    if (!name) return "";
-    const nameArray = name.split(" ");
-    const initials = nameArray.map((word) => word.charAt(0).toUpperCase()).join("");
-    return initials;
-  }
+
+  const handleSelectUser = (selectedUser: any) => {
+    setSharedUsers((prev) => [...prev, selectedUser]);
+    setIsModalVisible(false);
+  };
 
   useEffect(() => {
     if (selectedItemId) {
-      database
-        .collection("Marketplace")
-        .doc(selectedItemId)
-        .get()
-        .then((doc) => {
+      const fetchData = async () => {
+        try {
+          const doc = await database.collection("Marketplace").doc(selectedItemId).get();
           if (doc.exists) {
             const data = doc.data();
             if (data) {
@@ -204,6 +175,11 @@ export function NewItem({
                 })
               );
               setValue("amount", data.amount.toString());
+              if (data.sharedWith && Array.isArray(data.sharedWith)) {
+                setSharedUsers(data.sharedWith); // Directly set the sharedWith array
+              } else {
+                setSharedUsers([]);
+              }
               setIsEditing(true);
             } else {
               console.log("Dados do documento estão vazios!");
@@ -211,10 +187,12 @@ export function NewItem({
           } else {
             console.log("Nenhum documento encontrado!");
           }
-        })
-        .catch((error) => {
+        } catch (error) {
           console.error("Erro ao obter o documento:", error);
-        });
+        }
+      };
+
+      fetchData();
     }
   }, [selectedItemId]);
 
@@ -404,16 +382,15 @@ export function NewItem({
                 )}
               />
               <Title>Compartilhar</Title>
-              <View style={{
-                width: '100%',
-                flexDirection: 'row'
-              }}>
-                <ButtonPlus>
+              <View style={{ width: '100%', flexDirection: 'row' }}>
+                <ButtonPlus onPress={() => setIsModalVisible(true)}>
                   <Plus name="plus" />
                 </ButtonPlus>
-                <ButtonPlus>
-                  <SubTitle>{getInitials(user?.displayName ?? "")}</SubTitle>
-                </ButtonPlus>
+                {sharedUsers.map((user, index) => (
+                  <ButtonPlus key={index}>
+                    <SubTitle>{getInitials(user.userName)}</SubTitle>
+                  </ButtonPlus>
+                ))}
               </View>
             </>
           )}
@@ -422,7 +399,7 @@ export function NewItem({
               style={{ marginBottom: 10 }}
               onPress={
                 isEditing
-                  ? handleSubmit(handleEditExpense, onInvalid)
+                  ? handleSubmit(handleSaveItem, onInvalid)
                   : handleSubmit(handleSaveItem, onInvalid)
               }
             >
@@ -439,6 +416,15 @@ export function NewItem({
           </View>
         </Content>
       </ScrollView>
+      {isModalVisible && (
+        <EditshareModal
+          visible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          onSelectUser={handleSelectUser}
+          share="sharedWith" 
+          uid={uid || ""} 
+        />
+      )}
     </DefaultContainer>
   );
 }
