@@ -13,7 +13,7 @@ export declare global{
             perfil: undefined;
             piggybank: undefined;
             historic: undefined;
-            filter: undefined;
+            filter: { showMonthFilter?: boolean, showCategoryFilter?: boolean, showMinValueFilter?: boolean, showMaxValueFilter?: boolean };
             newnotes: { selectedItemId?: string };
             newtask: { selectedItemId?: string };
             newlaunch: { selectedItemId?: string };

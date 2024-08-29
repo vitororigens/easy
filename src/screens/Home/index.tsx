@@ -141,6 +141,9 @@ export function Home() {
       type="SECONDARY"
       subtitle={formattedTotalValue}
       addActionFn={() => handleCreateItem(selectedItemId, activeButton)}
+      showCategoryFilter
+      showMaxValueFilter
+      showMinValueFilter
     >
       <Header>
         <NavBar>

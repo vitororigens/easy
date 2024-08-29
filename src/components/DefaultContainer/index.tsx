@@ -37,6 +37,10 @@ type DefaultContainerProps = {
   type?: "PRIMARY" | "SECONDARY";
   closeModalFn?: () => void;
   addActionFn?: () => void
+  showMonthFilter?: boolean;
+  showCategoryFilter?: boolean;
+  showMinValueFilter?: boolean;
+  showMaxValueFilter?: boolean;
 };
 
 export function DefaultContainer({
@@ -46,6 +50,9 @@ export function DefaultContainer({
   closeModalFn,
   addActionFn,
   customBg,
+  showCategoryFilter,
+  showMaxValueFilter,
+  showMinValueFilter,
   type = "PRIMARY",
   newNotes = false,
   newItemMarketplace = false,
@@ -57,6 +64,7 @@ export function DefaultContainer({
   newLaunch = false,
   listButtom = false,
   hasHeader = true,
+  showMonthFilter = true,
 }: DefaultContainerProps) {
   const navigation = useNavigation();
   const {COLORS} = useTheme()
@@ -94,7 +102,7 @@ export function DefaultContainer({
   }
 
   function handleShowFilter() {
-    navigation.navigate('filter');
+    navigation.navigate('filter', {showCategoryFilter, showMaxValueFilter, showMinValueFilter, showMonthFilter});
   }
 
   function handleNewLaunch() {
