@@ -6,7 +6,7 @@ import { Items } from "../../components/Items";
 import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
 import { useFilters } from "../../context/FiltersContext";
-import useFirestoreCollection from "../../hooks/useFirestoreCollection";
+import useFirestoreCollection, { type ExpenseData } from "../../hooks/useFirestoreCollection";
 import { useTotalValue } from "../../hooks/useTotalValue";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
@@ -28,15 +28,21 @@ export function Home() {
   const user = useUserAuth();
   const uid = user?.uid;
   const [activeButton, setActiveButton] = useState("receitas");
-  const { selectedMonth } = useFilters();
+  const {
+    selectedTab,
+    setSelectedTab,
+    selectedMonth,
+    selectedCategory,
+    setSelectedCategory,
+    values: { minValue, maxValue },
+  } = useFilters();
+
   const revenue = useFirestoreCollection("Revenue");
   const expense = useFirestoreCollection("Expense");
   const { tolalRevenueMunth, totalExpenseMunth } = useTotalValue(
     uid || "Não foi possivel encontrar o uid"
   );
   const [showNewTaskModal, setShowNewTaskModal] = useState(false);
-  const [confirmRevenueVisible, setConfirmRevenueVisible] = useState(false);
-  const [confirmExpenseVisible, setConfirmExpenseVisible] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -65,6 +71,7 @@ export function Home() {
   }
 
   function handleRevenueEdit(documentId: string, initialActiveButton: string) {
+    // @ts-ignore
     navigation.navigate("newtask", {
       selectedItemId: documentId,
       initialActiveButton,
@@ -72,6 +79,7 @@ export function Home() {
   }
 
   function handleExpenseEdit(documentId: string, initialActiveButton: string) {
+    // @ts-ignore
     navigation.navigate("newtask", {
       selectedItemId: documentId,
       initialActiveButton,
@@ -80,6 +88,9 @@ export function Home() {
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
+    setSelectedTab(buttonName)
+
+    setSelectedCategory("all")
   };
 
   function handleDeleteRevenue(documentId: string) {
@@ -109,6 +120,7 @@ export function Home() {
   }
 
   function handleCreateItem(documentId: string, initialActiveButton: string) {
+    // @ts-ignore
     navigation.navigate("newtask", {
       selectedItemId: documentId,
       initialActiveButton,
@@ -116,6 +128,7 @@ export function Home() {
   }
 
   useEffect(() => {
+
     const timer = setTimeout(() => {
       setIsLoaded(true);
     }, 1000);
@@ -127,12 +140,22 @@ export function Home() {
     return <Loading />;
   }
 
-  const filteredRevenue = revenue.filter(
-    (item) => item.uid === uid && item.month === selectedMonth
-  );
-  const filteredExpense = expense.filter(
-    (item) => item.uid === uid && item.month === selectedMonth
-  );
+  // Filtros
+  const applyFilters = (item: ExpenseData) => {
+    return (
+      item.uid === uid &&
+      item.month === selectedMonth &&
+      (selectedCategory === "all" || item.category.toUpperCase() === selectedCategory.toUpperCase()) &&
+      (!minValue || Number(item.valueTransaction) >= minValue) &&
+      (!maxValue || Number(item.valueTransaction) <= maxValue)
+    );
+  };
+
+  const applyBasicFilters = (item: ExpenseData) => item.uid === uid && item.month === selectedMonth
+
+  const filteredRevenue = revenue.filter(selectedTab === "receitas" || !selectedTab ? applyFilters : applyBasicFilters);
+  
+  const filteredExpense = expense.filter(selectedTab === "despesas" ? applyFilters : applyBasicFilters);
 
   return (
     <DefaultContainer

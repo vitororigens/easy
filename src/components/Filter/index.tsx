@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 //
 import {
   InputContainer,
@@ -43,7 +43,7 @@ const months = [
   { id: 12, name: "Dezembro" },
 ];
 
-const categories = [
+const categoriesExpense = [
   { label: "Todas", value: "all" },
   { label: "Investimentos", value: "Investimentos" },
   { label: "Contas", value: "Contas" },
@@ -81,6 +81,16 @@ const categories = [
   { label: "Outros", value: "outros" },
 ];
 
+const categoriesRevenue = [
+  { label: "Todas", value: "all" },
+  { label: "Salário", value: "salario" },
+  { label: "Vendas", value: "vendas" },
+  { label: "Investimentos", value: "investimentos" },
+  { label: "Comissão", value: "Comissão" },
+  { label: "Adiantamentos", value: "Adiantamentos" },
+  { label: "Outros", value: "outros" },
+];
+
 const currentDate = new Date();
 
 const currentMonth = currentDate.getMonth() + 1;
@@ -96,8 +106,9 @@ const filterSchema = z.object({
 type FilterType = z.infer<typeof filterSchema>;
 
 export function Filter() {
-  // State
+  // Hooks
   const {
+    selectedTab,
     selectedMonth,
     setSelectedMonth,
     selectedCategory,
@@ -106,7 +117,6 @@ export function Filter() {
     setValues,
   } = useFilters();
 
-  // Hooks
   const route = useRoute();
 
   const {
@@ -118,7 +128,7 @@ export function Filter() {
 
   const navigation = useNavigation();
 
-  const { control, handleSubmit } = useForm<FilterType>({
+  const { control, handleSubmit, watch, reset } = useForm<FilterType>({
     resolver: zodResolver(filterSchema),
     defaultValues: {
       month: selectedMonth ?? currentMonth,
@@ -159,6 +169,13 @@ export function Filter() {
 
     navigation.goBack();
   };
+
+  const categories =
+    selectedTab === "despesas" ? categoriesExpense : categoriesRevenue;
+
+  const selectedCategoryValue = categories.find(
+    (i) => i.value === watch("category")
+  );
 
   return (
     <>
@@ -212,8 +229,8 @@ export function Filter() {
                       value,
                     }))}
                     placeholder={{
-                      label: "Todas",
-                      value: "all",
+                      label: selectedCategoryValue?.label,
+                      value: selectedCategoryValue?.value,
                     }}
                     style={{
                       placeholder: {

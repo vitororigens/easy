@@ -6,6 +6,8 @@ type ValuesType = {
 };
 
 type FiltersContextType = {
+  selectedTab: string;
+  setSelectedTab: (tab: string) => void;
   selectedMonth: number | null;
   setSelectedMonth: (month: number | null) => void;
   selectedCategory: string;
@@ -34,6 +36,8 @@ export const FiltersProvider = ({ children }: FiltersProviderProps) => {
   const currentMonth = new Date().getMonth() + 1;
 
   // States
+  const [selectedTab, setSelectedTab] = useState("")
+
   const [selectedMonth, setSelectedMonth] = useState<number | null>(
     currentMonth
   );
@@ -45,11 +49,11 @@ export const FiltersProvider = ({ children }: FiltersProviderProps) => {
     maxValue: null,
   });
 
-  console.log(values.minValue)
-
   return (
     <FiltersContext.Provider
       value={{
+        selectedTab,
+        setSelectedTab,
         selectedMonth,
         setSelectedMonth,
         selectedCategory,

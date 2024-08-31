@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
-import useFirestoreCollection, { ExpenseData } from './useFirestoreCollection';
-import { useFilters } from '../context/FiltersContext';
-
-
+import { useMemo, useState } from "react";
+import useFirestoreCollection, { ExpenseData } from "./useFirestoreCollection";
+import { useFilters } from "../context/FiltersContext";
 
 export interface TotalValues {
   totalRevenue: number;
@@ -13,34 +11,88 @@ export interface TotalValues {
 }
 
 export function useTotalValue(uid: string | null): TotalValues {
-  const revenue = useFirestoreCollection('Revenue');
-  const expense = useFirestoreCollection('Expense');
-  const { selectedMonth } = useFilters()
+  const revenue = useFirestoreCollection("Revenue");
+  const expense = useFirestoreCollection("Expense");
+  const {
+    selectedTab,
+    selectedMonth,
+    selectedCategory,
+    values: { minValue, maxValue },
+  } = useFilters();
 
   const [totalRevenueValue, setTotalRevenueValue] = useState<number>(0);
   const [totalExpenseValue, setTotalExpenseValue] = useState<number>(0);
-  const [totalRevenueValueMunth, setTotalRevenueValueMunth] = useState<number>(0);
-  const [totalExpenseValueMunth, setTotalExpenseValueMunth] = useState<number>(0);
+  const [totalRevenueValueMunth, setTotalRevenueValueMunth] =
+    useState<number>(0);
+  const [totalExpenseValueMunth, setTotalExpenseValueMunth] =
+    useState<number>(0);
 
-  useEffect(() => {
+  useMemo(() => {
     if (uid) {
-      const revenueFiltered = revenue.filter(item => item.uid === uid);
-      const expenseFiltered = expense.filter(item => item.uid === uid);
-      const revenueFilteredMunth = revenue.filter(item => item.uid === uid && item.month === selectedMonth);
-      const expenseFilteredMunth = expense.filter(item => item.uid === uid && item.month === selectedMonth);
+      // Aplicando os mesmos filtros em todas as etapas
+      const applyFilters = (item: ExpenseData) => {
+        return (
+          item.uid === uid &&
+          item.month === selectedMonth &&
+          (selectedCategory === "all" ||
+            item.category.toUpperCase() === selectedCategory.toUpperCase()) &&
+          (!minValue || Number(item.valueTransaction) >= minValue) &&
+          (!maxValue || Number(item.valueTransaction) <= maxValue)
+        );
+      };
 
-      const totalRevenue = revenueFiltered.reduce((acc: number, curr: ExpenseData) => acc + parseInt(curr.valueTransaction), 0);
-      const totalExpense = expenseFiltered.reduce((acc: number, curr: ExpenseData) => acc + parseFloat(curr.valueTransaction), 0);
+      const applyBasicFilters = (item: ExpenseData) =>
+        item.uid === uid && item.month === selectedMonth;
 
-      const totalRevenueMunth = revenueFilteredMunth.reduce((acc: number, curr: ExpenseData) => acc + parseInt(curr.valueTransaction), 0);
-      const totalExpenseMunth = expenseFilteredMunth.reduce((acc: number, curr: ExpenseData) => acc + parseInt(curr.valueTransaction), 0);
+      // Filtrando a receita e a despesa
+      const revenueFiltered = revenue.filter(
+        selectedTab === "receitas" || !selectedTab
+          ? applyFilters
+          : applyBasicFilters
+      );
+      const expenseFiltered = expense.filter(
+        selectedTab === "despesas" ? applyFilters : applyBasicFilters
+      );
+
+      // Calculando valores totais
+      const totalRevenue = revenueFiltered.reduce(
+        (acc: number, curr: ExpenseData) =>
+          acc + parseFloat(curr.valueTransaction),
+        0
+      );
+      const totalExpense = expenseFiltered.reduce(
+        (acc: number, curr: ExpenseData) =>
+          acc + parseFloat(curr.valueTransaction),
+        0
+      );
+
+      // Calculando valores mensais (usando os mesmos filtros aplicados)
+      const totalRevenueMunth = revenueFiltered.reduce(
+        (acc: number, curr: ExpenseData) =>
+          acc + parseFloat(curr.valueTransaction),
+        0
+      );
+      const totalExpenseMunth = expenseFiltered.reduce(
+        (acc: number, curr: ExpenseData) =>
+          acc + parseFloat(curr.valueTransaction),
+        0
+      );
 
       setTotalRevenueValue(totalRevenue);
       setTotalExpenseValue(totalExpense);
-      setTotalRevenueValueMunth(totalRevenueMunth)
-      setTotalExpenseValueMunth(totalExpenseMunth)
+      setTotalRevenueValueMunth(totalRevenueMunth);
+      setTotalExpenseValueMunth(totalExpenseMunth);
     }
-  }, [uid, revenue, expense, selectedMonth]);
+  }, [
+    uid,
+    revenue,
+    expense,
+    selectedMonth,
+    selectedCategory,
+    minValue,
+    maxValue,
+    selectedTab,
+  ]);
 
   const totalValue = totalRevenueValue - totalExpenseValue;
 
@@ -49,6 +101,6 @@ export function useTotalValue(uid: string | null): TotalValues {
     totalExpense: totalExpenseValue,
     tolalRevenueMunth: totalRevenueValueMunth,
     totalExpenseMunth: totalExpenseValueMunth,
-    totalValue: totalValue
+    totalValue: totalValue,
   };
 }

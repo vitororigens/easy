@@ -73,7 +73,7 @@ export function Revenue({
       description: "",
       formattedDate: date.toLocaleDateString("pt-BR"),
       name: "",
-      selectedCategory: "Outros",
+      selectedCategory: "outros",
       valueTransaction: "",
     },
   });
@@ -416,7 +416,7 @@ export function Revenue({
                     <Controller
                       control={control}
                       name="selectedCategory"
-                      defaultValue="Outros"
+                      defaultValue="outros"
                       render={({ field: { onChange, value } }) => (
                         <RNPickerSelect
                           value={value}
@@ -427,7 +427,7 @@ export function Revenue({
                             { label: "Investimentos", value: "investimentos" },
                             { label: "Comissão", value: "Comissão" },
                             { label: "Adiantamentos", value: "Adiantamentos" },
-                            { label: "Outros", value: "Outros" },
+                            { label: "Outros", value: "outros" },
                           ]}
                           placeholder={{
                             label: "Selecione",
