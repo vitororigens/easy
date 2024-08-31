@@ -14,7 +14,7 @@ import {
 import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
-import { useMonth } from "../../context/MonthProvider";
+import { useFilters } from "../../context/FiltersContext";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
@@ -61,7 +61,7 @@ export function Expense({
 }: ExpenseProps) {
   // States
   const user = useUserAuth();
-  const { selectedMonth } = useMonth()
+  const { selectedMonth } = useFilters()
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [repeat, setRepeat] = useState(false);

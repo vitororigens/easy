@@ -4,7 +4,7 @@ import { ThemeProvider } from 'styled-components';
 import { StatusBar } from 'react-native';
 //
 import { Loading } from './src/components/Loading';
-import { MonthProvider } from './src/context/MonthProvider'
+import { FiltersProvider } from './src/context/FiltersContext'
 import { Routes } from './src/routes';
 import theme from './src/theme';
 
@@ -17,7 +17,7 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <MonthProvider>
+      <FiltersProvider>
         <ToastProvider>
           <StatusBar
             barStyle='light-content'
@@ -26,7 +26,7 @@ export default function App() {
           />
           {fontLoader ? <Routes /> : <Loading />}
         </ToastProvider>
-      </MonthProvider>
+      </FiltersProvider>
     </ThemeProvider>
   );
 }

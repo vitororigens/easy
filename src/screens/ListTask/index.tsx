@@ -22,7 +22,7 @@ import PersonImage from "../../assets/illustrations/tasks.png";
 import { FinishTasks } from "../../components/FinishTasks";
 import { ItemTask } from "../../components/ItemTask";
 import { Items } from "../../components/Items";
-import { useMonth } from "../../context/MonthProvider";
+import { useFilters } from "../../context/FiltersContext";
 import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
 import { NewItemTask } from "../NewItemTask";
 
@@ -33,7 +33,7 @@ type SelectedItems = {
 const modalBottom = Platform.OS === "ios" ? 90 : 70;
 
 export function ListTask() {
-  const { selectedMonth } = useMonth();
+  const { selectedMonth } = useFilters();
   const navigation = useNavigation()
   const [activeButton, setActiveButton] = useState("tarefas");
   const [selectedItems, setSelectedItems] = useState<{

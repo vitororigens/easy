@@ -12,13 +12,13 @@ import {
 import { DefaultContainer } from "../../components/DefaultContainer";
 //
 import RNPickerSelect from "react-native-picker-select";
-import { useMonth } from "../../context/MonthProvider";
-import { Text, View } from "react-native";
+import { useFilters } from "../../context/FiltersContext";
+import { View } from "react-native";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { currencyMask } from "../../utils/currency";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { currencyMask, currencyUnMask } from "../../utils/currency";
 
 export interface FilterProps {
   showMonthFilter?: boolean;
@@ -44,6 +44,7 @@ const months = [
 ];
 
 const categories = [
+  { label: "Todas", value: "all" },
   { label: "Investimentos", value: "Investimentos" },
   { label: "Contas", value: "Contas" },
   { label: "Compras", value: "Compras" },
@@ -88,49 +89,75 @@ const currentMonth = currentDate.getMonth() + 1;
 const filterSchema = z.object({
   month: z.number().min(1, "Este campo é obrigatório"),
   category: z.string().min(1, "Este campo é obrigatório"),
-  minValue: z.string(),
-  maxValue: z.string(),
+  minValue: z.string().optional(),
+  maxValue: z.string().optional(),
 });
 
 type FilterType = z.infer<typeof filterSchema>;
 
 export function Filter() {
   // State
-  const { selectedMonth, setSelectedMonth } = useMonth();
+  const {
+    selectedMonth,
+    setSelectedMonth,
+    selectedCategory,
+    setSelectedCategory,
+    values,
+    setValues,
+  } = useFilters();
 
   // Hooks
   const route = useRoute();
 
-  const { showCategoryFilter, showMaxValueFilter, showMinValueFilter, showMonthFilter } = route.params as FilterProps;
+  const {
+    showCategoryFilter,
+    showMaxValueFilter,
+    showMinValueFilter,
+    showMonthFilter,
+  } = route.params as FilterProps;
 
   const navigation = useNavigation();
 
-  const { control, watch, handleSubmit } = useForm<FilterType>({
+  const { control, handleSubmit } = useForm<FilterType>({
     resolver: zodResolver(filterSchema),
     defaultValues: {
       month: selectedMonth ?? currentMonth,
-      category: "outros",
-      maxValue: "",
-      minValue: "",
+      category: selectedCategory ?? "all",
+      minValue: values.minValue
+        ? values.minValue.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        : "",
+      maxValue: values.maxValue
+        ? values.maxValue.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        : "",
     },
   });
-
-  const selectedCategory = watch("category");
-
-  // Vars
-  const initialCategory = categories.find(
-    (item) => item.value === selectedCategory
-  );
 
   // Funcs
   const selectedCurrentDate = months.find(
     (month) => month.id === currentDate.getMonth() + 1
   )?.name;
 
-  const onSubmitFilter = (data: FilterType) => {
-    setSelectedMonth(data.month);
+  const onSubmitFilter = ({
+    month,
+    category,
+    minValue,
+    maxValue,
+  }: FilterType) => {
+    setSelectedMonth(month);
+    setSelectedCategory(category);
+
+    setValues({
+      minValue: minValue ? currencyUnMask(minValue.toString()) : null,
+      maxValue: maxValue ? currencyUnMask(maxValue.toString()) : null,
+    });
+
     navigation.goBack();
-    console.log(data);
   };
 
   return (
@@ -179,14 +206,14 @@ export function Filter() {
                   <Label>Categoria</Label>
                   <RNPickerSelect
                     value={value}
-                    onValueChange={(value) => onChange(value)}
+                    onValueChange={onChange}
                     items={categories.map(({ label, value }) => ({
                       label,
                       value,
                     }))}
                     placeholder={{
-                      label: initialCategory?.label,
-                      value: initialCategory?.value,
+                      label: "Todas",
+                      value: "all",
                     }}
                     style={{
                       placeholder: {
@@ -199,55 +226,54 @@ export function Filter() {
             />
           )}
           {(showMaxValueFilter || showMinValueFilter) && (
-              <View
-                style={{
-                  width: "80%",
-                  marginHorizontal: "auto",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  gap: 20,
-                }}
-              >
-                {showMinValueFilter && (
-                  <Controller
-                    control={control}
-                    name="minValue"
-                    render={({ field: { value, onChange, onBlur } }) => (
-                      <InputContainer style={{ flex: 1 }}>
-                        <Label>Valor mínimo</Label>
-                        <TextField
-                          value={value}
-                          onChangeText={(value) =>
-                            onChange(currencyMask(value))
-                          }
-                          onBlur={onBlur}
-                        />
-                      </InputContainer>
-                    )}
-                  />
-                )}
-                {showMaxValueFilter && (
-                  <Controller
-                    control={control}
-                    name="maxValue"
-                    render={({ field: { value, onChange, onBlur } }) => (
-                      <InputContainer style={{ flex: 1 }}>
-                        <Label>Valor máximo</Label>
-                        <TextField
-                          value={value}
-                          onChangeText={(value) =>
-                            onChange(currencyMask(value))
-                          }
-                          onBlur={onBlur}
-                        />
-                      </InputContainer>
-                    )}
-                  />
-                )}
-              </View>
-            )}
+            <View
+              style={{
+                width: "80%",
+                marginHorizontal: "auto",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                gap: 20,
+              }}
+            >
+              {showMinValueFilter && (
+                <Controller
+                  control={control}
+                  name="minValue"
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <InputContainer style={{ flex: 1 }}>
+                      <Label>Valor mínimo</Label>
+                      <TextField
+                        value={value}
+                        onChangeText={(value) => onChange(currencyMask(value))}
+                        onBlur={onBlur}
+                      />
+                    </InputContainer>
+                  )}
+                />
+              )}
+              {showMaxValueFilter && (
+                <Controller
+                  control={control}
+                  name="maxValue"
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <InputContainer style={{ flex: 1 }}>
+                      <Label>Valor máximo</Label>
+                      <TextField
+                        value={value}
+                        onChangeText={(value) => onChange(currencyMask(value))}
+                        onBlur={onBlur}
+                      />
+                    </InputContainer>
+                  )}
+                />
+              )}
+            </View>
+          )}
 
-          <ButtonBar onPress={handleSubmit(onSubmitFilter)} style={{marginTop: -12}}>
+          <ButtonBar
+            onPress={handleSubmit(onSubmitFilter)}
+            style={{ marginTop: -12 }}
+          >
             <Title>Aplicar Filtros</Title>
           </ButtonBar>
         </FormContainer>

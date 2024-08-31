@@ -5,7 +5,7 @@ import { Toast } from "react-native-toast-notifications";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { ItemNotes } from "../../components/ItemNotes";
 import { LoadData } from "../../components/LoadData";
-import { useMonth } from "../../context/MonthProvider";
+import { useFilters } from "../../context/FiltersContext";
 import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
@@ -17,7 +17,7 @@ import { Loading } from "../../components/Loading";
 
 
 export function Notes() {
-  const { selectedMonth } = useMonth();
+  const { selectedMonth } = useFilters();
   const [showNotesModal, setShowNotesModal] = useState(false);
   const data = useMarketplaceCollections("Notes");
   const user = useUserAuth();

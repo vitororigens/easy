@@ -8,7 +8,7 @@ import { Loading } from "../../components/Loading";
 //
 import { Toast } from "react-native-toast-notifications";
 import { Items } from "../../components/Items";
-import { useMonth } from "../../context/MonthProvider";
+import { useFilters } from "../../context/FiltersContext";
 import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
@@ -18,7 +18,7 @@ import { NewLaunch } from "../NewLaunch";
 export function PiggyBank() {
   const user = useUserAuth();
   const PiggyBankData = useFirestoreCollection("PiggyBank");
-  const { selectedMonth } = useMonth();
+  const { selectedMonth } = useFilters();
   const uid = user?.uid;
   const [isLoaded, setIsLoaded] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);

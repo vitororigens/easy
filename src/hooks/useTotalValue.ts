@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import useFirestoreCollection, { ExpenseData } from './useFirestoreCollection';
-import { useMonth } from '../context/MonthProvider';
+import { useFilters } from '../context/FiltersContext';
 
 
 
@@ -15,7 +15,7 @@ export interface TotalValues {
 export function useTotalValue(uid: string | null): TotalValues {
   const revenue = useFirestoreCollection('Revenue');
   const expense = useFirestoreCollection('Expense');
-  const { selectedMonth } = useMonth()
+  const { selectedMonth } = useFilters()
 
   const [totalRevenueValue, setTotalRevenueValue] = useState<number>(0);
   const [totalExpenseValue, setTotalExpenseValue] = useState<number>(0);

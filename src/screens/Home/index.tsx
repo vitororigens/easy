@@ -5,7 +5,7 @@ import { DefaultContainer } from "../../components/DefaultContainer";
 import { Items } from "../../components/Items";
 import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
-import { useMonth } from "../../context/MonthProvider";
+import { useFilters } from "../../context/FiltersContext";
 import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { useTotalValue } from "../../hooks/useTotalValue";
 import { useUserAuth } from "../../hooks/useUserAuth";
@@ -28,7 +28,7 @@ export function Home() {
   const user = useUserAuth();
   const uid = user?.uid;
   const [activeButton, setActiveButton] = useState("receitas");
-  const { selectedMonth } = useMonth();
+  const { selectedMonth } = useFilters();
   const revenue = useFirestoreCollection("Revenue");
   const expense = useFirestoreCollection("Expense");
   const { tolalRevenueMunth, totalExpenseMunth } = useTotalValue(

@@ -14,7 +14,6 @@ import {
 import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
-import { useMonth } from "../../context/MonthProvider";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
@@ -28,6 +27,7 @@ import {
   Title,
   TitleTask,
 } from "./styles";
+import { useFilters } from "../../context/FiltersContext";
 
 type RevenueProps = {
   selectedItemId?: string;
@@ -56,7 +56,7 @@ export function Revenue({
 }: RevenueProps) {
   // States
   const user = useUserAuth();
-  const { selectedMonth } = useMonth();
+  const { selectedMonth } = useFilters();
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [repeat, setRepeat] = useState(false);
