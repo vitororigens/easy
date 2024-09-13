@@ -47,4 +47,7 @@ export const Content = styled.View`
 
 export const Button = styled(TouchableOpacity)`
     flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-left: 10px;
 `;

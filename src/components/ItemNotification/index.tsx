@@ -15,8 +15,14 @@ export function ItemNotification({ span, subtitle, title }: ItemNotificationProp
             <Content>
                 <Span>{span}</Span>
                 <View style={{ flexDirection: 'row' }}>
-                    <Button> <SubTitle>Aprovar  </SubTitle><Icon type="PRIMARY" name="check" /> </Button>
-                    <Button> <SubTitle>Reprovar</SubTitle> <Icon type="SECUNDARY" name="close" />  </Button>
+                    <Button>
+                        <SubTitle>Aprovar</SubTitle>
+                        <Icon type="PRIMARY" name="check" />
+                    </Button>
+                    <Button>
+                        <SubTitle>Reprovar</SubTitle>
+                        <Icon type="SECUNDARY" name="close" />
+                    </Button>
                 </View>
             </Content>
         </Container>
