@@ -87,6 +87,10 @@ export function Gears() {
     navigation.navigate("notifications");
   }
 
+  function handleShared() {
+    navigation.navigate("shared");
+  }
+
   return (
     <DefaultContainer title="Configurações">
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -124,6 +128,18 @@ export function Gears() {
                     <Icon>
                       <FontAwesome
                         name="bell"
+                        size={30}
+                        color={COLORS.PURPLE_800}
+                      />
+                    </Icon>
+                  </Items>
+                </ButtonIcon>
+                <ButtonIcon onPress={handleShared}>
+                  <Items>
+                    <Title>Compartilhamentos</Title>
+                    <Icon>
+                      <FontAwesome
+                        name="share"
                         size={30}
                         color={COLORS.PURPLE_800}
                       />

@@ -15,6 +15,7 @@ import { BottomTabsNavigation } from "./BottomTabsNavigation";
 import { Expense } from "../components/Expense";
 import { Revenue } from "../components/Revenue";
 import { Notifications } from "../screens/Notifications";
+import { Shared } from "../screens/Shared";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
@@ -38,6 +39,7 @@ export function StackPrivateNavigation() {
       <Screen name="newexpense" component={Expense} />
       <Screen name="newrevenue" component={Revenue} />
       <Screen name="notifications" component={Notifications} />
+      <Screen name="shared" component={Shared} />
     </Navigator>
   );
 }
