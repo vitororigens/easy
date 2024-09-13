@@ -14,6 +14,7 @@ import { PiggyBank } from "../screens/PiggyBank";
 import { BottomTabsNavigation } from "./BottomTabsNavigation";
 import { Expense } from "../components/Expense";
 import { Revenue } from "../components/Revenue";
+import { Notifications } from "../screens/Notifications";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
@@ -36,6 +37,7 @@ export function StackPrivateNavigation() {
       <Screen name="filter" component={Filter} />
       <Screen name="newexpense" component={Expense} />
       <Screen name="newrevenue" component={Revenue} />
+      <Screen name="notifications" component={Notifications} />
     </Navigator>
   );
 }

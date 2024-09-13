@@ -23,7 +23,8 @@ export declare global{
             historymarketplace: { selectedItemId?: string };
             newexpense: { selectedItemId?: string };
             newrevenue: { selectedItemId?: string };
-            
+            notifications: undefined;
+            shared: undefined;
         }
     }
 }
