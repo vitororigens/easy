@@ -14,6 +14,7 @@ import {
 import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
+import { useMonth } from "../../context/MonthProvider";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
@@ -27,7 +28,6 @@ import {
   Title,
   TitleTask,
 } from "./styles";
-import { useFilters } from "../../context/FiltersContext";
 
 type RevenueProps = {
   selectedItemId?: string;
@@ -56,7 +56,7 @@ export function Revenue({
 }: RevenueProps) {
   // States
   const user = useUserAuth();
-  const { selectedMonth } = useFilters();
+  const { selectedMonth } = useMonth();
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [repeat, setRepeat] = useState(false);
@@ -73,7 +73,7 @@ export function Revenue({
       description: "",
       formattedDate: date.toLocaleDateString("pt-BR"),
       name: "",
-      selectedCategory: "outros",
+      selectedCategory: "Outros",
       valueTransaction: "",
     },
   });
@@ -416,7 +416,7 @@ export function Revenue({
                     <Controller
                       control={control}
                       name="selectedCategory"
-                      defaultValue="outros"
+                      defaultValue="Outros"
                       render={({ field: { onChange, value } }) => (
                         <RNPickerSelect
                           value={value}
@@ -427,7 +427,7 @@ export function Revenue({
                             { label: "Investimentos", value: "investimentos" },
                             { label: "Comissão", value: "Comissão" },
                             { label: "Adiantamentos", value: "Adiantamentos" },
-                            { label: "Outros", value: "outros" },
+                            { label: "Outros", value: "Outros" },
                           ]}
                           placeholder={{
                             label: "Selecione",

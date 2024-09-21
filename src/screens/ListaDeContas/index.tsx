@@ -7,7 +7,7 @@ import { Expense } from "../../components/Expense";
 import { ItemsAccounts } from "../../components/ItemsAccounts";
 import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
-import { useFilters } from "../../context/FiltersContext";
+import { useMonth } from "../../context/MonthProvider";
 import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../services";
@@ -22,7 +22,7 @@ type Props = {
 };
 
 export function ListaDeContas() {
-  const { selectedMonth } = useFilters();
+  const { selectedMonth } = useMonth();
   const user = useUserAuth();
   const uid = user?.uid;
   const [status, setStatus] = useState(false);

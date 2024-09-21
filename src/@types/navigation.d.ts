@@ -13,7 +13,7 @@ export declare global{
             perfil: undefined;
             piggybank: undefined;
             historic: undefined;
-            filter: { showMonthFilter?: boolean, showCategoryFilter?: boolean, showMinValueFilter?: boolean, showMaxValueFilter?: boolean };
+            filter: undefined;
             newnotes: { selectedItemId?: string };
             newtask: { selectedItemId?: string };
             newlaunch: { selectedItemId?: string };
@@ -23,8 +23,7 @@ export declare global{
             historymarketplace: { selectedItemId?: string };
             newexpense: { selectedItemId?: string };
             newrevenue: { selectedItemId?: string };
-            notifications: undefined;
-            shared: undefined;
+            
         }
     }
 }

@@ -18,7 +18,7 @@ import { ItemMarketplace } from "../../components/ItemMarketplace";
 import { Items } from "../../components/Items";
 import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
-import { useFilters } from "../../context/FiltersContext";
+import { useMonth } from "../../context/MonthProvider";
 import useHistoryMarketplaceCollections, {
   HistoryMarketplaceData,
 } from "../../hooks/useHistoryMarketplaceCollection";
@@ -34,7 +34,7 @@ import { Button, Container, ContentTitle, Divider, DividerContent, Header, Icon,
 const modalBottom = Platform.OS === "ios" ? 50 : 60;
 
 export function Marketplace() {
-  const { selectedMonth } = useFilters();
+  const { selectedMonth } = useMonth();
   const [activeButton, setActiveButton] = useState("lista");
   const [confirmItemVisible, setConfirmItemVisible] = useState(false);
   const [modalActive, setModalActive] = useState(false);

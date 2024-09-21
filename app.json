@@ -2,7 +2,7 @@
   "expo": {
     "name": "easy",
     "slug": "easy",
-    "version": "1.8.0",
+    "version": "1.7.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,14 +11,12 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.easy.io.app",
-      "buildNumber": "8",
+      "buildNumber": "7",
       "runtimeVersion": {
         "policy": "appVersion"
       }
@@ -30,8 +28,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 8,
-      "runtimeVersion": "1.8.0"
+      "versionCode": 7,
+      "runtimeVersion": "1.7.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -40,7 +38,27 @@
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
       "@react-native-firebase/messaging",
-      "expo-font"
+      "expo-font",
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "development"
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-1904400573870779~6241470792",
+          "iosAppId": "ca-app-pub-1904400573870779~7856475809",
+          "skAdNetworkItems": [
+            "cstr6suwn9.skadnetwork",
+            "4fzdc2evr5.skadnetwork",
+            "4pfyvq9l8r.skadnetwork",
+            "2fnua5tdw4.skadnetwork",
+            "ydx93a7ass.skadnetwork"
+          ]
+        }
+      ]
     ],
     "extra": {
       "eas": {

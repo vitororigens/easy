@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { ButtonBar, Content, Header, NavBar, Title } from "./styles";
 import { useRoute } from "@react-navigation/native";
 import { DefaultContainer } from "../../components/DefaultContainer";
-import { Expense } from "../../components/Expense";
 import { Revenue } from "../../components/Revenue";
 import theme from "../../theme";
 
@@ -53,7 +52,7 @@ export function NewTask() {
             </NavBar>
           </Header>
           {activeButton === "receitas" && <Revenue selectedItemId={selectedItemId} showButtonSave />}
-          {activeButton === "despesas" && <Expense selectedItemId={selectedItemId} showButtonSave />}
+          {activeButton === "despesas" && <Revenue selectedItemId={selectedItemId} showButtonSave />}
         </Content>
       </DefaultContainer>
     </>

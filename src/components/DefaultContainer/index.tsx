@@ -1,11 +1,15 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useRef, useState } from "react";
 import { Modal, Platform, View } from "react-native";
 import { NewItem } from "../../screens/NewItem";
 import { NewItemTask } from "../../screens/NewItemTask";
 import { NewLaunch } from "../../screens/NewLaunch";
 
 import { useTheme } from "styled-components/native";
+import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
+
+const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-1904400573870779~6241470792';
+
 import {
   Button,
   ButtonBack,
@@ -37,10 +41,6 @@ type DefaultContainerProps = {
   type?: "PRIMARY" | "SECONDARY";
   closeModalFn?: () => void;
   addActionFn?: () => void
-  showMonthFilter?: boolean;
-  showCategoryFilter?: boolean;
-  showMinValueFilter?: boolean;
-  showMaxValueFilter?: boolean;
 };
 
 export function DefaultContainer({
@@ -50,9 +50,6 @@ export function DefaultContainer({
   closeModalFn,
   addActionFn,
   customBg,
-  showCategoryFilter,
-  showMaxValueFilter,
-  showMinValueFilter,
   type = "PRIMARY",
   newNotes = false,
   newItemMarketplace = false,
@@ -64,17 +61,17 @@ export function DefaultContainer({
   newLaunch = false,
   listButtom = false,
   hasHeader = true,
-  showMonthFilter = true,
 }: DefaultContainerProps) {
   const navigation = useNavigation();
-  const {COLORS} = useTheme()
+  const { COLORS } = useTheme();
   const [showNewItemModal, setShowNewItemModal] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [showNewItemMarketplace, setShowNewItemMarketplace] = useState(false);
   const [showListModal, setShowListModal] = useState(false);
   const [showNewLaunchModal, setShowNewLaunchModal] = useState(false);
   const [showFilterPickerModal, setShowFilterPickerModal] = useState(false);
-  const [selectedItemId, setSelectItemId] = useState('');
+  const [selectedItemId, setSelectItemId] = useState("");
+  const bannerRef = useRef<BannerAd>(null);
 
   function closeModals() {
     setShowNewItemModal(false);
@@ -90,19 +87,19 @@ export function DefaultContainer({
   }
 
   function handleNewItemTask(documentId: string) {
-    navigation.navigate('newitemtask', { selectedItemId: documentId });
+    navigation.navigate("newitemtask", { selectedItemId: documentId });
   }
 
   function handleNewNotes(documentId: string) {
-    navigation.navigate('newnotes', { selectedItemId: documentId });
+    navigation.navigate("newnotes", { selectedItemId: documentId });
   }
 
   function handleNewItemMarketplace(documentId: string) {
-    navigation.navigate('newitem', { selectedItemId: documentId });
+    navigation.navigate("newitem", { selectedItemId: documentId });
   }
 
   function handleShowFilter() {
-    navigation.navigate('filter', {showCategoryFilter, showMaxValueFilter, showMinValueFilter, showMonthFilter});
+    navigation.navigate("filter");
   }
 
   function handleNewLaunch() {
@@ -230,10 +227,12 @@ export function DefaultContainer({
         visible={showNewItemModal}
         onRequestClose={closeModals}
       >
-        <View style={{
-          flex: 1,
-          paddingTop: Platform.OS === 'ios' ? 20 : 0
-        }}>
+        <View
+          style={{
+            flex: 1,
+            paddingTop: Platform.OS === "ios" ? 20 : 0,
+          }}
+        >
           <NewItemTask showButtonSave closeBottomSheet={closeModals} />
         </View>
       </Modal>
@@ -243,10 +242,12 @@ export function DefaultContainer({
         visible={showNewLaunchModal}
         onRequestClose={closeModals}
       >
-        <View style={{
-          flex: 1,
-          paddingTop: Platform.OS === 'ios' ? 20 : 0
-        }}>
+        <View
+          style={{
+            flex: 1,
+            paddingTop: Platform.OS === "ios" ? 20 : 0,
+          }}
+        >
           <NewLaunch closeBottomSheet={closeModals} showButtonSave />
         </View>
       </Modal>
@@ -256,14 +257,23 @@ export function DefaultContainer({
         visible={showNewItemMarketplace}
         onRequestClose={closeModals}
       >
-        <View style={{
-          flex: 1,
-          paddingTop: Platform.OS === 'ios' ? 20 : 0
-        }}>
+        <View
+          style={{
+            flex: 1,
+            paddingTop: Platform.OS === "ios" ? 20 : 0,
+          }}
+        >
           <NewItem showButtonSave closeBottomSheet={closeModals} />
-
         </View>
       </Modal>
+
+      <View style={{ paddingBottom: 120, backgroundColor: 'white' }}>
+        <BannerAd
+          unitId={adUnitId}
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+         
+        />
+      </View>
     </Container>
   );
 }
