@@ -78,8 +78,17 @@ export function Gears() {
   function handleGraphics() {
     navigation.navigate("graphics");
   }
+
   function handlePefil() {
     navigation.navigate("perfil");
+  }
+
+  function handleNotifications() {
+    navigation.navigate("notifications");
+  }
+
+  function handleShared() {
+    navigation.navigate("shared");
   }
 
   return (
@@ -107,6 +116,30 @@ export function Gears() {
                     <Icon>
                       <FontAwesome5
                         name="piggy-bank"
+                        size={30}
+                        color={COLORS.PURPLE_800}
+                      />
+                    </Icon>
+                  </Items>
+                </ButtonIcon>
+                <ButtonIcon onPress={handleNotifications}>
+                  <Items>
+                    <Title>Notificações</Title>
+                    <Icon>
+                      <FontAwesome
+                        name="bell"
+                        size={30}
+                        color={COLORS.PURPLE_800}
+                      />
+                    </Icon>
+                  </Items>
+                </ButtonIcon>
+                <ButtonIcon onPress={handleShared}>
+                  <Items>
+                    <Title>Compartilhamentos</Title>
+                    <Icon>
+                      <FontAwesome
+                        name="share"
                         size={30}
                         color={COLORS.PURPLE_800}
                       />
