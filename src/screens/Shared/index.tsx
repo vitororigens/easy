@@ -82,8 +82,8 @@ export function Shared() {
                     renderItem={({ item }) => (
                         <ItemSharedUser
                             title={item.userName} 
-                            span={"Compatilhando"}     
-                            type="PRIMARY"       
+                            span={"Aguardando"}     
+                            type="SECUNDARY"       
                         />
                     )}
                 />
