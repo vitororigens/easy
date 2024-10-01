@@ -58,6 +58,14 @@
             "ydx93a7ass.skadnetwork"
           ]
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
       ]
     ],
     "extra": {
