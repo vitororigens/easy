@@ -12,7 +12,7 @@ import mobileAds from 'react-native-google-mobile-ads';
 
 
 
-OneSignal.initialize("029e1bac-8243-4b3d-9cb0-200f31cb91da")
+OneSignal.initialize("04b5e397-b327-469b-a9f2-9ac8a22a039f")
 OneSignal.Notifications.requestPermission(true)
 
 export default function App() {
