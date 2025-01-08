@@ -9,33 +9,31 @@ import {
   SubTitle,
   Title,
 } from "./styles";
+import { INote } from "../../services/firebase/notes.firebase";
+import { format } from "date-fns";
 
 type ItemNotesProps = {
-  title: string;
-  description: string;
-  date?: string;
-  onDelete: () => void;
-  onEdit: () => void;
+  note: INote;
+  handleDelete: () => void;
+  handleUpdate: () => void;
 };
 
 export function ItemNotes({
-  description,
-  title,
-  onDelete,
-  onEdit,
-  date,
+  note,
+  handleDelete,
+  handleUpdate,
 }: ItemNotesProps) {
   return (
-    <Container onPress={onEdit}>
+    <Container onPress={handleUpdate}>
       <View style={{ flex: 1 }}>
-        <Title>{title}</Title>
-        <SubTitle>
-          {description
-            ? description.length > 10
-              ? description.substring(0, 10) + "..."
-              : description
-            : ""}
-        </SubTitle>
+        <Title>{note.name}</Title>
+        {note.description && (
+          <SubTitle>
+            {note.description.length > 10
+              ? note.description.substring(0, 10) + "..."
+              : note.description}
+          </SubTitle>
+        )}
       </View>
       <View style={{ alignItems: "flex-end" }}>
         <Popover
@@ -48,18 +46,18 @@ export function ItemNotes({
           <Popover.Backdrop />
           <Popover.Content>
             <ContainerMenu style={{ alignSelf: "flex-end" }}>
-              <Button onPress={onDelete}>
+              <Button onPress={handleDelete}>
                 <Icon name="trash" />
                 <Title>Excluir</Title>
               </Button>
-              <Button onPress={onEdit}>
+              <Button onPress={handleUpdate}>
                 <Icon name="pencil" />
                 <Title>Editar</Title>
               </Button>
             </ContainerMenu>
           </Popover.Content>
         </Popover>
-        {!!date && <DateNote>{date}</DateNote>}
+        <DateNote>{format(note.createdAt.toDate(), "dd/mm/yyyy")}</DateNote>
       </View>
     </Container>
   );

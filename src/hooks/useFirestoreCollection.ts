@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore'; 
-import { database } from '../services';
+import { useState, useEffect } from "react";
+import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import { database } from "../libs/firebase";
 
 export interface ExpenseData {
   id: string;
@@ -20,22 +20,19 @@ export interface ExpenseData {
   income: boolean;
 }
 
-
-const useFirestoreCollection = (
-  collectionName: string 
-): ExpenseData[] => {
+const useFirestoreCollection = (collectionName: string): ExpenseData[] => {
   const [data, setData] = useState<ExpenseData[]>([]);
 
   useEffect(() => {
-    const unsubscribe = database.collection(collectionName).onSnapshot(
-      (snapshot: FirebaseFirestoreTypes.QuerySnapshot) => {
+    const unsubscribe = database
+      .collection(collectionName)
+      .onSnapshot((snapshot: FirebaseFirestoreTypes.QuerySnapshot) => {
         const collectionData: ExpenseData[] = [];
-        snapshot.forEach(doc => {
+        snapshot.forEach((doc) => {
           collectionData.push({ id: doc.id, ...doc.data() } as ExpenseData);
         });
         setData(collectionData);
-      }
-    );
+      });
 
     return () => unsubscribe();
   }, [collectionName]);

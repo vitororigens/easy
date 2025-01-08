@@ -16,7 +16,6 @@ import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
 import { useMonth } from "../../context/MonthProvider";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
 import { LoadingIndicator } from "../Loading/style";
 import {
@@ -28,6 +27,7 @@ import {
   Title,
   TitleTask,
 } from "./styles";
+import { database } from "../../libs/firebase";
 
 type RevenueProps = {
   selectedItemId?: string;
@@ -49,9 +49,7 @@ type FormSchemaType = z.infer<typeof formSchema>;
 
 export function Revenue({
   selectedItemId,
-  showButtonRemove,
   onCloseModal,
-  showButtonEdit,
   showButtonSave,
 }: RevenueProps) {
   // States
@@ -79,7 +77,6 @@ export function Revenue({
   });
 
   // Functions
-
 
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     setShowDatePicker(false);
@@ -305,9 +302,7 @@ export function Revenue({
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <TitleTask>Nome*</TitleTask>
           <Controller
@@ -335,20 +330,22 @@ export function Revenue({
           />
         </View>
 
-        {Platform.OS === 'ios' ? (
+        {Platform.OS === "ios" ? (
           <View>
             <TitleTask>Data*</TitleTask>
-            <View style={{
-              width: 100,
-              marginTop: 10
-            }}>
-                <DateTimePicker
-              value={date}
-              mode="date"
-              display="calendar"
-              onChange={handleDateChange}
-              accessibilityLanguage="pt-BR"
-            />
+            <View
+              style={{
+                width: 100,
+                marginTop: 10,
+              }}
+            >
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display="calendar"
+                onChange={handleDateChange}
+                accessibilityLanguage="pt-BR"
+              />
             </View>
           </View>
         ) : (

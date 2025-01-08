@@ -7,49 +7,74 @@ import { useTheme } from "styled-components/native";
 import { Loading } from "../components/Loading";
 import { StackNavigation } from "./StackNavigation";
 import { StackPrivateNavigation } from "./StackPrivateNavigation";
+import {
+  NotificationWillDisplayEvent,
+  OneSignal,
+} from "react-native-onesignal";
 
 const storage = new MMKV({ id: "easy-finances" });
 
 export function Routes() {
-    const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
-    const [loading, setLoading] = useState(true); // Estado de carregamento
-    const { COLORS } = useTheme();
+  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+  const [loading, setLoading] = useState(true); // Estado de carregamento
+  const { COLORS } = useTheme();
 
-    useEffect(() => {
-        // Recupera dados do usuário do MMKV na inicialização
-        const storedUser = storage.getString('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
+  console.log(user);
 
-        const subscriber = auth().onAuthStateChanged(authUser => {
-            if (authUser) {
-                const userData = {
-                    uid: authUser.uid,
-                    name: authUser.displayName,
-                    email: authUser.email,
-                };
-                // @ts-ignore
-                setUser(userData);
-                storage.set('user', JSON.stringify(userData));
-            } else {
-                setUser(null);
-                storage.delete('user');
-            }
-            setLoading(false); // Finaliza o carregamento após a verificação
-        });
-        return subscriber;
-    }, []);
-
-    if (loading) {
-        return <Loading />;
+  useEffect(() => {
+    // Recupera dados do usuário do MMKV na inicialização
+    const storedUser = storage.getString("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
 
-    return (
-        <View style={{ backgroundColor: COLORS.WHITE, flex: 1 }}>
-            <NavigationContainer>
-                {user ? <StackPrivateNavigation /> : <StackNavigation />}
-            </NavigationContainer>
-        </View>
+    const subscriber = auth().onAuthStateChanged((authUser) => {
+      if (authUser) {
+        const userData = {
+          uid: authUser.uid,
+          name: authUser.displayName,
+          email: authUser.email,
+        };
+        // @ts-ignore
+        setUser(userData);
+        storage.set("user", JSON.stringify(userData));
+      } else {
+        setUser(null);
+        storage.delete("user");
+      }
+      setLoading(false); // Finaliza o carregamento após a verificação
+    });
+    return subscriber;
+  }, []);
+
+  useEffect(() => {
+    const handleNotification = (e: NotificationWillDisplayEvent): void => {
+      e.preventDefault();
+      const res = e.getNotification();
+      console.log(res);
+    };
+
+    OneSignal.Notifications.addEventListener(
+      "foregroundWillDisplay",
+      handleNotification
     );
+
+    return () =>
+      OneSignal.Notifications.removeEventListener(
+        "foregroundWillDisplay",
+        handleNotification
+      );
+  }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  return (
+    <View style={{ backgroundColor: COLORS.WHITE, flex: 1 }}>
+      <NavigationContainer>
+        {user ? <StackPrivateNavigation /> : <StackNavigation />}
+      </NavigationContainer>
+    </View>
+  );
 }

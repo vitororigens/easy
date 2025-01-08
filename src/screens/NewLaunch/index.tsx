@@ -1,14 +1,15 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useEffect, useState } from "react";
-import { Alert, Platform, ScrollView, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Toast } from "react-native-toast-notifications";
 //
-import {
-  Button,
-  Content,
-  Input,
-  Title
-} from "./styles";
+import { Button, Content, Input, Title } from "./styles";
 //
 import { DefaultContainer } from "../../components/DefaultContainer";
 //
@@ -16,8 +17,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
+import { database } from "../../libs/firebase";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -100,7 +101,7 @@ export function NewLaunch({
       .then(() => {
         Toast.show("Item adicionado!", { type: "success" });
         reset();
-        !!closeBottomSheet && closeBottomSheet()
+        !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
         console.error("Erro ao adicionar o item: ", error);
@@ -152,7 +153,7 @@ export function NewLaunch({
       })
       .then(() => {
         Toast.show("Item adicionado!", { type: "success" });
-        !!closeBottomSheet && closeBottomSheet()
+        !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
         console.error("Erro ao adicionar o item: ", error);
@@ -176,10 +177,13 @@ export function NewLaunch({
           if (doc.exists) {
             const data = doc.data();
             if (data) {
-              setValue("valueItem", data.valueItem.toLocaleString("pt-BR", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }));
+              setValue(
+                "valueItem",
+                data.valueItem.toLocaleString("pt-BR", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              );
               setValue("description", data.description || "");
               setValue("name", data.name);
               setIsEditing(true);
@@ -200,26 +204,23 @@ export function NewLaunch({
     }
   }, [selectedItemId]);
 
-
   return (
     <>
-      <DefaultContainer closeModalFn={closeBottomSheet} title="Quanto você economizou?" >
+      <DefaultContainer
+        closeModalFn={closeBottomSheet}
+        title="Quanto você economizou?"
+      >
         <ScrollView
           keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}
         >
-
           <Content>
             <Title>Nome*</Title>
             <Controller
               control={control}
               name="name"
               render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                />
+                <Input onBlur={onBlur} onChangeText={onChange} value={value} />
               )}
             />
 
@@ -237,69 +238,67 @@ export function NewLaunch({
                 />
               )}
             />
-            
-        {Platform.OS === 'ios' ? (
-          <View>
-            <Title>Data*</Title>
-            <View style={{
-              width: 100,
-              marginTop: 10,
-              marginBottom: 10
-            }}>
-                <DateTimePicker
-              value={date}
-              mode="date"
-              display="calendar"
-              onChange={handleDateChange}
-              accessibilityLanguage="pt-BR"
-            />
-            </View>
-          </View>
-        ) : (
-          <View>
-            <Title>Data* </Title>
 
-            <Controller
-              control={control}
-              name="formattedDate"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TouchableOpacity
-                  style={{ height: 50 }}
-                  onPress={showDatePickerModal}
+            {Platform.OS === "ios" ? (
+              <View>
+                <Title>Data*</Title>
+                <View
+                  style={{
+                    width: 100,
+                    marginTop: 10,
+                    marginBottom: 10,
+                  }}
                 >
-                  <Input
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    editable={false}
-                    onFocus={showDatePickerModal}
+                  <DateTimePicker
+                    value={date}
+                    mode="date"
+                    display="calendar"
+                    onChange={handleDateChange}
+                    accessibilityLanguage="pt-BR"
                   />
-                </TouchableOpacity>
-              )}
-            />
+                </View>
+              </View>
+            ) : (
+              <View>
+                <Title>Data* </Title>
 
-            {showDatePicker && (
-              <DateTimePicker
-                display="inline"
-                value={date}
-                mode="date"
-                onChange={handleDateChange}
-                locale="pt-BR"
-              />
+                <Controller
+                  control={control}
+                  name="formattedDate"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TouchableOpacity
+                      style={{ height: 50 }}
+                      onPress={showDatePickerModal}
+                    >
+                      <Input
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        editable={false}
+                        onFocus={showDatePickerModal}
+                      />
+                    </TouchableOpacity>
+                  )}
+                />
+
+                {showDatePicker && (
+                  <DateTimePicker
+                    display="inline"
+                    value={date}
+                    mode="date"
+                    onChange={handleDateChange}
+                    locale="pt-BR"
+                  />
+                )}
+              </View>
             )}
-          </View>
-        )}
 
             <Title>Descrição</Title>
             <Controller
               control={control}
               name="description"
               render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                />
+                <Input value={value} onChangeText={onChange} onBlur={onBlur} />
               )}
             />
             <View style={{ marginBottom: 10, height: 150 }}>

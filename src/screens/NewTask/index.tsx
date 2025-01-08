@@ -12,7 +12,9 @@ export function NewTask() {
     initialActiveButton?: string;
   };
 
-  const [activeButton, setActiveButton] = useState<string | undefined>(undefined);
+  const [activeButton, setActiveButton] = useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     if (initialActiveButton) {
@@ -29,7 +31,6 @@ export function NewTask() {
       <DefaultContainer
         hasHeader={false}
         title="Adicionar Lançamento"
-       
         backButton
       >
         <Content>
@@ -51,8 +52,12 @@ export function NewTask() {
               </ButtonBar>
             </NavBar>
           </Header>
-          {activeButton === "receitas" && <Revenue selectedItemId={selectedItemId} showButtonSave />}
-          {activeButton === "despesas" && <Expense selectedItemId={selectedItemId} showButtonSave />}
+          {activeButton === "receitas" && (
+            <Revenue selectedItemId={selectedItemId} showButtonSave />
+          )}
+          {activeButton === "despesas" && (
+            <Expense selectedItemId={selectedItemId} showButtonSave />
+          )}
         </Content>
       </DefaultContainer>
     </>

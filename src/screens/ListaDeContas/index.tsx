@@ -10,8 +10,8 @@ import { Loading } from "../../components/Loading";
 import { useMonth } from "../../context/MonthProvider";
 import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { database } from "../../services";
 import { ButtonClose, Content, Title } from "./styles";
+import { database } from "../../libs/firebase";
 
 type Props = {
   closeBottomSheet?: () => void;

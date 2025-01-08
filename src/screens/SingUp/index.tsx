@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import auth from "@react-native-firebase/auth";
 import { ActivityIndicator } from "react-native";
 import { Toast } from "react-native-toast-notifications";
@@ -9,7 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
-import { database } from '../../services';
+import { database } from "../../libs/firebase";
 
 const formSchema = z
   .object({
@@ -69,12 +69,12 @@ export function SingUp() {
   });
 
   const checkUsernameExists = async (username: string) => {
-    const userRef = database.collection('User');
-    const snapshot = await userRef.where('userName', '==', username).get();
-    return !snapshot.empty; 
+    const userRef = database.collection("User");
+    const snapshot = await userRef.where("userName", "==", username).get();
+    return !snapshot.empty;
   };
 
-  const userName = watch('userName'); 
+  const userName = watch("userName");
 
   useEffect(() => {
     const checkUsername = async () => {
@@ -100,7 +100,7 @@ export function SingUp() {
       Toast.show("Nome de usuário já existe.", { type: "danger" });
       return;
     }
-  
+
     auth()
       .createUserWithEmailAndPassword(email.trim(), password.trim())
       .then((userCredential) => {
@@ -110,27 +110,29 @@ export function SingUp() {
             displayName: name.trim(),
           })
           .then(() => {
-            database.collection('User').doc(uid).set({
+            database.collection("User").doc(uid).set({
               userName: userName.trim(),
-              uid
+              uid,
             });
             Toast.show("Conta cadastrada com sucesso!", { type: "success" });
           });
       })
       .catch((error) => {
-        if (error.code === 'auth/email-already-in-use') {
-          Toast.show("O email já está em uso por outra conta.", { type: "danger" });
+        if (error.code === "auth/email-already-in-use") {
+          Toast.show("O email já está em uso por outra conta.", {
+            type: "danger",
+          });
         } else {
           console.error("Erro ao criar conta:", error);
-          Toast.show("Não foi possível cadastrar sua conta, verifique.", { type: "danger" });
+          Toast.show("Não foi possível cadastrar sua conta, verifique.", {
+            type: "danger",
+          });
         }
       })
       .finally(() => {
         reset();
       });
   }
-  
-
 
   return (
     <Container>

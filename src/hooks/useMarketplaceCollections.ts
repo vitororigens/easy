@@ -1,6 +1,6 @@
-import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import { useEffect, useState } from 'react';
-import { database } from '../services';
+import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import { useEffect, useState } from "react";
+import { database } from "../libs/firebase";
 
 export interface MarketplaceData {
   uid: string;
@@ -10,27 +10,27 @@ export interface MarketplaceData {
   measurements: string;
   name: string;
   valueItem: number;
-  id:string;
-  createdAt?:string;
+  id: string;
+  createdAt?: string;
   totalValue?: number;
   sharedWith?: string[];
 }
 
 const useMarketplaceCollections = (
-  collectionName: string 
+  collectionName: string
 ): MarketplaceData[] => {
   const [data, setData] = useState<MarketplaceData[]>([]);
 
   useEffect(() => {
-    const unsubscribe = database.collection(collectionName).onSnapshot(
-      (snapshot: FirebaseFirestoreTypes.QuerySnapshot) => {
+    const unsubscribe = database
+      .collection(collectionName)
+      .onSnapshot((snapshot: FirebaseFirestoreTypes.QuerySnapshot) => {
         const collectionData: MarketplaceData[] = [];
-        snapshot.forEach(doc => {
+        snapshot.forEach((doc) => {
           collectionData.push({ id: doc.id, ...doc.data() } as MarketplaceData);
         });
         setData(collectionData);
-      }
-    );
+      });
 
     return () => unsubscribe();
   }, [collectionName]);

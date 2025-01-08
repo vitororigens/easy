@@ -1,14 +1,21 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { ReactNode, useRef, useState } from "react";
 import { Modal, Platform, View } from "react-native";
-import { NewItem } from "../../screens/NewItem";
+import { MarketItem } from "../../screens/MarketItem";
 import { NewItemTask } from "../../screens/NewItemTask";
 import { NewLaunch } from "../../screens/NewLaunch";
 
 import { useTheme } from "styled-components/native";
-import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
+import {
+  BannerAd,
+  BannerAdSize,
+  TestIds,
+  useForeground,
+} from "react-native-google-mobile-ads";
 
-const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-1904400573870779~6241470792';
+const adUnitId = __DEV__
+  ? TestIds.ADAPTIVE_BANNER
+  : "ca-app-pub-1904400573870779~6241470792";
 
 import {
   Button,
@@ -37,10 +44,10 @@ type DefaultContainerProps = {
   hasHeader?: boolean;
   title?: string;
   subtitle?: string;
-  customBg?: string
+  customBg?: string;
   type?: "PRIMARY" | "SECONDARY";
   closeModalFn?: () => void;
-  addActionFn?: () => void
+  addActionFn?: () => void;
 };
 
 export function DefaultContainer({
@@ -95,7 +102,7 @@ export function DefaultContainer({
   }
 
   function handleNewItemMarketplace(documentId: string) {
-    navigation.navigate("newitem", { selectedItemId: documentId });
+    navigation.navigate("market-item", { selectedItemId: documentId });
   }
 
   function handleShowFilter() {
@@ -263,15 +270,14 @@ export function DefaultContainer({
             paddingTop: Platform.OS === "ios" ? 20 : 0,
           }}
         >
-          <NewItem showButtonSave closeBottomSheet={closeModals} />
+          <MarketItem showButtonSave closeBottomSheet={closeModals} />
         </View>
       </Modal>
 
-      <View style={{ paddingBottom: 120, backgroundColor: 'white' }}>
+      <View style={{ paddingBottom: 120, backgroundColor: "white" }}>
         <BannerAd
           unitId={adUnitId}
           size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-         
         />
       </View>
     </Container>

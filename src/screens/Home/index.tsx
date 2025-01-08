@@ -9,7 +9,6 @@ import { useMonth } from "../../context/MonthProvider";
 import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { useTotalValue } from "../../hooks/useTotalValue";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { database } from "../../services";
 import { formatCurrency } from "../../utils/formatCurrency";
 import {
   Button,
@@ -23,6 +22,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import ExpensePersonImage from "../../assets/illustrations/expense.png";
 import RevenuePersonImage from "../../assets/illustrations/revenue.png";
+import { database } from "../../libs/firebase";
 
 export function Home() {
   const user = useUserAuth();
@@ -258,8 +258,6 @@ export function Home() {
           )}
         </ContainerItems>
       )}
-      
-      
     </DefaultContainer>
   );
 }

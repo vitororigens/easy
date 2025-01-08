@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { database } from "../../services";
-import { Button } from '../Button';
-import { Input } from '../Input';
-import { getInitials } from "../../utils/getInitials";
-import { Container, ModalContent, SharedUserContainer, SharedUser, Title, IconCheck, ButtonSelect } from './styles';
+import React, { useEffect, useState } from "react";
+import { Modal, FlatList } from "react-native";
+import { Button } from "../Button";
+import { Input } from "../Input";
+import {
+  Container,
+  ModalContent,
+  Title,
+  IconCheck,
+  ButtonSelect,
+} from "./styles";
+import { database } from "../../libs/firebase";
 
 interface EditshareModalProps {
   visible: boolean;
@@ -15,7 +20,11 @@ interface EditshareModalProps {
   uid: string;
 }
 
-export function EditshareModal({ visible, onClose, onSelectUser }: EditshareModalProps) {
+export function EditshareModal({
+  visible,
+  onClose,
+  onSelectUser,
+}: EditshareModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [sharedUsers, setSharedUsers] = useState<any[]>([]);
@@ -26,10 +35,13 @@ export function EditshareModal({ visible, onClose, onSelectUser }: EditshareModa
       return;
     }
     try {
-      const userRef = database.collection('User');
-      const snapshot = await userRef.where('userName', '==', username).get();
+      const userRef = database.collection("User");
+      const snapshot = await userRef.where("userName", "==", username).get();
       if (!snapshot.empty) {
-        const results = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
+        const results = snapshot.docs.map((doc) => ({
+          uid: doc.id,
+          ...doc.data(),
+        }));
         setSearchResults(results);
       } else {
         setSearchResults([]);
@@ -44,7 +56,7 @@ export function EditshareModal({ visible, onClose, onSelectUser }: EditshareModa
   }, [searchTerm]);
 
   const addSharedUser = (user: any) => {
-    if (sharedUsers.find(u => u.uid === user.uid)) return;
+    if (sharedUsers.find((u) => u.uid === user.uid)) return;
     setSharedUsers([...sharedUsers, user]);
     setSearchTerm("");
     setSearchResults([]);
@@ -56,7 +68,7 @@ export function EditshareModal({ visible, onClose, onSelectUser }: EditshareModa
       <Container>
         <ModalContent>
           <Input
-            name='user'
+            name="user"
             placeholder="Buscar usuários"
             value={searchTerm}
             onChangeText={(text) => setSearchTerm(text)}
@@ -65,13 +77,19 @@ export function EditshareModal({ visible, onClose, onSelectUser }: EditshareModa
             data={searchResults}
             keyExtractor={(item) => item.uid}
             renderItem={({ item }) => {
-              const isChecked = !!sharedUsers.find(u => u.uid === item.uid);
+              const isChecked = !!sharedUsers.find((u) => u.uid === item.uid);
               return (
                 <ButtonSelect onPress={() => addSharedUser(item)}>
-                  <Title type={isChecked ? 'PRIMARY' : 'SECONDARY'}>{item.userName}</Title>
+                  <Title type={isChecked ? "PRIMARY" : "SECONDARY"}>
+                    {item.userName}
+                  </Title>
                   <IconCheck
-                    type={isChecked ? 'PRIMARY' : 'SECONDARY'}
-                    name={isChecked ? "checkbox-marked-circle-outline" : "checkbox-blank-circle-outline"}
+                    type={isChecked ? "PRIMARY" : "SECONDARY"}
+                    name={
+                      isChecked
+                        ? "checkbox-marked-circle-outline"
+                        : "checkbox-blank-circle-outline"
+                    }
                   />
                 </ButtonSelect>
               );

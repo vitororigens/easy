@@ -2,6 +2,7 @@
   "expo": {
     "name": "easy",
     "slug": "easy",
+    "scheme": "easy",
     "version": "1.7.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -70,11 +71,16 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "644c7760-a5b0-4044-bcd4-9288b16c6948"
-      }
+        "projectId": "644c7760-a5b0-4044-bcd4-9288b16c6948",
+        "owner": "totalsolutionssoftware"
+      },
+      // TODO: Change oneSignalAppId and restApiKey to your own onesignal app id and rest api key
+      "oneSignalAppId": "9322c5aa-6636-4f52-bd5b-bd5a72f53848",
+      "restApiKey": "os_v2_app_smrmlktggzhvfpk3xvnhf5jyja7nrvvxi6gu2zvgikzzzgl3knh27phf23ycnk6hrocrccdabxda7ayhk2nxai32huj7xqntebeafdi"
     },
     "updates": {
       "url": "https://u.expo.dev/644c7760-a5b0-4044-bcd4-9288b16c6948"
-    }
+    },
+    "owner": "totalsolutionssoftware"
   }
 }

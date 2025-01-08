@@ -9,6 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
+import { createUserTag } from "../../services/one-signal";
 
 const formSchema = z.object({
   email: z.string().min(1, "Email é obrigatório").email("Formato inválido"),
@@ -36,9 +37,15 @@ export function SingIn() {
   function handleSingIn({ email, password }: FormSchemaType) {
     auth()
       .signInWithEmailAndPassword(email.trim(), password.trim())
-      .then(() => {
+      .then(async (v) => {
         Toast.show("Login realizado com sucesso!", { type: "success" });
+        const { user } = v;
+        console.log("v", v);
         reset();
+        await createUserTag({
+          tag: "user_id",
+          value: user.uid,
+        });
         navigation.navigate("tabroutes");
       })
       .catch(() =>

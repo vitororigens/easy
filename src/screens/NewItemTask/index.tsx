@@ -9,8 +9,8 @@ import { z } from "zod";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { LoadingIndicator } from "../../components/Loading/style";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { database } from "../../services";
 import { Button, Content, Input, Title } from "./styles";
+import { database } from "../../libs/firebase";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -29,7 +29,7 @@ type FormSchemaType = z.infer<typeof formSchema>;
 
 export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
   // State
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const user = useUserAuth();
   const uid = user?.uid;
   const route = useRoute();
@@ -62,7 +62,7 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
         setLoading(false);
         Toast.show("Item adicionado!", { type: "success" });
         reset();
-        navigation.goBack()
+        navigation.goBack();
         !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
@@ -84,7 +84,7 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
       .then(() => {
         setLoading(false);
         Toast.show("Item Excluido!", { type: "success" });
-        navigation.goBack()
+        navigation.goBack();
         onCloseModal && onCloseModal();
       })
       .catch((error) => {
@@ -106,7 +106,7 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
         setLoading(false);
         Toast.show("Item adicionado!", { type: "success" });
         onCloseModal && onCloseModal();
-        navigation.goBack()
+        navigation.goBack();
         !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {

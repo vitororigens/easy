@@ -16,7 +16,6 @@ import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
 import { useMonth } from "../../context/MonthProvider";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { database } from "../../services";
 import { currencyMask, currencyUnMask } from "../../utils/currency";
 import { LoadingIndicator } from "../Loading/style";
 import {
@@ -28,8 +27,14 @@ import {
   Title,
   TitleTask,
 } from "./styles";
-import notifee, { AndroidImportance, TimestampTrigger, TriggerType, EventType } from "@notifee/react-native";
+import notifee, {
+  AndroidImportance,
+  TimestampTrigger,
+  TriggerType,
+  EventType,
+} from "@notifee/react-native";
 import { formatDate } from "date-fns";
+import { database } from "../../libs/firebase";
 
 export type ExpenseProps = {
   selectedItemId?: string;
@@ -61,7 +66,7 @@ export function Expense({
 }: ExpenseProps) {
   // States
   const user = useUserAuth();
-  const { selectedMonth } = useMonth()
+  const { selectedMonth } = useMonth();
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [repeat, setRepeat] = useState(false);
@@ -94,33 +99,42 @@ export function Expense({
     const { selectedHourNotification, selectedDateNotification } = getValues();
 
     if (!selectedHourNotification || !selectedDateNotification) {
-      return { isValid: false, errorMessage: 'Horário ou data de notificação não definido.' };
+      return {
+        isValid: false,
+        errorMessage: "Horário ou data de notificação não definido.",
+      };
     }
 
-    const [hour, minute] = selectedHourNotification.split(':');
+    const [hour, minute] = selectedHourNotification.split(":");
     if (isNaN(Number(hour)) || isNaN(Number(minute))) {
-      return { isValid: false, errorMessage: 'Hora ou minuto inválido.' };
+      return { isValid: false, errorMessage: "Hora ou minuto inválido." };
     }
 
     const notificationDate = new Date(date);
     notificationDate.setHours(Number(hour), Number(minute), 0, 0);
 
     switch (selectedDateNotification) {
-      case 'um dia antes':
+      case "um dia antes":
         notificationDate.setDate(notificationDate.getDate() - 1);
         break;
-      case 'tres dias antes':
+      case "tres dias antes":
         notificationDate.setDate(notificationDate.getDate() - 3);
         break;
-      case 'cinco dias antes':
+      case "cinco dias antes":
         notificationDate.setDate(notificationDate.getDate() - 5);
         break;
       default:
-        return { isValid: false, errorMessage: 'Data de notificação inválida.' };
+        return {
+          isValid: false,
+          errorMessage: "Data de notificação inválida.",
+        };
     }
 
     if (notificationDate < new Date()) {
-      return { isValid: false, errorMessage: 'A data de notificação está no passado.' };
+      return {
+        isValid: false,
+        errorMessage: "A data de notificação está no passado.",
+      };
     }
 
     return { isValid: true, notificationDate };
@@ -134,8 +148,8 @@ export function Expense({
 
     try {
       const channelId = await notifee.createChannel({
-        id: 'notificacao',
-        name: 'Expense Notification',
+        id: "notificacao",
+        name: "Expense Notification",
         vibration: true,
         importance: AndroidImportance.HIGH,
       });
@@ -149,11 +163,9 @@ export function Expense({
         trigger
       );
     } catch (error) {
-      console.error('Erro ao agendar notificação:', error);
+      console.error("Erro ao agendar notificação:", error);
     }
   };
-
-
 
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     setShowDatePicker(false);
@@ -178,7 +190,11 @@ export function Expense({
 
     try {
       const [day, month, year] = formattedDate.split("/");
-      const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
+      const selectedDate = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day)
+      );
       const monthNumber = selectedDate.getMonth() + 1;
 
       const transactionValue = valueTransaction
@@ -279,12 +295,12 @@ export function Expense({
       const validationResult = await validateNotificationParams();
       if (validationResult.isValid) {
         await scheduleNotification(validationResult.notificationDate);
-        console.log('Notificação agendada com sucesso!');
+        console.log("Notificação agendada com sucesso!");
       } else {
         console.error(validationResult.errorMessage);
       }
     } catch (error) {
-      console.error('Erro inesperado:', error);
+      console.error("Erro inesperado:", error);
     }
   }
 
@@ -416,11 +432,11 @@ export function Expense({
     const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
       switch (type) {
         case EventType.DISMISSED:
-          console.log('Usuário descartou a notificação');
+          console.log("Usuário descartou a notificação");
           break;
 
         case EventType.ACTION_PRESS:
-          console.log('Usuário pressionou a notificação', detail.notification);
+          console.log("Usuário pressionou a notificação", detail.notification);
           break;
 
         default:
@@ -435,9 +451,8 @@ export function Expense({
       if (type === EventType.PRESS) {
         console.log("Usuário tocou na notificação", detail.notification);
       }
-    })
-  }, [])
-
+    });
+  }, []);
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
@@ -466,21 +481,23 @@ export function Expense({
             )}
           />
         </View>
-      
-        {Platform.OS === 'ios' ? (
+
+        {Platform.OS === "ios" ? (
           <View>
             <TitleTask>Data*</TitleTask>
-            <View style={{
-              width: 100,
-              marginTop: 10
-            }}>
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="calendar"
-              onChange={handleDateChange}
-              accessibilityLanguage="pt-BR"
-            />
+            <View
+              style={{
+                width: 100,
+                marginTop: 10,
+              }}
+            >
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display="calendar"
+                onChange={handleDateChange}
+                accessibilityLanguage="pt-BR"
+              />
             </View>
           </View>
         ) : (
@@ -572,8 +589,14 @@ export function Expense({
         </View>
         {showAdvanced && (
           <View>
-            <View style={{ flexDirection: "row", marginBottom: 10, justifyContent: 'space-between' }}>
-              <View >
+            <View
+              style={{
+                flexDirection: "row",
+                marginBottom: 10,
+                justifyContent: "space-between",
+              }}
+            >
+              <View>
                 <View>
                   <TitleTask>
                     Categorias <Span>(opcional)</Span>
@@ -632,11 +655,9 @@ export function Expense({
                     />
                   </View>
                 </View>
-                {alert &&
+                {alert && (
                   <>
-                    <TitleTask>
-                      Data da notificação
-                    </TitleTask>
+                    <TitleTask>Data da notificação</TitleTask>
                     <View style={{ height: 50, justifyContent: "center" }}>
                       <Controller
                         control={control}
@@ -648,9 +669,14 @@ export function Expense({
                             items={[
                               { label: "No dia", value: "no dia" },
                               { label: "Um dia antes", value: "um dia antes" },
-                              { label: "Tres dia antes", value: "tres dia antes" },
-                              { label: "Cinco dia antes de vencer", value: "cinco dias antes de vencer" },
-
+                              {
+                                label: "Tres dia antes",
+                                value: "tres dia antes",
+                              },
+                              {
+                                label: "Cinco dia antes de vencer",
+                                value: "cinco dias antes de vencer",
+                              },
                             ]}
                             placeholder={{
                               label: "Selecione",
@@ -660,9 +686,7 @@ export function Expense({
                         )}
                       />
                     </View>
-                    <TitleTask>
-                      Hora da notificação
-                    </TitleTask>
+                    <TitleTask>Hora da notificação</TitleTask>
                     <View style={{ height: 50, justifyContent: "center" }}>
                       <Controller
                         control={control}
@@ -675,7 +699,6 @@ export function Expense({
                               { label: "07:00", value: "07:00" },
                               { label: "08:00", value: "08:00" },
                               { label: "09:00", value: "09:00" },
-
                             ]}
                             placeholder={{
                               label: "Selecione",
@@ -686,10 +709,10 @@ export function Expense({
                       />
                     </View>
                   </>
-                }
+                )}
               </View>
               <DividerTask />
-              <View >
+              <View>
                 <TitleTask>
                   Essa conta já está paga? <Span>(opcional)</Span>
                 </TitleTask>
@@ -746,9 +769,13 @@ export function Expense({
               />
             </View>
           </View>
-
         )}
-        <View style={{ marginBottom: 250, marginTop: Platform.OS === 'ios' && alert === true ? 90 : 0  }}>
+        <View
+          style={{
+            marginBottom: 250,
+            marginTop: Platform.OS === "ios" && alert === true ? 90 : 0,
+          }}
+        >
           {showButtonSave && (
             <Button
               style={{ marginBottom: 10 }}
@@ -768,7 +795,6 @@ export function Expense({
           )}
         </View>
       </ScrollView>
-
     </View>
   );
 }

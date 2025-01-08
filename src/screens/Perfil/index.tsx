@@ -5,14 +5,25 @@ import { CustomModal } from "../../components/CustomModal";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Loading } from "../../components/Loading";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { ContainerIcon, Content, ContentItems, Header, Icon, ImageContainer, Items, StyledImage, SubTitle, Title } from "./styles";
-import { MaterialIcons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
+import {
+  ContainerIcon,
+  Content,
+  ContentItems,
+  Header,
+  Icon,
+  ImageContainer,
+  Items,
+  StyledImage,
+  SubTitle,
+  Title,
+} from "./styles";
+import { MaterialIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { database, storage } from "../../services";
 import { Toast } from "react-native-toast-notifications";
+import { database, storage } from "../../libs/firebase";
 
 const formSchema = z.object({
   image: z.string().optional(),
@@ -42,7 +53,7 @@ export function Perfil() {
             const data = doc.data();
             if (data?.image) {
               setImage(data.image);
-              setValue('image', data.image);
+              setValue("image", data.image);
             }
           }
         } catch (error) {
@@ -56,13 +67,14 @@ export function Perfil() {
   function handleLogout() {
     auth()
       .signOut()
-      .then(() => console.log('User signed out'))
+      .then(() => console.log("User signed out"))
       .catch((error) => console.error("Error signing out: ", error));
   }
 
   function handleDeleteUser() {
-    auth().currentUser?.delete()
-      .then(() => console.log('User deleted'))
+    auth()
+      .currentUser?.delete()
+      .then(() => console.log("User deleted"))
       .catch((error) => console.error("Error deleting user: ", error));
   }
 
@@ -78,7 +90,7 @@ export function Perfil() {
       if (!result.canceled) {
         const uri = result.assets[0].uri;
         setImage(uri);
-        setValue('image', uri);
+        setValue("image", uri);
         await handleSaveItem({ image: uri });
       }
     } catch (error) {
@@ -101,7 +113,7 @@ export function Perfil() {
 
   const handleSaveItem = async ({ image }: FormSchemaType) => {
     try {
-      let imageUrl = '';
+      let imageUrl = "";
       if (image) {
         imageUrl = await uploadImage(image);
       }
@@ -119,24 +131,27 @@ export function Perfil() {
   const deleteImage = async () => {
     if (image) {
       try {
-        const filePath = decodeURIComponent(image.substring(image.indexOf('/o/') + 3, image.indexOf('?')));
+        const filePath = decodeURIComponent(
+          image.substring(image.indexOf("/o/") + 3, image.indexOf("?"))
+        );
         const imageRef = storage.ref(filePath);
         await imageRef.delete();
         await database.collection("Perfil").doc(uid).update({ image: null });
         Toast.show("Imagem deletada!", { type: "success" });
         setImage(null);
-        setValue('image', undefined);
+        setValue("image", undefined);
       } catch (error) {
-        if (error === 'storage/object-not-found') {
-          console.error("Erro ao deletar a imagem: Objeto não encontrado.", error);
+        if (error === "storage/object-not-found") {
+          console.error(
+            "Erro ao deletar a imagem: Objeto não encontrado.",
+            error
+          );
         } else {
           console.error("Erro ao deletar a imagem: ", error);
         }
       }
     }
   };
-  
-  
 
   return (
     <DefaultContainer backButton title="Perfil">
@@ -171,7 +186,11 @@ export function Perfil() {
                 <Items>
                   <Title>ID:</Title>
                   <SubTitle type="SECONDARY">
-                    {user?.uid ? (user.uid.length > 10 ? user.uid.substring(0, 15) + '...' : user.uid) : ""}
+                    {user?.uid
+                      ? user.uid.length > 10
+                        ? user.uid.substring(0, 15) + "..."
+                        : user.uid
+                      : ""}
                   </SubTitle>
                 </Items>
               </ContentItems>
@@ -185,7 +204,9 @@ export function Perfil() {
         animationType="slide"
         transparent={true}
         onCancel={() => setConfirmLogoutVisible(false)}
-        onClose={() => { setConfirmLogoutVisible(false); }}
+        onClose={() => {
+          setConfirmLogoutVisible(false);
+        }}
         onConfirme={() => {
           setConfirmLogoutVisible(false);
           handleLogout();
@@ -197,7 +218,9 @@ export function Perfil() {
         animationType="slide"
         transparent={true}
         onCancel={() => setConfirmDeleteVisible(false)}
-        onClose={() => { setConfirmDeleteVisible(false); }}
+        onClose={() => {
+          setConfirmDeleteVisible(false);
+        }}
         onConfirme={() => {
           setConfirmDeleteVisible(false);
           handleDeleteUser();

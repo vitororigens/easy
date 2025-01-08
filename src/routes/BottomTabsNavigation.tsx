@@ -5,15 +5,16 @@ import LogoClipBoard from "../assets/Icones/icones_brokerx_cinza-18.svg";
 import LogoHome from "../assets/Icones/icones_brokerx_cinza-19.svg";
 import LogoCart from "../assets/Icones/icones_brokerx_cinza-25.svg";
 import { Gears } from "../screens/Gears";
-import { Marketplace } from "../screens/Marketplace";
+import { Market } from "../screens/Market";
 
 import { Platform } from "react-native";
 import { Home } from "../screens/Home";
 import { ListTask } from "../screens/ListTask";
 import { Notes } from "../screens/Notes";
 import { LogoUser } from "../components/LogoUser";
+import { TabParamList } from "../@types/navigation";
 
-const { Navigator, Screen } = createBottomTabNavigator();
+const { Navigator, Screen } = createBottomTabNavigator<TabParamList>();
 const tabBarHeight = Platform.OS === "ios" ? 80 : 60;
 
 export function BottomTabsNavigation() {
@@ -44,8 +45,8 @@ export function BottomTabsNavigation() {
             <LogoCart width={50} height={50} fill={color} />
           ),
         }}
-        name="Mercado"
-        component={Marketplace}
+        name="Market"
+        component={Market}
       />
       <Screen
         options={{
@@ -76,9 +77,7 @@ export function BottomTabsNavigation() {
       />
       <Screen
         options={{
-          tabBarIcon: ({ color }) => (
-            <LogoUser  color={color} /> 
-          ),
+          tabBarIcon: ({ color }) => <LogoUser color={color} />,
         }}
         name="Config"
         component={Gears}

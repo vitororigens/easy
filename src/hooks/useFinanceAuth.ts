@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { database } from "../services";
+import { database } from "../libs/firebase";
 
 export interface FinanceData {
   uid: string;
@@ -13,7 +13,7 @@ export function useFinanceData(uid: string): FinanceData | null {
   useEffect(() => {
     const fetchFinanceData = async () => {
       try {
-        const financeDoc = await database.collection('Tasks').doc(uid).get();
+        const financeDoc = await database.collection("Tasks").doc(uid).get();
         if (financeDoc.exists) {
           const data = financeDoc.data();
           if (data) {
@@ -24,13 +24,13 @@ export function useFinanceData(uid: string): FinanceData | null {
             };
             setFinanceData(financeData);
           } else {
-            console.log('No finance data found for user with uid:', uid);
+            console.log("No finance data found for user with uid:", uid);
           }
         } else {
-          console.log('No finance data found for user with uid:', uid);
+          console.log("No finance data found for user with uid:", uid);
         }
       } catch (error) {
-        console.error('Error fetching finance data:', error);
+        console.error("Error fetching finance data:", error);
       }
     };
 
@@ -38,8 +38,7 @@ export function useFinanceData(uid: string): FinanceData | null {
       fetchFinanceData();
     }
 
-    return () => {
-    };
+    return () => {};
   }, [uid]);
 
   return financeData;

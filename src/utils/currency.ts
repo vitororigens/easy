@@ -8,5 +8,5 @@ export function currencyMask(value: string) {
 
 export function currencyUnMask(maskedValue: string) {
     let UnMaskedValue = parseFloat(maskedValue.replace(/\./, '').replace(/,/,'.'));
-    return UnMaskedValue;
+    return UnMaskedValue * 100;
 }

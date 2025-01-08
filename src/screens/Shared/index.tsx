@@ -1,93 +1,127 @@
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Input } from "../../components/Input";
 import { ButtonSelect, Container, Content, IconCheck, Title } from "./styles";
-import { database } from "../../services";
 import { FlatList } from "react-native";
 import { ItemSharedUser } from "../../components/ItemSharedUser";
 import { useEffect, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
+import {
+  findUserByUsername,
+  IUser,
+} from "../../services/firebase/users.firestore";
+import { useUserAuth } from "../../hooks/useUserAuth";
+import {
+  createSharing,
+  ESharingStatus,
+  getSharing,
+  ISharing,
+} from "../../services/firebase/sharing.firebase";
 
 export function Shared() {
-    const [searchTerm, setSearchTerm] = useState("");
-    const [searchResults, setSearchResults] = useState<any[]>([]);
-    const [sharedUsers, setSharedUsers] = useState<any[]>([]);
+  const [sharedUsers, setSharedUsers] = useState<ISharing[]>([]);
 
-    const searchUsers = async (username: string) => {
-        if (!username) {
-            setSearchResults([]);
-            return;
-        }
-        try {
-            const userRef = database.collection('User');
-            const snapshot = await userRef.where('userName', '==', username).get();
-            if (!snapshot.empty) {
-                const results = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
-                setSearchResults(results);
-            } else {
-                setSearchResults([]);
-            }
-        } catch (error) {
-            console.error("Error fetching users:", error);
-        }
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [searchValue, setSearchValue] = useState("");
+
+  const user = useUserAuth();
+
+  const searchUsers = useDebouncedCallback(async (username: string) => {
+    if (!username || !user) return;
+
+    try {
+      const result = await findUserByUsername(username, user.uid);
+      setUsers(result);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }, 300);
+
+  const addSharedUser = async (u: IUser) => {
+    if (sharedUsers.find((su) => su.invitedBy === u.uid)) return;
+    if (!user) return;
+
+    const result = await createSharing({
+      invitedBy: user.uid,
+      status: ESharingStatus.PENDING,
+      target: u.uid,
+    });
+    setSharedUsers([result, ...sharedUsers]);
+    setSearchValue("");
+    setUsers([]);
+  };
+
+  const onDeleteSharing = (id: string) => {
+    setSharedUsers(sharedUsers.filter((u) => u.id !== id));
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    const getSharingUsers = async () => {
+      const sharing = await getSharing({
+        profile: "invitedBy",
+        uid: user.uid as string,
+      });
+
+      setSharedUsers(sharing);
     };
+    getSharingUsers();
+  }, [user]);
 
-    useEffect(() => {
-        searchUsers(searchTerm);
-    }, [searchTerm]);
+  return (
+    <DefaultContainer title="Compartilhamento" backButton>
+      <Container>
+        <Input
+          name="search"
+          placeholder="Buscar usuários"
+          value={searchValue}
+          onChangeText={(text) => {
+            searchUsers(text);
+            setSearchValue(text);
+          }}
+        />
 
-    const addSharedUser = (user: any) => {
-        if (sharedUsers.find(u => u.uid === user.uid)) return;
-        setSharedUsers([...sharedUsers, user]);
-        setSearchTerm("");
-        setSearchResults([]);
-    };
+        {users && users.length > 0 && (
+          <Content>
+            <FlatList
+              data={users}
+              keyExtractor={(item) => item.uid}
+              renderItem={({ item }) => {
+                const isChecked = !!sharedUsers.find(
+                  (u) => u.target === item.uid
+                );
+                return (
+                  <ButtonSelect
+                    onPress={() => {
+                      if (isChecked) return;
+                      addSharedUser(item);
+                    }}
+                  >
+                    <Title type={isChecked ? "PRIMARY" : "SECONDARY"}>
+                      {item.userName}
+                    </Title>
+                    <IconCheck
+                      type={isChecked ? "PRIMARY" : "SECONDARY"}
+                      name={
+                        isChecked
+                          ? "checkbox-marked-circle-outline"
+                          : "checkbox-blank-circle-outline"
+                      }
+                    />
+                  </ButtonSelect>
+                );
+              }}
+            />
+          </Content>
+        )}
 
-    return (
-        <DefaultContainer title="Compartilhamento" backButton>
-            <Container>
-                <Input
-                    name="search"
-                    placeholder="Buscar usuários"
-                    value={searchTerm}
-                    onChangeText={(text) => setSearchTerm(text)}
-                />
-
-                {/* Renderizar o Content apenas quando houver termo de busca ou resultados */}
-                {searchTerm.length > 0 && searchResults.length > 0 && (
-                    <Content>
-                        <FlatList
-                            data={searchResults}
-                            keyExtractor={(item) => item.uid}
-                            renderItem={({ item }) => {
-                                const isChecked = !!sharedUsers.find(u => u.uid === item.uid);
-                                return (
-                                    <ButtonSelect onPress={() => addSharedUser(item)}>
-                                        <Title type={isChecked ? 'PRIMARY' : 'SECONDARY'}>
-                                            {item.userName}
-                                        </Title>
-                                        <IconCheck
-                                            type={isChecked ? 'PRIMARY' : 'SECONDARY'}
-                                            name={isChecked ? "checkbox-marked-circle-outline" : "checkbox-blank-circle-outline"}
-                                        />
-                                    </ButtonSelect>
-                                );
-                            }}
-                        />
-                    </Content>
-                )}
-
-                {/* Renderizando os usuários compartilhados */}
-                <FlatList
-                    data={sharedUsers}
-                    keyExtractor={(item) => item.uid}
-                    renderItem={({ item }) => (
-                        <ItemSharedUser
-                            title={item.userName} 
-                            span={"Aguardando"}     
-                            type="SECUNDARY"       
-                        />
-                    )}
-                />
-            </Container>
-        </DefaultContainer>
-    );
+        <FlatList
+          data={sharedUsers}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <ItemSharedUser sharing={item} onDeleteSharing={onDeleteSharing} />
+          )}
+        />
+      </Container>
+    </DefaultContainer>
+  );
 }

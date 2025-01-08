@@ -4,7 +4,7 @@ import { HistoryMarketplaceModal } from "../components/HistoryMarketplace";
 import { HistoryTaskModal } from "../components/HistoryTaskModal";
 import { Charts } from "../screens/Charts";
 import { Home } from "../screens/Home";
-import { NewItem } from "../screens/NewItem";
+import { MarketItem } from "../screens/MarketItem";
 import { NewItemTask } from "../screens/NewItemTask";
 import { NewLaunch } from "../screens/NewLaunch";
 import { NewNotes } from "../screens/NewNotes";
@@ -33,8 +33,8 @@ export function StackPrivateNavigation() {
       <Screen name="historytask" component={HistoryTaskModal} />
       <Screen name="newlaunch" component={NewLaunch} />
       <Screen name="newitemtask" component={NewItemTask} />
-      <Screen name="newitem" component={NewItem} />
-      <Screen name="historymarketplace" component={HistoryMarketplaceModal} />
+      <Screen name="market-item" component={MarketItem} />
+      <Screen name="market-history-item" component={HistoryMarketplaceModal} />
       <Screen name="filter" component={Filter} />
       <Screen name="newexpense" component={Expense} />
       <Screen name="newrevenue" component={Revenue} />

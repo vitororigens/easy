@@ -12,7 +12,6 @@ import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
 import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { database } from "../../services";
 import { Button, Header, NavBar, Title } from "./styles";
 
 import { useNavigation } from "@react-navigation/native";
@@ -25,6 +24,7 @@ import { Items } from "../../components/Items";
 import { useMonth } from "../../context/MonthProvider";
 import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
 import { NewItemTask } from "../NewItemTask";
+import { database } from "../../libs/firebase";
 
 type SelectedItems = {
   [key: string]: boolean;
@@ -34,7 +34,7 @@ const modalBottom = Platform.OS === "ios" ? 90 : 70;
 
 export function ListTask() {
   const { selectedMonth } = useMonth();
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const [activeButton, setActiveButton] = useState("tarefas");
   const [selectedItems, setSelectedItems] = useState<{
     [key: string]: boolean;
@@ -76,7 +76,6 @@ export function ListTask() {
     }
     setActiveButton(buttonName);
   };
-
 
   function handleUncheckAll() {
     setSelectedItems({});
@@ -184,12 +183,7 @@ export function ListTask() {
   }
 
   return (
-    <DefaultContainer
-      newItem
-      monthButton
-      title="Lista de Tarefas"
-      
-    >
+    <DefaultContainer newItem monthButton title="Lista de Tarefas">
       <Header>
         <NavBar>
           <Button

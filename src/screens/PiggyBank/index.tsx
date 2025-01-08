@@ -11,9 +11,9 @@ import { Items } from "../../components/Items";
 import { useMonth } from "../../context/MonthProvider";
 import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { database } from "../../services";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { NewLaunch } from "../NewLaunch";
+import { database } from "../../libs/firebase";
 
 export function PiggyBank() {
   const user = useUserAuth();
