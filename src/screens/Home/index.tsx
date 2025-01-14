@@ -17,6 +17,9 @@ import {
   NavBar,
   SubTitle,
   Title,
+  ContentTitle,
+  DividerContent,
+  Icon,
 } from "./styles";
 
 import { useNavigation } from "@react-navigation/native";
@@ -39,6 +42,7 @@ export function Home() {
   const [confirmExpenseVisible, setConfirmExpenseVisible] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isSharedListVisible, setIsSharedListVisible] = useState(false);
 
   const navigation = useNavigation();
 
@@ -258,6 +262,15 @@ export function Home() {
           )}
         </ContainerItems>
       )}
+      <ContentTitle
+        onPress={() => setIsSharedListVisible(!isSharedListVisible)}
+      >
+        <Title>Despesas e receitas compartilhadas</Title>
+        <DividerContent />
+        <Icon
+          name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"}
+        />
+      </ContentTitle>
     </DefaultContainer>
   );
 }
