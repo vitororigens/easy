@@ -16,8 +16,6 @@ export function Notifications() {
   const flatListRef = useRef<FlatList | null>(null);
   const user = useUserAuth();
 
-  console.log("notifications", notifications);
-
   const handleGetNotifications = async () => {
     try {
       const n = await getNotifications({

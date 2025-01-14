@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Modal, ScrollView, View } from "react-native";
+import {
+  FlatList,
+  Modal,
+  ScrollView,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import {
   CircleContainer,
   ButtonSelect,
@@ -39,6 +45,15 @@ export const shareUserSchema = z.object({
   ),
 });
 
+// const form = useForm<FormSchemaType>({
+//   resolver: zodResolver(formSchema),
+//   defaultValues: {
+//     description: "",
+//     name: "",
+//     sharedUsers: [],
+//   },
+// });
+
 export type TShareUser = z.infer<typeof shareUserSchema>;
 
 interface IShareWithUsers {}
@@ -47,9 +62,97 @@ export const ShareWithUsers = ({}: IShareWithUsers) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [users, setUsers] = useState<IUser[]>([]);
+  const [loading, setLoading] = useState(false);
   const [usersAlreadySharing, setUsersAlreadySharing] = useState<ISharing[]>(
     []
   );
+
+  const loggedUser = useUserAuth();
+
+  const uid = loggedUser?.uid;
+  // const handleShareNote = async (
+  //   name: string,
+  //   description: string,
+  //   sharedUsers: []
+  // ) => {
+  //   try {
+  //     if (!uid) return;
+  //     setLoading(true);
+
+  //     const createdNote = await createNote({
+  //       name,
+  //       description,
+  //       createdAt: Timestamp.now(),
+  //       uid,
+  //       shareWith: sharedUsers.map((user) => user.uid),
+  //       shareInfo: sharedUsers.map((user) => ({
+  //         uid: user.uid,
+  //         userName: user.userName,
+  //         acceptedAt: usersInvitedByMe.some(
+  //           (u) => u.target === user.uid && u.status === ESharingStatus.ACCEPTED
+  //         )
+  //           ? Timestamp.now()
+  //           : null,
+  //       })),
+  //     });
+
+  //     Toast.show("Nota adicionada!", { type: "success" });
+
+  //     if (sharedUsers.length > 0) {
+  //       for (const user of sharedUsers) {
+  //         const alreadySharing = usersInvitedByMe.some(
+  //           (u) => u.target === user.uid
+  //         );
+
+  //         const message = alreadySharing
+  //           ? `${loggedUser?.displayName} adicionou uma nova nota`
+  //           : `${loggedUser?.displayName} convidou você para compartilhar uma nota`;
+
+  //         await Promise.allSettled([
+  //           createNotification({
+  //             sender: uid as string,
+  //             receiver: user.uid,
+  //             status: alreadySharing ? "sharing_accepted" : "pending",
+  //             type: "sharing_invite",
+  //             source: {
+  //               type: "note",
+  //               id: createdNote.id,
+  //             },
+  //             title: "Compartilhamento de nota",
+  //             description: message,
+  //           }),
+  //           ...(!alreadySharing
+  //             ? [
+  //                 createSharing({
+  //                   invitedBy: uid as string,
+  //                   status: ESharingStatus.PENDING,
+  //                   target: user.uid,
+  //                 }),
+  //               ]
+  //             : []),
+  //           sendPushNotification({
+  //             title: "Compartilhamento de nota",
+  //             message,
+  //             uid: user.uid,
+  //           }),
+  //         ]);
+  //       }
+  //     }
+
+  //     reset();
+  //     navigation.navigate("tabroutes", {
+  //       screen: "Notas",
+  //       params: { reload: true },
+  //     });
+  //     onCloseModal && onCloseModal();
+  //     closeBottomSheet && closeBottomSheet();
+  //   } catch (error) {
+  //     setLoading(false);
+  //     console.error("Erro ao adicionar o item: ", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const user = useUserAuth();
 
@@ -111,6 +214,7 @@ export const ShareWithUsers = ({}: IShareWithUsers) => {
     <>
       <View>
         <Title
+          onPress={() => alert("Texto clicado!")}
           style={{
             textAlign: "center",
           }}

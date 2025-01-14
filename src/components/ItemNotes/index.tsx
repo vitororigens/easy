@@ -57,7 +57,7 @@ export function ItemNotes({
             </ContainerMenu>
           </Popover.Content>
         </Popover>
-        <DateNote>{format(note.createdAt.toDate(), "dd/mm/yyyy")}</DateNote>
+        <DateNote>{format(note.createdAt.toDate(), "dd/MM/yyyy")}</DateNote>
       </View>
     </Container>
   );

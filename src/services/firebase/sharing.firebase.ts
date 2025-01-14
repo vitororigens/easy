@@ -23,6 +23,7 @@ export interface ISharing {
   status: TSharingStatus;
   invitedBy: string;
   target: string;
+  //notificationTarget: string;
 }
 
 export const createSharing = async (
@@ -31,6 +32,7 @@ export const createSharing = async (
   const data = {
     status: ESharingStatus.PENDING,
     invitedBy: sharing.invitedBy,
+    //  notificationTarget: sharing.notificationTarget,
     target: sharing.target,
     updatedAt: sharing.updatedAt ?? Timestamp.now(),
     createdAt: sharing.createdAt ?? Timestamp.now(),
@@ -57,10 +59,12 @@ export const getSharing = async ({ uid, profile, status }: IGetSharing) => {
   }
   const result = await query.orderBy("createdAt", "desc").get();
 
-  return (result.docs.map((doc) => ({
+  const Results = (result.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   })) ?? []) as ISharing[];
+  console.log("resultados", Results);
+  return Results;
 };
 
 export const acceptSharing = async (id: string) => {

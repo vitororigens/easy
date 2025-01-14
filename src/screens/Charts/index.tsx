@@ -9,7 +9,16 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import useFirestoreCollection, {
   ExpenseData,
 } from "./../../hooks/useFirestoreCollection";
-import { Button, Content, Header, NavBar, Title } from "./styles";
+import {
+  Button,
+  Content,
+  Header,
+  NavBar,
+  Title,
+  ContentTitle,
+  DividerContent,
+  Icon,
+} from "./styles";
 
 import PersonImage from "../../assets/illustrations/charts.png";
 import theme from "../../theme";
@@ -21,6 +30,7 @@ export function Charts() {
   const [revenueData, setRevenueData] = useState<ExpenseData[] | never[]>([]);
   const [expenseData, setExpenseData] = useState<ExpenseData[] | never[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSharedListVisible, setIsSharedListVisible] = useState(false);
   const { COLORS } = useTheme();
   const revenue = useFirestoreCollection("Revenue");
   const expense = useFirestoreCollection("Expense");
@@ -111,24 +121,24 @@ export function Charts() {
       ? generateChartData(revenueData)
       : generateChartData(expenseData);
 
-      const chartConfig = {
-        backgroundGradientFrom: "#FFFFFF",
-        backgroundGradientFromOpacity: 0,
-        backgroundGradientTo: "#FFFFFF",
-        backgroundGradientToOpacity: 0.5,
-        color:
-          activeButton === "receitas"
-            ? (opacity = 1) => COLORS.TEAL_600
-            : (opacity = 1) => COLORS.PURPLE_600,
-        strokeWidth: 2,
-        barPercentage: 0.5,
-        useShadowColorFromDataset: false,
-      };
+  const chartConfig = {
+    backgroundGradientFrom: "#FFFFFF",
+    backgroundGradientFromOpacity: 0,
+    backgroundGradientTo: "#FFFFFF",
+    backgroundGradientToOpacity: 0.5,
+    color:
+      activeButton === "receitas"
+        ? (opacity = 1) => COLORS.TEAL_600
+        : (opacity = 1) => COLORS.PURPLE_600,
+    strokeWidth: 2,
+    barPercentage: 0.5,
+    useShadowColorFromDataset: false,
+  };
 
   const chartWidth = Math.max(screenWidth, chartData.labels.length * 60);
 
   return (
-    <DefaultContainer title="Análise Gráfica" backButton >
+    <DefaultContainer title="Análise Gráfica" backButton>
       <Content>
         <Header>
           <NavBar>

@@ -12,7 +12,16 @@ import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
 import useMarketplaceCollections from "../../hooks/useMarketplaceCollections";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { Button, Header, NavBar, Title } from "./styles";
+import {
+  Button,
+  Header,
+  NavBar,
+  Title,
+  ContentTitle,
+  Icon,
+  DividerContent,
+  Container,
+} from "./styles";
 
 import { useNavigation } from "@react-navigation/native";
 import { format, getMonth, parse } from "date-fns";
@@ -50,6 +59,9 @@ export function ListTask() {
   const [selectedItemId, setSelectedItemId] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedListTaskId, setSelectedListTaskId] = useState("");
+  const [isSharedListVisible, setIsSharedListVisible] = useState(false);
+  const [isMyListVisible, setIsMyListVisible] = useState(true);
+  const [isMyHistoricVisible, setisMyHistoricVisible] = useState(true);
   const { COLORS } = useTheme();
 
   const user = useUserAuth();
@@ -204,68 +216,92 @@ export function ListTask() {
       </Header>
 
       {activeButton === "tarefas" && (
-        <FlatList
-          style={{
-            marginTop: !!data.filter((item) => item.uid === uid).length
-              ? 16
-              : 0,
-          }}
-          data={data.filter((item) => item.uid === uid)}
-          renderItem={({ item }) => (
-            <ItemTask
-              onEdit={() => handleEditItem(item.id)}
-              onDelete={() => handleDeleteItem(item.id)}
-              title={item.name}
-              isChecked={selectedItems[item.id] || false}
-              onToggle={() => {
-                setSelectedItems((prev) => ({
-                  ...prev,
-                  [item.id]: !prev[item.id],
-                }));
+        <>
+          <ContentTitle onPress={() => setIsMyListVisible(!isMyListVisible)}>
+            <Title>Minhas tarefas</Title>
+            <DividerContent />
+            <Icon
+              name={isMyListVisible ? "arrow-drop-up" : "arrow-drop-down"}
+            />
+          </ContentTitle>
+          {isMyListVisible && (
+            <FlatList
+              style={{
+                marginTop: !!data.filter((item) => item.uid === uid).length
+                  ? 16
+                  : 0,
               }}
+              data={data.filter((item) => item.uid === uid)}
+              renderItem={({ item }) => (
+                <ItemTask
+                  onEdit={() => handleEditItem(item.id)}
+                  onDelete={() => handleDeleteItem(item.id)}
+                  title={item.name}
+                  isChecked={selectedItems[item.id] || false}
+                  onToggle={() => {
+                    setSelectedItems((prev) => ({
+                      ...prev,
+                      [item.id]: !prev[item.id],
+                    }));
+                  }}
+                />
+              )}
+              contentContainerStyle={{ paddingBottom: 90 }}
+              keyExtractor={(item) => item.id}
+              ListEmptyComponent={
+                <LoadData
+                  imageSrc={PersonImage}
+                  title="Comece agora!"
+                  subtitle="Adicione uma tarefa clicando em +"
+                  width={300}
+                />
+              }
+              ListFooterComponent={<View style={{ height: 90 }} />}
             />
           )}
-          contentContainerStyle={{ paddingBottom: 90 }}
-          keyExtractor={(item) => item.id}
-          ListEmptyComponent={
-            <LoadData
-              imageSrc={PersonImage}
-              title="Comece agora!"
-              subtitle="Adicione uma tarefa clicando em +"
-              width={300}
-            />
-          }
-          ListFooterComponent={<View style={{ height: 90 }} />}
-        />
+        </>
       )}
 
       {activeButton === "historico" && (
-        <FlatList
-          style={{ marginTop: !!historyUserMonth.length ? 16 : 0 }}
-          data={historyUserMonth}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => openModalHistoryTask(item.id)}>
-              <Items
-                showItemTask
-                category="lista de tarefas"
-                customStatusText="Finalizada"
-                status={true}
-                hasEdit={false}
-                date={item.finishedDate}
-                onDelete={() => handleDeleteHistoryTasks(item.id)}
-              />
-            </TouchableOpacity>
-          )}
-          contentContainerStyle={{ paddingBottom: 90 }}
-          ListEmptyComponent={
-            <LoadData
-              imageSrc={PersonImage}
-              title="Oops!"
-              subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando tarefas e crie sua lista de tartefas"
-              width={300}
+        <>
+          <ContentTitle
+            onPress={() => setisMyHistoricVisible(!isMyHistoricVisible)}
+          >
+            <Title>Meu histórico de tarefas</Title>
+            <DividerContent />
+            <Icon
+              name={isMyHistoricVisible ? "arrow-drop-up" : "arrow-drop-down"}
             />
-          }
-        />
+          </ContentTitle>
+          {isMyHistoricVisible && (
+            <FlatList
+              style={{ marginTop: !!historyUserMonth.length ? 16 : 0 }}
+              data={historyUserMonth}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => openModalHistoryTask(item.id)}>
+                  <Items
+                    showItemTask
+                    category="lista de tarefas"
+                    customStatusText="Finalizada"
+                    status={true}
+                    hasEdit={false}
+                    date={item.finishedDate}
+                    onDelete={() => handleDeleteHistoryTasks(item.id)}
+                  />
+                </TouchableOpacity>
+              )}
+              contentContainerStyle={{ paddingBottom: 90 }}
+              ListEmptyComponent={
+                <LoadData
+                  imageSrc={PersonImage}
+                  title="Oops!"
+                  subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando tarefas e crie sua lista de tartefas"
+                  width={300}
+                />
+              }
+            />
+          )}
+        </>
       )}
 
       <Modal
@@ -289,6 +325,33 @@ export function ListTask() {
         </View>
       </Modal>
 
+      {/* {isMyListVisible && (
+        <Container>
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={""}
+            renderItem={({ item }) => (
+              <ItemTask
+                //@ts-ignore
+                handleDelete={() => handleDeleteItem(item.id)}
+                //    handleUpdate={() => handleEditItem(item.id, true)}
+                note={item}
+              />
+            )}
+            //  keyExtractor={(item) => item.id}
+            contentContainerStyle={{ paddingBottom: 90 }}
+            ListEmptyComponent={
+              <LoadData
+                imageSrc={PersonImage}
+                title="Comece agora!"
+                subtitle="Adicione uma nota clicando em +"
+              />
+            }
+            ListFooterComponent={<View style={{ height: 90 }} />}
+          />
+        </Container>
+      )} */}
+
       {modalActive && (
         <View
           style={{
@@ -311,6 +374,15 @@ export function ListTask() {
           />
         </View>
       )}
+      <ContentTitle
+        onPress={() => setIsSharedListVisible(!isSharedListVisible)}
+      >
+        <Title>Tarefas compartilhadas</Title>
+        <DividerContent />
+        <Icon
+          name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"}
+        />
+      </ContentTitle>
     </DefaultContainer>
   );
 }
