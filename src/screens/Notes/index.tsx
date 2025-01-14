@@ -61,7 +61,7 @@ export function Notes({ route }: any) {
         listNotes(uid),
         listNotesSharedWithMe(uid),
       ]);
-      console.log("notas compartilhadas", sNotes);
+
       setMyNotes(mNotes);
       setSharedNotes(sNotes);
     } catch (error) {
@@ -123,7 +123,7 @@ export function Notes({ route }: any) {
         <ContentTitle
           onPress={() => setIsSharedListVisible(!isSharedListVisible)}
         >
-          <Title>Notas compartilhadas</Title>
+          <Title>Notas compartilhada</Title>
           <DividerContent />
           <Icon
             name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"}

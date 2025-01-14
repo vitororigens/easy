@@ -14,7 +14,6 @@ import {
   createNotification,
   INotification,
 } from "../../services/firebase/notifications.firebase";
-import { acceptSharing } from "../../services/firebase/sharing.firebase";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useUserAuth } from "../../hooks/useUserAuth";
@@ -62,7 +61,6 @@ export function ItemNotification({
     const message = `${user?.displayName} aceitou o compartilhamento.`;
     await Promise.allSettled([
       acceptSharingNotification(notification.id),
-      //   acceptSharing()
       createNotification({
         source: {
           id: notification.id,
@@ -116,7 +114,6 @@ export function ItemNotification({
 
   return (
     <Container onPress={handleNavigateToDetails}>
-      <Title></Title>
       <Title>{notification.title}</Title>
       <SubTitle>{notification.description}</SubTitle>
       <Content>

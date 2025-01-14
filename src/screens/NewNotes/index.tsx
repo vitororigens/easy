@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { useEffect, useState } from "react";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import { Alert, ScrollView, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
@@ -33,8 +33,6 @@ type Props = {
 const formSchema = z.object({
   name: z.string().min(1, "Nome da Tarefa é obrigatória"),
   description: z.string().min(1, "Descrição é obrigatória"),
-  author: z.string(),
-  type: z.string(),
   sharedUsers: z.array(
     z.object({
       uid: z.string(),
@@ -62,7 +60,6 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
   const loggedUser = useUserAuth();
 
   const uid = loggedUser?.uid;
-  const currentUser = loggedUser?.displayName;
 
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -70,8 +67,6 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
       description: "",
       name: "",
       sharedUsers: [],
-      author: "",
-      type: "",
     },
   });
 
@@ -79,11 +74,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
 
   const sharedUsers = watch("sharedUsers");
 
-  const handleCreateNote = async ({
-    name,
-    description,
-    sharedUsers,
-  }: FormSchemaType) => {
+  const handleCreateNote = async ({ name, description, sharedUsers }: FormSchemaType) => {
     try {
       if (!uid) return;
       setLoading(true);
@@ -95,8 +86,6 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
       const createdNote = await createNote({
         name,
         description,
-        type: "nota",
-        author: String(currentUser),
         createdAt: Timestamp.now(),
         uid,
         shareWith: sharedUsers.map((user) => user.uid),
@@ -113,7 +102,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
 
       Toast.show("Nota adicionada!", { type: "success" });
 
-      if (sharedUsers.length > 0 || sharedUsers.length !== null) {
+      if (sharedUsers.length > 0) {
         for (const user of sharedUsers) {
           const alreadySharing = usersInvitedByMe.some(
             (u) => u.target === user.uid
@@ -192,12 +181,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
     }
   };
 
-  const handleUpdateNote = async ({
-    name,
-    description,
-    author,
-    type,
-  }: FormSchemaType) => {
+  const handleUpdateNote = async ({ name, description }: FormSchemaType) => {
     if (!selectedItemId) {
       console.error("Nenhum documento selecionado para edição!");
       return;
@@ -206,8 +190,6 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
       await updateNote({
         id: selectedItemId,
         name,
-        author,
-        type,
         description,
         shareInfo: sharedUsers.map((user) => ({
           uid: user.uid,
@@ -244,8 +226,6 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
 
           if (note) {
             setValue("name", note.name);
-            setValue("author", note.author);
-            setValue("type", note.type);
             setValue("description", note.description);
             setValue(
               "sharedUsers",
@@ -291,38 +271,6 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
                 />
               )}
             />
-
-            {selectedItemId && (
-              <>
-                <Title>Autor da nota</Title>
-                <Controller
-                  control={control}
-                  name="author"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      editable={isCreator}
-                    />
-                  )}
-                />
-                <Title>Tipo de item</Title>
-                <Controller
-                  control={control}
-                  name="type"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      editable={isCreator}
-                    />
-                  )}
-                />
-              </>
-            )}
-
             <Title>Nota</Title>
             <Controller
               control={control}

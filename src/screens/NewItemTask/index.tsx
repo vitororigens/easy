@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
-import { Controller, useForm, FormProvider } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollView, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
@@ -11,8 +11,6 @@ import { LoadingIndicator } from "../../components/Loading/style";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { Button, Content, Input, Title } from "./styles";
 import { database } from "../../libs/firebase";
-import { ShareWithUsers } from "../../components/ShareWithUsers";
-import { Timestamp } from "firebase/firestore";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -23,27 +21,11 @@ type Props = {
   selectedItemId?: string;
 };
 
-// const formSchema = z.object({
-//   name: z.string().min(1, "Nome da Tarefa é obrigatória"),
-// });
+const formSchema = z.object({
+  name: z.string().min(1, "Nome da Tarefa é obrigatória"),
+});
 
 type FormSchemaType = z.infer<typeof formSchema>;
-
-const formSchema = z.object({
-  name: z.string().min(1, "Nome da Tarefa é obrigatório"),
-  quantity: z.string().optional(),
-  price: z.string().optional(),
-  category: z.string().optional(),
-  measurement: z.string().optional(),
-  observation: z.string().optional(),
-  sharedUsers: z.array(
-    z.object({
-      uid: z.string(),
-      userName: z.string(),
-      acceptedAt: z.union([z.null(), z.instanceof(Timestamp)]),
-    })
-  ),
-});
 
 export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
   // State
@@ -53,23 +35,7 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
   const route = useRoute();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { selectedItemId, isCreator = true } = route.params as {
-    selectedItemId?: string;
-    isCreator: boolean;
-  };
-
-  const form = useForm<FormSchemaType>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      quantity: "1",
-      price: "",
-      category: "",
-      measurement: "un",
-      observation: "",
-      sharedUsers: [],
-    },
-  });
+  const { selectedItemId } = route.params as { selectedItemId?: string };
 
   const formattedDate = format(new Date(), "dd/MM/yyyy");
 
@@ -221,11 +187,6 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
                 >
                   <Title>Excluir</Title>
                 </Button>
-              )}
-              {isCreator && (
-                <FormProvider {...form}>
-                  <ShareWithUsers />
-                </FormProvider>
               )}
             </View>
           </Content>
