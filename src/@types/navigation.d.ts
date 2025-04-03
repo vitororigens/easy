@@ -33,6 +33,9 @@ export declare global {
       newrevenue: { selectedItemId?: string };
       notifications: undefined;
       shared: undefined;
+      subscriptions: undefined;
+      "new-subscription": { selectedItemId?: string };
+      "subscription-history": { selectedItemId?: string };
     }
   }
 }
@@ -44,4 +47,5 @@ export type TabParamList = {
   Notas: { reload?: boolean };
   Receitas: { reload?: boolean };
   Config: undefined;
+  Assinaturas: { reload?: boolean };
 };

@@ -16,6 +16,9 @@ import { Expense } from "../components/Expense";
 import { Revenue } from "../components/Revenue";
 import { Notifications } from "../screens/Notifications";
 import { Shared } from "../screens/Shared";
+import { Subscriptions } from "../screens/Subscriptions";
+import { NewSubscription } from "../screens/NewSubscription";
+import { SubscriptionHistory } from "../screens/SubscriptionHistory";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
@@ -40,6 +43,9 @@ export function StackPrivateNavigation() {
       <Screen name="newrevenue" component={Revenue} />
       <Screen name="notifications" component={Notifications} />
       <Screen name="shared" component={Shared} />
+      <Screen name="subscriptions" component={Subscriptions} />
+      <Screen name="new-subscription" component={NewSubscription} />
+      <Screen name="subscription-history" component={SubscriptionHistory} />
     </Navigator>
   );
 }

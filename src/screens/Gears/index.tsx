@@ -90,6 +90,9 @@ export function Gears() {
   function handleShared() {
     navigation.navigate("shared");
   }
+  function handleSubscriptions() {
+    navigation.navigate("subscriptions");
+  }
 
   return (
     <DefaultContainer title="Configurações">
@@ -98,12 +101,12 @@ export function Gears() {
           {user ? (
             <View>
               <ContentItems>
-                <ButtonIcon onPress={handleGraphics}>
+              <ButtonIcon onPress={handleSubscriptions}>
                   <Items>
-                    <Title>Gráficos</Title>
+                    <Title>Assinaturas</Title>
                     <Icon>
                       <FontAwesome
-                        name="line-chart"
+                        name="pencil"
                         size={30}
                         color={COLORS.PURPLE_800}
                       />
@@ -116,6 +119,18 @@ export function Gears() {
                     <Icon>
                       <FontAwesome5
                         name="piggy-bank"
+                        size={30}
+                        color={COLORS.PURPLE_800}
+                      />
+                    </Icon>
+                  </Items>
+                </ButtonIcon>
+                <ButtonIcon onPress={handleGraphics}>
+                  <Items>
+                    <Title>Gráficos</Title>
+                    <Icon>
+                      <FontAwesome
+                        name="line-chart"
                         size={30}
                         color={COLORS.PURPLE_800}
                       />

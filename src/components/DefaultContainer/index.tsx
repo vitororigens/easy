@@ -49,6 +49,7 @@ type DefaultContainerProps = {
   onNewNotes?: (documentId: string) => void;
   onNewItemMarketplace?: (documentId: string) => void;
   onNewLaunch?: () => void;
+  onNewSubscription?: (documentId: string) => void;
 };
 
 export function DefaultContainer({
@@ -73,6 +74,7 @@ export function DefaultContainer({
   onNewNotes,
   onNewItemMarketplace,
   onNewLaunch,
+  onNewSubscription,
 }: DefaultContainerProps) {
   const navigation = useNavigation();
   const { COLORS } = useTheme();
@@ -111,6 +113,14 @@ export function DefaultContainer({
       onNewNotes(documentId);
     } else {
       navigation.navigate("newnotes", { selectedItemId: documentId });
+    }
+  }
+
+  function handleNewSubscription(documentId: string) {
+    if (onNewSubscription) {
+      onNewSubscription(documentId);
+    } else {
+      navigation.navigate("newsubscription", { selectedItemId: documentId });
     }
   }
 
@@ -221,7 +231,17 @@ export function DefaultContainer({
             <Icon name="add-outline" />
           </Button>
         )}
-
+        {onNewSubscription && (
+          <Button
+            style={{
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+            onPress={() => handleNewSubscription(selectedItemId)}
+          >
+            <Icon name="add-outline" />
+          </Button>
+        )}
         {!!closeModalFn && (
           <ButtonClose
             style={{
