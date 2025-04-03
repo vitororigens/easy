@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "1072840275905",
+    "project_id": "easy-85791",
+    "storage_bucket": "easy-85791.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072840275905:android:89bd8d9f22f3e0cc3be140",
+        "android_client_info": {
+          "package_name": "com.easy.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1072840275905-mnhemshridgca86opukb0gtv86tmaknc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvcROqjqQw-T0BjBuenLyGaERB0rxKRsg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1072840275905-mnhemshridgca86opukb0gtv86tmaknc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1072840275905-qt34u9cbbp97vrb2pc9hl4kl5l9affgu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.easy.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072840275905:android:8de0769d5327dc2e3be140",
+        "android_client_info": {
+          "package_name": "com.easy.io.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1072840275905-mnhemshridgca86opukb0gtv86tmaknc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvcROqjqQw-T0BjBuenLyGaERB0rxKRsg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1072840275905-mnhemshridgca86opukb0gtv86tmaknc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1072840275905-qt34u9cbbp97vrb2pc9hl4kl5l9affgu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.easy.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

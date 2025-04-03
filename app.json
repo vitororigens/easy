@@ -1,0 +1,93 @@
+{
+  "expo": {
+    "name": "easy",
+    "slug": "easy",
+    "scheme": "easy",
+    "version": "1.7.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "notification": {
+      "icon": "./assets/logo_notification.png"
+    },
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "bundleIdentifier": "com.easy.io.app",
+      "buildNumber": "7",
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
+    },
+    "android": {
+      "googleServicesFile": "./google-services.json",
+      "package": "com.easy.io.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "versionCode": 7,
+      "runtimeVersion": "1.7.0"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/messaging",
+      "expo-font",
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "development"
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-6318524024886686~2563561493",
+          "iosAppId": "ca-app-pub-6318524024886686~5099893794",
+          "skAdNetworkItems": [
+            "cstr6suwn9.skadnetwork",
+            "4fzdc2evr5.skadnetwork",
+            "4pfyvq9l8r.skadnetwork",
+            "2fnua5tdw4.skadnetwork",
+            "ydx93a7ass.skadnetwork"
+          ]
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "podfileProperties": {
+              "use_modular_headers!": "true"
+            }
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "644c7760-a5b0-4044-bcd4-9288b16c6948",
+        "owner": "totalsolutionssoftware"
+      },
+      "oneSignalAppId": "04b5e397-b327-469b-a9f2-9ac8a22a039f",
+      "restApiKey": "os_v2_app_as26hf5te5djxkpstlekekqdt4oahagr6xyejcez2hdgol5ykcixw7hqbz2qvittluo6sr5ihlq2kdzxbd5bal3uo2cx36jzpllwxxy"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/644c7760-a5b0-4044-bcd4-9288b16c6948"
+    },
+    "owner": "totalsolutionssoftware"
+  }
+}
