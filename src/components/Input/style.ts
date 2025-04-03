@@ -13,6 +13,7 @@ export const InputWrapper = styled.View<{ error?: boolean }>`
   justify-content: center;
   min-height: 60px;
   max-height: 60px;
+  width: 100%;
   padding: 16px;
   background-color: ${({theme}) => theme.COLORS.GRAY_300};
   border-width: 1px;

@@ -24,7 +24,7 @@ import {
   FilterText,
 } from "./styles";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { currencyMask } from "../../utils/mask";
+import { currencyMask, dataMask } from "../../utils/mask";
 
 function formatDate(date: string | Date | any): Date {
   if (date instanceof Date) return date;
@@ -64,6 +64,16 @@ export function Subscriptions() {
     return (
       <DefaultContainer title="Assinaturas" backButton>
         <Container>
+          <Title>{showActive ? "Assinaturas Ativas" : "Assinaturas Canceladas"}</Title>
+
+          <FilterContainer>
+            <FilterButton active={showActive} onPress={() => setShowActive(true)}>
+              <FilterText active={showActive}>Ativas</FilterText>
+            </FilterButton>
+            <FilterButton active={!showActive} onPress={() => setShowActive(false)}>
+              <FilterText active={!showActive}>Canceladas</FilterText>
+            </FilterButton>
+          </FilterContainer>
           <EmptyContainer>
             <EmptyText>
               {showActive
@@ -98,7 +108,7 @@ export function Subscriptions() {
               <ItemTitle>{item.name}</ItemTitle>
               <ItemValue>{formatCurrency(item.value)}</ItemValue>
               <ItemDate>
-                Vence em {format(formatDate(item.dueDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                Vence em {dataMask(item.dueDate)}
               </ItemDate>
               <ItemStatus active={item.status}>
                 {item.status ? "Ativa" : "Cancelada"}

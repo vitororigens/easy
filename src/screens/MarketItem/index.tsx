@@ -38,6 +38,7 @@ import {
 import { createNotification } from "../../services/firebase/notifications.firebase";
 import { sendPushNotification } from "../../services/one-signal";
 import { ShareWithUsers } from "../../components/ShareWithUsers";
+import { DefaultContainer } from "../../components/DefaultContainer";
 
 type IMarketItemProps = {
   closeBottomSheet?: () => void;
@@ -330,7 +331,10 @@ export const MarketItem = ({
   };
 
   return (
-    <ModalContainer visible={true} onClose={handleClose}>
+    <DefaultContainer    hasHeader={false}
+    title="Adicionar novo item"
+    closeModalFn={closeBottomSheet}
+    backButton>
       <ScrollView
         keyboardShouldPersistTaps="always"
         showsVerticalScrollIndicator={false}
@@ -374,14 +378,27 @@ export const MarketItem = ({
             )}
           />
 
-          <ButtonPlus onPress={handleShowAdvanced}>
-            <Plus>+</Plus>
-            <Span>Opções avançadas</Span>
-          </ButtonPlus>
+<View style={{ marginTop: 40, marginBottom: 20 }}>
+            <TouchableOpacity
+              onPress={handleShowAdvanced}
+              style={{
+                width: "100%",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Title>{showAdvanced ? "Mostrar menos" : "Mostrar mais"}</Title>
+              <MaterialIcons
+                name={showAdvanced ? "arrow-drop-up" : "arrow-drop-down"}
+                size={24}
+                color="black"
+              />
+            </TouchableOpacity>
+          </View>
 
           {showAdvanced && (
             <>
-              <Separator />
               <Title>Categoria</Title>
               <Controller
                 control={control}
@@ -448,6 +465,6 @@ export const MarketItem = ({
           </View>
         </Content>
       </ScrollView>
-    </ModalContainer>
+    </DefaultContainer>
   );
 };
