@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { View, Platform } from "react-native";
+import { View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
 import { Toast } from "react-native-toast-notifications";
-import { database } from "../../libs/firebase";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
-import { ISubscription } from "../Subscriptions";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { createSubscription, updateSubscription, getSubscriptions } from "../../services/firebase/subscription.firebase";
+import { Subscription } from "../../services/firebase/subscription.firebase";
 
 import {
   Container,
@@ -22,35 +22,23 @@ import {
   SelectButton,
   SelectText,
 } from "./styles";
-import { dataMask } from "../../utils/currency";
+import { currencyMask, dataMask } from "../../utils/mask";
 
 type FormData = {
   name: string;
-  price: string;
-  billingCycle: string;
-  nextBillingDate: string;
-  category: string;
+  value: string;
+  dueDate: string;
+  description?: string;
+  status: boolean;
 };
-
-const categories = [
-  "Streaming",
-  "Música",
-  "Jogos",
-  "Software",
-  "Outros",
-];
-
-const billingCycles = ["Mensal", "Trimestral", "Semestral", "Anual"];
 
 export function NewSubscription() {
   const navigation = useNavigation();
   const route = useRoute();
   const user = useUserAuth();
   const { selectedItemId } = route.params as { selectedItemId?: string };
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedBillingCycle, setSelectedBillingCycle] = useState("");
-  const [showCategorySelect, setShowCategorySelect] = useState(false);
-  const [showBillingCycleSelect, setShowBillingCycleSelect] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
+  const [status, setStatus] = useState(true);
 
   const {
     control,
@@ -68,20 +56,19 @@ export function NewSubscription() {
 
   async function fetchSubscription() {
     try {
-      const doc = await database
-        .collection("Subscriptions")
-        .doc(selectedItemId)
-        .get();
-
-      if (doc.exists) {
-        const data = doc.data() as ISubscription;
-        setValue("name", data.name);
-        setValue("price", data.price.toString());
-        setValue("billingCycle", data.billingCycle);
-        setValue("nextBillingDate", data.nextBillingDate);
-        setValue("category", data.category);
-        setSelectedCategory(data.category);
-        setSelectedBillingCycle(data.billingCycle);
+      const subscriptions = await getSubscriptions(user?.uid || '');
+      const subscription = subscriptions.find(sub => sub.id === selectedItemId);
+      
+      if (subscription) {
+        setValue("name", subscription.name);
+        setValue("value", subscription.value.toString());
+        setValue("dueDate", format(new Date(subscription.dueDate), "dd/MM/yyyy"));
+        setValue("status", subscription.status);
+        setStatus(subscription.status);
+        if (subscription.description) {
+          setValue("description", subscription.description);
+          setShowDescription(true);
+        }
       }
     } catch (error) {
       console.error("Erro ao buscar assinatura:", error);
@@ -92,24 +79,19 @@ export function NewSubscription() {
   async function onSubmit(data: FormData) {
     try {
       const subscriptionData = {
-        uid: user?.uid,
+        userId: user?.uid || '',
         name: data.name,
-        price: parseFloat(data.price),
-        billingCycle: selectedBillingCycle,
-        nextBillingDate: data.nextBillingDate,
-        category: selectedCategory,
-        createdAt: new Date(),
-        status: true,
+        value: parseFloat(data.value),
+        dueDate: data.dueDate,
+        description: data.description || '',
+        status: data.status,
       };
 
       if (selectedItemId) {
-        await database
-          .collection("Subscriptions")
-          .doc(selectedItemId)
-          .update(subscriptionData);
+        await updateSubscription(selectedItemId, subscriptionData);
         Toast.show("Assinatura atualizada!", { type: "success" });
       } else {
-        await database.collection("Subscriptions").add(subscriptionData);
+        await createSubscription(subscriptionData);
         Toast.show("Assinatura criada!", { type: "success" });
       }
 
@@ -134,10 +116,11 @@ export function NewSubscription() {
               rules={{ required: "Nome é obrigatório" }}
               render={({ field: { onChange, value } }) => (
                 <Input
+                  name="tag"
                   onChangeText={onChange}
                   value={value}
                   placeholder="Ex: Netflix"
-                  error={errors.name?.message}
+                  errorMessage={errors.name?.message}
                 />
               )}
             />
@@ -147,97 +130,86 @@ export function NewSubscription() {
             <Label>Valor</Label>
             <Controller
               control={control}
-              name="price"
+              name="value"
               rules={{ required: "Valor é obrigatório" }}
               render={({ field: { onChange, value } }) => (
                 <Input
-                  onChangeText={onChange}
+                  name="dollar"
+                  onChangeText={(text) => onChange(currencyMask(text))}
                   value={value}
                   placeholder="R$ 0,00"
                   keyboardType="numeric"
-                  error={errors.price?.message}
+                  errorMessage={errors.value?.message}
                 />
               )}
             />
           </InputContainer>
 
           <InputContainer>
-            <Label>Ciclo de Cobrança</Label>
-            <SelectContainer>
-              <SelectButton
-                onPress={() => setShowBillingCycleSelect(!showBillingCycleSelect)}
-              >
-                <SelectText>
-                  {selectedBillingCycle || "Selecione o ciclo"}
-                </SelectText>
-              </SelectButton>
-              {showBillingCycleSelect && (
-                <View>
-                  {billingCycles.map((cycle) => (
-                    <SelectButton
-                      key={cycle}
-                      onPress={() => {
-                        setSelectedBillingCycle(cycle);
-                        setShowBillingCycleSelect(false);
-                      }}
-                    >
-                      <SelectText>{cycle}</SelectText>
-                    </SelectButton>
-                  ))}
-                </View>
-              )}
-            </SelectContainer>
-          </InputContainer>
-
-          <InputContainer>
-            <Label>Próxima Cobrança</Label>
+            <Label>Data de Vencimento</Label>
             <Controller
               control={control}
-              name="nextBillingDate"
+              name="dueDate"
               rules={{ required: "Data é obrigatória" }}
               render={({ field: { onChange, value } }) => (
                 <Input
+                  name="calendar"
                   onChangeText={(text) => onChange(dataMask(text))}
                   value={value}
                   placeholder="DD/MM/AAAA"
-                  error={errors.nextBillingDate?.message}
+                  errorMessage={errors.dueDate?.message}
                 />
               )}
             />
           </InputContainer>
 
+          {showDescription && (
+            <InputContainer>
+              <Label>Descrição (opcional)</Label>
+              <Controller
+                control={control}
+                name="description"
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    name="align-left"
+                    onChangeText={onChange}
+                    value={value || ''}
+                    placeholder="Adicione uma descrição"
+                    multiline
+                    numberOfLines={3}
+                  />
+                )}
+              />
+            </InputContainer>
+          )}
+
           <InputContainer>
-            <Label>Categoria</Label>
+            <Label>Status</Label>
             <SelectContainer>
               <SelectButton
-                onPress={() => setShowCategorySelect(!showCategorySelect)}
+                active={status}
+                onPress={() => {
+                  setStatus(true);
+                  setValue("status", true);
+                }}
               >
-                <SelectText>
-                  {selectedCategory || "Selecione a categoria"}
-                </SelectText>
+                <SelectText active={status}>Ativa</SelectText>
               </SelectButton>
-              {showCategorySelect && (
-                <View>
-                  {categories.map((category) => (
-                    <SelectButton
-                      key={category}
-                      onPress={() => {
-                        setSelectedCategory(category);
-                        setShowCategorySelect(false);
-                      }}
-                    >
-                      <SelectText>{category}</SelectText>
-                    </SelectButton>
-                  ))}
-                </View>
-              )}
+              <SelectButton
+                active={!status}
+                onPress={() => {
+                  setStatus(false);
+                  setValue("status", false);
+                }}
+              >
+                <SelectText active={!status}>Cancelada</SelectText>
+              </SelectButton>
             </SelectContainer>
           </InputContainer>
 
           <Button
             title={selectedItemId ? "Atualizar" : "Criar"}
             onPress={handleSubmit(onSubmit)}
-            color="primary"
           />
         </Form>
       </Container>

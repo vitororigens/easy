@@ -16,7 +16,7 @@ import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
 import { useMonth } from "../../context/MonthProvider";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { currencyMask, currencyUnMask } from "../../utils/currency";
+import { currencyMask, currencyUnMask } from "../../utils/mask";
 import { LoadingIndicator } from "../Loading/style";
 import { sendPushNotification } from "../../services/one-signal";
 import { Timestamp } from "firebase/firestore";

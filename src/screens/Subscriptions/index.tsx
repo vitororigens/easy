@@ -1,162 +1,110 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, Platform, TouchableOpacity, View } from "react-native";
-import { Toast } from "react-native-toast-notifications";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { LoadData } from "../../components/LoadData";
-import { Loading } from "../../components/Loading";
-import { useUserAuth } from "../../hooks/useUserAuth";
+import React, { useState } from "react";
+import { ActivityIndicator, FlatList } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useTheme } from "styled-components/native";
-import { database } from "../../libs/firebase";
+import { useUserAuth } from "../../hooks/useUserAuth";
+import { DefaultContainer } from "../../components/DefaultContainer";
+import { useSubscriptionsCollection } from "../../hooks/useSubscriptionsCollection";
+import { deleteSubscription } from "../../services/firebase/subscription.firebase";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Subscription } from "../../services/firebase/subscription.firebase";
 
 import {
-  Button,
-  Header,
-  NavBar,
-  Title,
-  ContentTitle,
-  Icon,
-  DividerContent,
   Container,
-  SubTitle,
+  Title,
+  ItemContainer,
+  ItemTitle,
+  ItemValue,
+  ItemDate,
+  ItemStatus,
+  EmptyContainer,
+  EmptyText,
+  FilterContainer,
+  FilterButton,
+  FilterText,
 } from "./styles";
-import useFirestoreCollection from "../../hooks/useFirestoreCollection";
+import { formatCurrency } from "../../utils/formatCurrency";
+import { currencyMask } from "../../utils/mask";
 
-export interface ISubscription {
-  id: string;
-  uid: string;
-  name: string;
-  price: number;
-  billingCycle: string;
-  nextBillingDate: string;
-  category: string;
-  createdAt: Date;
-  status: boolean;
+function formatDate(date: string | Date | any): Date {
+  if (date instanceof Date) return date;
+  if (typeof date === 'string') return new Date(date);
+  if (date?.toDate) return date.toDate();
+  return new Date();
 }
 
 export function Subscriptions() {
-  const user = useUserAuth();
   const navigation = useNavigation();
-  const { COLORS } = useTheme();
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [subscriptions, setSubscriptions] = useState<ISubscription[]>([]);
-  const [activeButton, setActiveButton] = useState("ativas");
+  const { subscriptions, loading, error } = useSubscriptionsCollection();
+  const [showActive, setShowActive] = useState(true);
 
-  useEffect(() => {
-    fetchSubscriptions();
-  }, [user?.uid]);
+  const filteredSubscriptions = subscriptions.filter(sub => sub.status === showActive);
 
-  async function fetchSubscriptions() {
-    if (!user?.uid) return;
-    try {
-      setIsLoaded(true);
-      const subscriptionsRef = useFirestoreCollection("Task");
-      const snapshot = await subscriptionsRef.where("uid", "==", user.uid).get();
-      
-      const subscriptionsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt.toDate(),
-      })) as ISubscription[];
-
-      setSubscriptions(subscriptionsData);
-    } catch (error) {
-      console.error("Erro ao buscar assinaturas:", error);
-      Toast.show("Erro ao carregar assinaturas", { type: "error" });
-    } finally {
-      setIsLoaded(false);
-    }
+  if (loading) {
+    return (
+      <DefaultContainer title="Assinaturas" backButton>
+        <Container>
+          <ActivityIndicator size="large" color="#6B4EFF" />
+        </Container>
+      </DefaultContainer>
+    );
   }
 
-  function handleNewSubscription() {
-    navigation.navigate("new-subscription", { selectedItemId: "" });
+  if (error) {
+    return (
+      <DefaultContainer title="Assinaturas" backButton>
+        <Container>
+          <EmptyText>Erro ao carregar assinaturas</EmptyText>
+        </Container>
+      </DefaultContainer>
+    );
   }
 
-  function handleEditSubscription(id: string) {
-    navigation.navigate("new-subscription", { selectedItemId: id });
-  }
-
-  async function handleDeleteSubscription(id: string) {
-    try {
-      await database.collection("Subscriptions").doc(id).delete();
-      Toast.show("Assinatura excluída!", { type: "success" });
-      fetchSubscriptions();
-    } catch (error) {
-      console.error("Erro ao excluir assinatura:", error);
-      Toast.show("Erro ao excluir assinatura", { type: "error" });
-    }
-  }
-
-  function handleButtonClick(buttonName: string) {
-    setActiveButton(buttonName);
-  }
-
-  const filteredSubscriptions = subscriptions.filter(sub => 
-    activeButton === "ativas" ? sub.status : !sub.status
-  );
-
-  if (isLoaded || !user?.uid) {
-    return <Loading />;
+  if (filteredSubscriptions.length === 0) {
+    return (
+      <DefaultContainer title="Assinaturas" backButton>
+        <Container>
+          <EmptyContainer>
+            <EmptyText>
+              {showActive
+                ? "Nenhuma assinatura ativa encontrada"
+                : "Nenhuma assinatura cancelada encontrada"}
+            </EmptyText>
+          </EmptyContainer>
+        </Container>
+      </DefaultContainer>
+    );
   }
 
   return (
-    <DefaultContainer onNewSubscription={handleNewSubscription} monthButton title="Assinaturas">
-      <Header>
-        <NavBar>
-          <Button
-            onPress={() => handleButtonClick("ativas")}
-            active={activeButton !== "ativas"}
-            style={{ borderTopLeftRadius: 40 }}
-          >
-            <Title>Ativas</Title>
-          </Button>
-          <Button
-            onPress={() => handleButtonClick("canceladas")}
-            active={activeButton !== "canceladas"}
-            style={{ borderTopRightRadius: 40 }}
-          >
-            <Title>Canceladas</Title>
-          </Button>
-        </NavBar>
-      </Header>
-
+    <DefaultContainer title="Assinaturas" backButton onNewSubscription={() => navigation.navigate("new-subscription", { selectedItemId: "" })}>
       <Container>
+        <Title>{showActive ? "Assinaturas Ativas" : "Assinaturas Canceladas"}</Title>
 
-        <FlatList
+        <FilterContainer>
+          <FilterButton active={showActive} onPress={() => setShowActive(true)}>
+            <FilterText active={showActive}>Ativas</FilterText>
+          </FilterButton>
+          <FilterButton active={!showActive} onPress={() => setShowActive(false)}>
+            <FilterText active={!showActive}>Canceladas</FilterText>
+          </FilterButton>
+        </FilterContainer>
+
+        <FlatList<Subscription>
           data={filteredSubscriptions}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id || ''}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handleEditSubscription(item.id)}>
-              <View
-                style={{
-                  backgroundColor: COLORS.TEAL_600,
-                  borderRadius: 10,
-                  padding: 15,
-                  marginBottom: 10,
-                }}
-              >
-                <Title style={{ color: COLORS.WHITE }}>{item.name}</Title>
-                <SubTitle>
-                  R$ {item.price.toFixed(2)} - {item.billingCycle}
-                </SubTitle>
-                <SubTitle>
-                  Próxima cobrança: {format(new Date(item.nextBillingDate), "dd 'de' MMMM", { locale: ptBR })}
-                </SubTitle>
-                <SubTitle>Categoria: {item.category}</SubTitle>
-              </View>
-            </TouchableOpacity>
+            <ItemContainer>
+              <ItemTitle>{item.name}</ItemTitle>
+              <ItemValue>{formatCurrency(item.value)}</ItemValue>
+              <ItemDate>
+                Vence em {format(formatDate(item.dueDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+              </ItemDate>
+              <ItemStatus active={item.status}>
+                {item.status ? "Ativa" : "Cancelada"}
+              </ItemStatus>
+            </ItemContainer>
           )}
-          ListEmptyComponent={
-            <LoadData
-              imageSrc={require("../../assets/illustrations/expense.png")}
-              title="Nenhuma assinatura"
-              subtitle="Adicione uma assinatura clicando em +"
-              width={300}
-            />
-          }
-          contentContainerStyle={{ paddingBottom: 90 }}
         />
       </Container>
     </DefaultContainer>

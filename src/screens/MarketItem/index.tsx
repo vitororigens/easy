@@ -10,7 +10,7 @@ import { z } from "zod";
 import { LoadingIndicator } from "../../components/Loading/style";
 import { ModalContainer } from "../../components/ModalContainer";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { currencyMask, currencyUnMask } from "../../utils/currency";
+import { currencyMask, currencyUnMask } from "../../utils/mask";
 import {
   Button,
   ButtonPlus,

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TextInputProps } from "react-native";
-import { Button, Container, Icon, IconInput, InputContainer } from "./style";
+import { Button, Container, Icon, IconInput, InputContainer, ErrorText, InputWrapper } from "./style";
 
 type InputProps = TextInputProps & {
   placeholder: string;
@@ -11,6 +11,7 @@ type InputProps = TextInputProps & {
   showIcon?: boolean;
   name: string;
   value: string;
+  errorMessage?: string;
 };
 
 export function Input({
@@ -21,6 +22,7 @@ export function Input({
   passwordType = false,
   showIcon = false,
   name,
+  errorMessage,
 }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -30,24 +32,27 @@ export function Input({
 
   return (
     <Container>
-      {showIcon && <IconInput name={name} />}
+      <InputWrapper error={!!errorMessage}>
+        {showIcon && <IconInput name={name} />}
 
-      <InputContainer
-        placeholder={placeholder}
-        onChangeText={onChangeText}
-        secureTextEntry={!showPassword && passwordType}
-        value={value}
-      />
-      {passwordType && (
-        <Button onPress={togglePasswordVisibility}>
-          <Icon name={showPassword ? "eye" : "eye-closed"} />
-        </Button>
-      )}
-      {showSearch && (
-        <Button onPress={togglePasswordVisibility}>
-          <Icon name="search" />
-        </Button>
-      )}
+        <InputContainer
+          placeholder={placeholder}
+          onChangeText={onChangeText}
+          secureTextEntry={!showPassword && passwordType}
+          value={value}
+        />
+        {passwordType && (
+          <Button onPress={togglePasswordVisibility}>
+            <Icon name={showPassword ? "eye" : "eye-closed"} />
+          </Button>
+        )}
+        {showSearch && (
+          <Button onPress={togglePasswordVisibility}>
+            <Icon name="search" />
+          </Button>
+        )}
+      </InputWrapper>
+      {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
     </Container>
   );
 }

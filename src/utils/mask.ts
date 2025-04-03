@@ -16,7 +16,7 @@ export function phoneUnMask(value: string): string {
 // Aplicar máscara de moeda (BRL)
 export function currencyMask(value: string): string {
   const numericValue = unMask(value || "");
-  return mask(numericValue, ['999,99','9.999,99', '99.999,99', '999.999,99', '999.999.999,99', '999.999.999.999,99']);
+  return mask(numericValue, ['9,9', '99,99','999,99','9.999,99', '99.999,99', '999.999,99', '999.999.999,99', '999.999.999.999,99']);
 }
 
 // Remover máscara de moeda

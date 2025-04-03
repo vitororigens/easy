@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { currencyMask, currencyUnMask } from "../../utils/currency";
+import { currencyMask, currencyUnMask } from "../../utils/mask";
 import { database } from "../../libs/firebase";
 import { sendPushNotification } from "../../services/one-signal";
 import { ModalContainer } from "../../components/ModalContainer";

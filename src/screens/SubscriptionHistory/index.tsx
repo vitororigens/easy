@@ -1,113 +1,79 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { ActivityIndicator, FlatList } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useTheme } from "styled-components/native";
-import { database } from "../../libs/firebase";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { DefaultContainer } from "../../components/DefaultContainer";
-import { LoadData } from "../../components/LoadData";
-import { Loading } from "../../components/Loading";
+import { useSubscriptionsCollection } from "../../hooks/useSubscriptionsCollection";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Subscription } from "../../services/firebase/subscription.firebase";
 
 import {
   Container,
   Title,
-  ContentTitle,
-  Icon,
-  DividerContent,
-  SubTitle,
+  ItemContainer,
+  ItemTitle,
+  ItemValue,
+  ItemDate,
+  EmptyContainer,
+  EmptyText,
 } from "./styles";
-
-export interface ISubscriptionHistory {
-  id: string;
-  uid: string;
-  subscriptionId: string;
-  subscriptionName: string;
-  price: number;
-  category: string;
-  canceledAt: Date;
-  reason: string;
-}
 
 export function SubscriptionHistory() {
   const navigation = useNavigation();
-  const user = useUserAuth();
-  const { COLORS } = useTheme();
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [history, setHistory] = useState<ISubscriptionHistory[]>([]);
+  const { subscriptions, loading, error } = useSubscriptionsCollection();
 
-  useEffect(() => {
-    fetchHistory();
-  }, [user?.uid]);
+  const canceledSubscriptions = subscriptions.filter(sub => !sub.status);
 
-  async function fetchHistory() {
-    if (!user?.uid) return;
-    try {
-      setIsLoaded(true);
-      const historyRef = database.collection("SubscriptionHistory");
-      const snapshot = await historyRef.where("uid", "==", user.uid).get();
-      
-      const historyData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        canceledAt: doc.data().canceledAt.toDate(),
-      })) as ISubscriptionHistory[];
-
-      setHistory(historyData);
-    } catch (error) {
-      console.error("Erro ao buscar histórico:", error);
-    } finally {
-      setIsLoaded(false);
-    }
+  if (loading) {
+    return (
+      <DefaultContainer title="Histórico de Assinaturas" backButton>
+        <Container>
+          <ActivityIndicator size="large" color="#6B4EFF" />
+        </Container>
+      </DefaultContainer>
+    );
   }
 
-  if (isLoaded || !user?.uid) {
-    return <Loading />;
+  if (error) {
+    return (
+      <DefaultContainer title="Histórico de Assinaturas" backButton>
+        <Container>
+          <EmptyText>Erro ao carregar assinaturas</EmptyText>
+        </Container>
+      </DefaultContainer>
+    );
+  }
+
+  if (canceledSubscriptions.length === 0) {
+    return (
+      <DefaultContainer title="Histórico de Assinaturas" backButton>
+        <Container>
+          <EmptyContainer>
+            <EmptyText>Nenhuma assinatura cancelada encontrada</EmptyText>
+          </EmptyContainer>
+        </Container>
+      </DefaultContainer>
+    );
   }
 
   return (
     <DefaultContainer title="Histórico de Assinaturas" backButton>
       <Container>
-        <ContentTitle>
-          <Title>Histórico de Assinaturas Canceladas</Title>
-        </ContentTitle>
+        <Title>Assinaturas Canceladas</Title>
 
-        <FlatList
-          data={history}
-          keyExtractor={(item) => item.id}
+        <FlatList<Subscription>
+          data={canceledSubscriptions}
+          keyExtractor={(item) => item.id || ''}
           renderItem={({ item }) => (
-            <TouchableOpacity>
-              <View
-                style={{
-                  backgroundColor: COLORS.TEAL_600,
-                  borderRadius: 10,
-                  padding: 15,
-                  marginBottom: 10,
-                }}
-              >
-                <Title style={{ color: COLORS.WHITE }}>
-                  {item.subscriptionName}
-                </Title>
-                <SubTitle>
-                  R$ {item.price.toFixed(2)} - {item.category}
-                </SubTitle>
-                <SubTitle>
-                  Cancelado em: {format(item.canceledAt, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                </SubTitle>
-                <SubTitle>Motivo: {item.reason}</SubTitle>
-              </View>
-            </TouchableOpacity>
+            <ItemContainer>
+              <ItemTitle>{item.name}</ItemTitle>
+              <ItemValue>R$ {item.value.toFixed(2)}</ItemValue>
+              <ItemDate>
+                Cancelada em {format(new Date(item.updatedAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+              </ItemDate>
+            </ItemContainer>
           )}
-          ListEmptyComponent={
-            <LoadData
-              imageSrc={require("../../assets/illustrations/expense.png")}
-              title="Nenhum histórico"
-              subtitle="Você ainda não cancelou nenhuma assinatura"
-              width={300}
-            />
-          }
-          contentContainerStyle={{ paddingBottom: 90 }}
         />
       </Container>
     </DefaultContainer>
