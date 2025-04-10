@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import { collection, onSnapshot, query } from "@react-native-firebase/firestore";
 import { database } from "../libs/firebase";
 
 export interface ExpenseData {
@@ -24,15 +24,15 @@ const useFirestoreCollection = (collectionName: string): ExpenseData[] => {
   const [data, setData] = useState<ExpenseData[]>([]);
 
   useEffect(() => {
-    const unsubscribe = database
-      .collection(collectionName)
-      .onSnapshot((snapshot: FirebaseFirestoreTypes.QuerySnapshot) => {
-        const collectionData: ExpenseData[] = [];
-        snapshot.forEach((doc) => {
-          collectionData.push({ id: doc.id, ...doc.data() } as ExpenseData);
-        });
-        setData(collectionData);
+    const q = query(collection(database, collectionName));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const collectionData: ExpenseData[] = [];
+      snapshot.forEach((doc) => {
+        collectionData.push({ id: doc.id, ...doc.data() } as ExpenseData);
       });
+      setData(collectionData);
+    });
 
     return () => unsubscribe();
   }, [collectionName]);

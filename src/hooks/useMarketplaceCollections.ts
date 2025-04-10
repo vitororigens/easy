@@ -1,4 +1,4 @@
-import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import { collection, onSnapshot, query } from "@react-native-firebase/firestore";
 import { useEffect, useState } from "react";
 import { database } from "../libs/firebase";
 
@@ -22,15 +22,15 @@ export const useMarketplaceCollections = (
   const [data, setData] = useState<MarketplaceData[]>([]);
 
   useEffect(() => {
-    const unsubscribe = database
-      .collection(collectionName)
-      .onSnapshot((snapshot: FirebaseFirestoreTypes.QuerySnapshot) => {
-        const collectionData: MarketplaceData[] = [];
-        snapshot.forEach((doc) => {
-          collectionData.push({ id: doc.id, ...doc.data() } as MarketplaceData);
-        });
-        setData(collectionData);
+    const q = query(collection(database, collectionName));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const collectionData: MarketplaceData[] = [];
+      snapshot.forEach((doc) => {
+        collectionData.push({ id: doc.id, ...doc.data() } as MarketplaceData);
       });
+      setData(collectionData);
+    });
 
     return () => unsubscribe();
   }, [collectionName]);

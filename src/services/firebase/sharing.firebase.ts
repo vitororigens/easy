@@ -1,6 +1,7 @@
+import { collection, addDoc, doc, getDoc, getDocs, query, where, orderBy, updateDoc, deleteDoc } from '@react-native-firebase/firestore';
+import { database } from '../../libs/firebase';
 import { Optional } from "../../@types/optional";
-import { database } from "../../libs/firebase";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore";
 
 export type TSharingStatus = "accepted" | "pending" | "rejected";
 
@@ -26,61 +27,60 @@ export interface ISharing {
   //notificationTarget: string;
 }
 
-export const createSharing = async (
-  sharing: Optional<Omit<ISharing, "id">, "createdAt" | "updatedAt">
-): Promise<ISharing> => {
-  const data = {
-    status: ESharingStatus.PENDING,
-    invitedBy: sharing.invitedBy,
-    //  notificationTarget: sharing.notificationTarget,
-    target: sharing.target,
-    updatedAt: sharing.updatedAt ?? Timestamp.now(),
-    createdAt: sharing.createdAt ?? Timestamp.now(),
-  };
-  const ref = await database.collection("Sharing").add(data);
+export const createSharing = async (sharing: Omit<ISharing, "id">) => {
+  const docRef = await addDoc(collection(database, "Sharing"), sharing);
+  return docRef;
+};
 
-  return {
-    ...data,
-    id: ref.id,
-  };
+export const updateSharing = async (id: string, sharing: Partial<ISharing>) => {
+  const sharingRef = doc(database, "Sharing", id);
+  await updateDoc(sharingRef, sharing);
+};
+
+export const findSharingById = async (id: string) => {
+  const docRef = doc(database, "Sharing", id);
+  const docSnap = await getDoc(docRef);
+
+  if (!docSnap.exists) return null;
+  return { id: docSnap.id, ...docSnap.data() } as ISharing;
 };
 
 interface IGetSharing {
-  profile: keyof Pick<ISharing, "invitedBy" | "target">;
+  profile: string;
   uid: string;
-  status?: TSharingStatus;
+  status?: boolean;
 }
 
 export const getSharing = async ({ uid, profile, status }: IGetSharing) => {
-  let query = database.collection("Sharing").where(profile, "==", uid);
+  let q = query(
+    collection(database, "Sharing"),
+    where(profile, "==", uid)
+  );
 
-  if (status) {
-    query = query.where("status", "==", status);
+  if (status !== undefined) {
+    q = query(q, where("status", "==", status));
   }
-  const result = await query.orderBy("createdAt", "desc").get();
+  
+  q = query(q, orderBy("createdAt", "desc"));
+  const querySnapshot = await getDocs(q);
 
-  const Results = (result.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
+  return (querySnapshot.docs.map((docSnapshot) => ({
+    id: docSnapshot.id,
+    ...docSnapshot.data(),
   })) ?? []) as ISharing[];
-  //console.log("resultados", Results);
-  return Results;
 };
 
 export const acceptSharing = async (id: string) => {
-  await database
-    .collection("Sharing")
-    .doc(id)
-    .update({ status: ESharingStatus.ACCEPTED });
+  const sharingRef = doc(database, "Sharing", id);
+  await updateDoc(sharingRef, { status: ESharingStatus.ACCEPTED });
 };
 
 export const rejectSharing = async (id: string) => {
-  await database
-    .collection("Sharing")
-    .doc(id)
-    .update({ status: ESharingStatus.REJECTED });
+  const sharingRef = doc(database, "Sharing", id);
+  await updateDoc(sharingRef, { status: ESharingStatus.REJECTED });
 };
 
 export const deleteSharing = async (id: string) => {
-  await database.collection("Sharing").doc(id).delete();
+  const sharingRef = doc(database, "Sharing", id);
+  await deleteDoc(sharingRef);
 };

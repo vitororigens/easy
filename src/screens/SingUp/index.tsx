@@ -10,6 +10,7 @@ import { z } from "zod";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { database } from "../../libs/firebase";
+import { collection, doc, setDoc, query, where, getDocs } from "firebase/firestore";
 
 const formSchema = z
   .object({
@@ -69,8 +70,9 @@ export function SingUp() {
   });
 
   const checkUsernameExists = async (username: string) => {
-    const userRef = database.collection("User");
-    const snapshot = await userRef.where("userName", "==", username).get();
+    const userRef = collection(database, "User");
+    const q = query(userRef, where("userName", "==", username));
+    const snapshot = await getDocs(q);
     return !snapshot.empty;
   };
 
@@ -110,7 +112,7 @@ export function SingUp() {
             displayName: name.trim(),
           })
           .then(() => {
-            database.collection("User").doc(uid).set({
+            setDoc(doc(database, "User", uid), {
               userName: userName.trim(),
               uid,
             });

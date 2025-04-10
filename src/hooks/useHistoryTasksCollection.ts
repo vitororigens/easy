@@ -1,4 +1,4 @@
-import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import { collection, onSnapshot, query } from "@react-native-firebase/firestore";
 import { useEffect, useState } from "react";
 import { database } from "../libs/firebase";
 
@@ -19,18 +19,18 @@ const useHistoryTasksCollections = (
   const [data, setData] = useState<HistoryTasksData[]>([]);
 
   useEffect(() => {
-    const unsubscribe = database
-      .collection(collectionName)
-      .onSnapshot((snapshot: FirebaseFirestoreTypes.QuerySnapshot) => {
-        const collectionData: HistoryTasksData[] = [];
-        snapshot.forEach((doc) => {
-          collectionData.push({
-            id: doc.id,
-            ...doc.data(),
-          } as HistoryTasksData);
-        });
-        setData(collectionData);
+    const q = query(collection(database, collectionName));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const collectionData: HistoryTasksData[] = [];
+      snapshot.forEach((doc) => {
+        collectionData.push({
+          id: doc.id,
+          ...doc.data(),
+        } as HistoryTasksData);
       });
+      setData(collectionData);
+    });
 
     return () => unsubscribe();
   }, [collectionName]);

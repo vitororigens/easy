@@ -1,6 +1,7 @@
+import { collection, addDoc, doc, getDoc, getDocs, query, where, updateDoc, deleteDoc } from '@react-native-firebase/firestore';
+import { database } from '../../libs/firebase';
 import { Optional } from "../../@types/optional";
-import { database } from "../../libs/firebase";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore";
 import { NewTask } from "../../screens/NewTask/index";
 
 type TShareInfo = {
@@ -12,18 +13,47 @@ type TShareInfo = {
 export interface ITask {
   id: string;
   uid: string;
-  createdAt: Timestamp;
   name: string;
+  description: string;
+  status: boolean;
+  createdAt: Date;
+  updatedAt: Date;
   type: string;
   shareWith: string[];
   shareInfo: TShareInfo[];
 }
 
 export const createTask = async (task: Omit<ITask, "id">) => {
-  const docRef = await database.collection("Task").add(task);
-
-  console.log("resultado:", docRef);
+  const docRef = await addDoc(collection(database, "Tasks"), task);
   return docRef;
+};
+
+export const updateTask = async (id: string, task: Partial<ITask>) => {
+  const taskRef = doc(database, "Tasks", id);
+  await updateDoc(taskRef, task);
+};
+
+export const findTaskById = async (id: string) => {
+  const docRef = doc(database, "Tasks", id);
+  const docSnap = await getDoc(docRef);
+
+  if (!docSnap.exists) return null;
+  return { id: docSnap.id, ...docSnap.data() } as ITask;
+};
+
+export const listTasks = async (uid: string) => {
+  const q = query(collection(database, "Tasks"), where("uid", "==", uid));
+  const querySnapshot = await getDocs(q);
+
+  return (querySnapshot.docs.map((docSnapshot) => ({
+    id: docSnapshot.id,
+    ...docSnapshot.data(),
+  })) ?? []) as ITask[];
+};
+
+export const deleteTask = async (id: string) => {
+  const taskRef = doc(database, "Tasks", id);
+  await deleteDoc(taskRef);
 };
 
 export const updateNote = async ({
@@ -33,34 +63,38 @@ export const updateNote = async ({
   Optional<ITask, "name" | "shareInfo" | "shareWith">,
   "createdAt" | "uid"
 >) => {
-  await database.collection("Notes").doc(id).update(rest);
+  const noteRef = doc(database, "Notes", id);
+  await updateDoc(noteRef, rest);
 };
 
 export const findNoteById = async (id: string) => {
-  const doc = await database.collection("Notes").doc(id).get();
+  const docRef = doc(database, "Notes", id);
+  const docSnap = await getDoc(docRef);
 
-  if (!doc.exists) return null;
-  return { id: doc.id, ...doc.data() } as ITask;
+  if (!docSnap.exists) return null;
+  return { id: docSnap.id, ...docSnap.data() } as ITask;
 };
 
 export const listNotes = async (uid: string) => {
-  const data = await database.collection("Notes").where("uid", "==", uid).get();
+  const q = query(collection(database, "Notes"), where("uid", "==", uid));
+  const querySnapshot = await getDocs(q);
 
-  return (data.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
+  return (querySnapshot.docs.map((docSnapshot) => ({
+    id: docSnapshot.id,
+    ...docSnapshot.data(),
   })) ?? []) as ITask[];
 };
 
 export const listTaskSharedWithMe = async (uid: string) => {
-  const data = await database
-    .collection("Task")
-    .where("shareWith", "array-contains", uid)
-    .get();
+  const q = query(
+    collection(database, "Task"),
+    where("shareWith", "array-contains", uid)
+  );
+  const querySnapshot = await getDocs(q);
 
-  const tasks = (data.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
+  const tasks = (querySnapshot.docs.map((docSnapshot) => ({
+    id: docSnapshot.id,
+    ...docSnapshot.data(),
   })) ?? []) as ITask[];
 
   const findTasks = tasks.filter((task) =>
@@ -69,34 +103,38 @@ export const listTaskSharedWithMe = async (uid: string) => {
     )
   );
 
-  console.log("findTasks", findTasks);
   return findTasks;
 };
 
 export const listNotesSharedByMe = async (uid: string) => {
-  const data = await database.collection("Notes").where("uid", "==", uid).get();
+  const q = query(
+    collection(database, "Notes"),
+    where("uid", "==", uid),
+    where("shareWith", "!=", [])
+  );
+  const querySnapshot = await getDocs(q);
 
-  const notes = data.docs
-    .map((doc) => doc.data())
-    .filter(
-      (doc) => Array.isArray(doc.shareWith) && doc.shareWith.length > 0
-    ) as ITask[];
-
-  return notes;
+  return (querySnapshot.docs.map((docSnapshot) => ({
+    id: docSnapshot.id,
+    ...docSnapshot.data(),
+  })) ?? []) as ITask[];
 };
 
 export const listTasksSharedByMe = async (uid: string): Promise<ITask[]> => {
-  const data = await database.collection("Task").where("uid", "==", uid).get();
+  const q = query(
+    collection(database, "Task"),
+    where("uid", "==", uid),
+    where("shareWith", "!=", [])
+  );
+  const querySnapshot = await getDocs(q);
 
-  const tasks = data.docs
-    .map((doc) => ({ id: doc.id, ...doc.data() } as ITask))
-    .filter(
-      (doc) => Array.isArray(doc.shareWith) && doc.shareWith.length > 0
-    ) as ITask[];
-
-  return tasks;
+  return (querySnapshot.docs.map((docSnapshot) => ({
+    id: docSnapshot.id,
+    ...docSnapshot.data(),
+  })) ?? []) as ITask[];
 };
 
 export const deleteNote = async (documentId: string) => {
-  await database.collection("Notes").doc(documentId).delete();
+  const noteRef = doc(database, "Notes", documentId);
+  await deleteDoc(noteRef);
 };

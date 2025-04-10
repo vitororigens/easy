@@ -24,6 +24,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Toast } from "react-native-toast-notifications";
 import { database, storage } from "../../libs/firebase";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 
 const formSchema = z.object({
   image: z.string().optional(),
@@ -48,9 +49,10 @@ export function Perfil() {
     if (uid) {
       const fetchImage = async () => {
         try {
-          const doc = await database.collection("Perfil").doc(uid).get();
-          if (doc.exists) {
-            const data = doc.data();
+          const docRef = doc(database, "Perfil", uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
             if (data?.image) {
               setImage(data.image);
               setValue("image", data.image);
@@ -111,45 +113,23 @@ export function Perfil() {
     }
   };
 
-  const handleSaveItem = async ({ image }: FormSchemaType) => {
+  const handleSaveItem = async ({ image }: { image: string }) => {
     try {
-      let imageUrl = "";
-      if (image) {
-        imageUrl = await uploadImage(image);
-      }
-      await database.collection("Perfil").doc(uid).set({
-        image: imageUrl,
-        uid,
-      });
-      Toast.show("Imagem adicionada!", { type: "success" });
-      reset();
+      const docRef = doc(database, "Perfil", uid);
+      await setDoc(docRef, { image }, { merge: true });
     } catch (error) {
-      console.error("Erro ao adicionar o item: ", error);
+      console.error("Error saving image: ", error);
     }
   };
 
   const deleteImage = async () => {
-    if (image) {
-      try {
-        const filePath = decodeURIComponent(
-          image.substring(image.indexOf("/o/") + 3, image.indexOf("?"))
-        );
-        const imageRef = storage.ref(filePath);
-        await imageRef.delete();
-        await database.collection("Perfil").doc(uid).update({ image: null });
-        Toast.show("Imagem deletada!", { type: "success" });
-        setImage(null);
-        setValue("image", undefined);
-      } catch (error) {
-        if (error === "storage/object-not-found") {
-          console.error(
-            "Erro ao deletar a imagem: Objeto não encontrado.",
-            error
-          );
-        } else {
-          console.error("Erro ao deletar a imagem: ", error);
-        }
-      }
+    try {
+      const docRef = doc(database, "Perfil", uid);
+      await updateDoc(docRef, { image: null });
+      setImage(null);
+      setValue("image", undefined);
+    } catch (error) {
+      console.error("Error deleting image: ", error);
     }
   };
 

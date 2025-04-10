@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Container, ContainerIcon, Icon, StyledImage, Title } from "./styles";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { database } from "../../libs/firebase";
+import { doc, onSnapshot } from "@react-native-firebase/firestore";
 
 type LogoUserProps = {
   color: string;
@@ -14,16 +15,15 @@ export function LogoUser({ color }: LogoUserProps) {
 
   useEffect(() => {
     if (uid) {
-      const unsubscribe = database
-        .collection("Perfil")
-        .doc(uid)
-        .onSnapshot((doc) => {
-          console.log("Document snapshot received: ", doc.data());
-          if (doc.exists) {
-            const data = doc.data();
-            setImage(data?.image ?? null);
-          }
-        });
+      const docRef = doc(database, "Perfil", uid);
+      
+      const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
+        console.log("Document snapshot received: ", docSnapshot.data());
+        if (docSnapshot.exists) {
+          const data = docSnapshot.data();
+          setImage(data?.image ?? null);
+        }
+      });
 
       // Cleanup the listener on component unmount
       return () => unsubscribe();

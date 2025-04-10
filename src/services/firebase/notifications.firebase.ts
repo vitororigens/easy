@@ -1,6 +1,6 @@
+import { collection, addDoc, doc, getDoc, getDocs, query, where, orderBy, updateDoc, deleteDoc, Timestamp } from '@react-native-firebase/firestore';
+import { database } from '../../libs/firebase';
 import { Optional } from "../../@types/optional";
-import { database } from "../../libs/firebase";
-import { Timestamp } from "firebase/firestore";
 import { updateExpenses, updateMarkets, updateNotes } from "./updateShareInfo";
 
 export type TNotificationType =
@@ -37,39 +37,39 @@ export interface INotification {
   };
 }
 
-export const createNotification = async (
-  notification: Optional<Omit<INotification, "id">, "createdAt">
-) => {
-  const ref = await database.collection("Notifications").add({
-    type: notification.type,
-    status: notification.status,
-    sender: notification.sender,
-    receiver: notification.receiver,
-    source: notification.source,
-    createdAt: notification.createdAt ?? Timestamp.now(),
-    title: notification.title,
-    description: notification.description,
-  });
+export const createNotification = async (notification: Omit<INotification, "id">) => {
+  const docRef = await addDoc(collection(database, "Notifications"), notification);
+  return docRef;
+};
 
-  return ref;
+export const updateNotification = async (id: string, notification: Partial<INotification>) => {
+  const notificationRef = doc(database, "Notifications", id);
+  await updateDoc(notificationRef, notification);
+};
+
+export const findNotificationById = async (id: string) => {
+  const docRef = doc(database, "Notifications", id);
+  const docSnap = await getDoc(docRef);
+
+  if (!docSnap.exists) return null;
+  return { id: docSnap.id, ...docSnap.data() } as INotification;
 };
 
 interface IGetNotifications {
-  profile: keyof Pick<INotification, "sender" | "receiver">;
   uid: string;
-  type?: TNotificationType;
-  status?: TNotificationStatus;
+  profile: string;
 }
 
 export const getNotifications = async ({ uid, profile }: IGetNotifications) => {
-  const result = await database
-    .collection("Notifications")
-    .where(profile, "==", uid)
-    .get();
+  const q = query(
+    collection(database, "Notifications"),
+    where(profile, "==", uid)
+  );
+  const querySnapshot = await getDocs(q);
 
-  const notifications = (result.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
+  const notifications = (querySnapshot.docs.map((docSnapshot) => ({
+    id: docSnapshot.id,
+    ...docSnapshot.data(),
   })) ?? []) as INotification[];
 
   notifications.sort((a, b) => {
@@ -83,81 +83,73 @@ export const getNotifications = async ({ uid, profile }: IGetNotifications) => {
     ).toDate();
     return dateA.getTime() - dateB.getTime();
   });
-  console.log("notifications", notifications[0]);
+
   return notifications;
 };
 
+export const deleteNotification = async (id: string) => {
+  const notificationRef = doc(database, "Notifications", id);
+  await deleteDoc(notificationRef);
+};
+
 export const readNotification = async (id: string) => {
-  await database.collection("Notifications").doc(id).update({ status: "read" });
+  const notificationRef = doc(database, "Notifications", id);
+  await updateDoc(notificationRef, { status: "read" });
 };
 
 export const acceptSharingNotification = async (id: string) => {
-  // const notification = await database
-  //   .collection("Notifications")
-  //   .doc(id)
-  //   .update({ status: "sharing_accepted" });
-
-  const docRef = database.collection("Notifications").doc(id);
-  const doc = await docRef.get();
-
-  if (!doc.exists) {
-    console.log("Documento não encontrado!");
-  } else {
-    const notification = doc.data();
-    const sourceType = notification?.source.type;
-    const senderId = notification?.sender;
-    const sourceId = notification?.source.id;
-    const receiverId = notification?.receiver;
-
-    await docRef.update({ status: "sharing_accepted" });
-
-    console.log("senderId", senderId);
-    console.log("receiverId", receiverId);
-
-    const sharingRef = database.collection("Sharing");
-
-    const sharingSnapshot = await sharingRef
-      .where("invitedBy", "==", senderId)
-      .where("target", "==", receiverId)
-      .get();
-
-    for (const doc of (await sharingSnapshot).docs) {
-      await sharingRef.doc(doc.id).update({
-        status: "accepted",
-      });
-    }
-
-    if (sourceType === "note") {
-      updateNotes(sourceId, receiverId);
-
-      // const docRef = database.collection("Notes").doc(sourceId);
-      // const doc = await docRef.get();
-      // if (doc.exists) {
-      //   const data = doc.data();
-      //   const updatedShareinfo = data?.shareInfo.map((item: any) => {
-      //     if (item.uid === receiverId) {
-      //       item.acceptedAt = new Date();
-      //     }
-      //     return item;
-      //   });
-
-      //   await docRef.update({
-      //     shareInfo: updatedShareinfo,
-      //   });
-      // } else {
-      //   console.log("nenhum documento encontrado");
-      // }
-    } else if (sourceType === "expense") {
-      updateExpenses(sourceId, receiverId);
-    } else if (sourceType === "market") {
-      updateMarkets(sourceId, receiverId);
-    }
+  const notificationRef = doc(database, "Notifications", id);
+  const notificationDoc = await getDoc(notificationRef);
+  
+  if (!notificationDoc.exists) {
+    throw new Error("Notification not found");
   }
+  
+  const notification = notificationDoc.data() as INotification;
+  
+  // Atualizar o status da notificação
+  await updateDoc(notificationRef, { 
+    status: "sharing_accepted" 
+  });
+  
+  // Atualizar o status do compartilhamento
+  const sharingRef = doc(database, "Sharing", notification.source.id);
+  await updateDoc(sharingRef, { 
+    status: "accepted" 
+  });
+  
+  // Atualizar o status do item compartilhado
+  if (notification.source.type === "expense") {
+    await updateExpenses(notification.source.id, notification.receiver);
+  } else if (notification.source.type === "market") {
+    await updateMarkets(notification.source.id, notification.receiver);
+  } else if (notification.source.type === "note") {
+    await updateNotes(notification.source.id, notification.receiver);
+  }
+  
+  return notification;
 };
 
 export const rejectSharingNotification = async (id: string) => {
-  await database
-    .collection("Notifications")
-    .doc(id)
-    .update({ status: "sharing_rejected" });
+  const notificationRef = doc(database, "Notifications", id);
+  const notificationDoc = await getDoc(notificationRef);
+  
+  if (!notificationDoc.exists) {
+    throw new Error("Notification not found");
+  }
+  
+  const notification = notificationDoc.data() as INotification;
+  
+  // Atualizar o status da notificação
+  await updateDoc(notificationRef, { 
+    status: "sharing_rejected" 
+  });
+  
+  // Atualizar o status do compartilhamento
+  const sharingRef = doc(database, "Sharing", notification.source.id);
+  await updateDoc(sharingRef, { 
+    status: "rejected" 
+  });
+  
+  return notification;
 };

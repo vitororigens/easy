@@ -1,5 +1,6 @@
 import { database } from "../../libs/firebase";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp, collection, addDoc, doc, updateDoc, getDoc, getDocs, query, where, deleteDoc } from "@react-native-firebase/firestore";
+import { Optional } from "../../@types/optional";
 
 type TShareInfo = {
   acceptedAt: Timestamp | null;
@@ -8,65 +9,65 @@ type TShareInfo = {
 };
 
 export interface IExpense {
-  category: string,
-  uid: string,
-  createdAt: Timestamp,
-  price: number,
-  description?: string,
-  isRecurrent: boolean,
-  status: boolean,
+  id?: string;
+  category: string;
+  uid: string;
+  createdAt: Timestamp;
+  price: number;
+  description?: string;
+  isRecurrent: boolean;
+  status: boolean;
   shareWith: string[];
   shareInfo: TShareInfo[];
 }
 
 export const createExpense = async (note: Omit<IExpense, "id">) => {
-  const docRef = await database.collection("Expenses").add(note);
-
+  const docRef = await addDoc(collection(database, "Expenses"), note);
   return docRef;
 };
 
-// export const updateExpense = async ({
-//   id,
-//   ...rest
-// }: Omit<
-//   Optional<IExpense, "description" | "name" | "shareInfo" | "shareWith">,
-//   "createdAt" | "uid"
-// >) => {
-//   await database.collection("Expenses").doc(id).update(rest);
-// };
+export const updateExpense = async (id: string, data: Partial<Omit<IExpense, "id" | "createdAt" | "uid">>) => {
+  const expenseRef = doc(database, "Expenses", id);
+  await updateDoc(expenseRef, data);
+};
 
-// export const findExpenseById = async (id: string) => {
-//   const doc = await database.collection("Expenses").doc(id).get();
-//   if (!doc.exists) return null;
-//   return { id: doc.id, ...doc.data() } as IExpense;
-// };
+export const findExpenseById = async (id: string) => {
+  const docRef = doc(database, "Expenses", id);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists) return null;
+  const data = docSnap.data();
+  return { id: docSnap.id, ...data } as IExpense;
+};
 
-// export const listExpenses = async (uid: string) => {
-//   const data = await database.collection("Expenses").where("uid", "==", uid).get();
-//   return (data.docs.map((doc) => ({
-//     id: doc.id,
-//     ...doc.data(),
-//   })) ?? []) as IExpense[];
-// };
+export const listExpenses = async (uid: string) => {
+  const q = query(collection(database, "Expenses"), where("uid", "==", uid));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  } as IExpense));
+};
 
-// export const listExpensesSharedWithMe = async (uid: string) => {
-//   const data = await database
-//     .collection("Expenses")
-//     .where("shareWith", "array-contains", uid)
-//     .get();
+export const listExpensesSharedWithMe = async (uid: string) => {
+  const q = query(
+    collection(database, "Expenses"),
+    where("shareWith", "array-contains", uid)
+  );
+  const querySnapshot = await getDocs(q);
 
-//   const notes = (data.docs.map((doc) => ({
-//     id: doc.id,
-//     ...doc.data(),
-//   })) ?? []) as IExpense[];
+  const expenses = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  } as IExpense));
 
-//   return notes.filter((n) =>
-//     n.shareInfo.some(
-//       ({ uid, acceptedAt }) => uid === uid && acceptedAt !== null
-//     )
-//   );
-// };
+  return expenses.filter((n) =>
+    n.shareInfo.some(
+      ({ uid: shareUid, acceptedAt }) => shareUid === uid && acceptedAt !== null
+    )
+  );
+};
 
-// export const deleteExpense = async (documentId: string) => {
-//   await database.collection("Expenses").doc(documentId).delete();
-// };
+export const deleteExpense = async (documentId: string) => {
+  const expenseRef = doc(database, "Expenses", documentId);
+  await deleteDoc(expenseRef);
+};

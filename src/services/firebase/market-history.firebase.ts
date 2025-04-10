@@ -1,6 +1,6 @@
 import { Optional } from "../../@types/optional";
 import { database } from "../../libs/firebase";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp, collection, doc, getDoc, getDocs, query, where, runTransaction, updateDoc, deleteDoc } from "@react-native-firebase/firestore";
 import { IMarket } from "./market.firebase";
 import { IExpense } from "./expenses.firebase";
 import { endOfMonth, startOfMonth } from "date-fns";
@@ -29,8 +29,8 @@ export const createMarketHistory = async ({
   uid,
   createdAt,
 }: Omit<IMarketHistory, "id" | "priceAmount" | "expenseId">) => {
-  const marketHistoryRef = database.collection("MarketHistory").doc();
-  const expenseRef = database.collection("Expenses").doc();
+  const marketHistoryRef = doc(collection(database, "MarketHistory"));
+  const expenseRef = doc(collection(database, "Expenses"));
 
   const priceAmount = markets.reduce(
     (acc, market) => acc + (market.price ?? 0) * (market.quantity ?? 0),
@@ -59,7 +59,7 @@ export const createMarketHistory = async ({
     createdAt,
   };
 
-  await database.runTransaction(async (transaction) => {
+  await runTransaction(database, async (transaction) => {
     transaction.set(expenseRef, newExpenseObj);
     transaction.set(marketHistoryRef, marketHistoryObj);
   });
@@ -79,13 +79,16 @@ export const updateMarketHistory = async ({
   Optional<IMarket, "name" | "shareInfo" | "shareWith">,
   "createdAt" | "uid"
 >) => {
-  await database.collection("MarketHistory").doc(id).update(rest);
+  const marketHistoryRef = doc(database, "MarketHistory", id);
+  await updateDoc(marketHistoryRef, rest);
 };
 
 export const findMarketHistoryById = async (id: string) => {
-  const doc = await database.collection("MarketHistory").doc(id).get();
-  if (!doc.exists) return null;
-  return { id: doc.id, ...doc.data() } as IMarketHistory;
+  const docRef = doc(database, "MarketHistory", id);
+  const docSnap = await getDoc(docRef);
+  
+  if (!docSnap.exists) return null;
+  return { id: docSnap.id, ...docSnap.data() } as IMarketHistory;
 };
 
 export const listMarketHistories = async (uid: string) => {
@@ -93,31 +96,35 @@ export const listMarketHistories = async (uid: string) => {
   const start = Timestamp.fromDate(startOfMonth(now));
   const end = Timestamp.fromDate(endOfMonth(now));
 
-  const data = await database
-    .collection("MarketHistory")
-    .where("uid", "==", uid)
-    .where("createdAt", ">=", start)
-    .where("createdAt", "<=", end)
-    .orderBy("createdAt", "desc")
-    .get();
-  return (data.docs.map((doc) => ({
+  const q = query(
+    collection(database, "MarketHistory"),
+    where("uid", "==", uid),
+    where("createdAt", ">=", start),
+    where("createdAt", "<=", end)
+  );
+  
+  const querySnapshot = await getDocs(q);
+  
+  return (querySnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   })) ?? []) as IMarketHistory[];
 };
 
 export const listMarketHistoriesSharedWithMe = async (uid: string) => {
-  const data = await database
-    .collection("MarketHistory")
-    .where("shareWith", "array-contains", uid)
-    .get();
-
-  const markets = (data.docs.map((doc) => ({
+  const q = query(
+    collection(database, "MarketHistory"),
+    where("shareWith", "array-contains", uid)
+  );
+  
+  const querySnapshot = await getDocs(q);
+  
+  const marketHistories = (querySnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   })) ?? []) as IMarketHistory[];
 
-  return markets.filter((n) =>
+  return marketHistories.filter((n) =>
     n.shareInfo.some(
       ({ uid, acceptedAt }) => uid === uid && acceptedAt !== null
     )
@@ -133,12 +140,11 @@ export const deleteMarketHistory = async ({
   expenseId,
   marketHistoryId,
 }: IDeleteMarketHistoryProps) => {
-  const expenseRef = database.collection("Expenses").doc(expenseId);
-  const marketHistoryRef = database
-    .collection("MarketHistory")
-    .doc(marketHistoryId);
-  await database.runTransaction(async (t) => {
-    t.delete(expenseRef);
-    t.delete(marketHistoryRef);
+  const expenseRef = doc(database, "Expenses", expenseId);
+  const marketHistoryRef = doc(database, "MarketHistory", marketHistoryId);
+  
+  await runTransaction(database, async (transaction) => {
+    transaction.delete(expenseRef);
+    transaction.delete(marketHistoryRef);
   });
 };
