@@ -115,8 +115,9 @@ export function Market({ route }: any) {
     // Garantir que todos os preços sejam números válidos
     const allMarkets = [...personalMarkets, ...sharedMarkets];
     const totalValue = allMarkets.reduce((acc, curr) => {
-      // Converter o preço para número se for string
-      const price = typeof curr.price === 'string' ? parseFloat(curr.price) : (curr.price || 0);
+      // Converter o preço para número se for string e remover caracteres não numéricos
+      const priceStr = typeof curr.price === 'string' ? curr.price.replace(/[^\d.,]/g, '').replace(',', '.') : String(curr.price || 0);
+      const price = parseFloat(priceStr) || 0;
       return acc + price;
     }, 0);
     
@@ -179,26 +180,18 @@ export function Market({ route }: any) {
 
   const handleFinishSelectedMarkets = async (groupName: string) => {
     try {
-      // Primeiro, finaliza todos os itens selecionados
-      for (const marketId of selectedMarkets) {
-        await toggleMarketCompletion(marketId);
-      }
-
-      // Pega as informações dos itens selecionados
+      // Pega as informações dos itens selecionados antes de finalizá-los
       const selectedMarketsInfo = markets
         ?.filter(market => selectedMarkets.includes(market.id))
         .map(market => {
           let dateStr: string;
           if (market.createdAt && typeof market.createdAt === 'object') {
             if ('seconds' in market.createdAt) {
-              // É um Timestamp do Firestore
               dateStr = new Date(market.createdAt.seconds * 1000).toISOString();
             } else {
-              // É um objeto Date
               dateStr = new Date(market.createdAt).toISOString();
             }
           } else {
-            // É uma string ou outro formato
             dateStr = new Date().toISOString();
           }
 
@@ -219,7 +212,13 @@ export function Market({ route }: any) {
         createdAt: Timestamp.now(),
       };
 
+      // Primeiro, adiciona ao histórico
       await database.collection("Marketplace").add(marketplaceData);
+
+      // Depois, exclui os itens selecionados da lista original
+      for (const marketId of selectedMarkets) {
+        await deleteMarket(marketId);
+      }
 
       setSelectedMarkets([]);
       Toast.show("Itens finalizados com sucesso!", { type: "success" });
