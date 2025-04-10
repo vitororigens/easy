@@ -15,15 +15,48 @@ export function phoneUnMask(value: string): string {
 
 // Aplicar máscara de moeda (BRL)
 export function currencyMask(value: string): string {
-  const numericValue = unMask(value || "");
-  return mask(numericValue, ['9,9', '99,99','999,99','9.999,99', '99.999,99', '999.999,99', '999.999.999,99', '999.999.999.999,99']);
+  // Remove tudo que não for número
+  let numericValue = value.replace(/\D/g, "");
+  
+  // Se não tiver valor, retorna vazio
+  if (numericValue === "") return "";
+  
+  // Converte para número e divide por 100 para ter os centavos
+  const number = Number(numericValue) / 100;
+  
+  // Formata o número para o padrão brasileiro
+  return number.toLocaleString("pt-BR", {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
-// Remover máscara de moeda
-export function currencyUnMask(value: string): string {
-  const unmaskedValue = value.replace(/\D/g, ""); 
-  const numericValue = parseFloat(unmaskedValue) / 100;
-  return isNaN(numericValue) ? "0.00" : numericValue.toFixed(2);
+// Remover máscara de moeda e retornar número
+export function currencyUnMask(value: string): number {
+  if (!value) return 0;
+  
+  // Remove tudo que não for número
+  const numericValue = value.replace(/\D/g, "");
+  
+  // Converte para número e divide por 100
+  return Number(numericValue) / 100;
+}
+
+// Formatar valor para exibição em BRL
+export function formatCurrency(value: number | string | undefined | null): string {
+  if (value === undefined || value === null) return "R$ 0,00";
+  
+  // Se for string, converte para número
+  const numericValue = typeof value === "string" ? currencyUnMask(value) : value;
+  
+  if (isNaN(numericValue)) return "R$ 0,00";
+  
+  // Formata o número para o padrão brasileiro com símbolo da moeda
+  return numericValue.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 }
 
 // Aplicar máscara de CEP

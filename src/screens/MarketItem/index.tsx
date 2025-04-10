@@ -10,7 +10,7 @@ import { z } from "zod";
 import { LoadingIndicator } from "../../components/Loading/style";
 import { ModalContainer } from "../../components/ModalContainer";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { currencyMask, currencyUnMask } from "../../utils/mask";
+import { currencyMask, currencyUnMask, formatCurrency } from "../../utils/mask";
 import {
   Button,
   ButtonPlus,
@@ -300,10 +300,7 @@ export const MarketItem = ({
             setValue("measurement", market.measurement);
             setValue(
               "price",
-              market.price?.toLocaleString("pt-BR", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }) ?? ""
+              market.price ? currencyMask(market.price.toString()) : ""
             );
             setValue("quantity", String(market.quantity ?? ""));
             setValue("observation", market.observation);
@@ -370,7 +367,10 @@ export const MarketItem = ({
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
                 value={value}
-                onChangeText={(value) => onChange(currencyMask(value))}
+                onChangeText={(text) => {
+                  const masked = currencyMask(text);
+                  onChange(masked);
+                }}
                 onBlur={onBlur}
                 placeholder="0,00"
                 keyboardType="numeric"

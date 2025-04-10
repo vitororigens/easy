@@ -25,6 +25,7 @@ import useMarketplaceCollections from "../../hooks/useHistoryMarketsCollection";
 import { database } from "../../libs/firebase";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { HistoryMarketModal } from "../../components/HistoryMarketModal";
+import { formatCurrency } from "../../utils/mask";
 
 import {
   Title,
@@ -278,7 +279,7 @@ export function Market({ route }: any) {
                 <StatLabel>Itens pendentes</StatLabel>
               </StatItem>
               <StatItem>
-                <StatValue>R$ {typeof marketStats.totalValue === 'number' ? marketStats.totalValue.toFixed(2) : '0.00'}</StatValue>
+                <StatValue>{formatCurrency(marketStats.totalValue)}</StatValue>
                 <StatLabel>Valor total</StatLabel>
               </StatItem>
             </StatsContainer>
