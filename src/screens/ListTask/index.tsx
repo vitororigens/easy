@@ -270,12 +270,12 @@ export function ListTask({ route }: any) {
             </Container>
           )}
 
-          <ContentTitle onPress={() => setIsSharedListVisible(!isSharedListVisible)}>
-            <HeaderContainer>
-              <SectionIcon name="share-variant" />
-              <Title>Tarefas compartilhadas</Title>
+          <ContentTitle type="PRIMARY" onPress={() => setIsSharedListVisible(!isSharedListVisible)}>
+            <HeaderContainer >
+              <SectionIcon type="PRIMARY" name="share-variant" />
+              <Title type="PRIMARY">Tarefas compartilhadas</Title>
             </HeaderContainer>
-            <Icon name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+            <Icon type="PRIMARY" name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
           </ContentTitle>
           {isSharedListVisible && (
             <Container>

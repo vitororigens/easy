@@ -20,7 +20,7 @@ export const ContentTitle = styled(TouchableOpacity)`
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background-color: ${({ theme }) => theme.COLORS.PURPLE_600};
+  background-color: ${({ theme }) => theme.COLORS.PURPLE_50};
   border-radius: 10px;
   elevation: 2;
   shadow-color: #000;
@@ -33,7 +33,7 @@ export const Title = styled.Text<{ active?: boolean }>`
   font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme, active }) => 
-    active ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_400};
+    active ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
   margin-bottom: 4px;
 `;
 

@@ -279,18 +279,18 @@ export function Market({ route }: any) {
                 <StatLabel>Itens pendentes</StatLabel>
               </StatItem>
               <StatItem>
-                <StatValue>{formatCurrency(marketStats.totalValue)}</StatValue>
+                <StatValue>{formatCurrency(marketStats.totalValue).formatted}</StatValue>
                 <StatLabel>Valor total</StatLabel>
               </StatItem>
             </StatsContainer>
           </Container>
 
-          <ContentTitle onPress={() => setIsListVisible(!isListVisible)}>
+          <ContentTitle type="PRIMARY" onPress={() => setIsListVisible(!isListVisible)}>
             <HeaderContainer>
-              <SectionIcon name="cart-variant" />
-              <Title>Meus itens</Title>
+              <SectionIcon type="PRIMARY" name="cart-variant" />
+              <Title type="PRIMARY">Meus itens</Title>
             </HeaderContainer>
-            <Icon name={isListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+            <Icon type="PRIMARY" name={isListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
           </ContentTitle>
           {isListVisible && (
             <Container>
@@ -321,12 +321,12 @@ export function Market({ route }: any) {
             </Container>
           )}
 
-          <ContentTitle onPress={() => setIsSharedListVisible(!isSharedListVisible)}>
+          <ContentTitle type="PRIMARY" onPress={() => setIsSharedListVisible(!isSharedListVisible)}>
             <HeaderContainer>
-              <SectionIcon name="share-variant" />
-              <Title>Itens compartilhados</Title>
+              <SectionIcon type="PRIMARY" name="share-variant" />
+              <Title type="PRIMARY">Itens compartilhados</Title>
             </HeaderContainer>
-            <Icon name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+            <Icon type="PRIMARY" name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
           </ContentTitle>
           {isSharedListVisible && (
             <Container>
