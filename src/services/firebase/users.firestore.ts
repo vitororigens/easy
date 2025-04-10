@@ -8,6 +8,7 @@ export interface IUser {
   photoURL?: string;
   createdAt: Date;
   updatedAt: Date;
+  favorites?: string[]; // Array de UIDs dos usuários favoritos
 }
 
 export const createUser = async (user: Omit<IUser, "uid">) => {
@@ -50,4 +51,58 @@ export const findUserByUsername = async (username: string, me: string) => {
 export const deleteUser = async (uid: string) => {
   const userRef = doc(database, "User", uid);
   await deleteDoc(userRef);
+};
+
+export const addToFavorites = async (userId: string, favoriteUserId: string) => {
+  const userRef = doc(database, "User", userId);
+  const userDoc = await getDoc(userRef);
+  
+  if (!userDoc.exists) return;
+  
+  const userData = userDoc.data() as IUser;
+  const favorites = userData.favorites || [];
+  
+  if (!favorites.includes(favoriteUserId)) {
+    await updateDoc(userRef, {
+      favorites: [...favorites, favoriteUserId]
+    });
+  }
+};
+
+export const removeFromFavorites = async (userId: string, favoriteUserId: string) => {
+  const userRef = doc(database, "User", userId);
+  const userDoc = await getDoc(userRef);
+  
+  if (!userDoc.exists) return;
+  
+  const userData = userDoc.data() as IUser;
+  const favorites = userData.favorites || [];
+  
+  await updateDoc(userRef, {
+    favorites: favorites.filter(id => id !== favoriteUserId)
+  });
+};
+
+export const getFavorites = async (userId: string): Promise<IUser[]> => {
+  const userRef = doc(database, "User", userId);
+  const userDoc = await getDoc(userRef);
+  
+  if (!userDoc.exists) return [];
+  
+  const userData = userDoc.data() as IUser;
+  const favorites = userData.favorites || [];
+  
+  if (favorites.length === 0) return [];
+  
+  const favoritesUsers = await Promise.all(
+    favorites.map(async (uid) => {
+      const userDoc = await getDoc(doc(database, "User", uid));
+      if (userDoc.exists) {
+        return { uid: userDoc.id, ...userDoc.data() } as IUser;
+      }
+      return null;
+    })
+  );
+  
+  return favoritesUsers.filter((user): user is IUser => user !== null);
 };
