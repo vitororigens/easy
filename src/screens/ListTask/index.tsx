@@ -372,19 +372,6 @@ export function ListTask({ route }: any) {
           />
         )}
       </Modal>
-
-      <TouchableOpacity
-        onPress={() => handleGroupTasks("Histórico")}
-        style={{
-          backgroundColor: COLORS.TEAL_600,
-          padding: 15,
-          borderRadius: 8,
-          marginTop: 10,
-          alignItems: 'center'
-        }}
-      >
-        <Title>Ver histórico</Title>
-      </TouchableOpacity>
     </DefaultContainer>
   );
 }

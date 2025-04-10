@@ -35,7 +35,7 @@ export const Button = styled(TouchableOpacity)<{ active: boolean }>`
   border-top-style: solid;
   background-color: ${({ theme }) => theme.COLORS.WHITE};
   border-top-color: ${({ theme, active }) =>
-    !active ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_300};
+    active ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_300};
 `;
 
 export const ContentTitle = styled(TouchableOpacity)`

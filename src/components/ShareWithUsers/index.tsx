@@ -28,7 +28,7 @@ import {
   CloseButton,
   CloseButtonText,
 } from "./styles";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, Control } from "react-hook-form";
 import { z } from "zod";
 import { getInitials } from "../../utils/getInitials";
 import { SubTitle } from "../DefaultContainer/style";
@@ -51,6 +51,7 @@ import {
   getSharing,
   ISharing,
 } from "../../services/firebase/sharing.firebase";
+import { FormSchemaType } from '../Expense';
 
 export const shareUserSchema = z.object({
   sharedUsers: z.array(
@@ -73,9 +74,13 @@ export const shareUserSchema = z.object({
 
 export type TShareUser = z.infer<typeof shareUserSchema>;
 
-interface IShareWithUsers {}
+interface IShareWithUsers {
+  control: Control<FormSchemaType>;
+  name: string;
+  currentUserId: string;
+}
 
-export const ShareWithUsers = ({}: IShareWithUsers) => {
+export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name, currentUserId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [users, setUsers] = useState<IUser[]>([]);
