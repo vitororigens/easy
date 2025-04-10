@@ -1,64 +1,92 @@
-import { TouchableOpacity, View } from "react-native";
-import { Popover } from "react-native-popper";
+import React, { useState } from "react";
+import { View } from "react-native";
+import Popover from "react-native-popover-view";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+import { INote } from "../../interfaces/INote";
 import {
-  Button,
   Container,
-  ContainerMenu,
+  Title,
+  SubTitle,
   DateNote,
   Icon,
-  SubTitle,
-  Title,
+  Button,
+  ContainerMenu,
+  ShareBadge,
+  ShareIcon,
 } from "./styles";
-import { INote } from "../../services/firebase/notes.firebase";
-import { format } from "date-fns";
 
 type ItemNotesProps = {
   note: INote;
-  handleDelete: () => void;
-  handleUpdate: () => void;
+  onDelete: (id: string) => void;
+  onUpdate: (note: INote) => void;
+  isSharedByMe?: boolean;
 };
 
-export function ItemNotes({
-  note,
-  handleDelete,
-  handleUpdate,
-}: ItemNotesProps) {
+export function ItemNotes({ note, onDelete, onUpdate, isSharedByMe }: ItemNotesProps) {
+  const [showPopover, setShowPopover] = useState(false);
+
+  const formattedDate = (() => {
+    try {
+      const date = note.createdAt instanceof Date 
+        ? note.createdAt 
+        : new Date(note.createdAt);
+      
+      if (isNaN(date.getTime())) {
+        return "Data inválida";
+      }
+
+      return format(date, "dd/MM/yyyy 'às' HH:mm", {
+        locale: ptBR,
+      });
+    } catch (error) {
+      console.error("Erro ao formatar data:", error);
+      return "Data indisponível";
+    }
+  })();
+
   return (
-    <Container onPress={handleUpdate}>
+    <Container isShared={note.isShared} onPress={() => onUpdate(note)}>
       <View style={{ flex: 1 }}>
-        <Title>{note.name}</Title>
-        {note.description && (
-          <SubTitle>
-            {note.description.length > 10
-              ? note.description.substring(0, 10) + "..."
-              : note.description}
-          </SubTitle>
-        )}
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Title numberOfLines={1}>{note.title}</Title>
+          {note.isShared && (
+            <ShareBadge isSharedByMe={isSharedByMe}>
+              <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
+            </ShareBadge>
+          )}
+        </View>
+        <SubTitle numberOfLines={2}>{note.description}</SubTitle>
+        <DateNote>{formattedDate}</DateNote>
       </View>
-      <View style={{ alignItems: "flex-end" }}>
-        <Popover
-          trigger={
-            <TouchableOpacity>
-              <Icon name="dots-three-horizontal" />
-            </TouchableOpacity>
-          }
-        >
-          <Popover.Backdrop />
-          <Popover.Content>
-            <ContainerMenu style={{ alignSelf: "flex-end" }}>
-              <Button onPress={handleDelete}>
-                <Icon name="trash" />
-                <Title>Excluir</Title>
-              </Button>
-              <Button onPress={handleUpdate}>
-                <Icon name="pencil" />
-                <Title>Editar</Title>
-              </Button>
-            </ContainerMenu>
-          </Popover.Content>
-        </Popover>
-        <DateNote>{format(note.createdAt.toDate(), "dd/MM/yyyy")}</DateNote>
-      </View>
+
+      <Popover
+        isVisible={showPopover}
+        onRequestClose={() => setShowPopover(false)}
+        from={
+          <Button onPress={() => setShowPopover(true)}>
+            <Icon name="dots-three-vertical" />
+          </Button>
+        }
+      >
+        <ContainerMenu>
+          <Button onPress={() => {
+            setShowPopover(false);
+            onUpdate(note);
+          }}>
+            <Icon name="edit" />
+            <SubTitle style={{ marginLeft: 8 }}>Editar</SubTitle>
+          </Button>
+          <Button onPress={() => {
+            setShowPopover(false);
+            onDelete(note.id);
+          }}>
+            <Icon name="trash" />
+            <SubTitle style={{ marginLeft: 8 }}>Excluir</SubTitle>
+          </Button>
+        </ContainerMenu>
+      </Popover>
     </Container>
   );
 }

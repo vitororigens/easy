@@ -14,6 +14,9 @@ import {
   Icon,
   SubTitle,
   Title,
+  HeaderContainer,
+  SectionIcon,
+  EmptyContainer,
 } from "./styles";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import PersonImage from "../../assets/illustrations/notes.png";
@@ -98,8 +101,10 @@ export function Notes({ route }: any) {
     <DefaultContainer newNotes monthButton title="Bloco de Notas">
       <Content>
         <ContentTitle onPress={() => setIsMyListVisible(!isMyListVisible)}>
-          <Title>Minhas notas</Title>
-          <DividerContent />
+          <HeaderContainer>
+            <SectionIcon name="notebook-outline" />
+            <Title>Minhas notas</Title>
+          </HeaderContainer>
           <Icon name={isMyListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
         </ContentTitle>
         {isMyListVisible && (
@@ -115,55 +120,55 @@ export function Notes({ route }: any) {
                 />
               )}
               keyExtractor={(item) => item.id}
-              contentContainerStyle={{ paddingBottom: 90 }}
+              contentContainerStyle={{ paddingBottom: 16 }}
               ListEmptyComponent={
-                <LoadData
-                  imageSrc={PersonImage}
-                  title="Comece agora!"
-                  subtitle="Adicione uma nota clicando em +"
-                />
+                <EmptyContainer>
+                  <LoadData
+                    imageSrc={PersonImage}
+                    title="Comece agora!"
+                    subtitle="Adicione uma nota clicando em +"
+                  />
+                </EmptyContainer>
               }
-              ListFooterComponent={<View style={{ height: 90 }} />}
             />
           </Container>
         )}
+
         <ContentTitle
           isMysharedNotes
           onPress={() => setIsSharedListVisible(!isSharedListVisible)}
         >
-          <Title>Notas compartilhadas</Title>
-          <DividerContent />
-          <Icon
-            name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"}
-          />
+          <HeaderContainer>
+            <SectionIcon name="share-variant" isMysharedNotes />
+            <Title>Notas compartilhadas</Title>
+          </HeaderContainer>
+          <Icon name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
         </ContentTitle>
+
         {isSharedListVisible && (
           <Container>
             <FlatList
               showsVerticalScrollIndicator={false}
-              data={sharedNotesByMe.concat(sharedNotesWithMe)}
-              renderItem={({ item }) => (
-                <ItemNotes
-                  handleDelete={() => handleDeleteNote(item.id)}
-                  handleUpdate={() => handleEditItem(item.id, false)}
-                  note={item}
-                />
-              )}
+              data={[...sharedNotesWithMe, ...sharedNotesByMe]}
+              renderItem={({ item }) => {
+                const isSharedByMe = sharedNotesByMe.some(note => note.id === item.id);
+                return (
+                  <ItemNotes
+                    handleDelete={() => handleDeleteNote(item.id)}
+                    handleUpdate={() => handleEditItem(item.id, false)}
+                    note={item}
+                    isSharedByMe={isSharedByMe}
+                  />
+                );
+              }}
               keyExtractor={(item) => item.id}
-              contentContainerStyle={{ paddingBottom: 90 }}
-              ListFooterComponent={<View style={{ height: 90 }} />}
+              contentContainerStyle={{ paddingBottom: 16 }}
               ListEmptyComponent={
-                <View
-                  style={{
-                    padding: 40,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
+                <EmptyContainer>
                   <SubTitle>
-                    Você não possui notas compartilhada com você
+                    Você não possui notas compartilhadas
                   </SubTitle>
-                </View>
+                </EmptyContainer>
               }
             />
           </Container>
