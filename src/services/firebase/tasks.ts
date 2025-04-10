@@ -138,3 +138,17 @@ export const deleteNote = async (documentId: string) => {
   const noteRef = doc(database, "Notes", documentId);
   await deleteDoc(noteRef);
 };
+
+export const createHistoryTasks = async (groupName: string) => {
+  const now = new Date();
+  const historyTask = {
+    name: groupName,
+    createdAt: Timestamp.now(),
+    finishedDate: now.toLocaleDateString(),
+    finishedTime: now.toLocaleTimeString(),
+    tasks: []
+  };
+
+  const docRef = await addDoc(collection(database, "HistoryTasks"), historyTask);
+  return docRef;
+};

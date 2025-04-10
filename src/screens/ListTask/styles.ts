@@ -104,3 +104,29 @@ export const SubTitle = styled.Text`
   color: ${({ theme }) => theme.COLORS.GRAY_400};
   margin-top: 8px;
 `;
+
+export const TaskCard = styled.TouchableOpacity`
+  padding: 15px;
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
+  border-radius: 8px;
+  margin-bottom: 12px;
+  elevation: 2;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.15;
+  shadow-radius: 2.84px;
+`;
+
+export const TaskName = styled.Text`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  color: ${({ theme }) => theme.COLORS.GRAY_600};
+  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+  margin-bottom: 8px;
+`;
+
+export const DateText = styled.Text`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  color: ${({ theme }) => theme.COLORS.GRAY_400};
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  margin-bottom: 4px;
+`;

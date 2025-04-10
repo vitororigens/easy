@@ -10,10 +10,14 @@ import {
   TaskItem,
   TaskName,
   TaskDate,
+  GroupName,
 } from './styles';
 
 interface HistoryTaskModalProps {
   onClose: () => void;
+  groupName: string;
+  finishedDate: string;
+  finishedTime: string;
   tasks: Array<{
     id: string;
     name: string;
@@ -21,7 +25,21 @@ interface HistoryTaskModalProps {
   }>;
 }
 
-export function HistoryTaskModal({ onClose, tasks }: HistoryTaskModalProps) {
+export function HistoryTaskModal({ 
+  onClose, 
+  groupName,
+  finishedDate,
+  finishedTime,
+  tasks 
+}: HistoryTaskModalProps) {
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return {
+      date: date.toLocaleDateString(),
+      time: date.toLocaleTimeString()
+    };
+  };
+
   return (
     <Modal
       visible={true}
@@ -38,15 +56,23 @@ export function HistoryTaskModal({ onClose, tasks }: HistoryTaskModalProps) {
             </CloseButton>
           </Header>
 
+          <GroupName>{groupName}</GroupName>
+          <TaskDate>Finalizado em: {finishedDate} às {finishedTime}</TaskDate>
+
           <FlatList
             data={tasks}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TaskItem>
-                <TaskName>{item.name}</TaskName>
-                <TaskDate>Finalizada em: {item.createdAt}</TaskDate>
-              </TaskItem>
-            )}
+            renderItem={({ item }) => {
+              const { date, time } = formatDateTime(item.createdAt);
+              return (
+                <TaskItem>
+                  <TaskName>{item.name}</TaskName>
+                  <TaskDate>
+                    Criada em: {date} às {time}
+                  </TaskDate>
+                </TaskItem>
+              );
+            }}
             showsVerticalScrollIndicator={false}
           />
         </Content>

@@ -34,6 +34,13 @@ export const Title = styled.Text`
   color: ${({ theme }) => theme.COLORS.GRAY_600};
 `;
 
+export const GroupName = styled.Text`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.XL}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+  color: ${({ theme }) => theme.COLORS.TEAL_600};
+  margin-bottom: 8px;
+`;
+
 export const CloseButton = styled(TouchableOpacity)`
   padding: 8px;
 `;

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { DefaultContainer } from "../../components/DefaultContainer";
@@ -29,6 +30,9 @@ import {
   NavBar,
   Button,
   SubTitle,
+  TaskCard,
+  TaskName,
+  DateText,
 } from "./styles";
 
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -44,8 +48,21 @@ import { NewItemTask } from "../NewItemTask";
 import { database } from "../../libs/firebase";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { HistoryTaskModal } from "../../components/HistoryTaskModal";
+import { createHistoryTasks } from "../../services/firebase/tasks";
 
 const modalBottom = Platform.OS === "ios" ? 90 : 70;
+
+interface HistoryItem {
+  id: string;
+  name: string;
+  finishedDate: string;
+  finishedTime: string;
+  tasks: Array<{
+    id: string;
+    name: string;
+    createdAt: string | Timestamp;
+  }>;
+}
 
 export function ListTask({ route }: any) {
   const reload = route?.params?.reload;
@@ -53,6 +70,7 @@ export function ListTask({ route }: any) {
   const uid = user?.uid;
   const { tasks, loading, deleteTask, toggleTaskCompletion } = useTask();
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryItem | null>(null);
 
   const { selectedMonth } = useMonth();
   const navigation = useNavigation();
@@ -70,14 +88,25 @@ export function ListTask({ route }: any) {
   });
 
   // Filtrar tarefas para cada seção
-  const personalTasks = tasks?.filter(task => !task.shareWith || task.shareWith.length === 0) || [];
-  const sharedTasks = tasks?.filter(task => task.shareWith && task.shareWith.length > 0) || [];
+  const personalTasks = tasks?.filter(task => 
+    (!task.shareWith || task.shareWith.length === 0) && !task.status
+  ) || [];
+  const sharedTasks = tasks?.filter(task => 
+    task.shareWith && task.shareWith.length > 0 && !task.status
+  ) || [];
   const completedTasks = tasks?.filter(task => task.status) || [];
 
   console.log("Tarefas no ListTask:", tasks);
   console.log("Tarefas pessoais:", personalTasks);
   console.log("Tarefas compartilhadas:", sharedTasks);
   console.log("Tarefas concluídas:", completedTasks);
+  
+  // Log detalhado da primeira tarefa concluída para debug
+  if (completedTasks.length > 0) {
+    console.log("Estrutura da primeira tarefa concluída:", JSON.stringify(completedTasks[0], null, 2));
+    console.log("Tipo de createdAt:", typeof completedTasks[0].createdAt);
+    console.log("Tipo de updatedAt:", typeof completedTasks[0].updatedAt);
+  }
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
@@ -116,16 +145,65 @@ export function ListTask({ route }: any) {
     });
   };
 
-  const handleFinishSelectedTasks = async () => {
+  const handleFinishSelectedTasks = async (groupName: string) => {
     try {
+      // Primeiro, finaliza todas as tarefas selecionadas
       for (const taskId of selectedTasks) {
         await toggleTaskCompletion(taskId);
       }
+
+      // Pega as informações das tarefas selecionadas
+      const selectedTasksInfo = tasks
+        .filter(task => selectedTasks.includes(task.id))
+        .map(task => {
+          let dateStr;
+          if (task.createdAt && typeof task.createdAt === 'object') {
+            if ('seconds' in task.createdAt) {
+              // É um Timestamp do Firestore
+              dateStr = new Date(task.createdAt.seconds * 1000).toISOString();
+            } else {
+              // É um objeto Date
+              dateStr = new Date(task.createdAt).toISOString();
+            }
+          } else {
+            // É uma string ou outro formato
+            dateStr = new Date().toISOString();
+          }
+
+          return {
+            id: task.id,
+            name: task.name,
+            createdAt: dateStr
+          };
+        });
+
+      const now = new Date();
+      const historyData = {
+        name: groupName,
+        uid: uid,
+        finishedDate: format(now, "dd/MM/yyyy"),
+        finishedTime: format(now, "HH:mm:ss"),
+        tasks: selectedTasksInfo,
+        createdAt: Timestamp.now(),
+      };
+
+      await database.collection("HistoryTasks").add(historyData);
+
       setSelectedTasks([]);
       Toast.show("Tarefas finalizadas com sucesso!", { type: "success" });
     } catch (error) {
       console.error("Erro ao finalizar tarefas:", error);
       Toast.show("Erro ao finalizar tarefas", { type: "error" });
+    }
+  };
+
+  const handleGroupTasks = async (groupName: string) => {
+    try {
+      await createHistoryTasks(groupName);
+      Alert.alert('Sucesso', 'Tarefas agrupadas com sucesso!');
+    } catch (error) {
+      console.error('Erro ao agrupar tarefas:', error);
+      Alert.alert('Erro', 'Ocorreu um erro ao agrupar as tarefas.');
     }
   };
 
@@ -237,14 +315,20 @@ export function ListTask({ route }: any) {
           <Container>
             <FlatList
               showsVerticalScrollIndicator={false}
-              data={completedTasks}
+              data={historyUserMonth}
               renderItem={({ item }) => (
-                <ItemTask
-                  task={item}
-                  handleDelete={() => handleDeleteTask(item.id)}
-                  handleUpdate={() => handleEditTask(item.id)}
-                  handleToggleCompletion={() => handleToggleCompletion(item.id)}
-                />
+                <TaskCard onPress={() => {
+                  setModalActive(true);
+                  setSelectedHistoryItem(item);
+                }}>
+                  <TaskName>{item.name}</TaskName>
+                  <DateText>
+                    📅 Finalizado em: {item.finishedDate} às {item.finishedTime}
+                  </DateText>
+                  <DateText>
+                    ✅ Total de tarefas: {item.tasks.length}
+                  </DateText>
+                </TaskCard>
               )}
               keyExtractor={(item) => item.id}
               contentContainerStyle={{ paddingBottom: 16 }}
@@ -252,8 +336,8 @@ export function ListTask({ route }: any) {
                 <EmptyContainer>
                   <LoadData
                     imageSrc={PersonImage}
-                    title="Nenhuma tarefa concluída"
-                    subtitle="Complete algumas tarefas para ver seu histórico"
+                    title="Nenhum conjunto de tarefas"
+                    subtitle="Finalize algumas tarefas para ver seu histórico"
                   />
                 </EmptyContainer>
               }
@@ -264,7 +348,7 @@ export function ListTask({ route }: any) {
 
       <FinishTasks
         selectedCount={selectedTasks.length}
-        onFinish={handleFinishSelectedTasks}
+        onFinish={(groupName: string) => handleFinishSelectedTasks(groupName)}
       />
 
       <Modal
@@ -273,11 +357,34 @@ export function ListTask({ route }: any) {
         animationType="slide"
         onRequestClose={() => setModalActive(false)}
       >
-        <HistoryTaskModal
-          onClose={() => setModalActive(false)}
-          tasks={historyUserMonth[0]?.tasks || []}
-        />
+        {selectedHistoryItem && (
+          <HistoryTaskModal
+            onClose={() => setModalActive(false)}
+            groupName={selectedHistoryItem.name}
+            finishedDate={selectedHistoryItem.finishedDate}
+            finishedTime={selectedHistoryItem.finishedTime}
+            tasks={selectedHistoryItem.tasks.map(task => ({
+              ...task,
+              createdAt: typeof task.createdAt === 'string' 
+                ? task.createdAt 
+                : new Date(task.createdAt.toDate()).toISOString()
+            }))}
+          />
+        )}
       </Modal>
+
+      <TouchableOpacity
+        onPress={() => handleGroupTasks("Histórico")}
+        style={{
+          backgroundColor: COLORS.TEAL_600,
+          padding: 15,
+          borderRadius: 8,
+          marginTop: 10,
+          alignItems: 'center'
+        }}
+      >
+        <Title>Ver histórico</Title>
+      </TouchableOpacity>
     </DefaultContainer>
   );
 }

@@ -1,6 +1,7 @@
 import { TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { TextInput } from 'react-native';
 
 export const Container = styled.View`
   position: absolute;
@@ -11,7 +12,7 @@ export const Container = styled.View`
   padding: 16px;
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
-  elevation: 5;
+  elevation: 2;
   shadow-color: #000;
   shadow-offset: 0px -2px;
   shadow-opacity: 0.25;
@@ -20,14 +21,13 @@ export const Container = styled.View`
 `;
 
 export const Content = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
 `;
 
 export const ButtonText = styled.View`
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   background-color: ${({ theme }) => theme.COLORS.TEAL_600};
   padding: 8px 16px;
   border-radius: 8px;
@@ -56,3 +56,13 @@ export const Icon = styled(MaterialCommunityIcons).attrs(({ theme }) => ({
   color: theme.COLORS.WHITE,
   size: 32,
 }))``;
+
+export const Input = styled(TextInput)`
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin: 8px 0;
+  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  color: ${({ theme }) => theme.COLORS.GRAY_600};
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+`;

@@ -5,7 +5,9 @@ import { database } from "../libs/firebase";
 export interface HistoryTasksData {
   id: string;
   uid: string;
+  name: string;
   finishedDate: string;
+  finishedTime: string;
   tasks: {
     createdAt: string;
     id: string;
