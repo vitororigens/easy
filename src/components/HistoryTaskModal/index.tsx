@@ -1,36 +1,56 @@
-import { useRoute } from "@react-navigation/native";
-import { FlatList, View } from "react-native";
-import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
-import { DefaultContainer } from "../DefaultContainer";
-import { ItemTask } from "../ItemTask";
-import { Content } from "./styles";
+import React from 'react';
+import { Modal, TouchableOpacity, FlatList } from 'react-native';
+import { MaterialIcons } from "@expo/vector-icons";
+import {
+  Container,
+  Content,
+  Header,
+  Title,
+  CloseButton,
+  TaskItem,
+  TaskName,
+  TaskDate,
+} from './styles';
 
-export function HistoryTaskModal() {
-  const route = useRoute();
+interface HistoryTaskModalProps {
+  onClose: () => void;
+  tasks: Array<{
+    id: string;
+    name: string;
+    createdAt: string;
+  }>;
+}
 
-  const { selectedItemId } = route.params as { selectedItemId?: string };
-
-  const historyData = useHistoryTasksCollections("HistoryTasks");
-  const selectedListTask = historyData.find(
-    (item) => item.id === selectedItemId
-  );
-
-  const tasks = selectedListTask?.tasks;
-
+export function HistoryTaskModal({ onClose, tasks }: HistoryTaskModalProps) {
   return (
-    <>
-      <DefaultContainer hasHeader={false} title="Tarefas" backButton>
+    <Modal
+      visible={true}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <Container>
         <Content>
+          <Header>
+            <Title>Tarefas Finalizadas</Title>
+            <CloseButton onPress={onClose}>
+              <MaterialIcons name="close" size={24} color="#6B7280" />
+            </CloseButton>
+          </Header>
+
           <FlatList
             data={tasks}
-            renderItem={({ item }) => (
-              <ItemTask title={item.name} isChecked={true} hasActions={false} />
-            )}
             keyExtractor={(item) => item.id}
-            ListFooterComponent={<View style={{ height: 90 }} />}
+            renderItem={({ item }) => (
+              <TaskItem>
+                <TaskName>{item.name}</TaskName>
+                <TaskDate>Finalizada em: {item.createdAt}</TaskDate>
+              </TaskItem>
+            )}
+            showsVerticalScrollIndicator={false}
           />
         </Content>
-      </DefaultContainer>
-    </>
+      </Container>
+    </Modal>
   );
 }

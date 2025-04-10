@@ -43,6 +43,7 @@ import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
 import { NewItemTask } from "../NewItemTask";
 import { database } from "../../libs/firebase";
 import { Timestamp } from "@react-native-firebase/firestore";
+import { HistoryTaskModal } from "../../components/HistoryTaskModal";
 
 const modalBottom = Platform.OS === "ios" ? 90 : 70;
 
@@ -51,6 +52,7 @@ export function ListTask({ route }: any) {
   const user = useUserAuth();
   const uid = user?.uid;
   const { tasks, loading, deleteTask, toggleTaskCompletion } = useTask();
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
 
   const { selectedMonth } = useMonth();
   const navigation = useNavigation();
@@ -105,6 +107,28 @@ export function ListTask({ route }: any) {
     }
   };
 
+  const handleSelectTask = (taskId: string) => {
+    setSelectedTasks(prev => {
+      if (prev.includes(taskId)) {
+        return prev.filter(id => id !== taskId);
+      }
+      return [...prev, taskId];
+    });
+  };
+
+  const handleFinishSelectedTasks = async () => {
+    try {
+      for (const taskId of selectedTasks) {
+        await toggleTaskCompletion(taskId);
+      }
+      setSelectedTasks([]);
+      Toast.show("Tarefas finalizadas com sucesso!", { type: "success" });
+    } catch (error) {
+      console.error("Erro ao finalizar tarefas:", error);
+      Toast.show("Erro ao finalizar tarefas", { type: "error" });
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -144,17 +168,15 @@ export function ListTask({ route }: any) {
               <FlatList
                 showsVerticalScrollIndicator={false}
                 data={personalTasks}
-                renderItem={({ item }) => {
-                  console.log("Renderizando ItemTask com item:", item);
-                  return (
-                    <ItemTask
-                      task={item}
-                      handleDelete={() => handleDeleteTask(item.id)}
-                      handleUpdate={() => handleEditTask(item.id)}
-                      handleToggleCompletion={() => handleToggleCompletion(item.id)}
-                    />
-                  );
-                }}
+                renderItem={({ item }) => (
+                  <ItemTask
+                    task={item}
+                    handleDelete={() => handleDeleteTask(item.id)}
+                    handleUpdate={() => handleEditTask(item.id)}
+                    isSelected={selectedTasks.includes(item.id)}
+                    onSelect={() => handleSelectTask(item.id)}
+                  />
+                )}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ paddingBottom: 16 }}
                 ListEmptyComponent={
@@ -182,24 +204,20 @@ export function ListTask({ route }: any) {
               <FlatList
                 showsVerticalScrollIndicator={false}
                 data={sharedTasks}
-                renderItem={({ item }) => {
-                  console.log("Renderizando ItemTask compartilhado com item:", item);
-                  return (
-                    <ItemTask
-                      task={item}
-                      handleDelete={() => handleDeleteTask(item.id)}
-                      handleUpdate={() => handleEditTask(item.id)}
-                      handleToggleCompletion={() => handleToggleCompletion(item.id)}
-                    />
-                  );
-                }}
+                renderItem={({ item }) => (
+                  <ItemTask
+                    task={item}
+                    handleDelete={() => handleDeleteTask(item.id)}
+                    handleUpdate={() => handleEditTask(item.id)}
+                    isSelected={selectedTasks.includes(item.id)}
+                    onSelect={() => handleSelectTask(item.id)}
+                  />
+                )}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ paddingBottom: 16 }}
                 ListEmptyComponent={
                   <EmptyContainer>
-                    <SubTitle>
-                      Você não possui tarefas compartilhadas
-                    </SubTitle>
+                    <SubTitle>Nenhuma tarefa compartilhada</SubTitle>
                   </EmptyContainer>
                 }
               />
@@ -243,6 +261,23 @@ export function ListTask({ route }: any) {
           </Container>
         </Content>
       )}
+
+      <FinishTasks
+        selectedCount={selectedTasks.length}
+        onFinish={handleFinishSelectedTasks}
+      />
+
+      <Modal
+        visible={modalActive}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalActive(false)}
+      >
+        <HistoryTaskModal
+          onClose={() => setModalActive(false)}
+          tasks={historyUserMonth[0]?.tasks || []}
+        />
+      </Modal>
     </DefaultContainer>
   );
 }

@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export const Container = styled.View`
   position: absolute;
-  bottom: 0;
+  bottom: 80px;
   left: 0;
   right: 0;
   background-color: ${({ theme }) => theme.COLORS.TEAL_600};
@@ -16,6 +16,7 @@ export const Container = styled.View`
   shadow-offset: 0px -2px;
   shadow-opacity: 0.25;
   shadow-radius: 3.84px;
+  margin: 0 16px;
 `;
 
 export const Content = styled.View`
@@ -27,9 +28,11 @@ export const Content = styled.View`
 export const ButtonText = styled.View`
   flex-direction: row;
   align-items: center;
-  background-color: ${({ theme }) => theme.COLORS.TEAL_700};
+  background-color: ${({ theme }) => theme.COLORS.TEAL_600};
   padding: 8px 16px;
   border-radius: 8px;
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.COLORS.WHITE};
 `;
 
 export const Title = styled.Text`
