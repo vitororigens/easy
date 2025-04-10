@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { ReactNode, useRef, useState } from "react";
-import { View } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { useTheme } from "styled-components/native";
 import {
   BannerAd,
@@ -9,11 +9,6 @@ import {
   useForeground,
 } from "react-native-google-mobile-ads";
 import { ModalContainer } from "../ModalContainer";
-
-const adUnitId = __DEV__
-  ? TestIds.ADAPTIVE_BANNER
-  : "ca-app-pub-1904400573870779~6241470792";
-
 import {
   Button,
   ButtonBack,
@@ -26,6 +21,10 @@ import {
   Title,
   ViewHomeCenter,
 } from "./style";
+
+const adUnitId = __DEV__
+  ? TestIds.ADAPTIVE_BANNER
+  : "ca-app-pub-1904400573870779~6241470792";
 
 type DefaultContainerProps = {
   children: ReactNode;
@@ -78,6 +77,9 @@ export function DefaultContainer({
 }: DefaultContainerProps) {
   const navigation = useNavigation();
   const { COLORS } = useTheme();
+  const bannerRef = useRef<BannerAd>(null);
+
+  // Estados
   const [showNewItemModal, setShowNewItemModal] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [showNewItemMarketplace, setShowNewItemMarketplace] = useState(false);
@@ -85,8 +87,8 @@ export function DefaultContainer({
   const [showNewLaunchModal, setShowNewLaunchModal] = useState(false);
   const [showFilterPickerModal, setShowFilterPickerModal] = useState(false);
   const [selectedItemId, setSelectItemId] = useState("");
-  const bannerRef = useRef<BannerAd>(null);
 
+  // Funções de manipulação de modais
   function closeModals() {
     setShowNewItemModal(false);
     setShowNewLaunchModal(false);
@@ -104,7 +106,7 @@ export function DefaultContainer({
     if (onNewItemTask) {
       onNewItemTask(documentId);
     } else {
-      navigation.navigate("newitemtask", { selectedItemId: documentId, isCreator: true });
+      navigation.navigate("newitemtask", { selectedItemId: documentId });
     }
   }
 
@@ -112,7 +114,7 @@ export function DefaultContainer({
     if (onNewNotes) {
       onNewNotes(documentId);
     } else {
-      navigation.navigate("newnotes", { selectedItemId: documentId });
+      navigation.navigate("newnotes", { selectedItemId: documentId, isCreator: true });
     }
   }
 
@@ -120,7 +122,7 @@ export function DefaultContainer({
     if (onNewSubscription) {
       onNewSubscription(documentId);
     } else {
-      navigation.navigate("newsubscription", { selectedItemId: documentId });
+      navigation.navigate("subscription-history", { selectedItemId: documentId });
     }
   }
 
@@ -147,127 +149,69 @@ export function DefaultContainer({
   return (
     <Container type={type}>
       <Header type={type}>
-        {monthButton && (
-          <Button
-            style={{
-              alignItems: "center",
-              flexDirection: "row",
-              height: 60,
-              width: "35%",
-            }}
-            onPress={handleShowFilter}
-          >
-            <Icon name="filter-outline" />
-          </Button>
-        )}
+        <View style={{ position: "absolute", left: 0, zIndex: 1 }}>
+          {backButton && (
+            <ButtonBack onPress={handleGoBack}>
+              <Icon name="arrow-back-circle-outline" />
+            </ButtonBack>
+          )}
+        </View>
 
-        {type === "PRIMARY" && <Title type={type}>{title}</Title>}
+        <View style={{ position: "absolute", left: backButton ? 50 : 0, zIndex: 1 }}>
+          {monthButton && (
+            <Button onPress={handleShowFilter}>
+              <Icon name="filter-outline" />
+            </Button>
+          )}
+        </View>
 
-        {type === "SECONDARY" && (
-          <ViewHomeCenter>
-            <Title type="SECONDARY">{title}</Title>
-            {subtitle && <SubTitle>{subtitle}</SubTitle>}
-          </ViewHomeCenter>
-        )}
+        <Title type={type}>{title}</Title>
 
-        {newItem && (
-          <Button
-            style={{
-              alignItems: "center",
-              flexDirection: "row",
-              height: 60,
-            }}
-            onPress={() => handleNewItemTask(selectedItemId)}
-          >
-            <Icon name="add-outline" />
-          </Button>
-        )}
-        {addActionFn && (
-          <Button
-            style={{
-              alignItems: "center",
-              flexDirection: "row",
-              height: 60,
-            }}
-            onPress={addActionFn}
-          >
-            <Icon name="add-outline" />
-          </Button>
-        )}
-        {newLaunch && (
-          <Button
-            style={{
-              alignItems: "center",
-              flexDirection: "row",
-              height: 60,
-              position: "absolute",
-              right: 0,
-            }}
-            onPress={handleNewLaunch}
-          >
-            <Icon name="add-outline" />
-          </Button>
-        )}
-        {newItemMarketplace && (
-          <Button
-            style={{
-              alignItems: "center",
-              flexDirection: "row",
-              height: 60,
-            }}
-            onPress={() => handleNewItemMarketplace(selectedItemId)}
-          >
-            <Icon name="add-outline" />
-          </Button>
-        )}
-        {newNotes && (
-          <Button
-            style={{
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-            onPress={() => handleNewNotes(selectedItemId)}
-          >
-            <Icon name="add-outline" />
-          </Button>
-        )}
-        {onNewSubscription && (
-          <Button
-            style={{
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-            onPress={() => handleNewSubscription(selectedItemId)}
-          >
-            <Icon name="add-outline" />
-          </Button>
-        )}
-        {!!closeModalFn && (
-          <ButtonClose
-            style={{
-              alignItems: "center",
-              flexDirection: "row",
-              height: 60,
-            }}
-            onPress={closeModalFn}
-          >
-            <Icon name="close-circle-outline" />
-          </ButtonClose>
-        )}
+        <View style={{ position: "absolute", right: 0, flexDirection: "row", zIndex: 1 }}>
+          {newItem && (
+            <Button onPress={() => handleNewItemTask(selectedItemId)}>
+              <Icon name="add-outline" />
+            </Button>
+          )}
 
-        {backButton && (
-          <ButtonBack
-            style={{
-              alignItems: "center",
-              flexDirection: "row",
-              height: 60,
-            }}
-            onPress={handleGoBack}
-          >
-            <Icon name="arrow-back-circle-outline" />
-          </ButtonBack>
-        )}
+          {addActionFn && (
+            <Button onPress={addActionFn}>
+              <Icon name="add-outline" />
+            </Button>
+          )}
+
+          {newLaunch && (
+            <Button onPress={handleNewLaunch}>
+              <Icon name="add-outline" />
+            </Button>
+          )}
+
+          {newItemMarketplace && (
+            <Button onPress={() => handleNewItemMarketplace(selectedItemId)}>
+              <Icon name="add-outline" />
+            </Button>
+          )}
+
+          {newNotes && (
+            <Button onPress={() => handleNewNotes(selectedItemId)}>
+              <Icon name="add-outline" />
+            </Button>
+          )}
+
+          {onNewSubscription && (
+            <Button onPress={() => handleNewSubscription(selectedItemId)}>
+              <Icon name="add-outline" />
+            </Button>
+          )}
+
+          {!!closeModalFn && (
+            <ButtonClose onPress={closeModalFn}>
+              <Icon name="close-circle-outline" />
+            </ButtonClose>
+          )}
+        </View>
       </Header>
+
       <Content customBg={customBg}>{children}</Content>
     </Container>
   );

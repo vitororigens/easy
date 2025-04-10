@@ -38,38 +38,37 @@ export const Content = styled.View<ContentProps>`
 export const Header = styled.View<Props>`
   width: 100%;
   height: ${({ theme, type }) => (type === "PRIMARY" ? "80px" : "120px")};
-  /* padding: 20px; */
   flex-direction: row;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
+  position: relative;
   background-color: ${({ theme, type }) =>
     type === "PRIMARY" ? theme.COLORS.PURPLE_800 : theme.COLORS.TEAL_600};
+  padding: 0 10px;
 `;
 
 export const Button = styled(TouchableOpacity)`
   height: 100%;
-  align-items: end;
+  align-items: center;
   justify-content: center;
-  width: 27%;
+  min-width: 40px;
   padding: 10px;
 `;
 
 export const ButtonClose = styled(TouchableOpacity)`
   height: 100%;
-  align-items: end;
+  align-items: center;
   justify-content: center;
-  width: 27%;
-  position: absolute;
-  right: -16px;
+  min-width: 40px;
+  padding: 10px;
 `;
 
 export const ButtonBack = styled(TouchableOpacity)`
   height: 100%;
-  align-items: end;
+  align-items: center;
   justify-content: center;
-  width: 27%;
-  position: absolute;
-  left: -16px;
+  min-width: 40px;
+  padding: 10px;
 `;
 
 export const Title = styled.Text<Props>`
@@ -78,7 +77,8 @@ export const Title = styled.Text<Props>`
   font-size: ${({ theme }) => theme.FONTE_SIZE.GG}px;
   font-weight: 700;
   text-align: center;
-  flex: ${({ theme, type }) => (type === "PRIMARY" ? 1 : "none")};
+  flex: 1;
+  padding: 0 50px;
 `;
 
 export const SubTitle = styled.Text`
@@ -89,7 +89,11 @@ export const SubTitle = styled.Text`
 `;
 
 export const ViewHomeCenter = styled.View`
-  margin-top: 20px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  align-items: center;
+  z-index: 1;
 `;
 
 export const Icon = styled(Ionicons).attrs(({ theme }) => ({
