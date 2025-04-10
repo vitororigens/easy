@@ -151,14 +151,12 @@ export function Revenue({
       ? currencyUnMask(valueTransaction)
       : 0;
 
-    let transactionValueConverted = transactionValue.toString().slice(0, -2);
-
     const revenueData = {
       name: name,
       category: selectedCategory,
       uid: uid,
       date: formattedDate,
-      valueTransaction: transactionValueConverted,
+      valueTransaction: transactionValue.toString(),
       description: description,
       repeat,
       type: "input",
@@ -310,7 +308,7 @@ export function Revenue({
         category: selectedCategory,
         uid: uid,
         date: formattedDate,
-        valueTransaction: transactionValue,
+        valueTransaction: transactionValue.toString(),
         description: description,
         repeat: removeRepeat ? false : repeat,
         type: "input",

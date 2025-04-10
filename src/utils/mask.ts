@@ -43,20 +43,64 @@ export function currencyUnMask(value: string): number {
   return Number(numericValue) / 100;
 }
 
-// Formatar valor para exibição em BRL
-export function formatCurrency(value: number | string | undefined | null): string {
-  if (value === undefined || value === null) return "R$ 0,00";
-  
+// Formatar valor para exibição em BRL com opções adicionais
+export function formatCurrency(
+  value: number | string | undefined | null,
+  options?: {
+    showSymbol?: boolean;
+    showNegative?: boolean;
+    colorize?: boolean;
+  }
+): { formatted: string; color: string } {
+  const defaultOptions = {
+    showSymbol: true,
+    showNegative: true,
+    colorize: true,
+    ...options,
+  };
+
+  if (value === undefined || value === null) {
+    return { 
+      formatted: defaultOptions.showSymbol ? "R$ 0,00" : "0,00",
+      color: "#000000" 
+    };
+  }
+
   // Se for string, converte para número
   const numericValue = typeof value === "string" ? currencyUnMask(value) : value;
-  
-  if (isNaN(numericValue)) return "R$ 0,00";
-  
-  // Formata o número para o padrão brasileiro com símbolo da moeda
-  return numericValue.toLocaleString("pt-BR", {
-    style: "currency",
+
+  if (isNaN(numericValue)) {
+    return { 
+      formatted: defaultOptions.showSymbol ? "R$ 0,00" : "0,00",
+      color: "#000000" 
+    };
+  }
+
+  // Determina a cor baseada no valor e nas opções
+  let color = "#000000";
+  if (defaultOptions.colorize) {
+    if (numericValue > 0) {
+      color = "#15803d"; // Verde para valores positivos
+    } else if (numericValue < 0) {
+      color = "#b91c1c"; // Vermelho para valores negativos
+    }
+  }
+
+  // Formata o número para o padrão brasileiro
+  const absValue = Math.abs(numericValue);
+  const formatted = absValue.toLocaleString("pt-BR", {
+    style: defaultOptions.showSymbol ? "currency" : "decimal",
     currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   });
+
+  // Adiciona o sinal negativo se necessário
+  const finalFormatted = defaultOptions.showNegative && numericValue < 0 
+    ? `-${formatted}` 
+    : formatted;
+
+  return { formatted: finalFormatted, color };
 }
 
 // Aplicar máscara de CEP

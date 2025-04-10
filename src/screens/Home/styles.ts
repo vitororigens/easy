@@ -33,7 +33,7 @@ export const Title = styled.Text<{ active?: boolean }>`
   font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme, active }) => 
-    active ? theme.COLORS.TEAL_600 : theme.COLORS.WHITE};
+    active ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_400};
   margin-bottom: 4px;
 `;
 

@@ -1,19 +1,114 @@
 import { Entypo } from "@expo/vector-icons";
 import styled from "styled-components/native";
+import { TouchableOpacity } from "react-native";
 
 export type ItemsTypeStyleProps = "PRIMARY" | "SECONDARY" | "TERTIARY";
 
 type Props = {
   type?: ItemsTypeStyleProps;
+  status?: "PENDING" | "PAID" | "OVERDUE" | undefined;
 };
 
 export const Container = styled.View`
   width: 100%;
-  height: 60px;
+  margin-bottom: 16px;
+`;
+
+export const Content = styled.View<Props>`
+  width: 100%;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 10px;
+  padding: 16px;
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
+  border-radius: 10px;
+  border-left-width: 4px;
+  border-left-color: ${({ theme, status }) => {
+    switch (status) {
+      case "PAID":
+        return theme.COLORS.GREEN_700;
+      case "PENDING":
+        return theme.COLORS.YELLOW_700;
+      case "OVERDUE":
+        return theme.COLORS.RED_700;
+      default:
+        return "transparent";
+    }
+  }};
+  elevation: 2;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.15;
+  shadow-radius: 2.84px;
+`;
+
+export const ContentInfo = styled.View`
+  flex: 1;
+`;
+
+export const Title = styled.Text<Props>`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+  color:  ${({ theme, status }) => {
+    switch (status) {
+      case "PAID":
+        return theme.COLORS.GREEN_700;
+      case "PENDING":
+        return theme.COLORS.YELLOW_700;
+      case "OVERDUE":
+        return theme.COLORS.RED_700;
+      default:
+        return theme.COLORS.GRAY_400;
+    }
+  }};
+`;
+
+export const Description = styled.Text`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  color: ${({ theme }) => theme.COLORS.GRAY_600};
+  margin-top: 4px;
+`;
+
+export const Value = styled.Text<{ color: string }>`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+  color: ${({ color }) => color};
+  margin-bottom: 4px;
+`;
+
+export const DateText = styled.Text`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  color: ${({ theme }) => theme.COLORS.GRAY_400};
+`;
+
+export const Status = styled.Text<Props>`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  color: ${({ theme, status }) => {
+    switch (status) {
+      case "PAID":
+        return theme.COLORS.GREEN_700;
+      case "PENDING":
+        return theme.COLORS.YELLOW_700;
+      case "OVERDUE":
+        return theme.COLORS.RED_700;
+      default:
+        return theme.COLORS.GRAY_600;
+    }
+  }};
+  margin-top: 4px;
+`;
+
+export const Actions = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const ActionButton = styled(TouchableOpacity)`
+  padding: 8px;
 `;
 
 export const Icon = styled.View<Props>`
@@ -31,17 +126,6 @@ export const Icon = styled.View<Props>`
   margin-right: 10px;
 `;
 
-export const Title = styled.Text<Props>`
-  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
-  color: ${({ theme, type }) =>
-    type === "PRIMARY"
-      ? theme.COLORS.GREEN_700
-      : type === "SECONDARY"
-      ? theme.COLORS.RED_700
-      : theme.COLORS.YELLOW_700};
-`;
-
 export const SubTitle = styled.Text`
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
@@ -52,12 +136,6 @@ export const Divider = styled.View`
   width: 100%;
   height: 2px;
   background-color: ${({ theme }) => theme.COLORS.GRAY_400};
-`;
-
-export const Content = styled.View`
-  flex: 1;
-  height: 60px;
-  justify-content: center;
 `;
 
 export const ContentItems = styled.View`

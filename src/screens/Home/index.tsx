@@ -354,8 +354,7 @@ export function Home() {
                         <Items
                           onDelete={() => handleDeleteItem(item.id, item.type)}
                           onEdit={() => handleRevenueEdit(item.id, activeButton)}
-                          showItemTaskRevenue
-                          type={item.type}
+                          type="PRIMARY"
                           category={item.name}
                           date={item.date}
                           repeat={item.repeat}
@@ -436,11 +435,10 @@ export function Home() {
                         onPress={() => handleExpenseEdit(item.id, activeButton)}
                       >
                         <Items
-                          onDelete={() => handleDeleteItem(item.id, "output")}
+                          onDelete={() => handleDeleteItem(item.id, item.type)}
                           onEdit={() => handleExpenseEdit(item.id, activeButton)}
-                          showItemTask
+                          type="SECONDARY"
                           status={item.status}
-                          type={item.type}
                           category={item.name}
                           date={item.date}
                           repeat={item.repeat}

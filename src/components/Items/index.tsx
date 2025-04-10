@@ -1,365 +1,150 @@
-import { AntDesign } from "@expo/vector-icons";
+import React from "react";
 import { TouchableOpacity } from "react-native";
-import { Popover } from "react-native-popper";
-import { useTheme } from "styled-components/native";
-import { Button } from "../ItemTask/styles";
+import { MaterialIcons } from "@expo/vector-icons";
+import { formatCurrency } from "../../utils/mask";
 import {
   Container,
-  ContainerMenu,
   Content,
-  ContentItems,
-  Divider,
-  Icon,
-  IconMenu,
-  SubTitle,
+  ContentInfo,
   Title,
+  Description,
+  Value,
+  DateText,
+  Status,
+  Actions,
+  ActionButton,
 } from "./styles";
+import { format, isBefore, parseISO, startOfDay } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
-type ItemsProps = {
-  category?: string;
-  date?: string;
-  valueTransaction?: string;
+interface ItemsProps {
+  type?: "PRIMARY" | "SECONDARY" | "TERTIARY";
+  category: string;
+  date: string;
+  description?: string;
   repeat?: boolean;
   status?: boolean;
-  alert?: boolean;
-  type?: string;
-  customStatusText?: string;
-  showItemPiggyBank?: boolean;
-  showItemTask?: boolean;
-  showItemTaskRevenue?: boolean;
-  hasEdit?: boolean;
-  hasAction?: boolean;
-  itemColor?: string;
-  onDelete?: () => void;
+  valueTransaction: string;
   onEdit?: () => void;
-};
+  onDelete?: () => void;
+}
 
 export function Items({
+  type = "PRIMARY",
   category,
   date,
-  valueTransaction,
+  description,
   repeat,
-  alert,
   status,
-  type,
-  itemColor,
-  showItemPiggyBank,
-  showItemTaskRevenue,
-  showItemTask,
-  customStatusText,
-  onDelete,
+  valueTransaction,
   onEdit,
-  hasEdit = true,
-  hasAction = true,
+  onDelete,
 }: ItemsProps) {
-  const transactionType = repeat ? "Renda fixa" : "Renda variável";
-  const { COLORS } = useTheme();
-  const textStatus = customStatusText
-    ? customStatusText
-    : status
-    ? "Pago"
-    : "Pendente";
-  const typeMode = type === "input" ? transactionType : textStatus;
-  const dateToday = formatDate(new Date());
+  const getExpenseStatus = () => {
+    if (status === true) return "PAID";
+    
+    try {
+      let expenseDate;
+      
+      // Verifica se a data está no formato DD/MM/YYYY
+      if (date.includes('/')) {
+        const [day, month, year] = date.split('/');
+        expenseDate = new Date(Number(year), Number(month) - 1, Number(day));
+      } else {
+        expenseDate = parseISO(date);
+      }
+      
+      // Verifica se a data é válida
+      if (isNaN(expenseDate.getTime())) {
+        return "PENDING";
+      }
+      
+      const today = startOfDay(new Date());
+      
+      if (isBefore(expenseDate, today)) {
+        return "OVERDUE";
+      }
+      return "PENDING";
+    } catch (error) {
+      console.warn("Data inválida:", date);
+      return "PENDING";
+    }
+  };
 
-  function formatDate(date: Date): string {
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
+  const expenseStatus = getExpenseStatus();
+  const formattedValue = formatCurrency(valueTransaction, {
+    showSymbol: true,
+    showNegative: type === "SECONDARY",
+    colorize: true,
+  });
 
-  function isPastDue(date: string): boolean {
-    const [day, month, year] = date.split("/").map(Number);
-    const itemDate = new Date(year, month - 1, day);
-    return itemDate < new Date() && !status;
-  }
+  const getFormattedDate = () => {
+    try {
+      // Verifica se a data está no formato DD/MM/YYYY
+      if (date.includes('/')) {
+        const [day, month, year] = date.split('/');
+        const parsedDate = new Date(Number(year), Number(month) - 1, Number(day));
+        
+        // Verifica se a data é válida
+        if (isNaN(parsedDate.getTime())) {
+          return "Data inválida";
+        }
+        
+        return format(parsedDate, "dd 'de' MMMM',' yyyy", {
+          locale: ptBR,
+        });
+      }
+      
+      // Tenta parsear como ISO se não estiver no formato DD/MM/YYYY
+      const parsedDate = parseISO(date);
+      
+      // Verifica se a data é válida
+      if (isNaN(parsedDate.getTime())) {
+        return "Data inválida";
+      }
+      
+      return format(parsedDate, "dd 'de' MMMM',' yyyy", {
+        locale: ptBR,
+      });
+    } catch (error) {
+      console.warn("Erro ao formatar data:", date);
+      return "Data inválida";
+    }
+  };
+
+  const formattedDate = getFormattedDate();
 
   return (
-    <>
-      <Container>
-        {showItemTask && isPastDue(date ?? new Date().toISOString()) && (
-          <>
-            <Icon
-              type="SECONDARY"
-              style={{
-                backgroundColor:
-                  type === "input" ? COLORS.GREEN_700 : COLORS.RED_700,
-              }}
-            >
-              <AntDesign name="infocirlce" size={24} color="white" />
-            </Icon>
-            <Content>
-              <ContentItems>
-                <Title
-                  type="SECONDARY"
-                  style={{
-                    color: type === "input" ? COLORS.GREEN_700 : COLORS.RED_700,
-                  }}
-                >
-                  {category}
-                </Title>
-                <Title
-                  type="SECONDARY"
-                  style={{
-                    color: type === "input" ? COLORS.GREEN_700 : COLORS.RED_700,
-                  }}
-                >
-                  {valueTransaction}
-                </Title>
-              </ContentItems>
-              <Divider />
-              <ContentItems>
-                <SubTitle>{date}</SubTitle>
-                <SubTitle>Atrasado</SubTitle>
-              </ContentItems>
-            </Content>
-            <Popover
-              trigger={
-                <TouchableOpacity>
-                  <IconMenu
-                    type="SECONDARY"
-                    name="dots-three-vertical"
-                    style={{
-                      color:
-                        type === "input" ? COLORS.GREEN_700 : COLORS.RED_700,
-                    }}
-                  />
-                </TouchableOpacity>
-              }
-            >
-              <Popover.Backdrop />
-              <Popover.Content>
-                <ContainerMenu>
-                  <Button onPress={onDelete}>
-                    <IconMenu
-                      type="SECONDARY"
-                      name="trash"
-                      style={{
-                        color:
-                          type === "input" ? COLORS.GREEN_700 : COLORS.RED_700,
-                      }}
-                    />
-                    <Title
-                      type="SECONDARY"
-                      style={{
-                        color:
-                          type === "input" ? COLORS.GREEN_700 : COLORS.RED_700,
-                      }}
-                    >
-                      Excluir
-                    </Title>
-                  </Button>
-                  <Button onPress={onEdit}>
-                    <IconMenu
-                      type="SECONDARY"
-                      name="pencil"
-                      style={{
-                        color:
-                          type === "input" ? COLORS.GREEN_700 : COLORS.RED_700,
-                      }}
-                    />
-                    <Title
-                      type="SECONDARY"
-                      style={{
-                        color:
-                          type === "input" ? COLORS.GREEN_700 : COLORS.RED_700,
-                      }}
-                    >
-                      Editar
-                    </Title>
-                  </Button>
-                  <Button onPress={onEdit}>
-                    <IconMenu
-                      type="SECONDARY"
-                      name="pencil"
-                      style={{
-                        color:
-                          type === "input" ? COLORS.GREEN_700 : COLORS.RED_700,
-                      }}
-                    />
-                    <Title
-                      type="SECONDARY"
-                      style={{
-                        color:
-                          type === "input" ? COLORS.GREEN_700 : COLORS.RED_700,
-                      }}
-                    >
-                      Pagar
-                    </Title>
-                  </Button>
-                </ContainerMenu>
-              </Popover.Content>
-            </Popover>
-          </>
-        )}
-        {showItemTask &&
-          !isPastDue(date ?? new Date().toISOString()) &&
-          !status && (
-            <>
-              <Icon type="TERTIARY">
-                <AntDesign name="infocirlce" size={24} color="white" />
-              </Icon>
-              <Content>
-                <ContentItems>
-                  <Title type="TERTIARY">{category}</Title>
-                  <Title type="TERTIARY">{valueTransaction}</Title>
-                </ContentItems>
-                <Divider />
-                <ContentItems>
-                  <SubTitle>{date}</SubTitle>
-                  <SubTitle>{typeMode}</SubTitle>
-                </ContentItems>
-              </Content>
-              <Popover
-                trigger={
-                  <TouchableOpacity>
-                    <IconMenu type="TERTIARY" name="dots-three-vertical" />
-                  </TouchableOpacity>
-                }
-              >
-                <Popover.Backdrop />
-                <Popover.Content>
-                  <ContainerMenu>
-                    <Button onPress={onDelete}>
-                      <IconMenu type="TERTIARY" name="trash" />
-                      <Title type="TERTIARY">Excluir</Title>
-                    </Button>
-                    <Button onPress={onEdit}>
-                      <IconMenu type="TERTIARY" name="pencil" />
-                      <Title type="TERTIARY">Editar</Title>
-                    </Button>
-                  </ContainerMenu>
-                </Popover.Content>
-              </Popover>
-            </>
+    <Container>
+      <Content status={type === "SECONDARY" ? expenseStatus : undefined}>
+        <ContentInfo>
+          <Title type={type} status={type === "SECONDARY" ? expenseStatus : undefined}>{category}</Title>
+          {description && <Description>{description}</Description>}
+          <DateText>{formattedDate}</DateText>
+          {type === "SECONDARY" && (
+            <Status status={expenseStatus}>
+              {expenseStatus === "PAID" && "Pago"}
+              {expenseStatus === "PENDING" && "Pendente"}
+              {expenseStatus === "OVERDUE" && "Vencido"}
+              {repeat && " • Recorrente"}
+            </Status>
           )}
-        {showItemTask && status && (
-          <>
-            <Icon type="PRIMARY">
-              <AntDesign name="infocirlce" size={24} color="white" />
-            </Icon>
-            <Content>
-              <ContentItems>
-                <Title type="PRIMARY">{category}</Title>
-                <Title type="PRIMARY">{valueTransaction}</Title>
-              </ContentItems>
-              <Divider />
-              <ContentItems>
-                <SubTitle>{date}</SubTitle>
-                <SubTitle>{typeMode}</SubTitle>
-              </ContentItems>
-            </Content>
-            {hasAction && (
-              <Popover
-                trigger={
-                  <TouchableOpacity>
-                    <IconMenu type="PRIMARY" name="dots-three-vertical" />
-                  </TouchableOpacity>
-                }
-              >
-                <Popover.Backdrop />
-                <Popover.Content>
-                  <ContainerMenu>
-                    <Button onPress={onDelete}>
-                      <IconMenu type="PRIMARY" name="trash" />
-                      <Title type="PRIMARY">Excluir</Title>
-                    </Button>
-                    {hasEdit && (
-                      <Button onPress={onEdit}>
-                        <IconMenu type="PRIMARY" name="pencil" />
-                        <Title type="PRIMARY">Editar</Title>
-                      </Button>
-                    )}
-                  </ContainerMenu>
-                </Popover.Content>
-              </Popover>
-            )}
-          </>
-        )}
-        {showItemTaskRevenue && (
-          <>
-            <Icon type="PRIMARY">
-              <AntDesign name="infocirlce" size={24} color="white" />
-            </Icon>
-            <Content>
-              <ContentItems>
-                <Title type="PRIMARY">{category}</Title>
-                <Title type="PRIMARY">{valueTransaction}</Title>
-              </ContentItems>
-              <Divider />
-              <ContentItems>
-                <SubTitle>{date}</SubTitle>
-                <SubTitle>{transactionType}</SubTitle>
-              </ContentItems>
-            </Content>
-            <Popover
-              trigger={
-                <TouchableOpacity>
-                  <IconMenu type="PRIMARY" name="dots-three-vertical" />
-                </TouchableOpacity>
-              }
-            >
-              <Popover.Backdrop />
-              <Popover.Content>
-                <ContainerMenu>
-                  <Button onPress={onDelete}>
-                    <IconMenu type="PRIMARY" name="trash" />
-                    <Title type="PRIMARY">Excluir</Title>
-                  </Button>
-                  <Button onPress={onEdit}>
-                    <IconMenu type="PRIMARY" name="pencil" />
-                    <Title type="PRIMARY">Editar</Title>
-                  </Button>
-                </ContainerMenu>
-              </Popover.Content>
-            </Popover>
-          </>
-        )}
-      </Container>
-      {showItemPiggyBank && (
-        <Container>
-          <Icon style={{ backgroundColor: COLORS.GREEN_700 }} type="PRIMARY">
-            <AntDesign name="infocirlce" size={24} color="white" />
-          </Icon>
-          <Content>
-            <ContentItems>
-              <Title style={{ color: COLORS.GREEN_700 }} type="PRIMARY">
-                {category}
-              </Title>
-              <Title style={{ color: COLORS.GREEN_700 }} type="PRIMARY">
-                {valueTransaction}
-              </Title>
-            </ContentItems>
-            <Divider />
-            <ContentItems>
-              <SubTitle>{date}</SubTitle>
-              <SubTitle>Economizou</SubTitle>
-            </ContentItems>
-          </Content>
-          <Popover
-            trigger={
-              <TouchableOpacity>
-                <IconMenu type="PRIMARY" name="dots-three-vertical" />
-              </TouchableOpacity>
-            }
-          >
-            <Popover.Backdrop />
-            <Popover.Content>
-              <ContainerMenu>
-                <Button onPress={onDelete}>
-                  <IconMenu type="PRIMARY" name="trash" />
-                  <Title type="PRIMARY">Excluir</Title>
-                </Button>
-                <Button onPress={onEdit}>
-                  <IconMenu type="PRIMARY" name="pencil" />
-                  <Title type="PRIMARY">Editar</Title>
-                </Button>
-              </ContainerMenu>
-            </Popover.Content>
-          </Popover>
-        </Container>
-      )}
-    </>
+        </ContentInfo>
+
+        <Actions>
+          <Value color={formattedValue.color}>{formattedValue.formatted}</Value>
+          {onEdit && (
+            <ActionButton onPress={onEdit}>
+              <MaterialIcons name="edit" size={24} color="#a7a9ac" />
+            </ActionButton>
+          )}
+          {onDelete && (
+            <ActionButton onPress={onDelete}>
+              <MaterialIcons name="delete-outline" size={24} color="#b91c1c" />
+            </ActionButton>
+          )}
+        </Actions>
+      </Content>
+    </Container>
   );
 }
