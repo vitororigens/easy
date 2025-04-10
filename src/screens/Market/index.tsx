@@ -150,6 +150,8 @@ export function Market({ route }: any) {
   const handleDeleteMarket = async (marketId: string) => {
     try {
       await deleteMarket(marketId);
+      // Remove o item da lista de selecionados quando ele é excluído
+      setSelectedMarkets(prev => prev.filter(id => id !== marketId));
       Toast.show("Item excluído!", { type: "success" });
     } catch (error) {
       console.error("Erro ao excluir o item: ", error);
@@ -266,10 +268,12 @@ export function Market({ route }: any) {
                 <StatValue>{marketStats.totalItems}</StatValue>
                 <StatLabel>Total de itens</StatLabel>
               </StatItem>
-              <StatItem>
-                <StatValue>{marketStats.completedItems}</StatValue>
-                <StatLabel>Itens comprados</StatLabel>
-              </StatItem>
+              {selectedMarkets.length > 0 && (
+                <StatItem>
+                  <StatValue>{selectedMarkets.length}</StatValue>
+                  <StatLabel>Itens selecionados</StatLabel>
+                </StatItem>
+              )}
               <StatItem>
                 <StatValue>{marketStats.pendingItems}</StatValue>
                 <StatLabel>Itens pendentes</StatLabel>
@@ -393,10 +397,12 @@ export function Market({ route }: any) {
         </Content>
       )}
 
-      <FinishMarkets
-        selectedCount={selectedMarkets.length}
-        onFinish={(groupName: string) => handleFinishSelectedMarkets(groupName)}
-      />
+      {selectedMarkets.length > 0 && (
+        <FinishMarkets
+          selectedCount={selectedMarkets.length}
+          onFinish={(groupName: string) => handleFinishSelectedMarkets(groupName)}
+        />
+      )}
 
       {modalActive && selectedHistoryItem && (
         <HistoryMarketModal
