@@ -130,3 +130,30 @@ export const DateText = styled.Text`
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   margin-bottom: 4px;
 `;
+
+export const StatsContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 16px;
+  background-color: ${({ theme }) => theme.COLORS.PURPLE_50};
+  border-radius: 8px;
+  margin: 8px 16px;
+`;
+
+export const StatItem = styled.View`
+  align-items: center;
+  flex: 1;
+`;
+
+export const StatValue = styled.Text`
+  font-size: 16px;
+  font-weight: bold;
+  color: ${({ theme }) => theme.COLORS.PURPLE_800};
+  margin-bottom: 4px;
+`;
+
+export const StatLabel = styled.Text`
+  font-size: 12px;
+  color: ${({ theme }) => theme.COLORS.GRAY_600};
+  text-align: center;
+`;

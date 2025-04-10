@@ -22,7 +22,8 @@ export function currencyMask(value: string): string {
 // Remover máscara de moeda
 export function currencyUnMask(value: string): string {
   const unmaskedValue = value.replace(/\D/g, ""); 
-  return (parseFloat(unmaskedValue) / 100).toFixed(2); 
+  const numericValue = parseFloat(unmaskedValue) / 100;
+  return isNaN(numericValue) ? "0.00" : numericValue.toFixed(2);
 }
 
 // Aplicar máscara de CEP

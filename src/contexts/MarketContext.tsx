@@ -22,17 +22,26 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
     console.log("Iniciando carregamento de mercados para o usuário:", user.uid);
     setLoading(true);
     
-    const unsubscribe = database
-      .collection("Markets")
+    // Simplificar a consulta para depuração
+    const marketsRef = database.collection("Markets");
+    
+    // Consulta simples para todos os mercados do usuário
+    const unsubscribe = marketsRef
       .where("uid", "==", user.uid)
       .onSnapshot((snapshot) => {
         console.log("Snapshot recebido do Firebase");
         const marketData: IMarket[] = [];
-        snapshot.forEach((doc) => {
-          console.log("Documento encontrado:", doc.id);
-          marketData.push({ id: doc.id, ...doc.data() } as IMarket);
-        });
-        console.log("Mercados carregados:", marketData);
+        
+        if (snapshot.empty) {
+          console.log("Nenhum documento encontrado");
+        } else {
+          snapshot.forEach((doc) => {
+            console.log("Documento encontrado:", doc.id, doc.data());
+            marketData.push({ id: doc.id, ...doc.data() } as IMarket);
+          });
+        }
+        
+        console.log("Total de mercados carregados:", marketData.length);
         setMarkets(marketData);
         setLoading(false);
       }, (error) => {

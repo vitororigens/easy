@@ -2,7 +2,7 @@ import { collection, onSnapshot, query } from "@react-native-firebase/firestore"
 import { useEffect, useState } from "react";
 import { database } from "../libs/firebase";
 
-export interface HistoryMarketsData {
+export interface MarketplaceData {
   id: string;
   uid: string;
   name: string;
@@ -15,21 +15,23 @@ export interface HistoryMarketsData {
   }[];
 }
 
-const useHistoryMarketsCollections = (
+const useMarketplaceCollections = (
   collectionName: string
-): HistoryMarketsData[] => {
-  const [data, setData] = useState<HistoryMarketsData[]>([]);
+): MarketplaceData[] => {
+  const [data, setData] = useState<MarketplaceData[]>([]);
 
   useEffect(() => {
-    const q = query(collection(database, collectionName));
+    // Usar Marketplace como coleção padrão
+    const actualCollectionName = "Marketplace";
+    const q = query(collection(database, actualCollectionName));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const collectionData: HistoryMarketsData[] = [];
+      const collectionData: MarketplaceData[] = [];
       snapshot.forEach((doc) => {
         collectionData.push({
           id: doc.id,
           ...doc.data(),
-        } as HistoryMarketsData);
+        } as MarketplaceData);
       });
       setData(collectionData);
     });
@@ -40,4 +42,4 @@ const useHistoryMarketsCollections = (
   return data;
 };
 
-export default useHistoryMarketsCollections; 
+export default useMarketplaceCollections; 

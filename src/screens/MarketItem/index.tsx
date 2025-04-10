@@ -442,7 +442,6 @@ export const MarketItem = ({
           </FormProvider>
 
           <View style={{ marginBottom: 10, height: 150 }}>
-            {showButtonSave && (
               <Button
                 style={{ marginBottom: 10 }}
                 onPress={
@@ -453,7 +452,7 @@ export const MarketItem = ({
               >
                 <Title>{loading ? <LoadingIndicator /> : "Salvar"}</Title>
               </Button>
-            )}
+
             {showButtonRemove && (
               <Button
                 style={{ marginBottom: 10 }}

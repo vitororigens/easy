@@ -10,6 +10,7 @@ import { StatusBar } from "react-native";
 import { Loading } from "./src/components/Loading";
 import { MonthProvider } from "./src/context/MonthProvider";
 import { TaskProvider } from "./src/contexts/TaskContext";
+import { MarketProvider } from "./src/contexts/MarketContext";
 import { Routes } from "./src/routes";
 import theme from "./src/theme";
 import {
@@ -81,14 +82,16 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <MonthProvider>
         <TaskProvider>
-          <ToastProvider>
-            <StatusBar
-              barStyle="light-content"
-              backgroundColor="transparent"
-              translucent
-            />
-            {fontLoader ? <Routes /> : <Loading />}
-          </ToastProvider>
+          <MarketProvider>
+            <ToastProvider>
+              <StatusBar
+                barStyle="light-content"
+                backgroundColor="transparent"
+                translucent
+              />
+              {fontLoader ? <Routes /> : <Loading />}
+            </ToastProvider>
+          </MarketProvider>
         </TaskProvider>
       </MonthProvider>
     </ThemeProvider>

@@ -68,7 +68,7 @@ export function SubscriptionHistory() {
           renderItem={({ item }) => (
             <ItemContainer>
               <ItemTitle>{item.name}</ItemTitle>
-              <ItemValue>R$ {item.value.toFixed(2)}</ItemValue>
+              <ItemValue>R$ {typeof item.value === 'number' ? item.value.toFixed(2) : '0.00'}</ItemValue>
               <ItemDate>
                 Cancelada em {format(new Date(item.updatedAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
               </ItemDate>

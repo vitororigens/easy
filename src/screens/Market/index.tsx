@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   FlatList,
   Modal,
@@ -21,7 +21,7 @@ import PersonImage from "../../assets/illustrations/marketplace.png";
 import { FinishMarkets } from "../../components/FinishMarkets";
 import { ItemMarket } from "../../components/ItemMarket";
 import { useMonth } from "../../context/MonthProvider";
-import useHistoryMarketsCollections from "../../hooks/useHistoryMarketsCollection";
+import useMarketplaceCollections from "../../hooks/useHistoryMarketsCollection";
 import { database } from "../../libs/firebase";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { HistoryMarketModal } from "../../components/HistoryMarketModal";
@@ -42,6 +42,10 @@ import {
   MarketCard,
   MarketName,
   DateText,
+  StatsContainer,
+  StatItem,
+  StatValue,
+  StatLabel,
 } from "./styles";
 
 const modalBottom = Platform.OS === "ios" ? 90 : 70;
@@ -71,6 +75,19 @@ export function Market({ route }: any) {
   const user = useUserAuth();
   const { markets, loading, deleteMarket, toggleMarketCompletion } = useMarket();
 
+  console.log("Componente Market renderizado");
+  console.log("Usuário atual:", user?.uid);
+  console.log("Mercados carregados:", markets);
+  console.log("Loading:", loading);
+
+  // Adicionar logs para depuração
+  useEffect(() => {
+    console.log("useEffect no componente Market");
+    console.log("Usuário atual:", user?.uid);
+    console.log("Mercados carregados:", markets);
+    console.log("Loading:", loading);
+  }, [user, markets, loading]);
+
   const [activeButton, setActiveButton] = useState("mercado");
   const [isListVisible, setIsListVisible] = useState(true);
   const [isSharedListVisible, setIsSharedListVisible] = useState(false);
@@ -78,16 +95,48 @@ export function Market({ route }: any) {
   const [modalActive, setModalActive] = useState(false);
   const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryItem | null>(null);
 
-  const historyUserMonth = useHistoryMarketsCollections("HistoryMarkets");
+  const marketplaceData = useMarketplaceCollections("Marketplace");
 
-  const personalMarkets = markets.filter((market) => market.uid === user?.uid);
-  const sharedMarkets = markets.filter(
-    (market) =>
-      market.shareWith.includes(user?.uid || "") &&
-      market.shareInfo.some(
-        (info: ShareInfo) => info.uid === user?.uid && info.acceptedAt !== null
-      )
+  const personalMarkets = useMemo(() => 
+    markets?.filter(market => market.uid === user?.uid) || [], 
+    [markets, user?.uid]
   );
+
+  const sharedMarkets = useMemo(() => 
+    markets?.filter(market => 
+      market.shareWith?.includes(user?.uid || "") &&
+      market.shareInfo?.some((info: ShareInfo) => info.uid === user?.uid && info.acceptedAt !== null)
+    ) || [],
+    [markets, user?.uid]
+  );
+
+  // Adicionar informações úteis sobre os mercados
+  const marketStats = useMemo(() => {
+    // Garantir que todos os preços sejam números válidos
+    const allMarkets = [...personalMarkets, ...sharedMarkets];
+    const totalValue = allMarkets.reduce((acc, curr) => {
+      // Converter o preço para número se for string
+      const price = typeof curr.price === 'string' ? parseFloat(curr.price) : (curr.price || 0);
+      return acc + price;
+    }, 0);
+    
+    return {
+      totalItems: allMarkets.length,
+      completedItems: allMarkets.filter(m => m.status).length,
+      pendingItems: allMarkets.filter(m => !m.status).length,
+      totalValue: totalValue
+    };
+  }, [personalMarkets, sharedMarkets]);
+
+  // Adicionar logs para depuração
+  useEffect(() => {
+    console.log("Estatísticas dos mercados:", {
+      total: marketStats.totalItems,
+      completed: marketStats.completedItems,
+      pending: marketStats.pendingItems,
+      value: marketStats.totalValue
+    });
+  }, [marketStats]);
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
@@ -135,7 +184,7 @@ export function Market({ route }: any) {
 
       // Pega as informações dos itens selecionados
       const selectedMarketsInfo = markets
-        .filter(market => selectedMarkets.includes(market.id))
+        ?.filter(market => selectedMarkets.includes(market.id))
         .map(market => {
           let dateStr: string;
           if (market.createdAt && typeof market.createdAt === 'object') {
@@ -156,10 +205,10 @@ export function Market({ route }: any) {
             name: market.name,
             createdAt: dateStr
           };
-        });
+        }) || [];
 
       const now = new Date();
-      const historyData = {
+      const marketplaceData = {
         name: groupName,
         uid: user?.uid,
         finishedDate: format(now, "dd/MM/yyyy"),
@@ -168,7 +217,7 @@ export function Market({ route }: any) {
         createdAt: Timestamp.now(),
       };
 
-      await database.collection("HistoryMarkets").add(historyData);
+      await database.collection("Marketplace").add(marketplaceData);
 
       setSelectedMarkets([]);
       Toast.show("Itens finalizados com sucesso!", { type: "success" });
@@ -183,7 +232,7 @@ export function Market({ route }: any) {
   }
 
   return (
-    <DefaultContainer newItem monthButton title="Lista de Mercado">
+    <DefaultContainer newItemMarketplace monthButton title="Lista de Mercado">
       <Header>
         <NavBar>
           <Button
@@ -205,6 +254,33 @@ export function Market({ route }: any) {
 
       {activeButton === "mercado" && (
         <Content>
+          <ContentTitle>
+            <HeaderContainer>
+              <SectionIcon name="chart-bar" />
+              <Title>Resumo</Title>
+            </HeaderContainer>
+          </ContentTitle>
+          <Container>
+            <StatsContainer>
+              <StatItem>
+                <StatValue>{marketStats.totalItems}</StatValue>
+                <StatLabel>Total de itens</StatLabel>
+              </StatItem>
+              <StatItem>
+                <StatValue>{marketStats.completedItems}</StatValue>
+                <StatLabel>Itens comprados</StatLabel>
+              </StatItem>
+              <StatItem>
+                <StatValue>{marketStats.pendingItems}</StatValue>
+                <StatLabel>Itens pendentes</StatLabel>
+              </StatItem>
+              <StatItem>
+                <StatValue>R$ {typeof marketStats.totalValue === 'number' ? marketStats.totalValue.toFixed(2) : '0.00'}</StatValue>
+                <StatLabel>Valor total</StatLabel>
+              </StatItem>
+            </StatsContainer>
+          </Container>
+
           <ContentTitle onPress={() => setIsListVisible(!isListVisible)}>
             <HeaderContainer>
               <SectionIcon name="cart-variant" />
@@ -286,7 +362,7 @@ export function Market({ route }: any) {
           <Container>
             <FlatList
               showsVerticalScrollIndicator={false}
-              data={historyUserMonth}
+              data={marketplaceData || []}
               renderItem={({ item }) => (
                 <MarketCard onPress={() => {
                   setModalActive(true);
@@ -297,7 +373,7 @@ export function Market({ route }: any) {
                     📅 Finalizado em: {item.finishedDate} às {item.finishedTime}
                   </DateText>
                   <DateText>
-                    ✅ Total de itens: {item.markets.length}
+                    ✅ Total de itens: {item.markets?.length || 0}
                   </DateText>
                 </MarketCard>
               )}
@@ -328,7 +404,7 @@ export function Market({ route }: any) {
           groupName={selectedHistoryItem.name}
           finishedDate={selectedHistoryItem.finishedDate}
           finishedTime={selectedHistoryItem.finishedTime}
-          markets={selectedHistoryItem.markets}
+          markets={selectedHistoryItem.markets || []}
         />
       )}
     </DefaultContainer>
