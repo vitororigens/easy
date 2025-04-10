@@ -1,79 +1,59 @@
-import { TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { TouchableOpacity } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
-export type subTitleTypeStyleProps = "PRIMARY" | "SECONDARY";
-
-type Props = {
-  type: subTitleTypeStyleProps;
-};
-
-export const Content = styled.View`
+export const Container = styled.View`
   flex: 1;
-  padding: 20px;
-  /* background-color: ${({ theme }) => theme.COLORS.WHITE}; */
+  padding: 16px;
+  margin-bottom: 70px;
 `;
 
 export const Header = styled.View`
   width: 100%;
+  margin-bottom: 16px;
 `;
 
-export const NavBar = styled.View`
+export const ContentTitle = styled(TouchableOpacity)`
+  margin-bottom: 16px;
   width: 100%;
-  min-height: 60px;
-  max-height: 80px;
   flex-direction: row;
-  justify-content: space-between;
-`;
-
-type ButtonProps = {
-  active: boolean;
-};
-
-export const Button = styled(TouchableOpacity)<ButtonProps>`
   align-items: center;
-  justify-content: center;
-  width: 50%;
-  border-top-width: 4px;
-  border-top-style: solid;
-  background-color: ${({ theme }) => theme.COLORS.WHITE};
-  border-top-color: ${({ theme, active }) =>
-    !active ? theme.COLORS.PURPLE_800 : theme.COLORS.GRAY_300};
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: ${({ theme }) => theme.COLORS.PURPLE_600};
+  border-radius: 10px;
+  elevation: 2;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.15;
+  shadow-radius: 2.84px;
 `;
 
-export const Title = styled.Text`
+export const Title = styled.Text<{ active?: boolean }>`
   font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+  color: ${({ theme, active }) => 
+    active ? theme.COLORS.TEAL_600 : theme.COLORS.WHITE};
+  margin-bottom: 4px;
 `;
 
-type DividerProps = {
-  active: boolean;
-};
-
-export const Divider = styled.View<DividerProps>`
-  width: 50%;
-  height: 4px;
-  background-color: ${({ theme, active }) =>
-    active ? theme.COLORS.PURPLE_800 : theme.COLORS.GRAY_300};
-`;
-
-export const SubTitle = styled.Text<Props>`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
-  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  color: ${({ theme, type }) =>
-    type === "PRIMARY" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
-`;
-
-export const SharingSubTitle = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+export const SubTitle = styled.Text<{ type?: "PRIMARY" | "SECONDARY" }>`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-  text-align: center;
-  color: ${({ theme }) => theme.COLORS.GRAY_400};
+  color: ${({ theme, type }) =>
+    type === "PRIMARY" ? theme.COLORS.GREEN_700 : theme.COLORS.RED_700};
 `;
 
-export const Container = styled.View`
-  width: 100%;
-  height: 400px;
+export const DividerContent = styled.View`
+  flex: 1;
+  height: 1px;
+  background-color: ${({ theme }) => theme.COLORS.GRAY_300};
+  margin: 0 8px;
+`;
+
+export const Icon = styled(MaterialIcons)`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.XL}px;
+  color: ${({ theme }) => theme.COLORS.GRAY_600};
 `;
 
 export const ContainerItems = styled.View`
@@ -81,46 +61,44 @@ export const ContainerItems = styled.View`
   width: 100%;
 `;
 
-export const HeaderItems = styled.View<Props>`
-  justify-content: center;
+export const Content = styled.View`
+  flex: 1;
+  width: 100%;
+  padding: 16px;
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
+  border-radius: 24px;
+  elevation: 4;
+  shadow-color: #000;
+  shadow-offset: 0px -2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 3px;
+`;
+
+export const Button = styled(TouchableOpacity)<{ active?: boolean }>`
+  flex: 1;
+  height: 70px;
   align-items: center;
-  background-color: ${({ theme, type }) =>
-    type === "PRIMARY" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
-  border-radius: 50px 50px 0px 0px;
-  height: 60px;
-  margin-top: 20px;
-  margin-bottom: 10px;
+  justify-content: center;
+  background-color: ${({ theme, active }) =>
+    active ?  theme.COLORS.PURPLE_50 : theme.COLORS.WHITE};
+  padding: 12px;
+  elevation: ${({ active }) => (active ? 4 : 0)};
+  shadow-color: #000;
+  shadow-offset: 0px ${({ active }) => (active ? -2 : 0)}px;
+  shadow-opacity: ${({ active }) => (active ? 0.1 : 0)};
+  shadow-radius: ${({ active }) => (active ? 3 : 0)}px;
 `;
 
-export const TitleItems = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
-  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  color: ${({ theme }) => theme.COLORS.WHITE};
-`;
-
-export const ButtonClose = styled(TouchableOpacity)`
-  height: 40px;
-`;
-
-export const ContentTitle = styled(TouchableOpacity)`
-  margin-bottom: 90px;
+export const NavBar = styled.View`
   width: 100%;
   flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding-left: 20px;
-  padding-right: 20px;
+  border-radius: 40px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  elevation: 4;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 3px;
+  background-color: ${({ theme }) => theme.COLORS.TEAL_600};
 `;
-
-export const DividerContent = styled.View`
-  flex: 1;
-  height: 2px;
-  background-color: ${({ theme }) => theme.COLORS.PURPLE_800};
-  margin-left: 5px;
-  margin-right: 5px;
-`;
-
-export const Icon = styled(MaterialIcons).attrs(({ theme }) => ({
-  color: theme.COLORS.GRAY_400,
-  size: 26,
-}))``;

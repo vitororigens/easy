@@ -21,14 +21,18 @@ import {
   ContentTitle,
   DividerContent,
   Icon,
-  SharingSubTitle,
   Container,
+  Content,
 } from "./styles";
 
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../@types/navigation";
 import ExpensePersonImage from "../../assets/illustrations/expense.png";
 import RevenuePersonImage from "../../assets/illustrations/revenue.png";
 import { database } from "../../libs/firebase";
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 type TShareInfo = {
   acceptedAt: Timestamp | null;
@@ -78,13 +82,13 @@ export function Home() {
   const [revenues, setRevenues] = useState<IRevenue[]>([]);
   const [expenses, setExpenses] = useState<IRevenue[]>([]);
 
+  const navigation = useNavigation<NavigationProp>();
+
   useEffect(() => {
     getRevenuesSharedByMe();
     // getExpenseSharedByMe();
     setIsLoaded(true);
   }, []);
-
-  const navigation = useNavigation();
 
   const formattedRevenue = tolalRevenueMunth.toLocaleString("pt-BR", {
     style: "currency",
@@ -112,14 +116,14 @@ export function Home() {
     navigation.navigate("newtask", {
       selectedItemId: documentId,
       initialActiveButton,
-    });
+    } as never);
   }
 
   function handleExpenseEdit(documentId: string, initialActiveButton: string) {
     navigation.navigate("newtask", {
       selectedItemId: documentId,
       initialActiveButton,
-    });
+    } as never);
   }
 
   const handleButtonClick = (buttonName: string) => {
@@ -284,7 +288,7 @@ export function Home() {
     navigation.navigate("newtask", {
       selectedItemId: documentId,
       initialActiveButton,
-    });
+    } as never);
   }
 
   // useEffect(() => {}, []);
@@ -308,220 +312,192 @@ export function Home() {
       subtitle={formattedTotalValue}
       addActionFn={() => handleCreateItem(selectedItemId, activeButton)}
     >
-      <Header>
+      <Container>
         <NavBar>
           <Button
             onPress={() => handleButtonClick("receitas")}
-            active={activeButton !== "receitas"}
-            style={{ borderTopLeftRadius: 40 }}
+            active={activeButton === "receitas"}
           >
-            <Title>Receitas</Title>
+            <Title active={activeButton === "receitas"}>Receitas</Title>
             <SubTitle type="PRIMARY">{formattedRevenue}</SubTitle>
           </Button>
           <Button
             onPress={() => handleButtonClick("despesas")}
-            active={activeButton !== "despesas"}
-            style={{ borderTopRightRadius: 40 }}
+            active={activeButton === "despesas"}
           >
-            <Title>Despesas</Title>
+            <Title active={activeButton === "despesas"}>Despesas</Title>
             <SubTitle type="SECONDARY">{formattedExpense}</SubTitle>
           </Button>
         </NavBar>
-      </Header>
-      {activeButton === "receitas" && (
-        <>
-          <ContainerItems>
-            {filteredRevenue.length === 0 ? (
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 10,
-                }}
-              >
-                {!isSharedRevenueListVisible && (
-                  <LoadData
-                    imageSrc={RevenuePersonImage}
-                    title="Comece agora!"
-                    subtitle="Adicione uma receita clicando em +"
+
+        <Content>
+          {activeButton === "receitas" && (
+            <>
+              <ContainerItems>
+                {filteredRevenue.length === 0 ? (
+                  <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                    {!isSharedRevenueListVisible && (
+                      <LoadData
+                        imageSrc={RevenuePersonImage}
+                        title="Comece agora!"
+                        subtitle="Adicione uma receita clicando em +"
+                      />
+                    )}
+                  </View>
+                ) : (
+                  <FlatList
+                    data={filteredRevenue}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        onPress={() => handleRevenueEdit(item.id, activeButton)}
+                      >
+                        <Items
+                          onDelete={() => handleDeleteItem(item.id, item.type)}
+                          onEdit={() => handleRevenueEdit(item.id, activeButton)}
+                          showItemTaskRevenue
+                          type={item.type}
+                          category={item.name}
+                          date={item.date}
+                          repeat={item.repeat}
+                          valueTransaction={
+                            item.valueTransaction
+                              ? formatCurrency(item.valueTransaction ?? "0")
+                              : formatCurrency("0")
+                          }
+                        />
+                      </TouchableOpacity>
+                    )}
+                    contentContainerStyle={{ paddingBottom: 90 }}
                   />
                 )}
-              </View>
-            ) : (
-              <FlatList
-                style={{ marginTop: 16 }}
-                data={filteredRevenue}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={() => handleRevenueEdit(item.id, activeButton)}
-                  >
-                    <Items
-                      onDelete={() => handleDeleteItem(item.id, item.type)}
-                      onEdit={() => handleRevenueEdit(item.id, activeButton)}
-                      showItemTaskRevenue
-                      type={item.type}
-                      category={item.name}
-                      date={item.date}
-                      repeat={item.repeat}
-                      valueTransaction={
-                        item.valueTransaction
-                          ? formatCurrency(item.valueTransaction ?? "0")
-                          : formatCurrency("0")
-                      }
-                    />
-                  </TouchableOpacity>
-                )}
-                contentContainerStyle={{ paddingBottom: 90 }}
-                ListFooterComponent={<View style={{ height: 90 }} />}
-              />
-            )}
-          </ContainerItems>
-          <ContentTitle
-            onPress={() =>
-              setSharedRevenueListVisible(!isSharedRevenueListVisible)
-            }
-          >
-            <Title>Despesas e receitas compartilhadas</Title>
+              </ContainerItems>
 
-            <DividerContent />
-            <Icon
-              name={
-                isSharedRevenueListVisible ? "arrow-drop-up" : "arrow-drop-down"
-              }
-            />
-          </ContentTitle>
-
-          {isSharedRevenueListVisible && (
-            <Container>
-              <FlatList
-                style={{ marginTop: 16 }}
-                data={revenueShareByMe.concat(revenueShareWithMe)}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={() => handleExpenseEdit(item.id, activeButton)}
-                  >
-                    <Items
-                      onDelete={() => handleDeleteItem(item.id, item.type)}
-                      onEdit={() => handleExpenseEdit(item.id, activeButton)}
-                      showItemTask
-                      status={item.status}
-                      type={item.type}
-                      category={item.name}
-                      date={item.date}
-                      repeat={item.repeat}
-                      valueTransaction={
-                        item.valueTransaction
-                          ? formatCurrency(item.valueTransaction ?? "0")
-                          : formatCurrency("0")
-                      }
-                    />
-                  </TouchableOpacity>
-                )}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingBottom: 10 }}
-                ListFooterComponent={<View style={{ height: 10 }} />}
-              />
-            </Container>
-          )}
-        </>
-      )}
-      {activeButton === "despesas" && (
-        <>
-          <ContainerItems>
-            {filteredExpense.length === 0 ? (
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 10,
-                }}
+              <ContentTitle
+                onPress={() => setSharedRevenueListVisible(!isSharedRevenueListVisible)}
               >
-                {!isSharedListVisible && (
-                  <LoadData
-                    imageSrc={ExpensePersonImage}
-                    title="Comece agora!"
-                    subtitle="Adicione uma despesa clicando em +"
+                <Title>Despesas e receitas compartilhadas</Title>
+                <DividerContent />
+                <Icon
+                  name={isSharedRevenueListVisible ? "arrow-drop-up" : "arrow-drop-down"}
+                />
+              </ContentTitle>
+
+              {isSharedRevenueListVisible && (
+                <Container>
+                  <FlatList
+                    data={revenueShareByMe.concat(revenueShareWithMe)}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        onPress={() => handleExpenseEdit(item.id, activeButton)}
+                      >
+                        <Items
+                          onDelete={() => handleDeleteItem(item.id, item.type)}
+                          onEdit={() => handleExpenseEdit(item.id, activeButton)}
+                          showItemTask
+                          status={item.status}
+                          type={item.type}
+                          category={item.name}
+                          date={item.date}
+                          repeat={item.repeat}
+                          valueTransaction={
+                            item.valueTransaction
+                              ? formatCurrency(item.valueTransaction ?? "0")
+                              : formatCurrency("0")
+                          }
+                        />
+                      </TouchableOpacity>
+                    )}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={{ paddingBottom: 10 }}
+                  />
+                </Container>
+              )}
+            </>
+          )}
+
+          {activeButton === "despesas" && (
+            <>
+              <ContainerItems>
+                {filteredExpense.length === 0 ? (
+                  <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                    {!isSharedListVisible && (
+                      <LoadData
+                        imageSrc={ExpensePersonImage}
+                        title="Comece agora!"
+                        subtitle="Adicione uma despesa clicando em +"
+                      />
+                    )}
+                  </View>
+                ) : (
+                  <FlatList
+                    data={filteredExpense}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        onPress={() => handleExpenseEdit(item.id, activeButton)}
+                      >
+                        <Items
+                          onDelete={() => handleDeleteItem(item.id, "output")}
+                          onEdit={() => handleExpenseEdit(item.id, activeButton)}
+                          showItemTask
+                          status={item.status}
+                          type={item.type}
+                          category={item.name}
+                          date={item.date}
+                          repeat={item.repeat}
+                          valueTransaction={
+                            item.valueTransaction
+                              ? formatCurrency(item.valueTransaction ?? "0")
+                              : formatCurrency("0")
+                          }
+                        />
+                      </TouchableOpacity>
+                    )}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={{ paddingBottom: 10 }}
                   />
                 )}
-              </View>
-            ) : (
-              <FlatList
-                style={{ marginTop: 16 }}
-                data={filteredExpense}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={() => handleExpenseEdit(item.id, activeButton)}
-                  >
-                    <Items
-                      onDelete={() => handleDeleteItem(item.id, "output")}
-                      onEdit={() => handleExpenseEdit(item.id, activeButton)}
-                      showItemTask
-                      status={item.status}
-                      type={item.type}
-                      category={item.name}
-                      date={item.date}
-                      repeat={item.repeat}
-                      valueTransaction={
-                        item.valueTransaction
-                          ? formatCurrency(item.valueTransaction ?? "0")
-                          : formatCurrency("0")
-                      }
-                    />
-                  </TouchableOpacity>
-                )}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingBottom: 10 }}
-                ListFooterComponent={<View style={{ height: 10 }} />}
-              />
-            )}
-          </ContainerItems>
-          <ContentTitle
-            onPress={() => setIsSharedListVisible(!isSharedListVisible)}
-          >
-            <Title>Despesas e receitas compartilhadas</Title>
+              </ContainerItems>
 
-            <DividerContent />
-            <Icon
-              name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"}
-            />
-          </ContentTitle>
+              <ContentTitle onPress={() => setIsSharedListVisible(!isSharedListVisible)}>
+                <Title>Despesas e receitas compartilhadas</Title>
+                <DividerContent />
+                <Icon name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+              </ContentTitle>
 
-          {isSharedListVisible && (
-            <Container>
-              <FlatList
-                style={{ marginTop: 16 }}
-                data={expenseSharedByMe.concat(expensesSharedWithMe)}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={() => handleExpenseEdit(item.id, activeButton)}
-                  >
-                    <Items
-                      onDelete={() => handleDeleteItem(item.id, item.type)}
-                      onEdit={() => handleExpenseEdit(item.id, activeButton)}
-                      showItemTask
-                      status={item.status}
-                      type={item.type}
-                      category={item.name}
-                      date={item.date}
-                      repeat={item.repeat}
-                      valueTransaction={
-                        item.valueTransaction
-                          ? formatCurrency(item.valueTransaction ?? "0")
-                          : formatCurrency("0")
-                      }
-                    />
-                  </TouchableOpacity>
-                )}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingBottom: 10 }}
-                ListFooterComponent={<View style={{ height: 10 }} />}
-              />
-            </Container>
+              {isSharedListVisible && (
+                <Container>
+                  <FlatList
+                    data={expenseSharedByMe.concat(expensesSharedWithMe)}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        onPress={() => handleExpenseEdit(item.id, activeButton)}
+                      >
+                        <Items
+                          onDelete={() => handleDeleteItem(item.id, item.type)}
+                          onEdit={() => handleExpenseEdit(item.id, activeButton)}
+                          showItemTask
+                          status={item.status}
+                          type={item.type}
+                          category={item.name}
+                          date={item.date}
+                          repeat={item.repeat}
+                          valueTransaction={
+                            item.valueTransaction
+                              ? formatCurrency(item.valueTransaction ?? "0")
+                              : formatCurrency("0")
+                          }
+                        />
+                      </TouchableOpacity>
+                    )}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={{ paddingBottom: 10 }}
+                  />
+                </Container>
+              )}
+            </>
           )}
-        </>
-      )}
+        </Content>
+      </Container>
     </DefaultContainer>
   );
 }

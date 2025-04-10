@@ -49,3 +49,20 @@ export type TabParamList = {
   Config: undefined;
   Assinaturas: { reload?: boolean };
 };
+
+export type RootStackParamList = {
+  newtask: {
+    selectedItemId: string;
+    initialActiveButton: string;
+  };
+  newnotes: {
+    selectedItemId: string;
+  };
+  "market-item": {
+    selectedItemId: string;
+  };
+  newsubscription: {
+    selectedItemId: string;
+  };
+  filter: undefined;
+};
