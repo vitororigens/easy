@@ -15,16 +15,18 @@ import { useMarketplaceCollections } from "../../hooks/useMarketplaceCollections
 import { useUserAuth } from "../../hooks/useUserAuth";
 
 import {
-  Button,
-  Header,
-  NavBar,
   Title,
   ContentTitle,
   Icon,
-  DividerContent,
   Container,
+  Content,
+  HeaderContainer,
+  SectionIcon,
+  EmptyContainer,
+  Header,
+  NavBar,
+  Button,
   SubTitle,
-  SubTitleSharing,
 } from "./styles";
 
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -43,20 +45,13 @@ import {
   listTaskSharedWithMe,
 } from "../../services/firebase/tasks";
 import { Timestamp } from "firebase/firestore";
+import { useTask } from "../../contexts/TaskContext";
+import { ITask } from "../../interfaces/ITask";
+import { ITask as IFirebaseTask } from "../../services/firebase/tasks";
 
 type SelectedItems = {
   [key: string]: boolean;
 };
-
-export interface ITask {
-  id: string;
-  uid: string;
-  createdAt: Timestamp;
-  name: string;
-  type: string;
-  shareWith: string[];
-  shareInfo: TShareInfo[];
-}
 
 type TShareInfo = {
   acceptedAt: Timestamp | null;
@@ -92,9 +87,12 @@ export function ListTask({ route }: any) {
   const [isSharedListVisible, setIsSharedListVisible] = useState(false);
   const [isMyListVisible, setIsMyListVisible] = useState(true);
   const [isMyHistoricVisible, setisMyHistoricVisible] = useState(true);
-  const [tasksSharedByMe, setTasksSharedByMe] = useState<ITask[]>([]);
-  const [tasksSharedWithMe, setTasksSharedWithMe] = useState<ITask[]>([]);
+  const [tasksSharedByMe, setTasksSharedByMe] = useState<IFirebaseTask[]>([]);
+  const [tasksSharedWithMe, setTasksSharedWithMe] = useState<IFirebaseTask[]>([]);
   const { COLORS } = useTheme();
+
+  const { tasks, loading, deleteTask, toggleTaskCompletion } = useTask();
+  const [isListVisible, setIsListVisible] = useState(true);
 
   const selectedTrueItems = Object.entries(selectedItems)
     .filter(([key, value]) => value)
@@ -300,9 +298,38 @@ export function ListTask({ route }: any) {
     }, [reload])
   );
 
-  if (isLoaded || uid === undefined) {
+  const handleEditTask = (taskId: string) => {
+    // @ts-ignore
+    navigation.navigate("newtask", { selectedTaskId: taskId });
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      await deleteTask(taskId);
+      Toast.show("Tarefa excluída!", { type: "success" });
+    } catch (error) {
+      console.error("Erro ao excluir a tarefa: ", error);
+      Toast.show("Erro ao excluir a tarefa", { type: "error" });
+    }
+  };
+
+  const handleToggleCompletion = async (taskId: string) => {
+    try {
+      await toggleTaskCompletion(taskId);
+    } catch (error) {
+      console.error("Erro ao alternar status da tarefa: ", error);
+      Toast.show("Erro ao alternar status da tarefa", { type: "error" });
+    }
+  };
+
+  if (loading) {
     return <Loading />;
   }
+
+  // Filtrar tarefas para cada seção
+  const personalTasks = tasks?.filter(task => !task.shareWith || task.shareWith.length === 0) || [];
+  const sharedTasks = tasks?.filter(task => task.shareWith && task.shareWith.length > 0) || [];
+  const completedTasks = tasks?.filter(task => task.status) || [];
 
   return (
     <DefaultContainer newItem monthButton title="Lista de Tarefas">
@@ -310,14 +337,14 @@ export function ListTask({ route }: any) {
         <NavBar>
           <Button
             onPress={() => handleButtonClick("tarefas")}
-            active={activeButton !== "tarefas"}
+            active={activeButton === "tarefas"}
             style={{ borderTopLeftRadius: 40 }}
           >
             <Title>Tarefas</Title>
           </Button>
           <Button
             onPress={() => handleButtonClick("historico")}
-            active={activeButton !== "historico"}
+            active={activeButton === "historico"}
             style={{ borderTopRightRadius: 40 }}
           >
             <Title>Histórico de tarefas</Title>
@@ -326,191 +353,112 @@ export function ListTask({ route }: any) {
       </Header>
 
       {activeButton === "tarefas" && (
-        <>
-          <ScrollView>
-            <ContentTitle onPress={() => setIsMyListVisible(!isMyListVisible)}>
+        <Content>
+          <ContentTitle onPress={() => setIsListVisible(!isListVisible)}>
+            <HeaderContainer>
+              <SectionIcon name="checkbox-marked-circle-outline" />
               <Title>Minhas tarefas</Title>
-              <DividerContent />
-              <Icon
-                name={isMyListVisible ? "arrow-drop-up" : "arrow-drop-down"}
-              />
-            </ContentTitle>
-            {isMyListVisible && (
+            </HeaderContainer>
+            <Icon name={isListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+          </ContentTitle>
+          {isListVisible && (
+            <Container>
               <FlatList
-                style={{
-                  marginTop: !!data.filter((item) => item.uid === uid).length
-                    ? 16
-                    : 0,
-                }}
-                data={data.filter((item) => item.uid === uid)}
+                showsVerticalScrollIndicator={false}
+                data={personalTasks}
                 renderItem={({ item }) => (
                   <ItemTask
-                    onEdit={() => handleEditItem(item.id)}
-                    onDelete={() => handleDeleteItem(item.id)}
-                    title={item.name}
-                    isChecked={selectedItems[item.id] || false}
-                    onToggle={() => {
-                      setSelectedItems((prev) => ({
-                        ...prev,
-                        [item.id]: !prev[item.id],
-                      }));
-                    }}
+                    task={item}
+                    handleDelete={() => handleDeleteTask(item.id)}
+                    handleUpdate={() => handleEditTask(item.id)}
+                    handleToggleCompletion={() => handleToggleCompletion(item.id)}
                   />
                 )}
-                contentContainerStyle={{ paddingBottom: 90 }}
                 keyExtractor={(item) => item.id}
+                contentContainerStyle={{ paddingBottom: 16 }}
                 ListEmptyComponent={
-                  <LoadData
-                    imageSrc={PersonImage}
-                    title="Comece agora!"
-                    subtitle="Adicione uma tarefa clicando em +"
-                    width={300}
-                  />
-                }
-                ListFooterComponent={<View style={{ height: 90 }} />}
-              />
-            )}
-            <ContentTitle
-              isSharedTasks
-              onPress={() => setIsSharedListVisible(!isSharedListVisible)}
-            >
-              <Title>Tarefas compartilhadas</Title>
-              <DividerContent />
-              <Icon
-                name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"}
-              />
-            </ContentTitle>
-            {isSharedListVisible && (
-              <>
-                <FlatList
-                  style={{
-                    marginTop: !!data.filter((item) => item.uid === uid).length
-                      ? 16
-                      : 0,
-                  }}
-                  data={tasksSharedByMe.concat(tasksSharedWithMe)}
-                  renderItem={({ item }) => (
-                    <ItemTask
-                      onEdit={() => handleEditItem(item.id)}
-                      onDelete={() => handleDeleteItem(item.id)}
-                      title={item.name}
-                      isChecked={selectedItems[item.id] || false}
-                      onToggle={() => {
-                        setSelectedItems((prev) => ({
-                          ...prev,
-                          [item.id]: !prev[item.id],
-                        }));
-                      }}
+                  <EmptyContainer>
+                    <LoadData
+                      imageSrc={PersonImage}
+                      title="Comece agora!"
+                      subtitle="Adicione uma tarefa clicando em +"
                     />
-                  )}
-                  contentContainerStyle={{ paddingBottom: 90 }}
-                  keyExtractor={(item) => item.id}
-                  ListEmptyComponent={
-                    <View
-                      style={{
-                        padding: 40,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <SubTitleSharing>
-                        Você não possui tarefas compartilhadas com você
-                      </SubTitleSharing>
-                    </View>
-                  }
-                  ListFooterComponent={<View style={{ height: 90 }} />}
-                />
-              </>
-            )}
+                  </EmptyContainer>
+                }
+              />
+            </Container>
+          )}
 
-            {modalActive && (
-              <View
-                style={{
-                  backgroundColor: COLORS.TEAL_600,
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
-                  height: 100,
-                  width: "100%",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  flexDirection: "row",
-                  padding: 10,
-                  marginTop: 20,
-                  marginBottom: 0,
-                }}
-              >
-                <FinishTasks
-                  itemsCount={filteredDataSelecteds.length}
-                  buttonSave={handleFinishTasks}
-                />
-              </View>
-            )}
-          </ScrollView>
-        </>
+          <ContentTitle onPress={() => setIsSharedListVisible(!isSharedListVisible)}>
+            <HeaderContainer>
+              <SectionIcon name="share-variant" />
+              <Title>Tarefas compartilhadas</Title>
+            </HeaderContainer>
+            <Icon name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+          </ContentTitle>
+          {isSharedListVisible && (
+            <Container>
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                data={sharedTasks}
+                renderItem={({ item }) => (
+                  <ItemTask
+                    task={item}
+                    handleDelete={() => handleDeleteTask(item.id)}
+                    handleUpdate={() => handleEditTask(item.id)}
+                    handleToggleCompletion={() => handleToggleCompletion(item.id)}
+                  />
+                )}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={{ paddingBottom: 16 }}
+                ListEmptyComponent={
+                  <EmptyContainer>
+                    <SubTitle>
+                      Você não possui tarefas compartilhadas
+                    </SubTitle>
+                  </EmptyContainer>
+                }
+              />
+            </Container>
+          )}
+        </Content>
       )}
 
       {activeButton === "historico" && (
-        <>
-          <ContentTitle
-            onPress={() => setisMyHistoricVisible(!isMyHistoricVisible)}
-          >
-            <Title>Meu histórico de tarefas</Title>
-            <DividerContent />
-            <Icon
-              name={isMyHistoricVisible ? "arrow-drop-up" : "arrow-drop-down"}
-            />
+        <Content>
+          <ContentTitle>
+            <HeaderContainer>
+              <SectionIcon name="history" />
+              <Title>Histórico de tarefas</Title>
+            </HeaderContainer>
           </ContentTitle>
-          {isMyHistoricVisible && (
+          <Container>
             <FlatList
-              style={{ marginTop: !!historyUserMonth.length ? 16 : 0 }}
-              data={historyUserMonth}
+              showsVerticalScrollIndicator={false}
+              data={completedTasks}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => openModalHistoryTask(item.id)}>
-                  <Items
-                    showItemTask
-                    category="lista de tarefas"
-                    customStatusText="Finalizada"
-                    status={true}
-                    hasEdit={false}
-                    date={item.finishedDate}
-                    onDelete={() => handleDeleteHistoryTasks(item.id)}
-                  />
-                </TouchableOpacity>
-              )}
-              contentContainerStyle={{ paddingBottom: 1000 }}
-              ListEmptyComponent={
-                <LoadData
-                  imageSrc={PersonImage}
-                  title="Oops!"
-                  subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando tarefas e crie sua lista de tartefas"
-                  width={300}
+                <ItemTask
+                  task={item}
+                  handleDelete={() => handleDeleteTask(item.id)}
+                  handleUpdate={() => handleEditTask(item.id)}
+                  handleToggleCompletion={() => handleToggleCompletion(item.id)}
                 />
+              )}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={{ paddingBottom: 16 }}
+              ListEmptyComponent={
+                <EmptyContainer>
+                  <LoadData
+                    imageSrc={PersonImage}
+                    title="Nenhuma tarefa concluída"
+                    subtitle="Complete algumas tarefas para ver seu histórico"
+                  />
+                </EmptyContainer>
               }
             />
-          )}
-        </>
+          </Container>
+        </Content>
       )}
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showTaskModal}
-        onRequestClose={closeModals}
-      >
-        <View
-          style={{
-            flex: 1,
-            paddingTop: Platform.OS === "ios" ? 20 : 0,
-          }}
-        >
-          <NewItemTask
-            selectedItemId={selectedItemId}
-            showButtonSave
-            showButtonRemove
-            closeBottomSheet={closeModals}
-          />
-        </View>
-      </Modal>
     </DefaultContainer>
   );
 }

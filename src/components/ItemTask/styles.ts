@@ -9,27 +9,66 @@ type ListItemProps = {
     type?: ListItemStyleProps;
 }
 
-export const Container = styled(TouchableOpacity)`
-    max-height: 40px;
-    min-height: 40px;
-    margin: 10px;
-    flex-direction: row;
+export const Container = styled.View`
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
+  border-radius: 8px;
+  margin-bottom: 8px;
+  elevation: 2;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.15;
+  shadow-radius: 2.84px;
 `;
 
-
-export const Title = styled.Text<ListItemProps>`
-    font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-    font-size: ${({theme}) => theme.FONTE_SIZE.GG}px;
-    color: ${({theme, type}) => type === 'PRIMARY' ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800 };
-    text-decoration-line: ${({type}) => type === 'PRIMARY' ? 'line-through' :  'none'};
+export const Content = styled.View`
+  flex-direction: row;
+  align-items: center;
+  padding: 12px;
 `;
 
-export const SubTitle = styled.Text`
-    font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-    color: ${({ theme }) => theme.COLORS.TEAL_600};
-    font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+export const CheckboxContainer = styled(TouchableOpacity)`
+  margin-right: 12px;
 `;
 
+export const Checkbox = styled.View<{ checked: boolean }>`
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  border-width: 2px;
+  border-color: ${({ theme, checked }) => 
+    checked ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_400};
+  background-color: ${({ theme, checked }) => 
+    checked ? theme.COLORS.TEAL_600 : "transparent"};
+  align-items: center;
+  justify-content: center;
+`;
+
+export const Title = styled.Text<{ status: boolean }>`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+  color: ${({ theme, status }) => 
+    status ? theme.COLORS.GRAY_400 : theme.COLORS.GRAY_600};
+  text-decoration-line: ${({ status }) => status ? "line-through" : "none"};
+  margin-bottom: 4px;
+`;
+
+export const Description = styled.Text<{ status: boolean }>`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  color: ${({ theme, status }) => 
+    status ? theme.COLORS.GRAY_400 : theme.COLORS.GRAY_600};
+  text-decoration-line: ${({ status }) => status ? "line-through" : "none"};
+`;
+
+export const Actions = styled.View`
+  flex-direction: row;
+  margin-left: 8px;
+`;
+
+export const ActionButton = styled(TouchableOpacity)`
+  padding: 8px;
+  margin-left: 4px;
+`;
 
 export const Button = styled(TouchableOpacity)`
     flex-direction: row;

@@ -1,54 +1,54 @@
-import { TouchableOpacity, View } from "react-native";
-import { Popover } from 'react-native-popper';
-import { Button, Container, ContainerMenu, Icon, IconCheck, Title } from "./styles";
+import React from "react";
+import { TouchableOpacity } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { ITask } from "../../interfaces/ITask";
+import {
+  Container,
+  Content,
+  Title,
+  Description,
+  Actions,
+  ActionButton,
+  Checkbox,
+  CheckboxContainer,
+} from "./styles";
 
-type ItemNotesProps = {
-  title: string;
-  onDelete?: () => void;
-  onEdit?: () => void;
-  isChecked: boolean;
-  hasActions?: boolean
-  onToggle?: () => void;
-};
+interface ItemTaskProps {
+  task: ITask;
+  handleDelete: () => void;
+  handleUpdate: () => void;
+  handleToggleCompletion: () => void;
+}
 
-export function ItemTask({ title, onDelete, onEdit, isChecked, onToggle, hasActions = true }: ItemNotesProps) {
+export function ItemTask({
+  task,
+  handleDelete,
+  handleUpdate,
+  handleToggleCompletion,
+}: ItemTaskProps) {
   return (
-    <Container onPress={onToggle}>
-      <View style={{
-        flex: 1,
-        flexDirection: 'row',
-      }}>
-        <IconCheck
-          type={isChecked ? 'PRIMARY' : 'SECONDARY'}
-          name={isChecked ? "checkbox-marked-circle-outline" : "checkbox-blank-circle-outline"}
-        />
-        <Title type={isChecked ? 'PRIMARY' : 'SECONDARY'}>{title}</Title>
-      </View>
-      {hasActions && (
-        <View>
-          <Popover
-            trigger={
-              <TouchableOpacity>
-                <Icon name="dots-three-horizontal" />
-              </TouchableOpacity>
-            }
-          >
-            <Popover.Backdrop />
-            <Popover.Content>
-              <ContainerMenu>
-                <Button onPress={onDelete}>
-                  <Icon name="trash" />
-                  <Title>Excluir</Title>
-                </Button>
-                <Button onPress={onEdit}>
-                  <Icon name="pencil" />
-                  <Title>Editar</Title>
-                </Button>
-              </ContainerMenu>
-            </Popover.Content>
-          </Popover>
-        </View>
-      )}
+    <Container>
+      <Content>
+        <CheckboxContainer onPress={handleToggleCompletion}>
+          <Checkbox checked={task.status}>
+            {task.status && (
+              <MaterialIcons name="check" size={16} color="#FFF" />
+            )}
+          </Checkbox>
+        </CheckboxContainer>
+        <TouchableOpacity onPress={handleUpdate} style={{ flex: 1 }}>
+          <Title status={task.status}>{task.name}</Title>
+          <Description status={task.status}>{task.description}</Description>
+        </TouchableOpacity>
+        <Actions>
+          <ActionButton onPress={handleUpdate}>
+            <MaterialIcons name="edit" size={24} color="#6B7280" />
+          </ActionButton>
+          <ActionButton onPress={handleDelete}>
+            <MaterialIcons name="delete" size={24} color="#EF4444" />
+          </ActionButton>
+        </Actions>
+      </Content>
     </Container>
   );
 }
