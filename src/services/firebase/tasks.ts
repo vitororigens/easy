@@ -16,8 +16,8 @@ export interface ITask {
   name: string;
   description: string;
   status: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
   type: string;
   shareWith: string[];
   shareInfo: TShareInfo[];

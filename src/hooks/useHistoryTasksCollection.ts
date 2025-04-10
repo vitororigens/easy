@@ -17,6 +17,7 @@ const useHistoryTasksCollections = (
   collectionName: string
 ): HistoryTasksData[] => {
   const [data, setData] = useState<HistoryTasksData[]>([]);
+  console.log(data);
 
   useEffect(() => {
     const q = query(collection(database, collectionName));

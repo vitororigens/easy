@@ -3,10 +3,33 @@ import styled from "styled-components/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export const Container = styled.View`
-  width: 100%;
-  align-items: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: ${({ theme }) => theme.COLORS.TEAL_600};
+  padding: 16px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  elevation: 5;
+  shadow-color: #000;
+  shadow-offset: 0px -2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+`;
+
+export const Content = styled.View`
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+`;
+
+export const ButtonText = styled.View`
+  flex-direction: row;
+  align-items: center;
+  background-color: ${({ theme }) => theme.COLORS.TEAL_700};
+  padding: 8px 16px;
+  border-radius: 8px;
 `;
 
 export const Title = styled.Text`

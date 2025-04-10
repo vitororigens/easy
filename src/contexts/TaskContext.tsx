@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { ITask } from "../interfaces/ITask";
 import { useUserAuth } from "../hooks/useUserAuth";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore";
+import { database } from "../libs/firebase";
 
 interface ITaskContext {
   tasks: ITask[];
@@ -19,20 +20,50 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   const user = useUserAuth();
 
+  // Carregar tarefas do Firebase
+  useEffect(() => {
+    if (!user?.uid) {
+      console.log("Usuário não autenticado");
+      return;
+    }
+    
+    console.log("Iniciando carregamento de tarefas para o usuário:", user.uid);
+    setLoading(true);
+    
+    const unsubscribe = database
+      .collection("Tasks")
+      .where("uid", "==", user.uid)
+      .onSnapshot((snapshot) => {
+        console.log("Snapshot recebido do Firebase");
+        const taskData: ITask[] = [];
+        snapshot.forEach((doc) => {
+          console.log("Documento encontrado:", doc.id);
+          taskData.push({ id: doc.id, ...doc.data() } as ITask);
+        });
+        console.log("Tarefas carregadas:", taskData);
+        setTasks(taskData);
+        setLoading(false);
+      }, (error) => {
+        console.error("Erro ao carregar tarefas:", error);
+        setLoading(false);
+      });
+
+    return () => {
+      console.log("Limpando listener de tarefas");
+      unsubscribe();
+    };
+  }, [user?.uid]);
+
   const addTask = useCallback(async (task: Omit<ITask, "id" | "createdAt" | "updatedAt">) => {
     if (!user?.uid) return;
     
     setLoading(true);
     try {
-      // Implementar lógica de adicionar task
-      const newTask: ITask = {
+      await database.collection("Tasks").add({
         ...task,
-        id: "temp-id",
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
-      };
-      
-      setTasks(prev => [...prev, newTask]);
+      });
     } catch (error) {
       console.error("Erro ao adicionar task:", error);
     } finally {
@@ -43,8 +74,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const updateTask = useCallback(async (id: string, task: Partial<ITask>) => {
     setLoading(true);
     try {
-      // Implementar lógica de atualizar task
-      setTasks(prev => prev.map(t => t.id === id ? { ...t, ...task, updatedAt: Timestamp.now() } : t));
+      await database.collection("Tasks").doc(id).update({
+        ...task,
+        updatedAt: Timestamp.now(),
+      });
     } catch (error) {
       console.error("Erro ao atualizar task:", error);
     } finally {
@@ -55,8 +88,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const deleteTask = useCallback(async (id: string) => {
     setLoading(true);
     try {
-      // Implementar lógica de deletar task
-      setTasks(prev => prev.filter(t => t.id !== id));
+      await database.collection("Tasks").doc(id).delete();
     } catch (error) {
       console.error("Erro ao deletar task:", error);
     } finally {
@@ -67,10 +99,15 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const toggleTaskCompletion = useCallback(async (id: string) => {
     setLoading(true);
     try {
-      // Implementar lógica de toggle completion
-      setTasks(prev => prev.map(t => 
-        t.id === id ? { ...t, status: !t.status, updatedAt: Timestamp.now() } : t
-      ));
+      const taskRef = database.collection("Tasks").doc(id);
+      const doc = await taskRef.get();
+      if (doc.exists) {
+        const taskData = doc.data();
+        await taskRef.update({
+          status: !taskData?.status,
+          updatedAt: Timestamp.now(),
+        });
+      }
     } catch (error) {
       console.error("Erro ao alternar status da task:", error);
     } finally {

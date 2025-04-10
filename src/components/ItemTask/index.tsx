@@ -17,21 +17,25 @@ interface ItemTaskProps {
   task: ITask;
   handleDelete: () => void;
   handleUpdate: () => void;
-  handleToggleCompletion: () => void;
+  isSelected: boolean;
+  onSelect: () => void;
 }
 
 export function ItemTask({
   task,
   handleDelete,
   handleUpdate,
-  handleToggleCompletion,
+  isSelected,
+  onSelect,
 }: ItemTaskProps) {
+  console.log("ItemTask recebeu a tarefa:", task);
+
   return (
     <Container>
       <Content>
-        <CheckboxContainer onPress={handleToggleCompletion}>
-          <Checkbox checked={task.status}>
-            {task.status && (
+        <CheckboxContainer onPress={onSelect}>
+          <Checkbox checked={isSelected}>
+            {isSelected && (
               <MaterialIcons name="check" size={16} color="#FFF" />
             )}
           </Checkbox>

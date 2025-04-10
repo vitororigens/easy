@@ -95,7 +95,10 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
 
       const createNewTask = await createTask({
         name: name,
+        description: "",
+        status: false,
         createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
         uid: uid,
         type: "task",
         shareWith: sharedUsers.map((user) => user.uid),

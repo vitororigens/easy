@@ -13,6 +13,8 @@ import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
 import { useMarketplaceCollections } from "../../hooks/useMarketplaceCollections";
 import { useUserAuth } from "../../hooks/useUserAuth";
+import { useTask } from "../../contexts/TaskContext";
+import { ITask } from "../../interfaces/ITask";
 
 import {
   Title,
@@ -40,24 +42,7 @@ import { useMonth } from "../../context/MonthProvider";
 import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
 import { NewItemTask } from "../NewItemTask";
 import { database } from "../../libs/firebase";
-import {
-  listTasksSharedByMe,
-  listTaskSharedWithMe,
-} from "../../services/firebase/tasks";
-import { Timestamp } from "firebase/firestore";
-import { useTask } from "../../contexts/TaskContext";
-import { ITask } from "../../interfaces/ITask";
-import { ITask as IFirebaseTask } from "../../services/firebase/tasks";
-
-type SelectedItems = {
-  [key: string]: boolean;
-};
-
-type TShareInfo = {
-  acceptedAt: Timestamp | null;
-  uid: string;
-  userName: string;
-};
+import { Timestamp } from "@react-native-firebase/firestore";
 
 const modalBottom = Platform.OS === "ios" ? 90 : 70;
 
@@ -65,238 +50,36 @@ export function ListTask({ route }: any) {
   const reload = route?.params?.reload;
   const user = useUserAuth();
   const uid = user?.uid;
+  const { tasks, loading, deleteTask, toggleTaskCompletion } = useTask();
 
   const { selectedMonth } = useMonth();
   const navigation = useNavigation();
   const [activeButton, setActiveButton] = useState("tarefas");
-  const [selectedItems, setSelectedItems] = useState<{
-    [key: string]: boolean;
-  }>({});
-
-  const data = useMarketplaceCollections("Task");
-  const historyData = useHistoryTasksCollections("HistoryTasks");
-
-  const [currentUid, setCurrentUid] = useState("");
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [showHistoryTask, setShowHistoryTask] = useState(false);
-
-  const [modalActive, setModalActive] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState("");
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [selectedListTaskId, setSelectedListTaskId] = useState("");
+  const [isListVisible, setIsListVisible] = useState(true);
   const [isSharedListVisible, setIsSharedListVisible] = useState(false);
-  const [isMyListVisible, setIsMyListVisible] = useState(true);
-  const [isMyHistoricVisible, setisMyHistoricVisible] = useState(true);
-  const [tasksSharedByMe, setTasksSharedByMe] = useState<IFirebaseTask[]>([]);
-  const [tasksSharedWithMe, setTasksSharedWithMe] = useState<IFirebaseTask[]>([]);
+  const [modalActive, setModalActive] = useState(false);
   const { COLORS } = useTheme();
 
-  const { tasks, loading, deleteTask, toggleTaskCompletion } = useTask();
-  const [isListVisible, setIsListVisible] = useState(true);
-
-  const selectedTrueItems = Object.entries(selectedItems)
-    .filter(([key, value]) => value)
-    .map(([key]) => key);
-
-  const filteredDataSelecteds = data.filter((item) =>
-    selectedTrueItems.includes(item.id)
-  );
-
+  const historyData = useHistoryTasksCollections("HistoryTasks");
   const historyUser = historyData.filter((item) => item.uid === uid);
-
   const historyUserMonth = historyUser.filter((item) => {
-    const month =
-      getMonth(parse(item.finishedDate, "dd/MM/yyyy", new Date())) + 1;
+    const month = getMonth(parse(item.finishedDate, "dd/MM/yyyy", new Date())) + 1;
     return month === selectedMonth;
   });
 
+  // Filtrar tarefas para cada seção
+  const personalTasks = tasks?.filter(task => !task.shareWith || task.shareWith.length === 0) || [];
+  const sharedTasks = tasks?.filter(task => task.shareWith && task.shareWith.length > 0) || [];
+  const completedTasks = tasks?.filter(task => task.status) || [];
+
+  console.log("Tarefas no ListTask:", tasks);
+  console.log("Tarefas pessoais:", personalTasks);
+  console.log("Tarefas compartilhadas:", sharedTasks);
+  console.log("Tarefas concluídas:", completedTasks);
+
   const handleButtonClick = (buttonName: string) => {
-    if (buttonName === "tarefas") {
-    }
     setActiveButton(buttonName);
   };
-
-  function handleUncheckAll() {
-    setSelectedItems({});
-  }
-
-  function openModalHistoryTask(documentId: string) {
-    navigation.navigate("historytask", { selectedItemId: documentId });
-  }
-
-  function closeModals() {
-    setShowTaskModal(false);
-    setShowHistoryTask(false);
-  }
-
-  function handleEditItem(documentId: string) {
-    navigation.navigate("newitemtask", { selectedItemId: documentId });
-  }
-
-  function handleDeleteItem(documentId: string) {
-    database
-      .collection("Task")
-      .doc(documentId)
-      .delete()
-      .then(() => {
-        Toast.show("Nota excluída!", { type: "success" });
-      })
-      .catch((error) => {
-        console.error("Erro ao excluir a nota: ", error);
-      });
-  }
-
-  function handleDeleteFilteredItem(documentId: string) {
-    const batch = database.batch();
-
-    const docRef = database.collection("Task").doc(documentId);
-    batch.delete(docRef);
-
-    batch
-      .commit()
-      .then(() => {
-        Toast.show("Tarefas finalizadas!", { type: "success" });
-      })
-      .catch((error) => {
-        console.error("Erro ao excluir as tarefas: ", error);
-      });
-  }
-
-  function handleDeleteHistoryTasks(documentId: string) {
-    database
-      .collection("HistoryTasks")
-      .doc(documentId)
-      .delete()
-      .then(() => {
-        Toast.show("Lista de tarefas excluída!", { type: "success" });
-      })
-      .catch((error) => {
-        console.error("Erro ao excluir a lista de tarefas: ", error);
-      });
-  }
-
-  async function handleFinishTasks() {
-    const tasks = filteredDataSelecteds.map((task) => ({
-      name: task.name,
-      id: task.id,
-      createdAt: task.createdAt,
-    }));
-
-    const taskIds = tasks.map((task) => task.id);
-
-    for (const foundTasksById of taskIds) {
-      const doc = await database.collection("Task").doc(foundTasksById).get();
-
-      if (doc.exists) {
-        const taskData = doc.data();
-
-        const shareInfo = taskData?.shareInfo || [];
-
-        if (taskData?.uid === user?.uid) {
-          await database
-            .collection("Task")
-            .doc(foundTasksById)
-            .update({ finished: true });
-
-          const allShareInfosTrue = taskData?.shareInfo.every(
-            (item: any) => item.finished === true
-          );
-
-          if (allShareInfosTrue) {
-            await database
-              .collection("HistoryTasks")
-              .doc(foundTasksById)
-              .set({
-                uid,
-                tasks,
-                finishedDate: format(new Date(), "dd/MM/yyyy"),
-              })
-              .then(() => {
-                handleDeleteFilteredItem(foundTasksById);
-                handleUncheckAll();
-                setModalActive(false);
-              })
-              .catch((error) => {
-                console.error("Erro ao finalizar tarefa: ", error);
-              });
-          }
-        } else {
-          const updatedShareInfo = shareInfo.map((item: any) => {
-            if (item.uid === user?.uid) {
-              return {
-                ...item,
-                finished: true,
-              };
-            }
-            return item;
-          });
-
-          await database
-            .collection("Tasks")
-            .doc(foundTasksById)
-            .update({ shareInfo: updatedShareInfo });
-        }
-
-        const allShareInfosTrue = taskData?.shareInfo.every(
-          (item: any) => item.finished === true
-        );
-
-        if (taskData?.finished === true && allShareInfosTrue === true) {
-          database
-            .collection("HistoryTasks")
-            .doc(foundTasksById)
-            .set({
-              uid,
-              tasks,
-              finishedDate: format(new Date(), "dd/MM/yyyy"),
-            })
-            .then(() => {
-              handleDeleteFilteredItem(foundTasksById);
-              handleUncheckAll();
-              setModalActive(false);
-            })
-            .catch((error) => {
-              console.error("Erro ao finalizar tarefas: ", error);
-            });
-        }
-      }
-    }
-  }
-  const fetchTasks = async () => {
-    if (!uid) return;
-    try {
-      setIsLoaded(true);
-      const [mTasks, sTasks] = await Promise.all([
-        listTasksSharedByMe(uid),
-        listTaskSharedWithMe(uid),
-      ]);
-
-      setTasksSharedWithMe(sTasks);
-      setTasksSharedByMe(mTasks);
-    } catch (err) {
-      setIsLoaded(false);
-      console.error("Erro ao buscar as notas: ", err);
-    } finally {
-      setIsLoaded(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTasks();
-  }, [uid]);
-
-  useEffect(() => {
-    if (!filteredDataSelecteds.length) return setModalActive(false);
-    setModalActive(true);
-  }, [filteredDataSelecteds]);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (reload) {
-        fetchTasks();
-      }
-    }, [reload])
-  );
 
   const handleEditTask = (taskId: string) => {
     // @ts-ignore
@@ -325,11 +108,6 @@ export function ListTask({ route }: any) {
   if (loading) {
     return <Loading />;
   }
-
-  // Filtrar tarefas para cada seção
-  const personalTasks = tasks?.filter(task => !task.shareWith || task.shareWith.length === 0) || [];
-  const sharedTasks = tasks?.filter(task => task.shareWith && task.shareWith.length > 0) || [];
-  const completedTasks = tasks?.filter(task => task.status) || [];
 
   return (
     <DefaultContainer newItem monthButton title="Lista de Tarefas">
@@ -366,14 +144,17 @@ export function ListTask({ route }: any) {
               <FlatList
                 showsVerticalScrollIndicator={false}
                 data={personalTasks}
-                renderItem={({ item }) => (
-                  <ItemTask
-                    task={item}
-                    handleDelete={() => handleDeleteTask(item.id)}
-                    handleUpdate={() => handleEditTask(item.id)}
-                    handleToggleCompletion={() => handleToggleCompletion(item.id)}
-                  />
-                )}
+                renderItem={({ item }) => {
+                  console.log("Renderizando ItemTask com item:", item);
+                  return (
+                    <ItemTask
+                      task={item}
+                      handleDelete={() => handleDeleteTask(item.id)}
+                      handleUpdate={() => handleEditTask(item.id)}
+                      handleToggleCompletion={() => handleToggleCompletion(item.id)}
+                    />
+                  );
+                }}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ paddingBottom: 16 }}
                 ListEmptyComponent={
@@ -401,14 +182,17 @@ export function ListTask({ route }: any) {
               <FlatList
                 showsVerticalScrollIndicator={false}
                 data={sharedTasks}
-                renderItem={({ item }) => (
-                  <ItemTask
-                    task={item}
-                    handleDelete={() => handleDeleteTask(item.id)}
-                    handleUpdate={() => handleEditTask(item.id)}
-                    handleToggleCompletion={() => handleToggleCompletion(item.id)}
-                  />
-                )}
+                renderItem={({ item }) => {
+                  console.log("Renderizando ItemTask compartilhado com item:", item);
+                  return (
+                    <ItemTask
+                      task={item}
+                      handleDelete={() => handleDeleteTask(item.id)}
+                      handleUpdate={() => handleEditTask(item.id)}
+                      handleToggleCompletion={() => handleToggleCompletion(item.id)}
+                    />
+                  );
+                }}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ paddingBottom: 16 }}
                 ListEmptyComponent={

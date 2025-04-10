@@ -1,29 +1,29 @@
-import { View } from "react-native";
-import { Button, Container, Title } from "./styles";
+import React from 'react';
+import { TouchableOpacity, Text } from 'react-native';
+import { MaterialIcons } from "@expo/vector-icons";
+import { Container, Content, ButtonText } from './styles';
 
-type IFinishTasksProps = {
-  itemsCount: number;
-  buttonSave: () => void;
-};
+interface FinishTasksProps {
+  selectedCount: number;
+  onFinish: () => void;
+}
 
-export function FinishTasks({ itemsCount, buttonSave }: IFinishTasksProps) {
+export function FinishTasks({ selectedCount, onFinish }: FinishTasksProps) {
+  if (selectedCount === 0) return null;
+
   return (
     <Container>
-      <View>
-        <Title>Total de Tarefas: {itemsCount}</Title>
-      </View>
-      <View>
-        <Button onPress={buttonSave}>
-          <Title
-            style={{
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            Finalizar tarefas
-          </Title>
-        </Button>
-      </View>
+      <Content>
+        <Text style={{ color: '#FFF', fontSize: 16 }}>
+          {selectedCount} {selectedCount === 1 ? 'tarefa selecionada' : 'tarefas selecionadas'}
+        </Text>
+        <TouchableOpacity onPress={onFinish}>
+          <ButtonText>
+            <MaterialIcons name="check-circle" size={24} color="#FFF" />
+            <Text style={{ color: '#FFF', marginLeft: 8 }}>Finalizar</Text>
+          </ButtonText>
+        </TouchableOpacity>
+      </Content>
     </Container>
   );
 }

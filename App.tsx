@@ -9,6 +9,7 @@ import { StatusBar } from "react-native";
 //
 import { Loading } from "./src/components/Loading";
 import { MonthProvider } from "./src/context/MonthProvider";
+import { TaskProvider } from "./src/contexts/TaskContext";
 import { Routes } from "./src/routes";
 import theme from "./src/theme";
 import {
@@ -79,14 +80,16 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <MonthProvider>
-        <ToastProvider>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
-          {fontLoader ? <Routes /> : <Loading />}
-        </ToastProvider>
+        <TaskProvider>
+          <ToastProvider>
+            <StatusBar
+              barStyle="light-content"
+              backgroundColor="transparent"
+              translucent
+            />
+            {fontLoader ? <Routes /> : <Loading />}
+          </ToastProvider>
+        </TaskProvider>
       </MonthProvider>
     </ThemeProvider>
   );
