@@ -92,43 +92,95 @@ export const findMarketHistoryById = async (id: string) => {
 };
 
 export const listMarketHistories = async (uid: string) => {
-  const now = Timestamp.now().toDate();
-  const start = Timestamp.fromDate(startOfMonth(now));
-  const end = Timestamp.fromDate(endOfMonth(now));
+  try {
+    console.log('Buscando histórico para o usuário:', uid);
+    
+    // Consulta direta apenas pelos documentos do usuário
+    const q = query(
+      collection(database, "MarketHistory"),
+      where("uid", "==", uid)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    
+    const histories = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      console.log('Documento encontrado:', doc.id, data);
+      return {
+        id: doc.id,
+        ...data,
+        markets: data.markets || [],
+      } as IMarketHistory;
+    });
 
-  const q = query(
-    collection(database, "MarketHistory"),
-    where("uid", "==", uid),
-    where("createdAt", ">=", start),
-    where("createdAt", "<=", end)
-  );
-  
-  const querySnapshot = await getDocs(q);
-  
-  return (querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) ?? []) as IMarketHistory[];
+    console.log('Total de históricos encontrados:', histories.length);
+    
+    // Filtra novamente para garantir que só retorne do usuário correto
+    const filteredHistories = histories.filter(history => {
+      const isOwner = history.uid === uid;
+      if (!isOwner) {
+        console.log('Histórico ignorado - UID diferente:', history.id, history.uid);
+      }
+      return isOwner;
+    });
+
+    console.log('Total após filtragem:', filteredHistories.length);
+    return filteredHistories;
+  } catch (error) {
+    console.error('Erro ao buscar histórico:', error);
+    return [];
+  }
 };
 
 export const listMarketHistoriesSharedWithMe = async (uid: string) => {
-  const q = query(
-    collection(database, "MarketHistory"),
-    where("shareWith", "array-contains", uid)
-  );
-  
-  const querySnapshot = await getDocs(q);
-  
-  const marketHistories = (querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) ?? []) as IMarketHistory[];
+  try {
+    console.log('Buscando histórico compartilhado para o usuário:', uid);
+    
+    // Consulta por documentos compartilhados com o usuário
+    const q = query(
+      collection(database, "MarketHistory"),
+      where("shareWith", "array-contains", uid)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    
+    const marketHistories = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      console.log('Documento compartilhado encontrado:', doc.id, data);
+      return {
+        id: doc.id,
+        ...data,
+        markets: data.markets || [],
+      } as IMarketHistory;
+    });
 
-  return marketHistories.filter((n) =>
-    n.shareInfo.some(
-      ({ uid, acceptedAt }) => uid === uid && acceptedAt !== null
-    )
-  );
+    console.log('Total de históricos compartilhados encontrados:', marketHistories.length);
+    
+    // Filtra para garantir que:
+    // 1. O histórico NÃO é do próprio usuário
+    // 2. O usuário está na lista de compartilhamento E aceitou
+    const filteredHistories = marketHistories.filter((history) => {
+      const isNotOwner = history.uid !== uid;
+      const hasAccepted = history.shareInfo?.some(
+        (info) => info.uid === uid && info.acceptedAt !== null
+      );
+
+      if (!isNotOwner) {
+        console.log('Histórico ignorado - é do próprio usuário:', history.id);
+      }
+      if (!hasAccepted) {
+        console.log('Histórico ignorado - não aceito:', history.id);
+      }
+
+      return isNotOwner && hasAccepted;
+    });
+
+    console.log('Total após filtragem:', filteredHistories.length);
+    return filteredHistories;
+  } catch (error) {
+    console.error('Erro ao buscar histórico compartilhado:', error);
+    return [];
+  }
 };
 
 interface IDeleteMarketHistoryProps {

@@ -163,3 +163,10 @@ export const StatLabel = styled.Text`
   color: ${({ theme }) => theme.COLORS.GRAY_600};
   text-align: center;
 `;
+
+export const DividerContent = styled.View`
+  flex: 1;
+  height: 1px;
+  margin: 0 10px;
+  background-color: ${({ theme }) => theme.COLORS.GRAY_300};
+`;

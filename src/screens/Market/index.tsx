@@ -98,6 +98,18 @@ export function Market({ route }: any) {
 
   const marketplaceData = useMarketplaceCollections("Marketplace");
 
+  // Filtrar apenas os itens do usuário atual
+  const filteredMarketplaceData = useMemo(() => {
+    if (!marketplaceData || !user?.uid) return [];
+    
+    console.log('Filtrando histórico para usuário:', user.uid);
+    const filtered = marketplaceData.filter(item => item.uid === user.uid);
+    console.log('Total de itens no histórico:', marketplaceData.length);
+    console.log('Total após filtragem:', filtered.length);
+    
+    return filtered;
+  }, [marketplaceData, user?.uid]);
+
   const personalMarkets = useMemo(() => 
     markets?.filter(market => market.uid === user?.uid) || [], 
     [markets, user?.uid]
@@ -366,7 +378,7 @@ export function Market({ route }: any) {
           <Container>
             <FlatList
               showsVerticalScrollIndicator={false}
-              data={marketplaceData || []}
+              data={filteredMarketplaceData || []}
               renderItem={({ item }) => (
                 <MarketCard onPress={() => {
                   setModalActive(true);

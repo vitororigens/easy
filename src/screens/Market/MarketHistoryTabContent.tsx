@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { FlatList, RefreshControl, TouchableOpacity, View } from "react-native";
 import { LoadData } from "../../components/LoadData";
 import {
@@ -37,6 +37,24 @@ export const MarketHistoryTabContent = ({
   const [isMarketHistoryVisible, setIsMarketHistoryVisible] = useState(true);
   const [isSharedMarketHistoryVisible, setIsSharedMarketHistoryVisible] =
     useState(false);
+
+  // Limpar dados quando o usuário mudar
+  useEffect(() => {
+    if (!loggedUser?.uid) {
+      console.log("Limpando dados do histórico - usuário deslogado");
+      setMarketHistories([]);
+      setSharedMarketHistories([]);
+    }
+  }, [loggedUser?.uid]);
+
+  // Carregar dados quando o componente for montado
+  useEffect(() => {
+    if (loggedUser?.uid) {
+      console.log("Carregando dados iniciais para o usuário:", loggedUser.uid);
+      fetchMyMarketHistory();
+      fetchSharedMarketHistory();
+    }
+  }, [loggedUser?.uid]);
 
   const handleDeleteMarketHistory = async (marketHistory: IMarketHistory) => {
     try {
@@ -77,28 +95,38 @@ export const MarketHistoryTabContent = ({
   };
 
   const fetchMyMarketHistory = async () => {
-    if (!loggedUser?.uid) return;
+    if (!loggedUser?.uid) {
+      console.log("Usuário não autenticado ao buscar histórico");
+      return;
+    }
     try {
+      console.log("Buscando histórico para o usuário:", loggedUser.uid);
       setIsRefreshingMarketHistory(true);
       const response = await listMarketHistories(loggedUser.uid);
-
+      console.log("Histórico recebido:", response);
       setMarketHistories(response);
     } catch (error) {
-      console.error("Erro ao buscar os mercados: ", error);
+      console.error("Erro ao buscar o histórico de compras: ", error);
+      Toast.show("Erro ao carregar o histórico", { type: "error" });
     } finally {
       setIsRefreshingMarketHistory(false);
     }
   };
 
   const fetchSharedMarketHistory = async () => {
-    if (!loggedUser?.uid) return;
+    if (!loggedUser?.uid) {
+      console.log("Usuário não autenticado ao buscar histórico compartilhado");
+      return;
+    }
     try {
+      console.log("Buscando histórico compartilhado para o usuário:", loggedUser.uid);
       setIsRefreshingSMarketHistory(true);
       const response = await listMarketHistoriesSharedWithMe(loggedUser.uid);
-
+      console.log("Histórico compartilhado recebido:", response);
       setSharedMarketHistories(response);
     } catch (error) {
-      console.error("Erro ao buscar os mercados: ", error);
+      console.error("Erro ao buscar o histórico compartilhado: ", error);
+      Toast.show("Erro ao carregar o histórico compartilhado", { type: "error" });
     } finally {
       setIsRefreshingSMarketHistory(false);
     }
@@ -115,6 +143,7 @@ export const MarketHistoryTabContent = ({
   return (
     <>
       <ContentTitle
+        type="PRIMARY"
         onPress={() => setIsMarketHistoryVisible(!isMarketHistoryVisible)}
       >
         <Title>Meu histórico de compras</Title>
@@ -126,8 +155,9 @@ export const MarketHistoryTabContent = ({
       {isMarketHistoryVisible && (
         <Container>
           <FlatList
-            style={{ marginTop: !!marketHistories.length ? 16 : 0 }}
+            style={{ marginTop: marketHistories.length ? 16 : 0 }}
             data={marketHistories}
+            keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() => handleNavigateToMarketHistoryDetails(item.id)}
@@ -143,8 +173,8 @@ export const MarketHistoryTabContent = ({
             ListEmptyComponent={
               <LoadData
                 imageSrc={PersonImage}
-                title="Oops!"
-                subtitle="Você ainda não possui dados para exibir aqui! Comece adicionando itens no seu carrinho e crie sua lista de mercado."
+                title="Nenhum histórico encontrado"
+                subtitle="Você ainda não possui histórico de compras. Comece adicionando itens no seu carrinho e crie sua lista de mercado."
               />
             }
             refreshControl={
@@ -157,8 +187,8 @@ export const MarketHistoryTabContent = ({
         </Container>
       )}
 
-      {/* TODO: Create component to tab */}
       <ContentTitle
+        type="PRIMARY"
         onPress={() =>
           setIsSharedMarketHistoryVisible(!isSharedMarketHistoryVisible)
         }
@@ -174,8 +204,9 @@ export const MarketHistoryTabContent = ({
       {isSharedMarketHistoryVisible && (
         <Container>
           <FlatList
-            style={{ marginTop: !!marketHistories.length ? 16 : 0 }}
+            style={{ marginTop: sharedMarketHistories.length ? 16 : 0 }}
             data={sharedMarketHistories}
+            keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() => handleNavigateToMarketHistoryDetails(item.id)}
@@ -191,8 +222,8 @@ export const MarketHistoryTabContent = ({
             ListEmptyComponent={
               <LoadData
                 imageSrc={PersonImage}
-                title="Oops!"
-                subtitle="Você ainda não possui dados para exibir aqui!."
+                title="Nenhum histórico compartilhado"
+                subtitle="Você ainda não possui histórico de compras compartilhado com você."
               />
             }
             refreshControl={
