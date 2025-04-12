@@ -92,6 +92,14 @@ export const Container = styled.View`
   border-radius: 10px;
   padding: 8px;
   margin-bottom: 16px;
+  max-height: 300px;
+`;
+export const ContainerHistory = styled.View`
+  width: 100%;
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
+  border-radius: 10px;
+  padding: 8px;
+  margin-bottom: 16px;
 `;
 
 export const EmptyContainer = styled.View`

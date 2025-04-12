@@ -47,6 +47,7 @@ import {
   StatItem,
   StatValue,
   StatLabel,
+  ContainerHistory,
 } from "./styles";
 
 const modalBottom = Platform.OS === "ios" ? 90 : 70;
@@ -319,7 +320,7 @@ export function Market({ route }: any) {
                   />
                 )}
                 keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingBottom: 16 }}
+                contentContainerStyle={{ paddingBottom: 20 }}
                 ListEmptyComponent={
                   <EmptyContainer>
                     <LoadData
@@ -355,7 +356,7 @@ export function Market({ route }: any) {
                   />
                 )}
                 keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingBottom: 30 }}
+                contentContainerStyle={{ paddingBottom: 20 }}
                 ListEmptyComponent={
                   <EmptyContainer>
                     <SubTitle>Nenhum item compartilhado</SubTitle>
@@ -375,7 +376,7 @@ export function Market({ route }: any) {
               <Title>Histórico de compras</Title>
             </HeaderContainer>
           </ContentTitle>
-          <Container>
+          <ContainerHistory>
             <FlatList
               showsVerticalScrollIndicator={false}
               data={filteredMarketplaceData || []}
@@ -394,7 +395,7 @@ export function Market({ route }: any) {
                 </MarketCard>
               )}
               keyExtractor={(item) => item.id}
-              contentContainerStyle={{ paddingBottom: 16 }}
+              contentContainerStyle={{ paddingBottom: 20 }}
               ListEmptyComponent={
                 <EmptyContainer>
                   <LoadData
@@ -405,7 +406,7 @@ export function Market({ route }: any) {
                 </EmptyContainer>
               }
             />
-          </Container>
+          </ContainerHistory>
         </Content>
       )}
 

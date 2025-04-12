@@ -111,6 +111,7 @@ export const Container = styled.View`
   border-radius: 10px;
   padding: 8px;
   margin-bottom: 16px;
+  max-height: 500px;
 `;
 
 export const SubTitle = styled.Text`

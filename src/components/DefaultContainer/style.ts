@@ -44,7 +44,7 @@ export const Header = styled.View<Props>`
   position: relative;
   background-color: ${({ theme, type }) =>
     type === "PRIMARY" ? theme.COLORS.PURPLE_800 : theme.COLORS.TEAL_600};
-  padding: 0 10px;
+  padding: 0 20px;
 `;
 
 export const Button = styled(TouchableOpacity)`
@@ -52,7 +52,7 @@ export const Button = styled(TouchableOpacity)`
   align-items: center;
   justify-content: center;
   min-width: 40px;
-  padding: 10px;
+  padding: 20px;
 `;
 
 export const ButtonClose = styled(TouchableOpacity)`
@@ -60,7 +60,7 @@ export const ButtonClose = styled(TouchableOpacity)`
   align-items: center;
   justify-content: center;
   min-width: 40px;
-  padding: 10px;
+  padding: 20px;
 `;
 
 export const ButtonBack = styled(TouchableOpacity)`
@@ -68,7 +68,7 @@ export const ButtonBack = styled(TouchableOpacity)`
   align-items: center;
   justify-content: center;
   min-width: 40px;
-  padding: 10px;
+  padding: 20px;
 `;
 
 export const Title = styled.Text<Props>`

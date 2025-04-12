@@ -256,7 +256,7 @@ export function ListTask({ route }: any) {
                   />
                 )}
                 keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingBottom: 16 }}
+                contentContainerStyle={{ paddingBottom: 20 }}
                 ListEmptyComponent={
                   <EmptyContainer>
                     <LoadData
@@ -292,7 +292,7 @@ export function ListTask({ route }: any) {
                   />
                 )}
                 keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingBottom: 16 }}
+                contentContainerStyle={{ paddingBottom: 20 }}
                 ListEmptyComponent={
                   <EmptyContainer>
                     <SubTitle>Nenhuma tarefa compartilhada</SubTitle>
@@ -331,7 +331,7 @@ export function ListTask({ route }: any) {
                 </TaskCard>
               )}
               keyExtractor={(item) => item.id}
-              contentContainerStyle={{ paddingBottom: 16 }}
+              contentContainerStyle={{ paddingBottom: 20 }}
               ListEmptyComponent={
                 <EmptyContainer>
                   <LoadData
