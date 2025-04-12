@@ -355,7 +355,7 @@ export function Market({ route }: any) {
                   />
                 )}
                 keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingBottom: 16 }}
+                contentContainerStyle={{ paddingBottom: 30 }}
                 ListEmptyComponent={
                   <EmptyContainer>
                     <SubTitle>Nenhum item compartilhado</SubTitle>
