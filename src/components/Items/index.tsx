@@ -1,5 +1,5 @@
-import React from "react";
-import { TouchableOpacity } from "react-native";
+import React, { useState, useRef } from "react";
+import { TouchableOpacity, View, Text } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { formatCurrency } from "../../utils/mask";
 import {
@@ -13,9 +13,14 @@ import {
   Status,
   Actions,
   ActionButton,
+  PopoverContainer,
+  PopoverItem,
+  PopoverItemText,
+  PopoverDivider,
 } from "./styles";
 import { format, isBefore, parseISO, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import Popover from "react-native-popover-view";
 
 interface ItemsProps {
   type?: "PRIMARY" | "SECONDARY" | "TERTIARY";
@@ -27,6 +32,7 @@ interface ItemsProps {
   valueTransaction: string;
   onEdit?: () => void;
   onDelete?: () => void;
+  onToggleStatus?: () => void;
 }
 
 export function Items({
@@ -39,7 +45,11 @@ export function Items({
   valueTransaction,
   onEdit,
   onDelete,
+  onToggleStatus,
 }: ItemsProps) {
+  const [isPopoverVisible, setIsPopoverVisible] = useState(false);
+  const popoverRef = useRef(null);
+
   const getExpenseStatus = () => {
     if (status === true) return "PAID";
     
@@ -114,6 +124,21 @@ export function Items({
 
   const formattedDate = getFormattedDate();
 
+  const handleEdit = () => {
+    setIsPopoverVisible(false);
+    onEdit && onEdit();
+  };
+
+  const handleDelete = () => {
+    setIsPopoverVisible(false);
+    onDelete && onDelete();
+  };
+
+  const handleToggleStatus = () => {
+    setIsPopoverVisible(false);
+    onToggleStatus && onToggleStatus();
+  };
+
   return (
     <Container>
       <Content status={type === "SECONDARY" ? expenseStatus : undefined}>
@@ -133,16 +158,55 @@ export function Items({
 
         <Actions>
           <Value color={formattedValue.color}>{formattedValue.formatted}</Value>
-          {onEdit && (
-            <ActionButton onPress={onEdit}>
-              <MaterialIcons name="edit" size={24} color="#a7a9ac" />
-            </ActionButton>
-          )}
-          {onDelete && (
-            <ActionButton onPress={onDelete}>
-              <MaterialIcons name="delete-outline" size={24} color="#b91c1c" />
-            </ActionButton>
-          )}
+          
+          <View>
+            <Popover
+              ref={popoverRef}
+              isVisible={isPopoverVisible}
+              onRequestClose={() => setIsPopoverVisible(false)}
+              popoverStyle={{ borderRadius: 8 }}
+              from={
+                <ActionButton onPress={() => setIsPopoverVisible(true)}>
+                  <MaterialIcons name="more-vert" size={24} color="#a7a9ac" />
+                </ActionButton>
+              }
+            >
+              <PopoverContainer>
+                {onToggleStatus && (
+                  <PopoverItem onPress={handleToggleStatus}>
+                    <MaterialIcons 
+                      name={status ? "check-circle-outline" : "radio-button-unchecked"} 
+                      size={20} 
+                      color={status ? "#16a34a" : "#a7a9ac"} 
+                    />
+                    <PopoverItemText>
+                      {status ? "Marcar como não pago" : "Marcar como pago"}
+                    </PopoverItemText>
+                  </PopoverItem>
+                )}
+                
+                {onEdit && (
+                  <>
+                    {onToggleStatus && <PopoverDivider />}
+                    <PopoverItem onPress={handleEdit}>
+                      <MaterialIcons name="edit" size={20} color="#a7a9ac" />
+                      <PopoverItemText>Editar</PopoverItemText>
+                    </PopoverItem>
+                  </>
+                )}
+                
+                {onDelete && (
+                  <>
+                    {(onEdit || onToggleStatus) && <PopoverDivider />}
+                    <PopoverItem onPress={handleDelete}>
+                      <MaterialIcons name="delete-outline" size={20} color="#b91c1c" />
+                      <PopoverItemText>Excluir</PopoverItemText>
+                    </PopoverItem>
+                  </>
+                )}
+              </PopoverContainer>
+            </Popover>
+          </View>
         </Actions>
       </Content>
     </Container>

@@ -166,3 +166,34 @@ export const ContainerMenu = styled.View`
   elevation: 5;
 
 `;
+
+export const PopoverContainer = styled.View`
+  min-width: 200px;
+  padding: 8px 0;
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
+  border-radius: 8px;
+  elevation: 5;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+`;
+
+export const PopoverItem = styled(TouchableOpacity)`
+  flex-direction: row;
+  align-items: center;
+  padding: 12px 16px;
+`;
+
+export const PopoverItemText = styled.Text`
+  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  color: ${({ theme }) => theme.COLORS.GRAY_600};
+  margin-left: 12px;
+`;
+
+export const PopoverDivider = styled.View`
+  height: 1px;
+  background-color: ${({ theme }) => theme.COLORS.GRAY_300};
+  margin: 4px 0;
+`;

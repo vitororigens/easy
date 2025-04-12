@@ -46,7 +46,7 @@ export interface IRevenue {
   createdAt: Timestamp;
   name: string;
   author: string;
-  type: string;
+  type: "input" | "output";
   date: string;
   repeat: boolean;
   description: string;
@@ -143,7 +143,7 @@ export function Home() {
       });
   }
 
-  const handleDeleteItem = (documentId: string, type: string) => {
+  const handleDeleteItem = (documentId: string, type: "input" | "output") => {
     if (type === "input") {
       database
         .collection("Revenue")
@@ -172,6 +172,45 @@ export function Home() {
       // setRevenueSharedByMe((prev) => prev.filter((n) => n.id !== documentId));
       // setExpenseSharedByMe((prev) => prev.filter((n) => n.id !== documentId));
     }
+  };
+
+  const handleToggleStatus = (documentId: string) => {
+    // Primeiro, buscar o documento atual para obter o status atual
+    database
+      .collection("Expense")
+      .doc(documentId)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          const currentStatus = doc.data()?.status || false;
+          
+          // Atualizar o status para o oposto do atual
+          database
+            .collection("Expense")
+            .doc(documentId)
+            .update({
+              status: !currentStatus,
+            })
+            .then(() => {
+              Toast.show(
+                !currentStatus 
+                  ? "Despesa marcada como paga!" 
+                  : "Despesa marcada como não paga!", 
+                { type: "success" }
+              );
+            })
+            .catch((error) => {
+              console.error("Erro ao atualizar o status: ", error);
+              Toast.show("Erro ao atualizar o status", { type: "error" });
+            });
+        } else {
+          Toast.show("Despesa não encontrada", { type: "error" });
+        }
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar a despesa: ", error);
+        Toast.show("Erro ao buscar a despesa", { type: "error" });
+      });
   };
 
   async function getRevenuesSharedByMe() {
@@ -352,9 +391,10 @@ export function Home() {
                         onPress={() => handleRevenueEdit(item.id, activeButton)}
                       >
                         <Items
-                          onDelete={() => handleDeleteItem(item.id, item.type)}
+                          onDelete={() => handleDeleteItem(item.id, item.type as "input" | "output")}
                           onEdit={() => handleRevenueEdit(item.id, activeButton)}
                           type="PRIMARY"
+                          status={item.status}
                           category={item.name}
                           date={item.date}
                           repeat={item.repeat}
@@ -392,9 +432,8 @@ export function Home() {
                         <Items
                           onDelete={() => handleDeleteItem(item.id, item.type)}
                           onEdit={() => handleExpenseEdit(item.id, activeButton)}
-                          showItemTask
                           status={item.status}
-                          type={item.type}
+                          type={item.type === "input" ? "PRIMARY" : "SECONDARY"}
                           category={item.name}
                           date={item.date}
                           repeat={item.repeat}
@@ -435,10 +474,11 @@ export function Home() {
                         onPress={() => handleExpenseEdit(item.id, activeButton)}
                       >
                         <Items
-                          onDelete={() => handleDeleteItem(item.id, item.type)}
+                          onDelete={() => handleDeleteItem(item.id, item.type as "input" | "output")}
                           onEdit={() => handleExpenseEdit(item.id, activeButton)}
                           type="SECONDARY"
                           status={item.status}
+                          onToggleStatus={() => handleToggleStatus(item.id)}
                           category={item.name}
                           date={item.date}
                           repeat={item.repeat}
@@ -471,11 +511,10 @@ export function Home() {
                         onPress={() => handleExpenseEdit(item.id, activeButton)}
                       >
                         <Items
-                          onDelete={() => handleDeleteItem(item.id, item.type)}
+                          onDelete={() => handleDeleteItem(item.id, item.type as "input" | "output")}
                           onEdit={() => handleExpenseEdit(item.id, activeButton)}
-                          showItemTask
                           status={item.status}
-                          type={item.type}
+                          type={item.type === "input" ? "PRIMARY" : "SECONDARY"}
                           category={item.name}
                           date={item.date}
                           repeat={item.repeat}

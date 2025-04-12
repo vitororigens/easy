@@ -17,10 +17,15 @@ import {
   ShareIcon,
 } from "./styles";
 
+// Estendendo a interface INote para incluir propriedades do Firebase
+interface ExtendedNote extends INote {
+  name?: string;
+}
+
 type ItemNotesProps = {
-  note: INote;
+  note: ExtendedNote;
   onDelete: (id: string) => void;
-  onUpdate: (note: INote) => void;
+  onUpdate: (note: ExtendedNote) => void;
   isSharedByMe?: boolean;
 };
 
@@ -29,9 +34,23 @@ export function ItemNotes({ note, onDelete, onUpdate, isSharedByMe }: ItemNotesP
 
   const formattedDate = (() => {
     try {
-      const date = note.createdAt instanceof Date 
-        ? note.createdAt 
-        : new Date(note.createdAt);
+      let date: Date;
+      
+      if (note.createdAt instanceof Date) {
+        date = note.createdAt;
+      } else if (note.createdAt && typeof note.createdAt === 'object') {
+        // Verifica se é um objeto Timestamp do Firestore
+        if ('seconds' in note.createdAt && 'nanoseconds' in note.createdAt) {
+          date = new Date(
+            (note.createdAt as any).seconds * 1000 + 
+            (note.createdAt as any).nanoseconds / 1000000
+          );
+        } else {
+          date = new Date(note.createdAt as any);
+        }
+      } else {
+        date = new Date(note.createdAt as any);
+      }
       
       if (isNaN(date.getTime())) {
         return "Data inválida";
@@ -50,7 +69,7 @@ export function ItemNotes({ note, onDelete, onUpdate, isSharedByMe }: ItemNotesP
     <Container isShared={note.isShared} onPress={() => onUpdate(note)}>
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Title numberOfLines={1}>{note.title}</Title>
+          <Title numberOfLines={1}>{note.title || note.name}</Title>
           {note.isShared && (
             <ShareBadge isSharedByMe={isSharedByMe}>
               <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
