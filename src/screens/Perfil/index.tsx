@@ -24,7 +24,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Toast } from "react-native-toast-notifications";
 import { database, storage } from "../../libs/firebase";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "@react-native-firebase/firestore";
 
 const formSchema = z.object({
   image: z.string().optional(),
@@ -51,7 +51,7 @@ export function Perfil() {
         try {
           const docRef = doc(database, "Perfil", uid);
           const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
+          if (docSnap.exists) {
             const data = docSnap.data();
             if (data?.image) {
               setImage(data.image);
@@ -114,6 +114,7 @@ export function Perfil() {
   };
 
   const handleSaveItem = async ({ image }: { image: string }) => {
+    if (!uid) return;
     try {
       const docRef = doc(database, "Perfil", uid);
       await setDoc(docRef, { image }, { merge: true });
@@ -123,6 +124,7 @@ export function Perfil() {
   };
 
   const deleteImage = async () => {
+    if (!uid) return;
     try {
       const docRef = doc(database, "Perfil", uid);
       await updateDoc(docRef, { image: null });
