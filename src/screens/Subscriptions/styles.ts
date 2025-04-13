@@ -33,11 +33,16 @@ export const FilterText = styled.Text<{ active: boolean }>`
   color: ${({theme, active}) => active ? theme.COLORS.WHITE : theme.COLORS.GRAY_600};
 `;
 
-export const ItemContainer = styled.View`
-  background-color: ${({theme}) => theme.COLORS.GRAY_300};
+export const ItemContainer = styled(TouchableOpacity)`
+  background-color: #fff;
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 8px;
+  elevation: 2;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
 `;
 
 export const ItemTitle = styled.Text`
@@ -142,4 +147,34 @@ export const Divider = styled.View<DividerProps>`
   height: 4px;
   background-color: ${({ theme, active }) =>
     active ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_300};
+`;
+
+export const MenuButton = styled(TouchableOpacity)`
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  padding: 8px;
+`;
+
+export const MenuOptions = styled.View`
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 8px;
+  elevation: 4;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+`;
+
+export const MenuOption = styled(TouchableOpacity)`
+  padding: 12px 16px;
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const MenuOptionText = styled.Text`
+  font-size: 16px;
+  color: #333;
+  margin-left: 8px;
 `; 
