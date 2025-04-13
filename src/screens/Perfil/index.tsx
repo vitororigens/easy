@@ -24,7 +24,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Toast } from "react-native-toast-notifications";
 import { database, storage } from "../../libs/firebase";
-import { doc, getDoc, setDoc, updateDoc } from "@react-native-firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from "@react-native-firebase/firestore";
 
 const formSchema = z.object({
   image: z.string().optional(),
@@ -38,6 +38,7 @@ export function Perfil() {
   const [confirmLogoutVisible, setConfirmLogoutVisible] = useState(false);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
   const [image, setImage] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
 
   const { setValue, reset } = useForm<FormSchemaType>({
     defaultValues: {
@@ -47,8 +48,9 @@ export function Perfil() {
 
   useEffect(() => {
     if (uid) {
-      const fetchImage = async () => {
+      const fetchUserData = async () => {
         try {
+          // Buscar imagem do perfil
           const docRef = doc(database, "Perfil", uid);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists) {
@@ -58,11 +60,21 @@ export function Perfil() {
               setValue("image", data.image);
             }
           }
+
+          // Buscar userName
+          const userRef = collection(database, "User");
+          const q = query(userRef, where("uid", "==", uid));
+          const querySnapshot = await getDocs(q);
+          
+          if (!querySnapshot.empty) {
+            const userData = querySnapshot.docs[0].data();
+            setUserName(userData.userName);
+          }
         } catch (error) {
-          console.error("Error fetching image: ", error);
+          console.error("Error fetching user data: ", error);
         }
       };
-      fetchImage();
+      fetchUserData();
     }
   }, [uid]);
 
@@ -159,6 +171,11 @@ export function Perfil() {
                 <Items>
                   <Title>Nome:</Title>
                   <SubTitle type="SECONDARY">{user?.displayName}</SubTitle>
+                </Items>
+
+                <Items>
+                  <Title>Nome de Usuário:</Title>
+                  <SubTitle type="SECONDARY">{userName || "Não definido"}</SubTitle>
                 </Items>
 
                 <Items>
