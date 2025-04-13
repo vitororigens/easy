@@ -6,12 +6,19 @@ import { DefaultContainer } from "../../components/DefaultContainer";
 import { Loading } from "../../components/Loading";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import {
+  ActionButton,
+  ButtonText,
+  ButtonsContainer,
+  Container,
   ContainerIcon,
   Content,
   ContentItems,
+  GradientBackground,
   Header,
   Icon,
+  IconField,
   ImageContainer,
+  ItemContent,
   Items,
   StyledImage,
   SubTitle,
@@ -149,56 +156,88 @@ export function Perfil() {
 
   return (
     <DefaultContainer backButton title="Perfil">
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Content>
-          {user ? (
-            <View>
-              <Header>
-                {image ? (
-                  <ImageContainer onPress={pickImage}>
-                    <StyledImage source={{ uri: image }} />
-                    <ContainerIcon onPress={deleteImage}>
-                      <Icon name="trash-o" />
-                    </ContainerIcon>
-                  </ImageContainer>
-                ) : (
-                  <ImageContainer onPress={pickImage}>
-                    <MaterialIcons name="add-a-photo" size={36} color="white" />
-                  </ImageContainer>
-                )}
-              </Header>
-              <ContentItems>
-                <Items>
-                  <Title>Nome:</Title>
-                  <SubTitle type="SECONDARY">{user?.displayName}</SubTitle>
-                </Items>
+      <Container>
+        <GradientBackground
+          colors={['#6B46C1', '#9F7AEA']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        />
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <Content>
+            {user ? (
+              <View>
+                <Header>
+                  {image ? (
+                    <ImageContainer onPress={pickImage}>
+                      <StyledImage source={{ uri: image }} />
+                      <ContainerIcon onPress={deleteImage}>
+                        <Icon name="trash-o" />
+                      </ContainerIcon>
+                    </ImageContainer>
+                  ) : (
+                    <ImageContainer onPress={pickImage}>
+                      <MaterialIcons name="add-a-photo" size={36} color="white" />
+                    </ImageContainer>
+                  )}
+                </Header>
+                <ContentItems>
+                  <Items>
+                    <IconField name="person" />
+                    <ItemContent>
+                      <Title>Nome</Title>
+                      <SubTitle type="SECONDARY">{user?.displayName}</SubTitle>
+                    </ItemContent>
+                  </Items>
 
-                <Items>
-                  <Title>Nome de Usuário:</Title>
-                  <SubTitle type="SECONDARY">{userName || "Não definido"}</SubTitle>
-                </Items>
+                  <Items>
+                    <IconField name="person-outline" />
+                    <ItemContent>
+                      <Title>Nome de Usuário</Title>
+                      <SubTitle type="SECONDARY">{userName || "Não definido"}</SubTitle>
+                    </ItemContent>
+                  </Items>
 
-                <Items>
-                  <Title>Email:</Title>
-                  <SubTitle type="SECONDARY">{user?.email}</SubTitle>
-                </Items>
-                <Items>
-                  <Title>ID:</Title>
-                  <SubTitle type="SECONDARY">
-                    {user?.uid
-                      ? user.uid.length > 10
-                        ? user.uid.substring(0, 15) + "..."
-                        : user.uid
-                      : ""}
-                  </SubTitle>
-                </Items>
-              </ContentItems>
-            </View>
-          ) : (
-            <Loading />
-          )}
-        </Content>
-      </ScrollView>
+                  <Items>
+                    <IconField name="email" />
+                    <ItemContent>
+                      <Title>Email</Title>
+                      <SubTitle type="SECONDARY">{user?.email}</SubTitle>
+                    </ItemContent>
+                  </Items>
+
+                  <Items>
+                    <IconField name="fingerprint" />
+                    <ItemContent>
+                      <Title>ID</Title>
+                      <SubTitle type="SECONDARY">
+                        {user?.uid
+                          ? user.uid.length > 10
+                            ? user.uid.substring(0, 15) + "..."
+                            : user.uid
+                          : ""}
+                      </SubTitle>
+                    </ItemContent>
+                  </Items>
+                </ContentItems>
+
+                <ButtonsContainer>
+                  <ActionButton onPress={() => setConfirmLogoutVisible(true)}>
+                    <MaterialIcons name="logout" size={24} color="white" />
+                    <ButtonText>Sair</ButtonText>
+                  </ActionButton>
+                  <ActionButton onPress={() => setConfirmDeleteVisible(true)}>
+                    <MaterialIcons name="delete" size={24} color="white" />
+                    <ButtonText>Excluir Conta</ButtonText>
+                  </ActionButton>
+                </ButtonsContainer>
+              </View>
+            ) : (
+              <Loading />
+            )}
+          </Content>
+        </ScrollView>
+      </Container>
+
       <CustomModal
         animationType="slide"
         transparent={true}
