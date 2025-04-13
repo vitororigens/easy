@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { createSubscription, updateSubscription, getSubscriptions } from "../../services/firebase/subscription.firebase";
 import { Subscription } from "../../services/firebase/subscription.firebase";
+import firestore from "@react-native-firebase/firestore";
 
 import {
   Container,
@@ -56,19 +57,33 @@ export function NewSubscription() {
 
   async function fetchSubscription() {
     try {
-      const subscriptions = await getSubscriptions(user?.uid || '');
-      const subscription = subscriptions.find(sub => sub.id === selectedItemId);
-      
-      if (subscription) {
+      const doc = await firestore()
+        .collection("subscriptions")
+        .doc(selectedItemId)
+        .get();
+
+      if (doc.exists) {
+        const subscription = doc.data() as Subscription;
+
         setValue("name", subscription.name);
         setValue("value", subscription.value.toString());
-        setValue("dueDate", format(new Date(subscription.dueDate), "dd/MM/yyyy"));
+
+        // Verifica se a data já está no formato correto antes de formatar
+        const formattedDate = /^\d{2}\/\d{2}\/\d{4}$/.test(subscription.dueDate)
+          ? subscription.dueDate
+          : format(new Date(subscription.dueDate), "dd/MM/yyyy");
+        setValue("dueDate", formattedDate);
+
         setValue("status", subscription.status);
         setStatus(subscription.status);
+
         if (subscription.description) {
           setValue("description", subscription.description);
           setShowDescription(true);
         }
+      } else {
+        console.error("Assinatura não encontrada");
+        Toast.show("Assinatura não encontrada", { type: "error" });
       }
     } catch (error) {
       console.error("Erro ao buscar assinatura:", error);
@@ -215,4 +230,4 @@ export function NewSubscription() {
       </Container>
     </DefaultContainer>
   );
-} 
+}

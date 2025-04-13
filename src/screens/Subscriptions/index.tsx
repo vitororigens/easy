@@ -1,14 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ActivityIndicator, FlatList, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { DefaultContainer } from "../../components/DefaultContainer";
-import { useSubscriptionsCollection } from "../../hooks/useSubscriptionsCollection";
 import { deleteSubscription } from "../../services/firebase/subscription.firebase";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { Subscription } from "../../services/firebase/subscription.firebase";
 import { Ionicons } from "@expo/vector-icons";
+import firestore from "@react-native-firebase/firestore";
 
 import {
   Container,
@@ -29,21 +27,49 @@ import {
   MenuOptionText,
 } from "./styles";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { currencyMask, dataMask } from "../../utils/mask";
+import { dataMask } from "../../utils/mask";
 import Popover from "react-native-popover-view";
 
 export function Subscriptions() {
   const navigation = useNavigation();
-  const { subscriptions, loading, error } = useSubscriptionsCollection();
+  const user = useUserAuth();
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showActive, setShowActive] = useState(true);
   const [menuVisible, setMenuVisible] = useState<string | null>(null);
 
-  const filteredSubscriptions = subscriptions.filter(sub => sub.status === showActive);
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection("subscriptions")
+      .where("userId", "==", user?.uid || "")
+      .onSnapshot(
+        (snapshot) => {
+          const data = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Subscription[];
+          setSubscriptions(data);
+          setLoading(false);
+        },
+        (err) => {
+          console.error("Erro ao carregar assinaturas:", err);
+          setError(true);
+          setLoading(false);
+        }
+      );
+
+    return () => unsubscribe(); // Remove o listener ao desmontar o componente
+  }, [user?.uid]);
+
+  const filteredSubscriptions = subscriptions.filter(
+    (sub) => sub.status === showActive
+  );
 
   const handleEdit = (subscription: Subscription) => {
     console.log("Edit subscription:", subscription);
     if (subscription.id) {
-      navigation.navigate('new-subscription', { selectedItemId: subscription.id });
+      navigation.navigate("new-subscription", { selectedItemId: subscription.id });
     }
   };
 
@@ -54,7 +80,7 @@ export function Subscriptions() {
       [
         {
           text: "Cancelar",
-          style: "cancel"
+          style: "cancel",
         },
         {
           text: "Excluir",
@@ -68,8 +94,8 @@ export function Subscriptions() {
               console.error("Erro ao excluir assinatura:", error);
               Alert.alert("Erro", "Não foi possível excluir a assinatura");
             }
-          }
-        }
+          },
+        },
       ]
     );
   };
@@ -121,11 +147,7 @@ export function Subscriptions() {
   }
 
   return (
-    <DefaultContainer
-      title="Assinaturas"
-      backButton
-      newSubscription
-    >
+    <DefaultContainer title="Assinaturas" backButton newSubscription>
       <Container>
         <Title>{showActive ? "Assinaturas Ativas" : "Assinaturas Canceladas"}</Title>
 
@@ -140,14 +162,12 @@ export function Subscriptions() {
 
         <FlatList<Subscription>
           data={filteredSubscriptions}
-          keyExtractor={(item) => item.id || ''}
+          keyExtractor={(item) => item.id || ""}
           renderItem={({ item }) => (
             <ItemContainer onPress={() => handleEdit(item)}>
               <ItemTitle>{item.name}</ItemTitle>
               <ItemValue>{formatCurrency(item.value)}</ItemValue>
-              <ItemDate>
-                Vence em {dataMask(item.dueDate)}
-              </ItemDate>
+              <ItemDate>Vence em {dataMask(item.dueDate)}</ItemDate>
               <ItemStatus active={item.status}>
                 {item.status ? "Ativa" : "Cancelada"}
               </ItemStatus>
@@ -161,19 +181,25 @@ export function Subscriptions() {
                 }
               >
                 <MenuOptions>
-                  <MenuOption onPress={() => {
-                    setMenuVisible(null);
-                    handleEdit(item);
-                  }}>
+                  <MenuOption
+                    onPress={() => {
+                      setMenuVisible(null);
+                      handleEdit(item);
+                    }}
+                  >
                     <Ionicons name="create-outline" size={20} color="#333" />
                     <MenuOptionText>Editar</MenuOptionText>
                   </MenuOption>
-                  <MenuOption onPress={() => {
-                    setMenuVisible(null);
-                    handleDelete(item);
-                  }}>
+                  <MenuOption
+                    onPress={() => {
+                      setMenuVisible(null);
+                      handleDelete(item);
+                    }}
+                  >
                     <Ionicons name="trash-outline" size={20} color="#FF3B30" />
-                    <MenuOptionText style={{ color: '#FF3B30' }}>Excluir</MenuOptionText>
+                    <MenuOptionText style={{ color: "#FF3B30" }}>
+                      Excluir
+                    </MenuOptionText>
                   </MenuOption>
                 </MenuOptions>
               </Popover>
@@ -183,4 +209,4 @@ export function Subscriptions() {
       </Container>
     </DefaultContainer>
   );
-} 
+}
