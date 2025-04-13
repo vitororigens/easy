@@ -28,12 +28,6 @@ export function Login() {
       >
         <Container>
           <Header>
-            {/* <Divider
-              style={{
-                alignSelf:
-                  activeButton === "Entrar" ? "flex-start" : "flex-end",
-              }}
-            /> */}
             <NavBar>
               <Button
                 onPress={() => handleButtonClick("Entrar")}
@@ -50,14 +44,7 @@ export function Login() {
                 <Title>Inscrever-se</Title>
               </Button>
             </NavBar>
-            {/* <Content>
-              <Button onPress={() => handleButtonClick("Entrar")}>
-                <Title>ENTRAR</Title>
-              </Button>
-              <Button onPress={() => handleButtonClick("Inscrever-se")}>
-                <Title>INSCREVER-SE</Title>
-              </Button>
-            </Content> */}
+        
           </Header>
           {activeButton === "Entrar" && <SingIn />}
           {activeButton === "Inscrever-se" && <SingUp />}

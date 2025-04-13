@@ -40,7 +40,7 @@ export function ItemMarket({
           </Checkbox>
         </CheckboxContainer>
         <TouchableOpacity onPress={handleUpdate} style={{ flex: 1 }}>
-          <Title status={market.status}>{market.name}</Title>
+          <Title status={isSelected}>{market.name}</Title>
           <Description status={market.status}>
             {market.quantity} {market.measurement} - {formatPrice(market.price || 0)}
           </Description>

@@ -3,8 +3,6 @@ import { TouchableOpacity, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components/native";
 
-// import backgroundImage from "../../assets/background.png";
-
 type Props = {
   type?: "PRIMARY" | "SECONDARY";
 };
@@ -27,13 +25,6 @@ export const Content = styled.View<ContentProps>`
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
 `;
-
-// export const Background = styled(ImageBackground).attrs({
-//   source: backgroundImage,
-//   resizeMode: "cover",
-// })`
-//   flex: 1;
-// `;
 
 export const Header = styled.View<Props>`
   width: 100%;
