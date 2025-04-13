@@ -1,15 +1,19 @@
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, Dimensions } from "react-native";
 import styled from "styled-components/native";
+
+const { height } = Dimensions.get('window');
 
 export const Container = styled.View`
     flex: 1;
-    margin-top: 10px;
+    margin-top: ${Math.min(height * 0.02, 10)}px;
 `;
 
 export const LogoContainer = styled.View`
     width: 100%;
     justify-content: center;
     align-items: center;
+    padding-vertical: ${Math.min(height * 0.02, 20)}px;
+    min-height: ${Math.min(height * 0.15, 100)}px;
 `;
 
 export const Header = styled.View`
@@ -18,12 +22,11 @@ export const Header = styled.View`
 
 export const Content = styled.View`
     width: 100%;
-    height: 60px;
+    height: ${Math.min(height * 0.08, 60)}px;
     flex-direction: row;
     justify-content: space-between;
-    padding-left: 50px;
-    padding-right: 25px;
-    padding-top: 10px;
+    padding-horizontal: ${Math.min(height * 0.03, 25)}px;
+    padding-top: ${Math.min(height * 0.015, 10)}px;
 `;
 
 type ButtonProps = {
@@ -32,7 +35,7 @@ type ButtonProps = {
 
 export const NavBar = styled.View`
     width: 100%;
-    height: 60px;
+    height: ${Math.min(height * 0.08, 60)}px;
     flex-direction: row;
     justify-content: space-between;
 `;
@@ -49,6 +52,8 @@ export const Button = styled(TouchableOpacity)<ButtonProps>`
 export const Title = styled.Text`
     font-size: ${({theme}) => theme.FONTE_SIZE.GG}px;
     font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
+    text-align: center;
+    padding-horizontal: ${Math.min(height * 0.02, 15)}px;
 `;
 
 export const Divider = styled.View`

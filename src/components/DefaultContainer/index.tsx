@@ -149,15 +149,12 @@ export function DefaultContainer({
   return (
     <Container type={type}>
       <Header type={type}>
-        <View style={{ position: "absolute", left: 0, zIndex: 1 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {backButton && (
             <ButtonBack onPress={handleGoBack}>
               <Icon name="arrow-back-circle-outline" />
             </ButtonBack>
           )}
-        </View>
-
-        <View style={{ position: "absolute", left: backButton ? 50 : 0, zIndex: 1 }}>
           {monthButton && (
             <Button onPress={handleShowFilter}>
               <Icon name="filter-outline" />
@@ -167,7 +164,7 @@ export function DefaultContainer({
 
         <Title type={type}>{title}</Title>
 
-        <View style={{ position: "absolute", right: 0, flexDirection: "row", zIndex: 1 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {newItem && (
             <Button onPress={() => handleNewItemTask(selectedItemId)}>
               <Icon name="add-outline" />

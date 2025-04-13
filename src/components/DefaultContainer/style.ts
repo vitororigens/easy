@@ -31,35 +31,35 @@ export const Header = styled.View<Props>`
   height: ${({ theme, type }) => (type === "PRIMARY" ? "80px" : "120px")};
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   position: relative;
   background-color: ${({ theme, type }) =>
     type === "PRIMARY" ? theme.COLORS.PURPLE_800 : theme.COLORS.TEAL_600};
-  padding: 0 20px;
+  padding: 0 10px;
 `;
 
 export const Button = styled(TouchableOpacity)`
-  height: 100%;
+  height: 40px;
+  width: 40px;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  padding: 20px;
+  margin: 0 5px;
 `;
 
 export const ButtonClose = styled(TouchableOpacity)`
-  height: 100%;
+  height: 40px;
+  width: 40px;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  padding: 20px;
+  margin: 0 5px;
 `;
 
 export const ButtonBack = styled(TouchableOpacity)`
-  height: 100%;
+  height: 40px;
+  width: 40px;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  padding: 20px;
+  margin: 0 5px;
 `;
 
 export const Title = styled.Text<Props>`
@@ -69,7 +69,7 @@ export const Title = styled.Text<Props>`
   font-weight: 700;
   text-align: center;
   flex: 1;
-  padding: 0 50px;
+  padding: 0 10px;
 `;
 
 export const SubTitle = styled.Text`

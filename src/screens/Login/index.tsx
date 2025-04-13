@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Logo } from "../../components/Logo";
 import { SingIn } from "../SingIn";
@@ -22,37 +22,43 @@ export function Login() {
 
   return (
     <DefaultContainer>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
       >
-        <Container>
-          <Header>
-            <NavBar>
-              <Button
-                onPress={() => handleButtonClick("Entrar")}
-                active={activeButton !== "Entrar"}
-                style={{ borderTopLeftRadius: 40 }}
-              >
-                <Title>Entrar</Title>
-              </Button>
-              <Button
-                onPress={() => handleButtonClick("Inscrever-se")}
-                active={activeButton !== "Inscrever-se"}
-                style={{ borderTopRightRadius: 40 }}
-              >
-                <Title>Inscrever-se</Title>
-              </Button>
-            </NavBar>
-        
-          </Header>
-          {activeButton === "Entrar" && <SingIn />}
-          {activeButton === "Inscrever-se" && <SingUp />}
-        </Container>
-        <LogoContainer>
-          <Logo />
-        </LogoContainer>
-      </ScrollView>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Container>
+            <Header>
+              <NavBar>
+                <Button
+                  onPress={() => handleButtonClick("Entrar")}
+                  active={activeButton !== "Entrar"}
+                  style={{ borderTopLeftRadius: 40 }}
+                >
+                  <Title>Entrar</Title>
+                </Button>
+                <Button
+                  onPress={() => handleButtonClick("Inscrever-se")}
+                  active={activeButton !== "Inscrever-se"}
+                  style={{ borderTopRightRadius: 40 }}
+                >
+                  <Title>Inscrever-se</Title>
+                </Button>
+              </NavBar>
+            </Header>
+
+            {activeButton === "Entrar" && <SingIn />}
+            {activeButton === "Inscrever-se" && <SingUp />}
+            <LogoContainer>
+              <Logo />
+            </LogoContainer>
+          </Container>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </DefaultContainer>
   );
 }
