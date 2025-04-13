@@ -422,7 +422,7 @@ export function Market({ route }: any) {
                     onPress={() => handleDeleteHistoryItem(item.id)}
                     style={{ position: 'absolute', right: 10, top: 10 }}
                   >
-                    <Icon name="delete" size={24} color={COLORS.ERROR} />
+                    <Icon name="delete" size={24} color={COLORS.RED_700} />
                   </TouchableOpacity>
                 </MarketCard>
               )}

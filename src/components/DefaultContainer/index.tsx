@@ -38,6 +38,7 @@ type DefaultContainerProps = {
   newItemMarketplace?: boolean;
   newNotes?: boolean;
   hasHeader?: boolean;
+  newSubscription?: boolean;
   title?: string;
   subtitle?: string;
   customBg?: string;
@@ -65,6 +66,7 @@ export function DefaultContainer({
   backButton = false,
   monthButton = false,
   addButton = false,
+  newSubscription = false,
   newItem = false,
   newLaunch = false,
   listButtom = false,
@@ -195,7 +197,7 @@ export function DefaultContainer({
             </Button>
           )}
 
-          {onNewSubscription && (
+          {newSubscription && (
             <Button onPress={() => handleNewSubscription(selectedItemId)}>
               <Icon name="add-outline" />
             </Button>

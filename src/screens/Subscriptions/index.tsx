@@ -62,7 +62,7 @@ export function Subscriptions() {
 
   if (filteredSubscriptions.length === 0) {
     return (
-      <DefaultContainer title="Assinaturas" backButton>
+      <DefaultContainer title="Assinaturas" backButton newSubscription>
         <Container>
           <Title>{showActive ? "Assinaturas Ativas" : "Assinaturas Canceladas"}</Title>
 
@@ -87,7 +87,11 @@ export function Subscriptions() {
   }
 
   return (
-    <DefaultContainer title="Assinaturas" backButton onNewSubscription={() => navigation.navigate("new-subscription", { selectedItemId: "" })}>
+    <DefaultContainer 
+      title="Assinaturas" 
+      backButton 
+      newSubscription 
+    >
       <Container>
         <Title>{showActive ? "Assinaturas Ativas" : "Assinaturas Canceladas"}</Title>
 
