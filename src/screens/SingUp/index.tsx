@@ -9,8 +9,8 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
-import { database } from "../../libs/firebase";
-import { collection, doc, setDoc, query, where, getDocs } from "firebase/firestore";
+import { database } from '../../libs/firebase';
+import firestore from '@react-native-firebase/firestore';
 
 const formSchema = z
   .object({
@@ -70,9 +70,8 @@ export function SingUp() {
   });
 
   const checkUsernameExists = async (username: string) => {
-    const userRef = collection(database, "User");
-    const q = query(userRef, where("userName", "==", username));
-    const snapshot = await getDocs(q);
+    const userRef = firestore().collection("User");
+    const snapshot = await userRef.where("userName", "==", username).get();
     return !snapshot.empty;
   };
 
@@ -112,7 +111,7 @@ export function SingUp() {
             displayName: name.trim(),
           })
           .then(() => {
-            setDoc(doc(database, "User", uid), {
+            firestore().collection("User").doc(uid).set({
               userName: userName.trim(),
               uid,
             });

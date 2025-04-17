@@ -113,18 +113,6 @@ export function Gears() {
                     </Icon>
                   </Items>
                 </ButtonIcon>
-                <ButtonIcon onPress={handlePiggyBank}>
-                  <Items>
-                    <Title>Cofrinho</Title>
-                    <Icon>
-                      <FontAwesome5
-                        name="piggy-bank"
-                        size={30}
-                        color={COLORS.PURPLE_800}
-                      />
-                    </Icon>
-                  </Items>
-                </ButtonIcon>
                 <ButtonIcon onPress={handleGraphics}>
                   <Items>
                     <Title>Gráficos</Title>

@@ -93,7 +93,7 @@ export const Container = styled.View`
   border-radius: 10px;
   padding: 8px;
   margin-bottom: 16px;
-  max-height: 500px;
+  max-height: 400px;
 `;
 
 export const EmptyContainer = styled.View`

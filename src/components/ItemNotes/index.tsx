@@ -4,7 +4,7 @@ import Popover from "react-native-popover-view";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-import { INote } from "../../interfaces/INote";
+import { INote } from "../../services/firebase/notes.firebase";
 import {
   Container,
   Title,
@@ -19,7 +19,8 @@ import {
 
 // Estendendo a interface INote para incluir propriedades do Firebase
 interface ExtendedNote extends INote {
-  name?: string;
+  isShared?: boolean;
+  sharedWith?: string[];
 }
 
 type ItemNotesProps = {
@@ -69,7 +70,7 @@ export function ItemNotes({ note, onDelete, onUpdate, isSharedByMe }: ItemNotesP
     <Container isShared={note.isShared} onPress={() => onUpdate(note)}>
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Title numberOfLines={1}>{note.title || note.name}</Title>
+          <Title numberOfLines={1}>{note.name}</Title>
           {note.isShared && (
             <ShareBadge isSharedByMe={isSharedByMe}>
               <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
