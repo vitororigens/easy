@@ -114,8 +114,8 @@ export function Notes({ route }: any) {
               data={myNotes}
               renderItem={({ item }) => (
                 <ItemNotes
-                  handleDelete={() => handleDeleteNote(item.id)}
-                  handleUpdate={() => handleEditItem(item.id, true)}
+                  onDelete={() => handleDeleteNote(item.id)} 
+                  onUpdate={() => handleEditItem(item.id, true)}
                   note={item}
                 />
               )}
@@ -154,8 +154,8 @@ export function Notes({ route }: any) {
                 const isSharedByMe = sharedNotesByMe.some(note => note.id === item.id);
                 return (
                   <ItemNotes
-                    handleDelete={() => handleDeleteNote(item.id)}
-                    handleUpdate={() => handleEditItem(item.id, false)}
+                    onDelete={() => handleDeleteNote(item.id)}
+                    onUpdate={() => handleEditItem(item.id, false)}
                     note={item}
                     isSharedByMe={isSharedByMe}
                   />

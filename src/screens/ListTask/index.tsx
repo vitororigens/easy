@@ -197,6 +197,32 @@ export function ListTask({ route }: any) {
     }
   };
 
+  const handleDeleteHistoryTaskHistory = async (itemId: string) => {
+    Alert.alert(
+      "Excluir histórico",
+      "Tem certeza que deseja excluir este item do histórico?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel"
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await database.collection("HistoryTasks").doc(itemId).delete();
+              Toast.show("Item excluído do histórico!", { type: "success" });
+            } catch (error) {
+              console.error("Erro ao excluir item do histórico:", error);
+              Toast.show("Erro ao excluir item do histórico", { type: "error" });
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const handleGroupTasks = async (groupName: string) => {
     try {
       await createHistoryTasks(groupName);
@@ -328,6 +354,12 @@ export function ListTask({ route }: any) {
                   <DateText>
                     ✅ Total de tarefas: {item.tasks.length}
                   </DateText>
+                  <TouchableOpacity 
+                    onPress={() => handleDeleteHistoryTaskHistory(item.id)}
+                    style={{ position: 'absolute', right: 10, top: 10 }}
+                  >
+                    <Icon name="delete" size={24} color={COLORS.RED_700} />
+                  </TouchableOpacity>
                 </TaskCard>
               )}
               keyExtractor={(item) => item.id}

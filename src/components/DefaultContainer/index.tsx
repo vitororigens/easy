@@ -124,7 +124,7 @@ export function DefaultContainer({
     if (onNewSubscription) {
       onNewSubscription(documentId);
     } else {
-      navigation.navigate("subscription-history", { selectedItemId: documentId });
+      navigation.navigate("new-subscription", { selectedItemId: documentId });
     }
   }
 
