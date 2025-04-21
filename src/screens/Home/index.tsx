@@ -103,14 +103,15 @@ export function Home() {
   }, []);
 
   useEffect(() => {
-    // Calculando contas pagas e pendentes apenas para o mês selecionado
-    const paid = expense.filter(item => item.status && item.month === selectedMonth).length;
-    const pending = expense.filter(item => !item.status && item.month === selectedMonth).length;
+    // Calculando contas pagas e pendentes apenas para o mês selecionado e do usuário atual
+    const filteredExpenses = expense.filter(item => item.uid === uid && item.month === selectedMonth);
+    const paid = filteredExpenses.filter(item => item.status).length;
+    const pending = filteredExpenses.filter(item => !item.status).length;
     
     setPaidBills(paid);
     setPendingBills(pending);
     setTotalValue(tolalRevenueMunth - totalExpenseMunth);
-  }, [expense, tolalRevenueMunth, totalExpenseMunth, selectedMonth]);
+  }, [expense, tolalRevenueMunth, totalExpenseMunth, selectedMonth, uid]);
 
   const formattedRevenue = tolalRevenueMunth.toLocaleString("pt-BR", {
     style: "currency",
@@ -401,7 +402,7 @@ export function Home() {
               
                       <StatsContainer>
                         <StatItem>
-                          <TouchableOpacity onPress={() => navigation.navigate("graphics")}>
+                          <TouchableOpacity onPress={() => navigation.navigate("graphics" as never)}>
                             <Icon name="pie-chart" size={24} color="#000" />
                             <StatLabel>Gráficos</StatLabel>
                           </TouchableOpacity>
