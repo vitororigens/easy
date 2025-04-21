@@ -303,6 +303,7 @@ export function Market({ route }: any) {
           </ContentTitle>
           <Container>
             <StatsContainer>
+              
               <StatItem>
                 <StatValue>{marketStats.totalItems}</StatValue>
                 <StatLabel>Total de itens</StatLabel>

@@ -121,14 +121,14 @@ export const StatItem = styled.View`
 `;
 
 export const StatValue = styled.Text`
-  font-size: 16px;
+  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
   font-weight: bold;
   color: ${({ theme }) => theme.COLORS.PURPLE_800};
   margin-bottom: 4px;
 `;
 
 export const StatLabel = styled.Text`
-  font-size: 12px;
+  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
   color: ${({ theme }) => theme.COLORS.GRAY_600};
   text-align: center;
 `;

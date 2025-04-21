@@ -103,14 +103,14 @@ export function Home() {
   }, []);
 
   useEffect(() => {
-    // Calculando contas pagas e pendentes
-    const paid = expense.filter(item => item.status).length;
-    const pending = expense.filter(item => !item.status).length;
+    // Calculando contas pagas e pendentes apenas para o mês selecionado
+    const paid = expense.filter(item => item.status && item.month === selectedMonth).length;
+    const pending = expense.filter(item => !item.status && item.month === selectedMonth).length;
     
     setPaidBills(paid);
     setPendingBills(pending);
     setTotalValue(tolalRevenueMunth - totalExpenseMunth);
-  }, [expense, tolalRevenueMunth, totalExpenseMunth]);
+  }, [expense, tolalRevenueMunth, totalExpenseMunth, selectedMonth]);
 
   const formattedRevenue = tolalRevenueMunth.toLocaleString("pt-BR", {
     style: "currency",
@@ -398,10 +398,10 @@ export function Home() {
         </NavBar>
 
         <Content>
-              <Container>
+              
                       <StatsContainer>
                         <StatItem>
-                          <TouchableOpacity onPress={() => navigation.navigate("filter")}>
+                          <TouchableOpacity onPress={() => navigation.navigate("graphics")}>
                             <Icon name="pie-chart" size={24} color="#000" />
                             <StatLabel>Gráficos</StatLabel>
                           </TouchableOpacity>
@@ -421,7 +421,7 @@ export function Home() {
                           <StatLabel>Valor total</StatLabel>
                         </StatItem>
                       </StatsContainer>
-                    </Container>
+                    
           {activeButton === "receitas" && (
             <>
             <ContentTitle
