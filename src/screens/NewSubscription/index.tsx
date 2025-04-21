@@ -7,7 +7,7 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
-import { format } from "date-fns";
+import { format, getDate } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { createSubscription, updateSubscription, getSubscriptions } from "../../services/firebase/subscription.firebase";
 import { Subscription } from "../../services/firebase/subscription.firebase";
@@ -23,12 +23,12 @@ import {
   SelectButton,
   SelectText,
 } from "./styles";
-import { currencyMask, dataMask } from "../../utils/mask";
+import { currencyMask } from "../../utils/mask";
 
 type FormData = {
   name: string;
   value: string;
-  dueDate: string;
+  dueDay: string;
   description?: string;
   status: boolean;
 };
@@ -67,13 +67,7 @@ export function NewSubscription() {
 
         setValue("name", subscription.name);
         setValue("value", subscription.value.toString());
-
-        // Verifica se a data já está no formato correto antes de formatar
-        const formattedDate = /^\d{2}\/\d{2}\/\d{4}$/.test(subscription.dueDate)
-          ? subscription.dueDate
-          : format(new Date(subscription.dueDate), "dd/MM/yyyy");
-        setValue("dueDate", formattedDate);
-
+        setValue("dueDay", subscription.dueDay.toString());
         setValue("status", subscription.status);
         setStatus(subscription.status);
 
@@ -97,7 +91,7 @@ export function NewSubscription() {
         userId: user?.uid || '',
         name: data.name,
         value: parseFloat(data.value),
-        dueDate: data.dueDate,
+        dueDay: parseInt(data.dueDay),
         description: data.description || '',
         status: data.status,
       };
@@ -161,18 +155,23 @@ export function NewSubscription() {
           </InputContainer>
 
           <InputContainer>
-            <Label>Data de Vencimento</Label>
+            <Label>Dia do Vencimento</Label>
             <Controller
               control={control}
-              name="dueDate"
-              rules={{ required: "Data é obrigatória" }}
+              name="dueDay"
+              rules={{ 
+                required: "Dia do vencimento é obrigatório",
+                min: { value: 1, message: "Dia deve ser entre 1 e 31" },
+                max: { value: 31, message: "Dia deve ser entre 1 e 31" }
+              }}
               render={({ field: { onChange, value } }) => (
                 <Input
                   name="calendar"
-                  onChangeText={(text) => onChange(dataMask(text))}
+                  onChangeText={onChange}
                   value={value}
-                  placeholder="DD/MM/AAAA"
-                  errorMessage={errors.dueDate?.message}
+                  placeholder="Dia (1-31)"
+                  keyboardType="numeric"
+                  errorMessage={errors.dueDay?.message}
                 />
               )}
             />

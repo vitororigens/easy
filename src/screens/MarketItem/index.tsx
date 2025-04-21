@@ -96,7 +96,7 @@ export const MarketItem = ({
       name: "",
       quantity: "1",
       price: "",
-      category: "",
+      category: "outros",
       measurement: "un",
       observation: "",
       sharedUsers: [],
@@ -181,12 +181,12 @@ export const MarketItem = ({
             }),
             ...(!alreadySharing && !possibleSharingRequestExists
               ? [
-                  createSharing({
-                    invitedBy: uid as string,
-                    status: ESharingStatus.PENDING,
-                    target: user.uid,
-                  }),
-                ]
+                createSharing({
+                  invitedBy: uid as string,
+                  status: ESharingStatus.PENDING,
+                  target: user.uid,
+                }),
+              ]
               : []),
             sendPushNotification({
               title: "Compartilhamento de mercado",
@@ -328,10 +328,10 @@ export const MarketItem = ({
   };
 
   return (
-    <DefaultContainer    hasHeader={false}
-    title="Adicionar novo item"
-    closeModalFn={closeBottomSheet}
-    backButton>
+    <DefaultContainer hasHeader={false}
+      title="Adicionar novo item"
+      closeModalFn={closeBottomSheet}
+      backButton>
       <ScrollView
         keyboardShouldPersistTaps="always"
         showsVerticalScrollIndicator={false}
@@ -378,7 +378,7 @@ export const MarketItem = ({
             )}
           />
 
-<View style={{ marginTop: 40, marginBottom: 20 }}>
+          <View style={{ marginTop: 40, marginBottom: 20 }}>
             <TouchableOpacity
               onPress={handleShowAdvanced}
               style={{
@@ -404,9 +404,35 @@ export const MarketItem = ({
                 control={control}
                 name="category"
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <Input onBlur={onBlur} onChangeText={onChange} value={value} />
+                  <RNPickerSelect
+                    onValueChange={onChange}
+                    value={value}
+                    items={[
+                      { label: "Açougue", value: "acougue" },
+                      { label: "Bebidas", value: "bebidas" },
+                      { label: "Biscoitos", value: "biscoitos" },
+                      { label: "Congelados", value: "congelados" },
+                      { label: "Condimentos e temperos", value: "condimentos" },
+                      { label: "Doces e snacks", value: "doces_snacks" },
+                      { label: "Enlatados", value: "enlatados" },
+                      { label: "Higiene pessoal", value: "higiene" },
+                      { label: "Hortifruti", value: "hortifruti" },
+                      { label: "Laticínios", value: "laticinios" },
+                      { label: "Limpeza", value: "limpeza" },
+                      { label: "Massas e grãos", value: "massas_graos" },
+                      { label: "Matinais (café, cereal...)", value: "matinais" },
+                      { label: "Mercearia", value: "mercearia" },
+                      { label: "Outros", value: "outros" },
+                      { label: "Padaria", value: "padaria" },
+                      { label: "Pet shop", value: "petshop" },
+                      { label: "Produtos naturais", value: "naturais" },
+                      { label: "Utilidades domésticas", value: "utilidades" },
+                    ]}
+                  />
                 )}
               />
+
+
 
               <Title>Medida</Title>
               <Controller
@@ -442,16 +468,16 @@ export const MarketItem = ({
           </FormProvider>
 
           <View style={{ marginBottom: 10, height: 150 }}>
-              <Button
-                style={{ marginBottom: 10 }}
-                onPress={
-                  isEditing
-                    ? handleSubmit(handleUpdateMarket)
-                    : handleSubmit(handleCreateMarket)
-                }
-              >
-                <Title>{loading ? <LoadingIndicator /> : "Salvar"}</Title>
-              </Button>
+            <Button
+              style={{ marginBottom: 10 }}
+              onPress={
+                isEditing
+                  ? handleSubmit(handleUpdateMarket)
+                  : handleSubmit(handleCreateMarket)
+              }
+            >
+              <Title>{loading ? <LoadingIndicator /> : "Salvar"}</Title>
+            </Button>
 
             {showButtonRemove && (
               <Button

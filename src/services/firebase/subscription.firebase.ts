@@ -5,7 +5,7 @@ export interface Subscription {
   id?: string;
   name: string;
   value: number;
-  dueDate: string;
+  dueDay: number;
   description?: string;
   userId: string;
   createdAt: Date;

@@ -3,9 +3,12 @@ import { TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 export const Container = styled.View`
-  flex: 1;
-  padding: 16px;
-  margin-bottom: 70px;
+  width: 100%;
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
+  border-radius: 10px;
+  padding: 8px;
+  margin-bottom: 16px;
+  max-height: 400px;
 `;
 
 export const Header = styled.View`
@@ -101,4 +104,31 @@ export const NavBar = styled.View`
   shadow-opacity: 0.1;
   shadow-radius: 3px;
   background-color: ${({ theme }) => theme.COLORS.TEAL_600};
+`;
+
+export const StatsContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 16px;
+  background-color: ${({ theme }) => theme.COLORS.PURPLE_50};
+  border-radius: 8px;
+  margin: 8px 16px;
+`;
+
+export const StatItem = styled.View`
+  align-items: center;
+  flex: 1;
+`;
+
+export const StatValue = styled.Text`
+  font-size: 16px;
+  font-weight: bold;
+  color: ${({ theme }) => theme.COLORS.PURPLE_800};
+  margin-bottom: 4px;
+`;
+
+export const StatLabel = styled.Text`
+  font-size: 12px;
+  color: ${({ theme }) => theme.COLORS.GRAY_600};
+  text-align: center;
 `;

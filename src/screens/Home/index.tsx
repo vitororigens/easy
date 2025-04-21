@@ -23,6 +23,10 @@ import {
   Icon,
   Container,
   Content,
+  StatsContainer,
+  StatItem,
+  StatValue,
+  StatLabel,
 } from "./styles";
 
 import { useNavigation } from "@react-navigation/native";
@@ -351,7 +355,6 @@ export function Home() {
       subtitle={formattedTotalValue}
       addActionFn={() => handleCreateItem(selectedItemId, activeButton)}
     >
-      <Container>
         <NavBar>
           <Button
             onPress={() => handleButtonClick("receitas")}
@@ -370,11 +373,46 @@ export function Home() {
         </NavBar>
 
         <Content>
+              <Container>
+                      <StatsContainer>
+                        
+                        <StatItem>
+                          <TouchableOpacity onPress={() => navigation.navigate("graphics")}>
+                          <Icon name="pie-chart" size={24} color="#000" />
+                          <StatLabel>Graficos</StatLabel>
+                          </TouchableOpacity>
+                        </StatItem>
+                   
+                          <StatItem>
+                            <StatValue>{.length}</StatValue>
+                            <StatLabel>Contas pendentes</StatLabel>
+                          </StatItem>
+                     
+                        <StatItem>
+                          <StatValue>{.pendingItems}</StatValue>
+                          <StatLabel>Contas pagas</StatLabel>
+                        </StatItem>
+                        <StatItem>
+                          <StatValue>{formatCurrency(.totalValue).formatted}</StatValue>
+                          <StatLabel>Valor total</StatLabel>
+                        </StatItem>
+                      </StatsContainer>
+                    </Container>
           {activeButton === "receitas" && (
             <>
-              <ContainerItems>
+            <ContentTitle
+                onPress={() => setSharedRevenueListVisible(!isSharedRevenueListVisible)}
+              >
+                <Title>Receitas</Title>
+                <DividerContent />
+                <Icon
+                  name={isSharedRevenueListVisible ? "arrow-drop-up" : "arrow-drop-down"}
+                />
+              </ContentTitle>
+              <Container>
                 {filteredRevenue.length === 0 ? (
-                  <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                 <FlatList>
+                   <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
                     {!isSharedRevenueListVisible && (
                       <LoadData
                         imageSrc={RevenuePersonImage}
@@ -383,6 +421,7 @@ export function Home() {
                       />
                     )}
                   </View>
+                 </FlatList>
                 ) : (
                   <FlatList
                     data={filteredRevenue}
@@ -409,7 +448,7 @@ export function Home() {
                     contentContainerStyle={{ paddingBottom: 90 }}
                   />
                 )}
-              </ContainerItems>
+              </Container>
 
               <ContentTitle
                 onPress={() => setSharedRevenueListVisible(!isSharedRevenueListVisible)}
@@ -534,7 +573,7 @@ export function Home() {
             </>
           )}
         </Content>
-      </Container>
+     
     </DefaultContainer>
   );
 }

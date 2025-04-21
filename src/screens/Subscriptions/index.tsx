@@ -27,7 +27,6 @@ import {
   MenuOptionText,
 } from "./styles";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { dataMask } from "../../utils/mask";
 import Popover from "react-native-popover-view";
 
 export function Subscriptions() {
@@ -59,7 +58,7 @@ export function Subscriptions() {
         }
       );
 
-    return () => unsubscribe(); // Remove o listener ao desmontar o componente
+    return () => unsubscribe();
   }, [user?.uid]);
 
   const filteredSubscriptions = subscriptions.filter(
@@ -67,7 +66,6 @@ export function Subscriptions() {
   );
 
   const handleEdit = (subscription: Subscription) => {
-    console.log("Edit subscription:", subscription);
     if (subscription.id) {
       navigation.navigate("new-subscription", { selectedItemId: subscription.id });
     }
@@ -167,7 +165,7 @@ export function Subscriptions() {
             <ItemContainer onPress={() => handleEdit(item)}>
               <ItemTitle>{item.name}</ItemTitle>
               <ItemValue>{formatCurrency(item.value)}</ItemValue>
-              <ItemDate>Vence em {dataMask(item.dueDate)}</ItemDate>
+              <ItemDate>Vence todo dia {item.dueDay}</ItemDate>
               <ItemStatus active={item.status}>
                 {item.status ? "Ativa" : "Cancelada"}
               </ItemStatus>
