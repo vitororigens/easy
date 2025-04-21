@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, TouchableOpacity, View, Text } from "react-native";
+import { FlatList, TouchableOpacity, View, Text, ScrollView } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Items } from "../../components/Items";
@@ -86,6 +86,11 @@ export function Home() {
   const [revenues, setRevenues] = useState<IRevenue[]>([]);
   const [expenses, setExpenses] = useState<IRevenue[]>([]);
 
+  // Adicionando estados para o resumo
+  const [paidBills, setPaidBills] = useState(0);
+  const [pendingBills, setPendingBills] = useState(0);
+  const [totalValue, setTotalValue] = useState(0);
+
   const navigation = useNavigation<NavigationProp>();
 
   useEffect(() => {
@@ -93,6 +98,16 @@ export function Home() {
     // getExpenseSharedByMe();
     setIsLoaded(true);
   }, []);
+
+  useEffect(() => {
+    // Calculando contas pagas e pendentes
+    const paid = expense.filter(item => item.status).length;
+    const pending = expense.filter(item => !item.status).length;
+    
+    setPaidBills(paid);
+    setPendingBills(pending);
+    setTotalValue(tolalRevenueMunth - totalExpenseMunth);
+  }, [expense, tolalRevenueMunth, totalExpenseMunth]);
 
   const formattedRevenue = tolalRevenueMunth.toLocaleString("pt-BR", {
     style: "currency",
@@ -102,7 +117,6 @@ export function Home() {
     style: "currency",
     currency: "BRL",
   });
-  const totalValue = tolalRevenueMunth - totalExpenseMunth;
   const formattedTotalValue = totalValue.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
@@ -375,25 +389,24 @@ export function Home() {
         <Content>
               <Container>
                       <StatsContainer>
-                        
                         <StatItem>
-                          <TouchableOpacity onPress={() => navigation.navigate("graphics")}>
-                          <Icon name="pie-chart" size={24} color="#000" />
-                          <StatLabel>Graficos</StatLabel>
+                          <TouchableOpacity onPress={() => navigation.navigate("filter")}>
+                            <Icon name="pie-chart" size={24} color="#000" />
+                            <StatLabel>Gráficos</StatLabel>
                           </TouchableOpacity>
                         </StatItem>
                    
-                          <StatItem>
-                            <StatValue>{.length}</StatValue>
-                            <StatLabel>Contas pendentes</StatLabel>
-                          </StatItem>
+                        <StatItem>
+                          <StatValue>{pendingBills}</StatValue>
+                          <StatLabel>Contas pendentes</StatLabel>
+                        </StatItem>
                      
                         <StatItem>
-                          <StatValue>{.pendingItems}</StatValue>
+                          <StatValue>{paidBills}</StatValue>
                           <StatLabel>Contas pagas</StatLabel>
                         </StatItem>
                         <StatItem>
-                          <StatValue>{formatCurrency(.totalValue).formatted}</StatValue>
+                          <StatValue>{formatCurrency(totalValue)}</StatValue>
                           <StatLabel>Valor total</StatLabel>
                         </StatItem>
                       </StatsContainer>
@@ -411,17 +424,21 @@ export function Home() {
               </ContentTitle>
               <Container>
                 {filteredRevenue.length === 0 ? (
-                 <FlatList>
-                   <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                    {!isSharedRevenueListVisible && (
-                      <LoadData
-                        imageSrc={RevenuePersonImage}
-                        title="Comece agora!"
-                        subtitle="Adicione uma receita clicando em +"
-                      />
-                    )}
-                  </View>
-                 </FlatList>
+                  <FlatList
+                    data={[]}
+                    renderItem={() => null}
+                    ListEmptyComponent={
+                      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                        {!isSharedRevenueListVisible && (
+                          <LoadData
+                            imageSrc={RevenuePersonImage}
+                            title="Comece agora!"
+                            subtitle="Adicione uma receita clicando em +"
+                          />
+                        )}
+                      </View>
+                    }
+                  />
                 ) : (
                   <FlatList
                     data={filteredRevenue}
@@ -494,17 +511,33 @@ export function Home() {
 
           {activeButton === "despesas" && (
             <>
+             <ContentTitle
+                onPress={() => setSharedRevenueListVisible(!isSharedRevenueListVisible)}
+              >
+                <Title>Despesas</Title>
+                <DividerContent />
+                <Icon
+                  name={isSharedRevenueListVisible ? "arrow-drop-up" : "arrow-drop-down"}
+                />
+              </ContentTitle>
+
               <ContainerItems>
                 {filteredExpense.length === 0 ? (
-                  <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                    {!isSharedListVisible && (
-                      <LoadData
-                        imageSrc={ExpensePersonImage}
-                        title="Comece agora!"
-                        subtitle="Adicione uma despesa clicando em +"
-                      />
-                    )}
-                  </View>
+                  <FlatList
+                    data={[]}
+                    renderItem={() => null}
+                    ListEmptyComponent={
+                      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                        {!isSharedListVisible && (
+                          <LoadData
+                            imageSrc={ExpensePersonImage}
+                            title="Comece agora!"
+                            subtitle="Adicione uma despesa clicando em +"
+                          />
+                        )}
+                      </View>
+                    }
+                  />
                 ) : (
                   <FlatList
                     data={filteredExpense}
