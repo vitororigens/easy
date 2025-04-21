@@ -77,6 +77,9 @@ export function Home() {
   const [isSharedListVisible, setIsSharedListVisible] = useState(false);
   const [isSharedRevenueListVisible, setSharedRevenueListVisible] =
     useState(false);
+  const [isSharedExpenseListVisible, setSharedExpenseListVisible] = useState(false);
+  const [isRevenueListVisible, setRevenueListVisible] = useState(true);
+  const [isExpenseListVisible, setExpenseListVisible] = useState(true);
   const [revenueShareByMe, setRevenueSharedByMe] = useState<IRevenue[]>([]);
   const [revenueShareWithMe, setRevenueSharedWithMe] = useState<IRevenue[]>([]);
   const [expenseSharedByMe, setExpenseSharedByMe] = useState<IRevenue[]>([]);
@@ -348,7 +351,15 @@ export function Home() {
     } as never);
   }
 
-  // useEffect(() => {}, []);
+  const handleSharedRevenueVisibility = () => {
+    setSharedRevenueListVisible(!isSharedRevenueListVisible);
+    setSharedExpenseListVisible(false);
+  };
+
+  const handleSharedExpenseVisibility = () => {
+    setSharedExpenseListVisible(!isSharedExpenseListVisible);
+    setSharedRevenueListVisible(false);
+  };
 
   if (!isLoaded || uid === undefined) {
     return <Loading />;
@@ -414,32 +425,16 @@ export function Home() {
           {activeButton === "receitas" && (
             <>
             <ContentTitle
-                onPress={() => setSharedRevenueListVisible(!isSharedRevenueListVisible)}
+                onPress={() => setRevenueListVisible(!isRevenueListVisible)}
               >
                 <Title>Receitas</Title>
                 <DividerContent />
                 <Icon
-                  name={isSharedRevenueListVisible ? "arrow-drop-up" : "arrow-drop-down"}
+                  name={isRevenueListVisible ? "arrow-drop-up" : "arrow-drop-down"}
                 />
               </ContentTitle>
               <Container>
-                {filteredRevenue.length === 0 ? (
-                  <FlatList
-                    data={[]}
-                    renderItem={() => null}
-                    ListEmptyComponent={
-                      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                        {!isSharedRevenueListVisible && (
-                          <LoadData
-                            imageSrc={RevenuePersonImage}
-                            title="Comece agora!"
-                            subtitle="Adicione uma receita clicando em +"
-                          />
-                        )}
-                      </View>
-                    }
-                  />
-                ) : (
+                {isRevenueListVisible && (
                   <FlatList
                     data={filteredRevenue}
                     renderItem={({ item }) => (
@@ -462,13 +457,22 @@ export function Home() {
                         />
                       </TouchableOpacity>
                     )}
+                    ListEmptyComponent={
+                      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                        <LoadData
+                          imageSrc={RevenuePersonImage}
+                          title="Comece agora!"
+                          subtitle="Adicione uma receita clicando em +"
+                        />
+                      </View>
+                    }
                     contentContainerStyle={{ paddingBottom: 90 }}
                   />
                 )}
               </Container>
 
               <ContentTitle
-                onPress={() => setSharedRevenueListVisible(!isSharedRevenueListVisible)}
+                onPress={handleSharedRevenueVisibility}
               >
                 <Title>Despesas e receitas compartilhadas</Title>
                 <DividerContent />
@@ -512,33 +516,17 @@ export function Home() {
           {activeButton === "despesas" && (
             <>
              <ContentTitle
-                onPress={() => setSharedRevenueListVisible(!isSharedRevenueListVisible)}
+                onPress={() => setExpenseListVisible(!isExpenseListVisible)}
               >
                 <Title>Despesas</Title>
                 <DividerContent />
                 <Icon
-                  name={isSharedRevenueListVisible ? "arrow-drop-up" : "arrow-drop-down"}
+                  name={isExpenseListVisible ? "arrow-drop-up" : "arrow-drop-down"}
                 />
               </ContentTitle>
 
-              <ContainerItems>
-                {filteredExpense.length === 0 ? (
-                  <FlatList
-                    data={[]}
-                    renderItem={() => null}
-                    ListEmptyComponent={
-                      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                        {!isSharedListVisible && (
-                          <LoadData
-                            imageSrc={ExpensePersonImage}
-                            title="Comece agora!"
-                            subtitle="Adicione uma despesa clicando em +"
-                          />
-                        )}
-                      </View>
-                    }
-                  />
-                ) : (
+              <Container>
+                {isExpenseListVisible && (
                   <FlatList
                     data={filteredExpense}
                     renderItem={({ item }) => (
@@ -562,19 +550,32 @@ export function Home() {
                         />
                       </TouchableOpacity>
                     )}
+                    ListEmptyComponent={
+                      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                        <LoadData
+                          imageSrc={ExpensePersonImage}
+                          title="Comece agora!"
+                          subtitle="Adicione uma despesa clicando em +"
+                        />
+                      </View>
+                    }
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={{ paddingBottom: 10 }}
                   />
                 )}
-              </ContainerItems>
+              </Container>
 
-              <ContentTitle onPress={() => setIsSharedListVisible(!isSharedListVisible)}>
+              <ContentTitle
+                onPress={handleSharedExpenseVisibility}
+              >
                 <Title>Despesas e receitas compartilhadas</Title>
                 <DividerContent />
-                <Icon name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+                <Icon
+                  name={isSharedExpenseListVisible ? "arrow-drop-up" : "arrow-drop-down"}
+                />
               </ContentTitle>
 
-              {isSharedListVisible && (
+              {isSharedExpenseListVisible && (
                 <Container>
                   <FlatList
                     data={expenseSharedByMe.concat(expensesSharedWithMe)}
