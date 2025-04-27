@@ -113,18 +113,6 @@ export function Gears() {
                     </Icon>
                   </Items>
                 </ButtonIcon>
-                <ButtonIcon onPress={handleGraphics}>
-                  <Items>
-                    <Title>Gráficos</Title>
-                    <Icon>
-                      <FontAwesome
-                        name="line-chart"
-                        size={30}
-                        color={COLORS.PURPLE_800}
-                      />
-                    </Icon>
-                  </Items>
-                </ButtonIcon>
                 <ButtonIcon onPress={handleNotifications}>
                   <Items>
                     <Title>Notificações</Title>
