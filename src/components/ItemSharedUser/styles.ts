@@ -8,10 +8,19 @@ type Props = {
   type: ItemProps;
 };
 
+type ActionButtonProps = {
+  type: 'accept' | 'reject' | 'delete';
+};
+
+type StatusProps = {
+  status: TSharingStatus;
+};
+
 export const Container = styled.View`
   padding: 16px;
   border-bottom-width: 1px;
   border-bottom-color: ${({ theme }) => theme.COLORS.GRAY_200};
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
 `;
 
 export const Content = styled.View`
@@ -24,13 +33,47 @@ export const Title = styled.Text`
   font-size: 16px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme }) => theme.COLORS.GRAY_600};
+  margin-bottom: 4px;
 `;
 
 export const Description = styled.Text`
   font-size: 14px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme }) => theme.COLORS.GRAY_400};
-  margin-top: 4px;
+  margin-bottom: 8px;
+`;
+
+export const Status = styled.Text<StatusProps>`
+  font-size: 12px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  padding: 4px 8px;
+  border-radius: 4px;
+  align-self: flex-start;
+
+  ${({ status, theme }) => {
+    switch (status) {
+      case 'accepted':
+        return css`
+          background-color: ${theme.COLORS.GREEN_700};
+          color: ${theme.COLORS.WHITE};
+        `;
+      case 'rejected':
+        return css`
+          background-color: ${theme.COLORS.RED_700};
+          color: ${theme.COLORS.WHITE};
+        `;
+      case 'pending':
+        return css`
+          background-color: ${theme.COLORS.YELLOW_700};
+          color: ${theme.COLORS.GRAY_600};
+        `;
+      default:
+        return css`
+          background-color: ${theme.COLORS.GRAY_400};
+          color: ${theme.COLORS.WHITE};
+        `;
+    }
+  }}
 `;
 
 export const Actions = styled.View`

@@ -1,8 +1,9 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Alert } from 'react-native';
 import { ISharing, acceptSharing, rejectSharing, deleteSharing } from '../../services/firebase/sharing.firebase';
 import { useUserAuth } from '../../hooks/useUserAuth';
-import { Container, Content, Title, Description, Actions, ActionButton, ActionText } from './styles';
+import { Container, Content, Title, Description, Actions, ActionButton, ActionText, Status } from './styles';
+import { findUserById, IUser } from '../../services/firebase/users.firestore';
 
 interface ItemSharedUserProps {
   sharing: ISharing;
@@ -11,8 +12,27 @@ interface ItemSharedUserProps {
 
 export function ItemSharedUser({ sharing, onDeleteSharing }: ItemSharedUserProps) {
   const user = useUserAuth();
+  const [targetUser, setTargetUser] = useState<IUser | null>(null);
+  const [senderUser, setSenderUser] = useState<IUser | null>(null);
 
   const isReceived = user?.uid === sharing.target;
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const [targetData, senderData] = await Promise.all([
+          findUserById(sharing.target),
+          findUserById(sharing.invitedBy)
+        ]);
+        setTargetUser(targetData);
+        setSenderUser(senderData);
+      } catch (error) {
+        console.error('Error loading users:', error);
+      }
+    };
+
+    loadUsers();
+  }, [sharing.target, sharing.invitedBy]);
 
   const handleAccept = async () => {
     try {
@@ -57,17 +77,33 @@ export function ItemSharedUser({ sharing, onDeleteSharing }: ItemSharedUserProps
     }
   };
 
+  const formatDate = (timestamp: any) => {
+    if (!timestamp || !timestamp.toDate) return 'Data não disponível';
+    try {
+      return timestamp.toDate().toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+      });
+    } catch (error) {
+      return 'Data não disponível';
+    }
+  };
+
   return (
     <Container>
       <Content>
-        <View>
+        <View style={{ flex: 1 }}>
           <Title>
-            {isReceived ? 'Recebido de:' : 'Enviado para:'} {sharing.invitedBy}
+            {isReceived ? 'Recebido de:' : 'Enviado para:'}{' '}
+            {isReceived ? senderUser?.userName || '...' : targetUser?.userName || '...'}
           </Title>
-          <Description>Status: {getStatusText()}</Description>
           <Description>
-            {sharing.createdAt?.toDate().toLocaleDateString('pt-BR') || 'Data não disponível'}
+            {formatDate(sharing.createdAt)}
           </Description>
+          <Status status={sharing.status}>
+            {getStatusText()}
+          </Status>
         </View>
 
         <Actions>
