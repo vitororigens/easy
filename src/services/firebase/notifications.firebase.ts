@@ -38,7 +38,12 @@ export interface INotification {
 }
 
 export const createNotification = async (notification: Omit<INotification, "id">) => {
-  const docRef = await addDoc(collection(database, "Notifications"), notification);
+  const notificationData = {
+    ...notification,
+    createdAt: notification.createdAt || Timestamp.now()
+  };
+  
+  const docRef = await addDoc(collection(database, "Notifications"), notificationData);
   return docRef;
 };
 
@@ -63,26 +68,32 @@ interface IGetNotifications {
 export const getNotifications = async ({ uid, profile }: IGetNotifications) => {
   const q = query(
     collection(database, "Notifications"),
-    where(profile, "==", uid)
+    where(profile, "==", uid),
+    orderBy("createdAt", "desc")
   );
+  
   const querySnapshot = await getDocs(q);
 
-  const notifications = (querySnapshot.docs.map((docSnapshot) => ({
-    id: docSnapshot.id,
-    ...docSnapshot.data(),
-  })) ?? []) as INotification[];
-
-  notifications.sort((a, b) => {
-    const dateA = new Timestamp(
-      b.createdAt.seconds,
-      b.createdAt.nanoseconds
-    ).toDate();
-    const dateB = new Timestamp(
-      a.createdAt.seconds,
-      a.createdAt.nanoseconds
-    ).toDate();
-    return dateA.getTime() - dateB.getTime();
-  });
+  const notifications = querySnapshot.docs
+    .map((docSnapshot) => {
+      const data = docSnapshot.data();
+      if (!data.createdAt) {
+        data.createdAt = Timestamp.now();
+      }
+      return {
+        id: docSnapshot.id,
+        ...data
+      } as INotification;
+    })
+    .filter(notification => notification.createdAt)
+    .sort((a, b) => {
+      try {
+        if (!a.createdAt || !b.createdAt) return 0;
+        return b.createdAt.toMillis() - a.createdAt.toMillis();
+      } catch (error) {
+        return 0;
+      }
+    });
 
   return notifications;
 };

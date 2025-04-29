@@ -7,31 +7,35 @@ type Props = {
   type: IconProps;
 };
 
-export const Container = styled.Pressable`
-  width: 100%;
-  height: 150px;
+export const Container = styled.TouchableOpacity`
+  padding: 16px;
   border-bottom-width: 1px;
-  border-bottom-color: ${({ theme }) => theme.COLORS.PURPLE_50};
-  padding: 10px;
-  justify-content: space-between;
+  border-bottom-color: ${({ theme }) => theme.COLORS.GRAY_200};
+`;
+
+export const Content = styled.View`
+  flex-direction: row;
+  align-items: center;
 `;
 
 export const Title = styled.Text`
+  font-size: 16px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.GG}px;
-  color: ${({ theme }) => theme.COLORS.PURPLE_800};
-`;
-
-export const SubTitle = styled.Text`
-  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.GG}px;
   color: ${({ theme }) => theme.COLORS.GRAY_600};
 `;
 
-export const DateDetails = styled.Text`
+export const Description = styled.Text`
+  font-size: 14px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
   color: ${({ theme }) => theme.COLORS.GRAY_400};
+  margin-top: 4px;
+`;
+
+export const Time = styled.Text`
+  font-size: 12px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  color: ${({ theme }) => theme.COLORS.GRAY_300};
+  margin-top: 4px;
 `;
 
 export const Icon = styled(AntDesign).attrs<Props>(({ theme }) => ({
@@ -49,12 +53,6 @@ export const Icon = styled(AntDesign).attrs<Props>(({ theme }) => ({
     css`
       color: ${({ theme }) => theme.COLORS.RED_700};
     `}
-`;
-
-export const Content = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 export const Button = styled(TouchableOpacity)`

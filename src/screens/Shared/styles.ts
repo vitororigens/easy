@@ -57,3 +57,24 @@ export const ButtonSelect = styled(TouchableOpacity)`
     margin-bottom: 10px;
 `;
 
+export const FilterContainer = styled.View`
+  flex-direction: row;
+  margin-bottom: 16px;
+  gap: 8px;
+`;
+
+export const FilterButton = styled.TouchableOpacity<{ active: boolean }>`
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: ${({theme, active}) => active ? theme.COLORS.PURPLE_600 : theme.COLORS.GRAY_300};
+  align-items: center;
+`;
+
+export const FilterText = styled.Text<{ active: boolean }>`
+  font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
+  font-size: ${({theme}) => theme.FONTE_SIZE.MD}px;
+  color: ${({theme, active}) => active ? theme.COLORS.WHITE : theme.COLORS.GRAY_600};
+`;
+
+

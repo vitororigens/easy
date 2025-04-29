@@ -1,164 +1,73 @@
-import { View } from "react-native";
-import {
-  Button,
-  Container,
-  Content,
-  Icon,
-  DateDetails,
-  SubTitle,
-  Title,
-  PendingNotificationCircle,
-} from "./styles";
-import {
-  acceptSharingNotification,
-  createNotification,
-  INotification,
-} from "../../services/firebase/notifications.firebase";
-import { acceptSharing } from "../../services/firebase/sharing.firebase";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { sendPushNotification } from "../../services/one-signal";
+import React from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { INotification } from '../../services/firebase/notifications.firebase';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from 'styled-components/native';
+import { Container, Content, Title, Description, Time } from './styles';
 
-type ItemNotificationProps = {
+interface IItemNotificationProps {
   notification: INotification;
   handleRefresh: () => void;
-};
+}
 
-export function ItemNotification({
-  notification,
-  handleRefresh,
-}: ItemNotificationProps) {
-  // const navigation = useNavigation();
-  const user = useUserAuth();
+export function ItemNotification({ notification, handleRefresh }: IItemNotificationProps) {
+  const theme = useTheme();
 
-  const handleNavigateToDetails = () => {
-    console.log("notification", notification);
-    if (notification.type === "sharing_invite") {
-      if (notification.status !== "sharing_accepted") return;
-      // TODO: add navigation to sharing details screen
-      switch (notification.source.type) {
-        case "expense":
-          break;
-        case "market":
-          break;
-        case "note":
-          break;
-        case "revenue":
-          break;
-        case "task":
-          break;
-        default:
-          break;
-      }
-    }
-
-    if (notification.type !== "sharing_invite") {
-      // TODO: add navigation to notification details screen
+  const getIconName = () => {
+    switch (notification.type) {
+      case 'sharing_invite':
+        return 'share';
+      case 'due_account':
+        return 'warning';
+      case 'overdue_account':
+        return 'error';
+      default:
+        return 'notifications';
     }
   };
 
-  const handleAcceptSharing = async () => {
-    const message = `${user?.displayName} aceitou o compartilhamento.`;
-    await Promise.allSettled([
-      acceptSharingNotification(notification.id),
-      //   acceptSharing()
-      createNotification({
-        source: {
-          id: notification.id,
-          type: "notification",
-        },
-        description: message,
-        receiver: notification.sender,
-        sender: notification.receiver,
-        title: "Compartilhamento aceito",
-        type: "sharing_invite",
-        status: "sharing_accepted",
-      }),
-      sendPushNotification({
-        message: message,
-        title: "Compartilhamento aceito",
-        uid: notification.sender,
-      }),
-    ]);
-
-    // TODO: After accept sharing, accept all notifications and entities (notes, expenses, revenues, tasks, kar) from the same source
-
-    handleRefresh();
+  const getStatusColor = () => {
+    switch (notification.status) {
+      case 'pending':
+        return theme.COLORS.PURPLE_600;
+      case 'read':
+        return theme.COLORS.GRAY_400;
+      case 'sharing_accepted':
+        return theme.COLORS.GREEN_700;
+      case 'sharing_rejected':
+        return theme.COLORS.RED_700;
+      default:
+        return theme.COLORS.PURPLE_600;
+    }
   };
 
-  const handleRejectSharing = async () => {
-    const message = `${user?.displayName} rejeitou o compartilhamento.`;
-    await Promise.allSettled([
-      createNotification({
-        source: {
-          id: notification.id,
-          type: "notification",
-        },
-        description: message,
-        receiver: notification.sender,
-        sender: notification.receiver,
-        title: "Compartilhamento rejeitado",
-        type: "sharing_invite",
-        status: "sharing_rejected",
-      }),
-      sendPushNotification({
-        message: message,
-        title: "Compartilhamento rejeitado",
-        uid: notification.sender,
-      }),
-    ]);
-
-    // TODO: After reject sharing, reject all notifications and entities (notes, expenses, revenues, tasks, kar) from the same source
-
-    handleRefresh();
+  const formatDate = (timestamp: any) => {
+    if (!timestamp || !timestamp.toDate) {
+      return 'Data não disponível';
+    }
+    try {
+      return timestamp.toDate().toLocaleDateString('pt-BR');
+    } catch (error) {
+      return 'Data não disponível';
+    }
   };
 
   return (
-    <Container onPress={handleNavigateToDetails}>
-      <Title></Title>
-      <Title>{notification.title}</Title>
-      <SubTitle>{notification.description}</SubTitle>
+    <Container>
       <Content>
-        <DateDetails>
-          {format(notification.createdAt.toDate(), "dd MMM '*' HH:mm", {
-            locale: ptBR,
-          })}
-        </DateDetails>
-        {notification.type === "sharing_invite" && (
-          <>
-            {notification.status === "pending" && (
-              <View style={{ flexDirection: "row" }}>
-                <Button onPress={handleAcceptSharing}>
-                  <SubTitle>Aprovar</SubTitle>
-                  <Icon type="success" name="check" />
-                </Button>
-                <Button onPress={handleRejectSharing}>
-                  <SubTitle>Reprovar</SubTitle>
-                  <Icon type="danger" name="close" />
-                </Button>
-              </View>
-            )}
-
-            {notification.status === "sharing_accepted" && (
-              <Button>
-                <SubTitle>Aceito</SubTitle>
-                <Icon type="success" name="check" />
-              </Button>
-            )}
-
-            {notification.status === "sharing_rejected" && (
-              <Button>
-                <SubTitle>Rejeitado</SubTitle>
-                <Icon type="danger" name="close" />
-              </Button>
-            )}
-          </>
-        )}
+        <MaterialIcons
+          name={getIconName()}
+          size={24}
+          color={getStatusColor()}
+        />
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <Title>{notification.title}</Title>
+          <Description>{notification.description}</Description>
+          <Time>
+            {formatDate(notification.createdAt)}
+          </Time>
+        </View>
       </Content>
-
-      {notification.type === "sharing_invite" &&
-        notification.status === "pending" && <PendingNotificationCircle />}
     </Container>
   );
 }
