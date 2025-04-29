@@ -35,6 +35,7 @@ export function Notes({ route }: any) {
   const [myNotes, setMyNotes] = useState<INote[]>([]);
   const [sharedNotesByMe, setSharedNotesByMe] = useState<INote[]>([]);
   const [sharedNotesWithMe, setSharedNotesWithMe] = useState<INote[]>([]);
+  console.log("compartilhadas", sharedNotesByMe, sharedNotesWithMe)
   const [isLoading, setIsLoading] = useState(true);
   const [isMyListVisible, setIsMyListVisible] = useState(true);
   const [isSharedListVisible, setIsSharedListVisible] = useState(false);
@@ -152,11 +153,15 @@ export function Notes({ route }: any) {
               data={[...sharedNotesWithMe, ...sharedNotesByMe]}
               renderItem={({ item }) => {
                 const isSharedByMe = sharedNotesByMe.some(note => note.id === item.id);
+                const noteWithShared = {
+                  ...item,
+                  isShared: true
+                };
                 return (
                   <ItemNotes
                     onDelete={() => handleDeleteNote(item.id)}
                     onUpdate={() => handleEditItem(item.id, false)}
-                    note={item}
+                    note={noteWithShared}
                     isSharedByMe={isSharedByMe}
                   />
                 );

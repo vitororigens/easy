@@ -4,6 +4,8 @@ import { ISharing, acceptSharing, rejectSharing, deleteSharing } from '../../ser
 import { useUserAuth } from '../../hooks/useUserAuth';
 import { Container, Content, Title, Description, Actions, ActionButton, ActionText, Status } from './styles';
 import { findUserById, IUser } from '../../services/firebase/users.firestore';
+import { updateNotes } from '../../services/firebase/updateShareInfo';
+import { findNoteById } from '../../services/firebase/notes.firebase';
 
 interface ItemSharedUserProps {
   sharing: ISharing;
@@ -43,6 +45,13 @@ export function ItemSharedUser({ sharing, onDeleteSharing, onStatusChange }: Ite
   const handleAccept = async () => {
     try {
       await acceptSharing(sharing.id);
+      
+      // Buscar todas as notas compartilhadas e atualizar o acceptedAt
+      const notes = await findNoteById(sharing.id);
+      if (notes) {
+        await updateNotes(notes.id, user?.uid || '');
+      }
+      
       setCurrentStatus('accepted');
       onStatusChange?.();
       Alert.alert('Sucesso', 'Compartilhamento aceito com sucesso!');

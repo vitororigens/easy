@@ -19,7 +19,8 @@ export interface INote {
   shareWith: string[];
   shareInfo: {
     uid: string;
-    acceptedAt: Date | null;
+    acceptedAt: Timestamp | null;
+    userName: string;
   }[];
 }
 
@@ -66,24 +67,45 @@ export const listNotes = async (uid: string) => {
 };
 
 export const listNotesSharedWithMe = async (uid: string) => {
-  const q = query(
-    collection(database, "Notes"),
-    where("shareWith", "array-contains", uid)
-  );
-  const querySnapshot = await getDocs(q);
+  console.log("Buscando notas compartilhadas para o usuário:", uid);
+  
+  try {
+    // Primeiro, buscar todas as notas onde o usuário está em shareWith
+    const q = query(
+      collection(database, "Notes"),
+      where("shareWith", "array-contains", uid)
+    );
+    const querySnapshot = await getDocs(q);
 
-  const notes = (querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) ?? []) as INote[];
+    const notes = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as INote[];
 
-  const filteredNotes = notes.filter((n) =>
-    n.shareInfo.some(
-      ({ uid, acceptedAt }) => uid === uid && acceptedAt !== null
-    )
-  );
+    console.log("Total de notas encontradas:", notes.length);
+    console.log("Notas encontradas:", notes);
 
-  return filteredNotes;
+    // Filtrar apenas as notas onde o usuário tem acceptedAt não nulo
+    const filteredNotes = notes.filter((note) => {
+      const shareInfo = note.shareInfo?.find(info => info.uid === uid);
+      console.log("Nota:", note.id, "ShareInfo:", shareInfo);
+      return shareInfo && shareInfo.acceptedAt !== null;
+    });
+
+    console.log("Notas filtradas:", filteredNotes.length);
+    console.log("Notas filtradas:", filteredNotes);
+
+    // Adicionar a propriedade isShared
+    const notesWithShared = filteredNotes.map(note => ({
+      ...note,
+      isShared: true
+    }));
+
+    return notesWithShared;
+  } catch (error) {
+    console.error("Erro ao buscar notas compartilhadas:", error);
+    return [];
+  }
 };
 
 export const listNotesSharedByMe = async (uid: string): Promise<INote[]> => {
