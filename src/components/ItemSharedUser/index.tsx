@@ -8,12 +8,14 @@ import { findUserById, IUser } from '../../services/firebase/users.firestore';
 interface ItemSharedUserProps {
   sharing: ISharing;
   onDeleteSharing: (id: string) => void;
+  onStatusChange?: () => void;
 }
 
-export function ItemSharedUser({ sharing, onDeleteSharing }: ItemSharedUserProps) {
+export function ItemSharedUser({ sharing, onDeleteSharing, onStatusChange }: ItemSharedUserProps) {
   const user = useUserAuth();
   const [targetUser, setTargetUser] = useState<IUser | null>(null);
   const [senderUser, setSenderUser] = useState<IUser | null>(null);
+  const [currentStatus, setCurrentStatus] = useState(sharing.status);
 
   const isReceived = user?.uid === sharing.target;
 
@@ -34,9 +36,15 @@ export function ItemSharedUser({ sharing, onDeleteSharing }: ItemSharedUserProps
     loadUsers();
   }, [sharing.target, sharing.invitedBy]);
 
+  useEffect(() => {
+    setCurrentStatus(sharing.status);
+  }, [sharing.status]);
+
   const handleAccept = async () => {
     try {
       await acceptSharing(sharing.id);
+      setCurrentStatus('accepted');
+      onStatusChange?.();
       Alert.alert('Sucesso', 'Compartilhamento aceito com sucesso!');
     } catch (error) {
       console.error('Error accepting sharing:', error);
@@ -47,6 +55,8 @@ export function ItemSharedUser({ sharing, onDeleteSharing }: ItemSharedUserProps
   const handleReject = async () => {
     try {
       await rejectSharing(sharing.id);
+      setCurrentStatus('rejected');
+      onStatusChange?.();
       Alert.alert('Aviso', 'Compartilhamento rejeitado');
     } catch (error) {
       console.error('Error rejecting sharing:', error);
@@ -58,6 +68,7 @@ export function ItemSharedUser({ sharing, onDeleteSharing }: ItemSharedUserProps
     try {
       await deleteSharing(sharing.id);
       onDeleteSharing(sharing.id);
+      onStatusChange?.();
     } catch (error) {
       console.error('Error deleting sharing:', error);
       Alert.alert('Erro', 'Não foi possível excluir o compartilhamento');
@@ -65,7 +76,7 @@ export function ItemSharedUser({ sharing, onDeleteSharing }: ItemSharedUserProps
   };
 
   const getStatusText = () => {
-    switch (sharing.status) {
+    switch (currentStatus) {
       case 'accepted':
         return 'Aceito';
       case 'rejected':
@@ -101,13 +112,13 @@ export function ItemSharedUser({ sharing, onDeleteSharing }: ItemSharedUserProps
           <Description>
             {formatDate(sharing.createdAt)}
           </Description>
-          <Status status={sharing.status}>
+          <Status status={currentStatus}>
             {getStatusText()}
           </Status>
         </View>
 
         <Actions>
-          {isReceived && sharing.status === 'pending' && (
+          {isReceived && currentStatus === 'pending' && (
             <>
               <ActionButton onPress={handleAccept} type="accept">
                 <ActionText>Aceitar</ActionText>

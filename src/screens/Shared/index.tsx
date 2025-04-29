@@ -3,7 +3,7 @@ import { Input } from "../../components/Input";
 import { ButtonSelect, Container, Content, IconCheck, Title, FilterButton, FilterContainer, FilterText } from "./styles";
 import { FlatList, View, Text } from "react-native";
 import { ItemSharedUser } from "../../components/ItemSharedUser";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import {
   findUserByUsername,
@@ -19,14 +19,15 @@ import {
 import { Alert } from "react-native";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { createNotification } from "../../services/firebase/notifications.firebase";
+import { Loading } from '../../components/Loading';
+import { EmptyList } from '../../components/EmptyList';
 
 export function Shared() {
-  const [sharedUsers, setSharedUsers] = useState<ISharing[]>([]);
-  const [receivedShares, setReceivedShares] = useState<ISharing[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'sent' | 'received'>('received');
+  const [sharings, setSharings] = useState<ISharing[]>([]);
   const [users, setUsers] = useState<IUser[]>([]);
   const [searchValue, setSearchValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'sent' | 'received'>('sent');
 
   const user = useUserAuth();
 
@@ -54,7 +55,7 @@ export function Shared() {
       return;
     }
 
-    if (sharedUsers.find((su) => su.target === u.uid)) {
+    if (sharings.find((su) => su.target === u.uid)) {
       Alert.alert("Aviso", "Este usuário já está na lista de compartilhamento");
       return;
     }
@@ -96,7 +97,7 @@ export function Shared() {
         }
       });
 
-      setSharedUsers([sharingData, ...sharedUsers]);
+      setSharings([sharingData, ...sharings]);
       setSearchValue("");
       setUsers([]);
     } catch (error) {
@@ -107,49 +108,46 @@ export function Shared() {
     }
   };
 
-  const onDeleteSharing = (id: string) => {
-    setSharedUsers(sharedUsers.filter((u) => u.id !== id));
-  };
-
-  const loadSharedUsers = async () => {
+  const loadSharings = useCallback(async () => {
     if (!user?.uid) return;
 
     try {
       setIsLoading(true);
-
-      // Buscar compartilhamentos enviados
-      const sentSharing = await getSharing({
-        profile: "invitedBy",
-        uid: user.uid,
-      });
-      setSharedUsers(sentSharing);
-
-      // Buscar compartilhamentos recebidos
-      const receivedSharing = await getSharing({
-        profile: "target",
-        uid: user.uid,
-      });
-      setReceivedShares(receivedSharing);
+      const profile = activeTab === 'sent' ? 'invitedBy' : 'target';
+      const response = await getSharing({ uid: user.uid, profile });
+      setSharings(response);
     } catch (error) {
-      console.error("Error fetching sharing users:", error);
-      Alert.alert("Erro", "Não foi possível carregar os compartilhamentos");
+      console.error('Error loading sharings:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os compartilhamentos');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.uid, activeTab]);
 
   useEffect(() => {
-    loadSharedUsers();
-  }, [user]);
+    loadSharings();
+  }, [loadSharings]);
+
+  const handleDeleteSharing = (id: string) => {
+    setSharings(prev => prev.filter(sharing => sharing.id !== id));
+  };
+
+  const handleTabPress = (tab: 'sent' | 'received') => {
+    setActiveTab(tab);
+  };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <DefaultContainer title="Compartilhamento" backButton>
       <Container>
         <FilterContainer>
-          <FilterButton active={activeTab === 'sent'} onPress={() => setActiveTab('sent')}>
+          <FilterButton active={activeTab === 'sent'} onPress={() => handleTabPress('sent')}>
             <FilterText active={activeTab === 'sent'}>Enviados</FilterText>
           </FilterButton>
-          <FilterButton active={activeTab === 'received'} onPress={() => setActiveTab('received')}>
+          <FilterButton active={activeTab === 'received'} onPress={() => handleTabPress('received')}>
             <FilterText active={activeTab === 'received'}>Recebidos</FilterText>
           </FilterButton>
         </FilterContainer>
@@ -173,7 +171,7 @@ export function Shared() {
                   data={users}
                   keyExtractor={(item) => item.uid}
                   renderItem={({ item }) => {
-                    const isChecked = !!sharedUsers.find(
+                    const isChecked = !!sharings.find(
                       (u) => u.target === item.uid
                     );
                     return (
@@ -203,15 +201,23 @@ export function Shared() {
             )}
 
             <FlatList
-              data={sharedUsers}
+              data={sharings}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <ItemSharedUser sharing={item} onDeleteSharing={onDeleteSharing} />
+                <ItemSharedUser
+                  sharing={item}
+                  onDeleteSharing={handleDeleteSharing}
+                  onStatusChange={loadSharings}
+                />
               )}
               ListEmptyComponent={() => (
-                <View style={{ padding: 16, alignItems: 'center' }}>
-                  <Text>Nenhum compartilhamento enviado</Text>
-                </View>
+                <EmptyList
+                  message={
+                    activeTab === 'sent'
+                      ? 'Você ainda não compartilhou com ninguém'
+                      : 'Você ainda não recebeu compartilhamentos'
+                  }
+                />
               )}
             />
           </>
@@ -219,15 +225,23 @@ export function Shared() {
 
         {activeTab === 'received' && (
           <FlatList
-            data={receivedShares}
+            data={sharings}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <ItemSharedUser sharing={item} onDeleteSharing={onDeleteSharing} />
+              <ItemSharedUser
+                sharing={item}
+                onDeleteSharing={handleDeleteSharing}
+                onStatusChange={loadSharings}
+              />
             )}
             ListEmptyComponent={() => (
-              <View style={{ padding: 16, alignItems: 'center' }}>
-                <Text>Nenhum compartilhamento recebido</Text>
-              </View>
+              <EmptyList
+                message={
+                  activeTab === 'sent'
+                    ? 'Você ainda não compartilhou com ninguém'
+                    : 'Você ainda não recebeu compartilhamentos'
+                }
+              />
             )}
           />
         )}
