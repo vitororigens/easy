@@ -34,6 +34,7 @@ export function LogoUser({ color }: LogoUserProps) {
     if (!name) return "";
     const nameArray = name.split(" ");
     const initials = nameArray
+      .slice(0, 2) // Pega apenas os dois primeiros nomes
       .map((word) => word.charAt(0).toUpperCase())
       .join("");
     return initials;

@@ -1,51 +1,48 @@
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { MMKV } from 'react-native-mmkv';
 
 const storage = new MMKV({id: "easy-finances"});
 
-export function useUserAuth() {
-  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+interface UserData {
+  uid: string;
+  displayName: string | null;
+  email: string | null;
+}
 
-  console.log("useUserAuth hook chamado");
-  
+export function useUserAuth() {
+  const [user, setUser] = useState<UserData | null>(null);
+  const isInitialized = useRef(false);
+
   useEffect(() => {
-    console.log("useUserAuth useEffect iniciado");
+    if (isInitialized.current) return;
+    isInitialized.current = true;
     
     // Recuperar dados do usuário do MMKV na inicialização
     const storedUser = storage.getString('user');
     if (storedUser) {
-      console.log("Usuário encontrado no MMKV:", JSON.parse(storedUser));
-      setUser(JSON.parse(storedUser));
-    } else {
-      console.log("Nenhum usuário encontrado no MMKV");
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
     }
     
     // Subscrever às mudanças de autenticação do Firebase
-    const subscriber = auth().onAuthStateChanged((user) => {
-      console.log("onAuthStateChanged chamado com usuário:", user?.uid);
-      
-      if (user) {
-        const userData = {
-          uid: user.uid,
-          displayName: user.displayName,
-          email: user.email,
+    const subscriber = auth().onAuthStateChanged((firebaseUser) => {
+      if (firebaseUser) {
+        const userData: UserData = {
+          uid: firebaseUser.uid,
+          displayName: firebaseUser.displayName,
+          email: firebaseUser.email,
         };
-        console.log("Dados do usuário formatados:", userData);
-        // @ts-ignore
         setUser(userData);
         storage.set('user', JSON.stringify(userData));
       } else {
-        console.log("Usuário não autenticado");
         setUser(null);
         storage.delete('user');
       }
     });
 
-    // Retornar a função de limpeza da subscrição
     return subscriber;
   }, []);
 
-  console.log("useUserAuth retornando:", user);
   return user;
 }

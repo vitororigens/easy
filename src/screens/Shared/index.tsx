@@ -3,7 +3,7 @@ import { Input } from "../../components/Input";
 import { ButtonSelect, Container, Content, IconCheck, Title, FilterButton, FilterContainer, FilterText } from "./styles";
 import { FlatList, View, Text } from "react-native";
 import { ItemSharedUser } from "../../components/ItemSharedUser";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import {
   findUserByUsername,
@@ -28,26 +28,31 @@ export function Shared() {
   const [sharings, setSharings] = useState<ISharing[]>([]);
   const [users, setUsers] = useState<IUser[]>([]);
   const [searchValue, setSearchValue] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   const user = useUserAuth();
 
   const searchUsers = useDebouncedCallback(async (username: string) => {
+    console.log('Iniciando busca com valor:', username);
     if (!username || !user?.uid) {
+      console.log('Busca cancelada - username vazio ou usuário não autenticado');
       setUsers([]);
       return;
     }
 
     try {
-      setIsLoading(true);
+      setIsSearching(true);
+      console.log('Buscando usuários...');
       const result = await findUserByUsername(username, user.uid);
+      console.log('Resultado da busca:', result.length, 'usuários encontrados');
       setUsers(result);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Erro ao buscar usuários:", error);
       Alert.alert("Erro", "Não foi possível buscar os usuários");
     } finally {
-      setIsLoading(false);
+      setIsSearching(false);
     }
-  }, 300);
+  }, 500);
 
   const addSharedUser = async (u: IUser) => {
     if (!user?.uid) {
@@ -136,10 +141,12 @@ export function Shared() {
     setActiveTab(tab);
   };
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
+  const filteredUsers = useMemo(() => {
+    console.log('Filtrando usuários...');
+    return users.filter(user => 
+      !sharings.find(sharing => sharing.target === user.uid)
+    );
+  }, [users, sharings]);
   return (
     <DefaultContainer title="Compartilhamento" backButton>
       <Container>
@@ -159,16 +166,24 @@ export function Shared() {
               placeholder="Buscar usuários"
               value={searchValue}
               onChangeText={(text) => {
-                searchUsers(text);
+                console.log('Texto alterado:', text);
                 setSearchValue(text);
+                searchUsers(text);
               }}
               editable={!isLoading}
             />
 
-            {users && users.length > 0 && (
-              <Content>
+
+              {isSearching ? (
+                            <Content>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', minHeight: 100 }}>
+                  <Loading />
+                </View>
+                 </Content>
+              ) : filteredUsers.length > 0 ? (
+                <Content>
                 <FlatList
-                  data={users}
+                  data={filteredUsers}
                   keyExtractor={(item) => item.uid}
                   renderItem={({ item }) => {
                     const isChecked = !!sharings.find(
@@ -197,8 +212,15 @@ export function Shared() {
                     );
                   }}
                 />
-              </Content>
-            )}
+                            </Content>
+              ) : searchValue.length > 0 ? (
+                <Content>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', minHeight: 100 }}>
+                  <Text>Nenhum usuário encontrao</Text>
+                </View>
+                </Content>
+              ) : null}
+           
 
             <FlatList
               data={sharings}
