@@ -62,6 +62,12 @@ export const Remove = styled(AntDesign).attrs(({ theme }) => ({
   shadow-radius: 3.84px;
 `;
 
+export const TextCircle = styled.Text`
+  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  color: ${({ theme }) => theme.COLORS.PURPLE_800};
+`;
+
 export const ModalContainer = styled.View`
   flex: 1;
   justify-content: flex-end;

@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   Alert,
+  Text,
 } from "react-native";
 import {
   CircleContainer,
@@ -27,6 +28,7 @@ import {
   FavoritesList,
   CloseButton,
   CloseButtonText,
+  TextCircle,
 } from "./styles";
 import { useFormContext, Control } from "react-hook-form";
 import { z } from "zod";
@@ -398,7 +400,8 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name, curre
                   {favoriteUsers.map((item) => {
                     const isSelected = sharedUsers.some(u => u.uid === item.uid);
                     return (
-                      <CircleContainer
+                      <View style={{ alignItems: 'center' }} key={item.uid}>
+                              <CircleContainer
                         key={`fav-${item.uid}`}
                         onPress={() =>
                           handleToggleSharedUser({
@@ -437,8 +440,13 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name, curre
                           }}
                         >
                           <Remove name="close" size={12} />
+                        
                         </TouchableOpacity>
                       </CircleContainer>
+                      <TextCircle>
+                            {item.userName}
+                          </TextCircle>
+                      </View>
                     );
                   })}
                 </FavoritesList>
