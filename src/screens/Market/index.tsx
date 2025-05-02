@@ -111,36 +111,78 @@ export function Market({ route }: any) {
     return filtered;
   }, [marketplaceData, user?.uid]);
 
-  const personalMarkets = useMemo(() => 
-    markets?.filter(market => market.uid === user?.uid) || [], 
-    [markets, user?.uid]
-  );
+  const personalMarkets = useMemo(() => {
+    console.log("Filtrando mercados pessoais");
+    console.log("Total de mercados:", markets?.length);
+    const filtered = markets?.filter(market => market.isOwner) || [];
+    console.log("Mercados pessoais encontrados:", filtered.map(m => ({ 
+      id: m.id, 
+      name: m.name,
+      isOwner: m.isOwner,
+      isShared: m.isShared
+    })));
+    return filtered;
+  }, [markets]);
 
-  const sharedMarkets = useMemo(() => 
-    markets?.filter(market => 
-      market.shareWith?.includes(user?.uid || "") &&
-      market.shareInfo?.some((info: ShareInfo) => info.uid === user?.uid && info.acceptedAt !== null)
-    ) || [],
-    [markets, user?.uid]
-  );
+  const sharedMarkets = useMemo(() => {
+    console.log("Filtrando mercados compartilhados");
+    console.log("Total de mercados:", markets?.length);
+    console.log("Mercados disponíveis:", markets?.map(m => ({
+      id: m.id,
+      name: m.name,
+      isOwner: m.isOwner,
+      isShared: m.isShared,
+      shareInfo: m.shareInfo,
+      shareWith: m.shareWith
+    })));
+    
+    const filtered = markets?.filter(market => {
+      const isShared = market.isShared && !market.isOwner;
+      console.log("Verificando mercado:", {
+        id: market.id,
+        name: market.name,
+        isShared: market.isShared,
+        isOwner: market.isOwner,
+        shareInfo: market.shareInfo,
+        shareWith: market.shareWith
+      });
+      return isShared;
+    }) || [];
+    
+    console.log("Mercados compartilhados encontrados:", filtered.map(m => ({ 
+      id: m.id, 
+      name: m.name,
+      isOwner: m.isOwner,
+      isShared: m.isShared,
+      shareInfo: m.shareInfo,
+      shareWith: m.shareWith
+    })));
+    return filtered;
+  }, [markets]);
 
   // Adicionar informações úteis sobre os mercados
   const marketStats = useMemo(() => {
+    console.log("Calculando estatísticas dos mercados");
+    console.log("Mercados pessoais:", personalMarkets.length);
+    console.log("Mercados compartilhados:", sharedMarkets.length);
+    
     // Garantir que todos os preços sejam números válidos
     const allMarkets = [...personalMarkets, ...sharedMarkets];
     const totalValue = allMarkets.reduce((acc, curr) => {
-      // Converter o preço para número se for string e remover caracteres não numéricos
-      const priceStr = typeof curr.price === 'string' ? curr.price.replace(/[^\d.,]/g, '').replace(',', '.') : String(curr.price || 0);
-      const price = parseFloat(priceStr) || 0;
+      // Converter o preço para número
+      const price = typeof curr.price === 'number' ? curr.price : 0;
       return acc + price;
     }, 0);
     
-    return {
+    const stats = {
       totalItems: allMarkets.length,
       completedItems: allMarkets.filter(m => m.status).length,
       pendingItems: allMarkets.filter(m => !m.status).length,
       totalValue: totalValue
     };
+    
+    console.log("Estatísticas calculadas:", stats);
+    return stats;
   }, [personalMarkets, sharedMarkets]);
 
   // Adicionar logs para depuração

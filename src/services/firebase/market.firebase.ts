@@ -21,6 +21,9 @@ export interface IMarket {
   createdAt: Timestamp;
   shareWith: string[];
   shareInfo: TShareInfo[];
+  status?: boolean;
+  isOwner?: boolean;
+  isShared?: boolean;
 }
 
 export const createMarket = async (market: Omit<IMarket, "id">) => {
@@ -56,43 +59,83 @@ export const listMarkets = async (uid: string) => {
   const q = query(collection(database, "Markets"), where("uid", "==", uid));
   const querySnapshot = await getDocs(q);
   
-  return (querySnapshot.docs.map((docSnapshot) => ({
-    id: docSnapshot.id,
-    ...docSnapshot.data(),
-  })) ?? []) as IMarket[];
+  const markets = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    isOwner: true
+  })) as IMarket[];
+
+  return markets;
 };
 
 export const listMarketsSharedWithMe = async (uid: string) => {
-  const q = query(
-    collection(database, "Markets"),
-    where("shareWith", "array-contains", uid)
-  );
-  const querySnapshot = await getDocs(q);
+  console.log("Buscando mercados compartilhados para o usuário:", uid);
+  
+  try {
+    // Primeiro, buscar todos os mercados onde o usuário está em shareWith
+    const q = query(
+      collection(database, "Markets"),
+      where("shareWith", "array-contains", uid)
+    );
+    const querySnapshot = await getDocs(q);
 
-  const markets = (querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) ?? []) as IMarket[];
+    const markets = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      console.log("Documento encontrado:", {
+        id: doc.id,
+        shareWith: data.shareWith,
+        shareInfo: data.shareInfo,
+        uid: data.uid
+      });
+      return {
+        id: doc.id,
+        ...data,
+      };
+    }) as IMarket[];
 
-  return markets.filter((n) =>
-    n.shareInfo.some(
-      (shareInfo) => shareInfo.uid === uid && shareInfo.acceptedAt !== null
-    )
-  );
+    console.log("Total de mercados encontrados:", markets.length);
+    console.log("Mercados encontrados:", markets);
+
+    // Filtrar apenas os mercados onde o usuário está em shareWith
+    const filteredMarkets = markets.filter((market) => {
+      const shareInfo = market.shareInfo?.find(info => info.uid === uid);
+      console.log("Verificando mercado:", {
+        id: market.id,
+        shareWith: market.shareWith,
+        shareInfo: shareInfo,
+        uid: market.uid
+      });
+      return shareInfo !== undefined;
+    });
+
+    console.log("Mercados filtrados:", filteredMarkets.length);
+    console.log("Mercados filtrados:", filteredMarkets);
+
+    // Adicionar a propriedade isShared
+    const marketsWithShared = filteredMarkets.map(market => ({
+      ...market,
+      isShared: true,
+      isOwner: false
+    }));
+
+    return marketsWithShared;
+  } catch (error) {
+    console.error("Erro ao buscar mercados compartilhados:", error);
+    return [];
+  }
 };
 
-export const listMarketsSharedByMe = async (uid: string) => {
-  const q = query(
-    collection(database, "Markets"),
-    where("uid", "==", uid)
-  );
+export const listMarketsSharedByMe = async (uid: string): Promise<IMarket[]> => {
+  const q = query(collection(database, "Markets"), where("uid", "==", uid));
   const querySnapshot = await getDocs(q);
 
-  const notes = querySnapshot.docs
+  const markets = querySnapshot.docs
     .map((doc) => ({ id: doc.id, ...doc.data() } as IMarket))
-    .filter((doc) => Array.isArray(doc.shareWith) && doc.shareWith.length > 0);
+    .filter(
+      (doc) => Array.isArray(doc.shareWith) && doc.shareWith.length > 0
+    ) as IMarket[];
 
-  return notes;
+  return markets;
 };
 
 export const deleteMarket = async (id: string) => {

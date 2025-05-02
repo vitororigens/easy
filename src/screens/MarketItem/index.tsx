@@ -428,6 +428,11 @@ export const MarketItem = ({
                       { label: "Produtos naturais", value: "naturais" },
                       { label: "Utilidades domésticas", value: "utilidades" },
                     ]}
+                    style={{
+                      placeholder: {
+                        color: "#d10000",
+                      },
+                    }}
                   />
                 )}
               />

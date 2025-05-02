@@ -19,4 +19,6 @@ export interface IMarket {
   shareWith: string[];
   shareInfo: TShareInfo[];
   status?: boolean;
+  isOwner?: boolean;
+  isShared?: boolean;
 } 

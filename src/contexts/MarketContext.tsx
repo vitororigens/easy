@@ -4,6 +4,7 @@ import { useUserAuth } from "../hooks/useUserAuth";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { database } from "../libs/firebase";
 import { IMarketContext } from "../interfaces/IMarketContext";
+import { listMarkets, listMarketsSharedWithMe, listMarketsSharedByMe } from "../services/firebase/market.firebase";
 
 const MarketContext = createContext<IMarketContext>({} as IMarketContext);
 
@@ -22,37 +23,50 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
     console.log("Iniciando carregamento de mercados para o usuário:", user.uid);
     setLoading(true);
     
-    // Simplificar a consulta para depuração
-    const marketsRef = database.collection("Markets");
-    
-    // Consulta simples para todos os mercados do usuário
-    const unsubscribe = marketsRef
-      .where("uid", "==", user.uid)
-      .onSnapshot((snapshot) => {
-        console.log("Snapshot recebido do Firebase");
-        const marketData: IMarket[] = [];
-        
-        if (snapshot.empty) {
-          console.log("Nenhum documento encontrado");
-        } else {
-          snapshot.forEach((doc) => {
-            console.log("Documento encontrado:", doc.id, doc.data());
-            marketData.push({ id: doc.id, ...doc.data() } as IMarket);
-          });
-        }
-        
-        console.log("Total de mercados carregados:", marketData.length);
-        setMarkets(marketData);
-        setLoading(false);
-      }, (error) => {
-        console.error("Erro ao carregar mercados:", error);
-        setLoading(false);
-      });
+    const fetchMarkets = async () => {
+      try {
+        console.log("Buscando mercados...");
+        const [myMarkets, sharedWithMe, sharedByMe] = await Promise.all([
+          listMarkets(user.uid),
+          listMarketsSharedWithMe(user.uid),
+          listMarketsSharedByMe(user.uid)
+        ]);
 
-    return () => {
-      console.log("Limpando listener de mercados");
-      unsubscribe();
+        console.log("Resultados da busca:", {
+          meusMercados: myMarkets.map(m => ({ id: m.id, name: m.name })),
+          compartilhadosComigo: sharedWithMe.map(m => ({ id: m.id, name: m.name, shareInfo: m.shareInfo })),
+          compartilhadosPorMim: sharedByMe.map(m => ({ id: m.id, name: m.name }))
+        });
+
+        // Combinar todos os mercados
+        const allMarkets = [
+          ...myMarkets,
+          ...sharedWithMe,
+          ...sharedByMe.map(market => ({
+            ...market,
+            isOwner: true,
+            isShared: true
+          }))
+        ];
+
+        console.log("Total de mercados combinados:", allMarkets.length);
+        console.log("Mercados combinados:", allMarkets.map(m => ({ 
+          id: m.id, 
+          name: m.name,
+          isOwner: m.isOwner,
+          isShared: m.isShared,
+          shareInfo: m.shareInfo
+        })));
+        
+        setMarkets(allMarkets);
+      } catch (error) {
+        console.error("Erro ao carregar mercados:", error);
+      } finally {
+        setLoading(false);
+      }
     };
+
+    fetchMarkets();
   }, [user?.uid]);
 
   const addMarket = useCallback(async (market: Omit<IMarket, "id" | "createdAt">) => {
