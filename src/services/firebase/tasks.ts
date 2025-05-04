@@ -99,7 +99,7 @@ export const listTaskSharedWithMe = async (uid: string) => {
 
   const findTasks = tasks.filter((task) =>
     task.shareInfo.some(
-      ({ uid, acceptedAt }) => uid === uid && acceptedAt !== null
+      (shareInfo) => shareInfo.uid === uid && shareInfo.acceptedAt !== null
     )
   );
 

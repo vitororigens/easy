@@ -30,27 +30,61 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     console.log("Iniciando carregamento de tarefas para o usuário:", user.uid);
     setLoading(true);
     
-    const unsubscribe = database
+    // Lista para armazenar todas as tarefas
+    let allTasks: ITask[] = [];
+    
+    // 1. Listener para tarefas criadas pelo usuário
+    const userTasksUnsubscribe = database
       .collection("Tasks")
       .where("uid", "==", user.uid)
       .onSnapshot((snapshot) => {
-        console.log("Snapshot recebido do Firebase");
-        const taskData: ITask[] = [];
+        console.log("Snapshot de tarefas do usuário recebido");
+        const userTasks: ITask[] = [];
         snapshot.forEach((doc) => {
-          console.log("Documento encontrado:", doc.id);
-          taskData.push({ id: doc.id, ...doc.data() } as ITask);
+          userTasks.push({ id: doc.id, ...doc.data() } as ITask);
         });
-        console.log("Tarefas carregadas:", taskData);
-        setTasks(taskData);
+        console.log("Tarefas do usuário carregadas:", userTasks.length);
+        
+        // Atualiza a lista combinada
+        allTasks = [...userTasks, ...allTasks.filter(task => task.uid !== user.uid)];
+        setTasks(allTasks);
         setLoading(false);
       }, (error) => {
-        console.error("Erro ao carregar tarefas:", error);
+        console.error("Erro ao carregar tarefas do usuário:", error);
         setLoading(false);
+      });
+    
+    // 2. Listener para tarefas compartilhadas com o usuário
+    const sharedTasksUnsubscribe = database
+      .collection("Tasks")
+      .where("shareWith", "array-contains", user.uid)
+      .onSnapshot((snapshot) => {
+        console.log("Snapshot de tarefas compartilhadas recebido");
+        const sharedTasksData: ITask[] = [];
+        snapshot.forEach((doc) => {
+          const taskData = doc.data() as ITask;
+          const taskWithId = { ...taskData, id: doc.id } as ITask;
+          
+          // Verificar se o usuário tem uma entrada em shareInfo e se foi aceita
+          const userShareInfo = taskData.shareInfo?.find(info => info.uid === user.uid);
+          if (userShareInfo && userShareInfo.acceptedAt !== null) {
+            console.log("Tarefa compartilhada aceita encontrada:", doc.id);
+            sharedTasksData.push(taskWithId);
+          }
+        });
+        console.log("Tarefas compartilhadas carregadas:", sharedTasksData.length);
+        
+        // Atualiza a lista combinada
+        allTasks = [...allTasks.filter(task => !task.shareWith?.includes(user.uid)), ...sharedTasksData];
+        setTasks(allTasks);
+      }, (error) => {
+        console.error("Erro ao carregar tarefas compartilhadas:", error);
       });
 
     return () => {
-      console.log("Limpando listener de tarefas");
-      unsubscribe();
+      console.log("Limpando listeners de tarefas");
+      userTasksUnsubscribe();
+      sharedTasksUnsubscribe();
     };
   }, [user?.uid]);
 
@@ -129,10 +163,4 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useTask() {
-  const context = useContext(TaskContext);
-  if (!context) {
-    throw new Error("useTask must be used within a TaskProvider");
-  }
-  return context;
-} 
+export const useTask = () => useContext(TaskContext); 

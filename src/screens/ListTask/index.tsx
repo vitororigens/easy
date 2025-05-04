@@ -91,9 +91,22 @@ export function ListTask({ route }: any) {
   const personalTasks = tasks?.filter(task => 
     (!task.shareWith || task.shareWith.length === 0) && !task.status
   ) || [];
-  const sharedTasks = tasks?.filter(task => 
-    task.shareWith && task.shareWith.length > 0 && !task.status
-  ) || [];
+  
+  const sharedTasks = tasks?.filter(task => {
+    // Verificar se a tarefa tem shareWith e o usuário está incluído
+    const isShared = task.shareWith && 
+                    task.shareWith.length > 0 && 
+                    task.shareWith.includes(uid as string);
+    
+    // Verificar se o usuário tem uma entrada em shareInfo com acceptedAt não nulo
+    const isAccepted = task.shareInfo && 
+                      task.shareInfo.some(info => 
+                        info.uid === uid && info.acceptedAt !== null);
+    
+    // A tarefa deve ser compartilhada, aceita e não estar concluída
+    return isShared && isAccepted && !task.status;
+  }) || [];
+  
   const completedTasks = tasks?.filter(task => task.status) || [];
 
   console.log("Tarefas no ListTask:", tasks);

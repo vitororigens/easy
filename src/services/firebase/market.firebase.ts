@@ -73,11 +73,11 @@ export const listMarketsSharedWithMe = async (uid: string) => {
   
   try {
     // Primeiro, buscar todos os mercados onde o usuário está em shareWith
-    const q = query(
-      collection(database, "Markets"),
-      where("shareWith", "array-contains", uid)
-    );
-    const querySnapshot = await getDocs(q);
+  const q = query(
+    collection(database, "Markets"),
+    where("shareWith", "array-contains", uid)
+  );
+  const querySnapshot = await getDocs(q);
 
     const markets = querySnapshot.docs.map((doc) => {
       const data = doc.data();
@@ -88,7 +88,7 @@ export const listMarketsSharedWithMe = async (uid: string) => {
         uid: data.uid
       });
       return {
-        id: doc.id,
+    id: doc.id,
         ...data,
       };
     }) as IMarket[];
