@@ -49,6 +49,7 @@ import { database } from "../../libs/firebase";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { HistoryTaskModal } from "../../components/HistoryTaskModal";
 import { createHistoryTasks } from "../../services/firebase/tasks";
+import { NativeAdComponent } from "../../components/NativeAd";
 
 const modalBottom = Platform.OS === "ios" ? 90 : 70;
 
@@ -285,14 +286,19 @@ export function ListTask({ route }: any) {
               <FlatList
                 showsVerticalScrollIndicator={false}
                 data={personalTasks}
-                renderItem={({ item }) => (
-                  <ItemTask
-                    task={item}
-                    handleDelete={() => handleDeleteTask(item.id)}
-                    handleUpdate={() => handleEditTask(item.id)}
-                    isSelected={selectedTasks.includes(item.id)}
-                    onSelect={() => handleSelectTask(item.id)}
-                  />
+                renderItem={({ item, index }) => (
+                  <View>
+                    <ItemTask
+                      task={item}
+                      handleDelete={() => handleDeleteTask(item.id)}
+                      handleUpdate={() => handleEditTask(item.id)}
+                      isSelected={selectedTasks.includes(item.id)}
+                      onSelect={() => handleSelectTask(item.id)}
+                    />
+                    {index % 5 === 0 && index !== 0 && (
+                      <NativeAdComponent style={{ marginVertical: 10 }} />
+                    )}
+                  </View>
                 )}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ paddingBottom: 20 }}
@@ -321,14 +327,19 @@ export function ListTask({ route }: any) {
               <FlatList
                 showsVerticalScrollIndicator={false}
                 data={sharedTasks}
-                renderItem={({ item }) => (
-                  <ItemTask
-                    task={item}
-                    handleDelete={() => handleDeleteTask(item.id)}
-                    handleUpdate={() => handleEditTask(item.id)}
-                    isSelected={selectedTasks.includes(item.id)}
-                    onSelect={() => handleSelectTask(item.id)}
-                  />
+                renderItem={({ item, index }) => (
+                  <View>
+                    <ItemTask
+                      task={item}
+                      handleDelete={() => handleDeleteTask(item.id)}
+                      handleUpdate={() => handleEditTask(item.id)}
+                      isSelected={selectedTasks.includes(item.id)}
+                      onSelect={() => handleSelectTask(item.id)}
+                    />
+                    {index % 5 === 0 && index !== 0 && (
+                      <NativeAdComponent style={{ marginVertical: 10 }} />
+                    )}
+                  </View>
                 )}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ paddingBottom: 20 }}

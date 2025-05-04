@@ -26,6 +26,7 @@ import { database } from "../../libs/firebase";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { HistoryMarketModal } from "../../components/HistoryMarketModal";
 import { formatCurrency } from "../../utils/mask";
+import { NativeAdComponent } from "../../components/NativeAd";
 
 import {
   Title,
@@ -379,14 +380,19 @@ export function Market({ route }: any) {
               <FlatList
                 showsVerticalScrollIndicator={false}
                 data={personalMarkets}
-                renderItem={({ item }) => (
-                  <ItemMarket
-                    market={item}
-                    handleDelete={() => handleDeleteMarket(item.id)}
-                    handleUpdate={() => handleEditMarket(item.id)}
-                    isSelected={selectedMarkets.includes(item.id)}
-                    onSelect={() => handleSelectMarket(item.id)}
-                  />
+                renderItem={({ item, index }) => (
+                  <View>
+                    <ItemMarket
+                      market={item}
+                      handleDelete={() => handleDeleteMarket(item.id)}
+                      handleUpdate={() => handleEditMarket(item.id)}
+                      isSelected={selectedMarkets.includes(item.id)}
+                      onSelect={() => handleSelectMarket(item.id)}
+                    />
+                    {index % 5 === 0 && index !== 0 && (
+                      <NativeAdComponent style={{ marginVertical: 10 }} />
+                    )}
+                  </View>
                 )}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ paddingBottom: 20 }}
@@ -415,14 +421,19 @@ export function Market({ route }: any) {
               <FlatList
                 showsVerticalScrollIndicator={false}
                 data={sharedMarkets}
-                renderItem={({ item }) => (
-                  <ItemMarket
-                    market={item}
-                    handleDelete={() => handleDeleteMarket(item.id)}
-                    handleUpdate={() => handleEditMarket(item.id)}
-                    isSelected={selectedMarkets.includes(item.id)}
-                    onSelect={() => handleSelectMarket(item.id)}
-                  />
+                renderItem={({ item, index }) => (
+                  <View>
+                    <ItemMarket
+                      market={item}
+                      handleDelete={() => handleDeleteMarket(item.id)}
+                      handleUpdate={() => handleEditMarket(item.id)}
+                      isSelected={selectedMarkets.includes(item.id)}
+                      onSelect={() => handleSelectMarket(item.id)}
+                    />
+                    {index % 5 === 0 && index !== 0 && (
+                      <NativeAdComponent style={{ marginVertical: 10 }} />
+                    )}
+                  </View>
                 )}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ paddingBottom: 20 }}
