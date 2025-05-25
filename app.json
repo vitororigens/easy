@@ -52,6 +52,22 @@
         }
       ],
       [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "podfileProperties": {
+              "use_modular_headers!": "true"
+            }
+          },
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0"
+          }
+        }
+      ],
+      [
         "react-native-google-mobile-ads",
         {
           "androidAppId": "ca-app-pub-6318524024886686~2563561493",
@@ -63,17 +79,6 @@
             "2fnua5tdw4.skadnetwork",
             "ydx93a7ass.skadnetwork"
           ]
-        }
-      ],
-      [
-        "expo-build-properties",
-        {
-          "ios": {
-            "useFrameworks": "static",
-            "podfileProperties": {
-              "use_modular_headers!": "true"
-            }
-          }
         }
       ]
     ],

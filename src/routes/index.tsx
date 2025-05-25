@@ -2,7 +2,7 @@ import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { NavigationContainer } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { MMKV } from "react-native-mmkv";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "styled-components/native";
 import { Loading } from "../components/Loading";
 import { StackNavigation } from "./StackNavigation";
@@ -12,8 +12,6 @@ import {
   OneSignal,
 } from "react-native-onesignal";
 
-const storage = new MMKV({ id: "easy-finances" });
-
 export function Routes() {
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [loading, setLoading] = useState(true); // Estado de carregamento
@@ -22,11 +20,19 @@ export function Routes() {
   console.log(user);
 
   useEffect(() => {
-    // Recupera dados do usuário do MMKV na inicialização
-    const storedUser = storage.getString("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    // Recupera dados do usuário do AsyncStorage na inicialização
+    const loadStoredUser = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem("user");
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error("Error loading stored user:", error);
+      }
+    };
+
+    loadStoredUser();
 
     const subscriber = auth().onAuthStateChanged((authUser) => {
       if (authUser) {
@@ -37,10 +43,10 @@ export function Routes() {
         };
         // @ts-ignore
         setUser(userData);
-        storage.set("user", JSON.stringify(userData));
+        AsyncStorage.setItem("user", JSON.stringify(userData));
       } else {
         setUser(null);
-        storage.delete("user");
+        AsyncStorage.removeItem("user");
       }
       setLoading(false); // Finaliza o carregamento após a verificação
     });

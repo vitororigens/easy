@@ -3,7 +3,7 @@ import auth from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
-import { MMKV } from "react-native-mmkv";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "styled-components/native";
 import { CustomModal } from "../../components/CustomModal";
 import { DefaultContainer } from "../../components/DefaultContainer";
@@ -18,8 +18,6 @@ import {
   Title,
 } from "./styles";
 
-const storage = new MMKV();
-
 export function Gears() {
   const navigation = useNavigation();
   const { COLORS } = useTheme();
@@ -31,44 +29,40 @@ export function Gears() {
     setConfirmLogoutVisible(true);
   }
 
-  function handleLogout() {
-    auth()
-      .signOut()
-      .then(() => {
-        storage.delete("user");
-        console.log("User signed out");
-        setTimeout(() => {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "login" }],
-          });
-        }, 1000);
-      })
-      .catch((error) => {
-        console.error("Error signing out: ", error);
-      });
+  async function handleLogout() {
+    try {
+      await auth().signOut();
+      await AsyncStorage.removeItem("user");
+      console.log("User signed out");
+      setTimeout(() => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "login" }],
+        });
+      }, 1000);
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
   }
 
   function handleDeleteUserConfirmation() {
     setConfirmDeleteVisible(true);
   }
 
-  function handleDeleteUser() {
-    auth()
-      .currentUser?.delete()
-      .then(() => {
-        storage.delete("user");
-        console.log("User deleted account");
-        setTimeout(() => {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "login" }],
-          });
-        }, 1000);
-      })
-      .catch((error) => {
-        console.error("Error delete account: ", error);
-      });
+  async function handleDeleteUser() {
+    try {
+      await auth().currentUser?.delete();
+      await AsyncStorage.removeItem("user");
+      console.log("User deleted account");
+      setTimeout(() => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "login" }],
+        });
+      }, 1000);
+    } catch (error) {
+      console.error("Error delete account: ", error);
+    }
   }
 
   function handlePiggyBank() {
