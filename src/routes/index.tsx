@@ -1,4 +1,4 @@
-import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
+import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
 import { NavigationContainer } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
@@ -13,14 +13,14 @@ import {
 } from "react-native-onesignal";
 
 export function Routes() {
-  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
-  const [loading, setLoading] = useState(true); // Estado de carregamento
+  const [user, setUser] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
   const { COLORS } = useTheme();
+  const auth = getAuth();
 
   console.log(user);
 
   useEffect(() => {
-    // Recupera dados do usuário do AsyncStorage na inicialização
     const loadStoredUser = async () => {
       try {
         const storedUser = await AsyncStorage.getItem("user");
@@ -34,21 +34,20 @@ export function Routes() {
 
     loadStoredUser();
 
-    const subscriber = auth().onAuthStateChanged((authUser) => {
+    const subscriber = onAuthStateChanged(auth, (authUser) => {
       if (authUser) {
         const userData = {
           uid: authUser.uid,
           name: authUser.displayName,
           email: authUser.email,
         };
-        // @ts-ignore
         setUser(userData);
         AsyncStorage.setItem("user", JSON.stringify(userData));
       } else {
         setUser(null);
         AsyncStorage.removeItem("user");
       }
-      setLoading(false); // Finaliza o carregamento após a verificação
+      setLoading(false);
     });
     return subscriber;
   }, []);

@@ -1,5 +1,5 @@
-import { Entypo, FontAwesome, FontAwesome5 } from "@expo/vector-icons";
-import auth from "@react-native-firebase/auth";
+import { Entypo, FontAwesome, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import { getAuth, signOut, deleteUser } from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
@@ -17,6 +17,8 @@ import {
   Items,
   Title,
 } from "./styles";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
 
 export function Gears() {
   const navigation = useNavigation();
@@ -24,6 +26,7 @@ export function Gears() {
   const user = useUserAuth();
   const [confirmLogoutVisible, setConfirmLogoutVisible] = useState(false);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
+  const auth = getAuth();
 
   function handleLogoutConfirmation() {
     setConfirmLogoutVisible(true);
@@ -31,7 +34,7 @@ export function Gears() {
 
   async function handleLogout() {
     try {
-      await auth().signOut();
+      await signOut(auth);
       await AsyncStorage.removeItem("user");
       console.log("User signed out");
       setTimeout(() => {
@@ -51,15 +54,17 @@ export function Gears() {
 
   async function handleDeleteUser() {
     try {
-      await auth().currentUser?.delete();
-      await AsyncStorage.removeItem("user");
-      console.log("User deleted account");
-      setTimeout(() => {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "login" }],
-        });
-      }, 1000);
+      if (auth.currentUser) {
+        await deleteUser(auth.currentUser);
+        await AsyncStorage.removeItem("user");
+        console.log("User deleted account");
+        setTimeout(() => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "login" }],
+          });
+        }, 1000);
+      }
     } catch (error) {
       console.error("Error delete account: ", error);
     }
@@ -84,8 +89,13 @@ export function Gears() {
   function handleShared() {
     navigation.navigate("shared");
   }
+
   function handleSubscriptions() {
     navigation.navigate("subscriptions");
+  }
+
+  function handleCalendar() {
+    navigation.navigate("calendar");
   }
 
   return (
@@ -95,7 +105,19 @@ export function Gears() {
           {user ? (
             <View>
               <ContentItems>
-              <ButtonIcon onPress={handleSubscriptions}>
+                <ButtonIcon onPress={handleCalendar}>
+                  <Items>
+                    <Title>Agenda</Title>
+                    <Icon>
+                      <MaterialCommunityIcons
+                        name="calendar"
+                        size={30}
+                        color={COLORS.PURPLE_800}
+                      />
+                    </Icon>
+                  </Items>
+                </ButtonIcon>
+                <ButtonIcon onPress={handleSubscriptions}>
                   <Items>
                     <Title>Assinaturas</Title>
                     <Icon>

@@ -36,6 +36,8 @@ export declare global {
       subscriptions: undefined;
       "new-subscription": { selectedItemId?: string };
       "subscription-history": { selectedItemId?: string };
+      calendar: { reload?: boolean };
+      newevent: { selectedItemId?: string; isCreator: boolean };
     }
   }
 }
@@ -48,6 +50,7 @@ export type TabParamList = {
   Receitas: { reload?: boolean };
   Config: undefined;
   Assinaturas: { reload?: boolean };
+  Agenda: { reload?: boolean };
 };
 
 export type RootStackParamList = {
@@ -63,6 +66,10 @@ export type RootStackParamList = {
   };
   newsubscription: {
     selectedItemId: string;
+  };
+  newevent: {
+    selectedItemId: string;
+    isCreator: boolean;
   };
   filter: undefined;
 };

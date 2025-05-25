@@ -1,4 +1,4 @@
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
 import { useEffect, useState, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -31,8 +31,9 @@ export function useUserAuth() {
 
     loadStoredUser();
     
-    // Subscrever às mudanças de autenticação do Firebase
-    const subscriber = auth().onAuthStateChanged(async (firebaseUser) => {
+    // Subscrever às mudanças de autenticação do Firebase usando a API modular
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         const userData: UserData = {
           uid: firebaseUser.uid,
@@ -47,7 +48,7 @@ export function useUserAuth() {
       }
     });
 
-    return subscriber;
+    return unsubscribe;
   }, []);
 
   return user;

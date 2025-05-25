@@ -9,7 +9,9 @@ import {
   IconCheck,
   ButtonSelect,
 } from "./styles";
-import { database } from "../../libs/firebase";
+import { getFirestore, collection, query, where, getDocs } from '@react-native-firebase/firestore';
+
+const db = getFirestore();
 
 interface EditshareModalProps {
   visible: boolean;
@@ -35,10 +37,12 @@ export function EditshareModal({
       return;
     }
     try {
-      const userRef = database.collection("User");
-      const snapshot = await userRef.where("userName", "==", username).get();
-      if (!snapshot.empty) {
-        const results = snapshot.docs.map((doc) => ({
+      const userRef = collection(db, 'User');
+      const q = query(userRef, where('userName', '==', username));
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        const results = querySnapshot.docs.map((doc) => ({
           uid: doc.id,
           ...doc.data(),
         }));

@@ -64,7 +64,7 @@ export const ButtonBack = styled(TouchableOpacity)`
 
 export const Title = styled.Text<Props>`
   color: ${({ theme }) => theme.COLORS.WHITE};
-  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  font-family: 'Roboto';
   font-size: ${({ theme }) => theme.FONTE_SIZE.GG}px;
   font-weight: 700;
   text-align: center;
@@ -74,7 +74,7 @@ export const Title = styled.Text<Props>`
 
 export const SubTitle = styled.Text`
   color: ${({ theme }) => theme.COLORS.WHITE};
-  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  font-family: 'Roboto';
   font-size: ${({ theme }) => theme.FONTE_SIZE.XL}px;
   font-weight: 700;
 `;
@@ -89,5 +89,5 @@ export const ViewHomeCenter = styled.View`
 
 export const Icon = styled(Ionicons).attrs(({ theme }) => ({
   color: theme.COLORS.WHITE,
-  size: theme.FONTE_SIZE.XL,
+  size: 24,
 }))``;

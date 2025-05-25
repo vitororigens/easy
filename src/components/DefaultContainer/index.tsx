@@ -39,6 +39,7 @@ type DefaultContainerProps = {
   newNotes?: boolean;
   hasHeader?: boolean;
   newSubscription?: boolean;
+  newEvent?: boolean;
   title?: string;
   subtitle?: string;
   customBg?: string;
@@ -50,6 +51,7 @@ type DefaultContainerProps = {
   onNewItemMarketplace?: (documentId: string) => void;
   onNewLaunch?: () => void;
   onNewSubscription?: (documentId: string) => void;
+  onNewEvent?: () => void;
 };
 
 export function DefaultContainer({
@@ -71,11 +73,13 @@ export function DefaultContainer({
   newLaunch = false,
   listButtom = false,
   hasHeader = true,
+  newEvent = false,
   onNewItemTask,
   onNewNotes,
   onNewItemMarketplace,
   onNewLaunch,
   onNewSubscription,
+  onNewEvent,
 }: DefaultContainerProps) {
   const navigation = useNavigation();
   const { COLORS } = useTheme();
@@ -148,6 +152,14 @@ export function DefaultContainer({
     }
   }
 
+  function handleNewEvent() {
+    if (onNewEvent) {
+      onNewEvent();
+    } else {
+      navigation.navigate("new-event" as never);
+    }
+  }
+
   return (
     <Container type={type}>
       <Header type={type}>
@@ -199,6 +211,12 @@ export function DefaultContainer({
 
           {newSubscription && (
             <Button onPress={() => handleNewSubscription(selectedItemId)}>
+              <Icon name="add-outline" />
+            </Button>
+          )}
+
+          {newEvent && (
+            <Button onPress={handleNewEvent}>
               <Icon name="add-outline" />
             </Button>
           )}

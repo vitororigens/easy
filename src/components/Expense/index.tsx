@@ -294,6 +294,7 @@ export function Expense({
               },
               title: "Compartilhamento de compras",
               description: message,
+              createdAt: Timestamp.now(),
             }),
             ...(!alreadySharing && !possibleSharingRequestExists
               ? [
@@ -301,6 +302,8 @@ export function Expense({
                     invitedBy: uid as string,
                     status: ESharingStatus.PENDING,
                     target: userSharing.uid as string,
+                    createdAt: Timestamp.now(),
+                    updatedAt: Timestamp.now(),
                   }),
                 ]
               : []),
@@ -498,7 +501,7 @@ export function Expense({
         .doc(selectedItemId)
         .get()
         .then((doc) => {
-          if (doc.exists) {
+          if (doc.exists()) {
             const data = doc.data();
             if (data) {
               setValue("name", data.name);
@@ -901,7 +904,11 @@ export function Expense({
           )}
           {user && (
             <FormProvider {...form}>
-              <ShareWithUsers />
+              <ShareWithUsers 
+                control={control}
+                name="sharedUsers"
+                currentUserId={user.uid}
+              />
             </FormProvider>
           )}
         </View>
