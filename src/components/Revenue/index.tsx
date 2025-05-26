@@ -29,6 +29,8 @@ import {
   getSharing,
 } from "../../services/firebase/sharing.firebase";
 import { ShareWithUsers } from "../../components/ShareWithUsers";
+import { Loading } from "../Loading";
+import { LoadData } from "../LoadData";
 import {
   Button,
   DividerTask,
@@ -39,6 +41,8 @@ import {
   TitleTask,
 } from "./styles";
 import { database } from "../../libs/firebase";
+import { INotification } from "../../@types/notifications";
+import { ISharing } from "../../@types/sharing";
 
 type RevenueProps = {
   selectedItemId?: string;
@@ -71,7 +75,7 @@ export function Revenue({
   showButtonSave,
 }: RevenueProps) {
   // States
-  const user = useUserAuth();
+  const { user, loading: authLoading } = useUserAuth();
   const { selectedMonth } = useMonth();
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -84,23 +88,10 @@ export function Revenue({
 
   const navigation = useNavigation();
   const route = useRoute();
-  const { isCreator = true } = route.params as {
+  const { isCreator = true } = (route.params as {
     selectedItemId?: string;
     isCreator: boolean;
-  };
-
-  // Hooks
-  // const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
-  //   resolver: zodResolver(formSchema),
-  //   defaultValues: {
-  //     description: "",
-  //     formattedDate: date.toLocaleDateString("pt-BR"),
-  //     name: "",
-  //     selectedCategory: "Outros",
-  //     valueTransaction: "",
-  //     sharedUsers: [],
-  //   },
-  // });
+  }) || {};
 
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -114,7 +105,6 @@ export function Revenue({
     },
   });
   const { control, handleSubmit, reset, setValue, watch } = form;
-  // Functions
 
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     setShowDatePicker(false);
@@ -136,67 +126,56 @@ export function Revenue({
     selectedCategory,
     sharedUsers,
   }: FormSchemaType) {
+    if (!uid) {
+      Toast.show("Erro: Usuário não autenticado", { type: "error" });
+      return;
+    }
+
     setLoading(true);
 
-    const [day, month, year] = formattedDate.split("/");
-    const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
-    const monthNumber = selectedDate.getMonth() + 1;
-
-    const usersInvitedByMe = await getSharing({
-      profile: "invitedBy",
-      uid: uid as string,
-    });
-
-    const transactionValue = valueTransaction
-      ? currencyUnMask(valueTransaction)
-      : 0;
-
-    const revenueData = {
-      name: name,
-      category: selectedCategory,
-      uid: uid,
-      date: formattedDate,
-      valueTransaction: transactionValue.toString(),
-      description: description,
-      repeat,
-      type: "input",
-      month: monthNumber,
-      shareWith: sharedUsers.map((user) => user.uid),
-      shareInfo: sharedUsers.map((user) => ({
-        uid: user.uid,
-        userName: user.userName,
-        acceptedAt: usersInvitedByMe.some(
-          (u) => u.target === user.uid && u.status === ESharingStatus.ACCEPTED
-        )
-          ? Timestamp.now()
-          : null,
-      })),
-    };
-
-    // Salva o lançamento de receita para o mês atual
-    // const saveRevenue = database
-    //   .collection("Revenue")
-    //   .add(revenueData)
-    //   .then(() => {
-    //     Toast.show("Transação adicionada!", { type: "success" });
-    //     setRepeat(false);
-    //     reset();
-    //     setLoading(false);
-    //     !!onCloseModal && onCloseModal();
-    //   })
-    //   .catch((error) => {
-    //     setLoading(false);
-    //     console.error("Erro ao adicionar a transação: ", error);
-    //   });
-
     try {
+      const [day, month, year] = formattedDate.split("/");
+      const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
+      const monthNumber = selectedDate.getMonth() + 1;
+
+      const usersInvitedByMe = await getSharing({
+        profile: "invitedBy",
+        uid: uid,
+      });
+
+      const transactionValue = valueTransaction
+        ? currencyUnMask(valueTransaction)
+        : 0;
+
+      const revenueData = {
+        name: name,
+        category: selectedCategory || "Outros",
+        uid: uid,
+        date: formattedDate,
+        valueTransaction: transactionValue.toString(),
+        description: description || "",
+        repeat,
+        type: "input",
+        month: monthNumber,
+        shareWith: sharedUsers?.map((user) => user.uid) || [],
+        shareInfo: sharedUsers?.map((user) => ({
+          uid: user.uid,
+          userName: user.userName,
+          acceptedAt: usersInvitedByMe.some(
+            (u) => u.target === user.uid && u.status === ESharingStatus.ACCEPTED
+          )
+            ? Timestamp.now()
+            : null,
+        })) || [],
+      };
+
       const createdRevenue = await createRevenue(revenueData);
 
       Toast.show("Transação adicionada!", { type: "success" });
       setRepeat(false);
       reset();
       setLoading(false);
-      !!onCloseModal && onCloseModal();
+      onCloseModal?.();
 
       navigation.navigate("tabroutes", {
         screen: "Receitas",
@@ -206,15 +185,14 @@ export function Revenue({
       if (repeat) {
         for (let i = 1; i <= 11; i++) {
           let nextMonth = monthNumber + i;
-          let nextYear: any = year;
+          let nextYear = Number(year);
 
           if (nextMonth > 12) {
             nextMonth -= 12;
             nextYear++;
           }
 
-          // Adiciona verificação para garantir que não passe do ano corrente
-          if (nextYear > year) {
+          if (nextYear > Number(year)) {
             break;
           }
 
@@ -225,60 +203,70 @@ export function Revenue({
             month: nextMonth,
           };
 
-          database
-            .collection("Revenue")
-            .add(nextMonthRevenueData)
-            .catch((error) => {
-              console.error("Erro ao adicionar a transação repetida: ", error);
-            });
+          try {
+            await database.collection("Revenue").add(nextMonthRevenueData);
+          } catch (error) {
+            console.error("Erro ao adicionar a transação repetida:", error);
+          }
         }
       }
 
-      for (const userSharing of sharedUsers) {
-        const alreadySharing = usersInvitedByMe.some(
-          (u) => u.target === userSharing.uid && u.status === "accepted"
-        );
+      if (sharedUsers?.length > 0) {
+        for (const userSharing of sharedUsers) {
+          const alreadySharing = usersInvitedByMe.some(
+            (u) => u.target === userSharing.uid && u.status === "accepted"
+          );
 
-        const possibleSharingRequestExists = usersInvitedByMe.some(
-          (u) => u.target === userSharing.uid
-        );
+          const possibleSharingRequestExists = usersInvitedByMe.some(
+            (u) => u.target === userSharing.uid
+          );
 
-        const message = alreadySharing
-          ? `${user?.displayName} adicionou um novo item ao mercado`
-          : `${user?.displayName} convidou você para compartilhar um item de mercado`;
+          const message = alreadySharing
+            ? `${user?.displayName} adicionou um novo item ao mercado`
+            : `${user?.displayName} convidou você para compartilhar um item de mercado`;
 
-        await Promise.allSettled([
-          createNotification({
-            sender: uid as string,
-            receiver: userSharing.uid,
-            status: alreadySharing ? "sharing_accepted" : "pending",
-            type: "sharing_invite",
-            source: {
-              type: "expense",
-              id: createdRevenue.id,
-            },
-            title: "Compartilhamento de compras",
-            description: message,
-          }),
-          ...(!alreadySharing && !possibleSharingRequestExists
-            ? [
-                createSharing({
-                  invitedBy: uid as string,
-                  status: ESharingStatus.PENDING,
-                  target: userSharing.uid as string,
-                }),
-              ]
-            : []),
-          sendPushNotification({
-            title: "Compartilhamento de despesa",
-            message,
-            uid: userSharing?.uid,
-          }),
-        ]);
+          try {
+            await Promise.allSettled([
+              createNotification({
+                sender: uid,
+                receiver: userSharing.uid,
+                status: alreadySharing ? "sharing_accepted" : "pending",
+                type: "sharing_invite",
+                source: {
+                  type: "expense",
+                  id: createdRevenue.id,
+                },
+                title: "Compartilhamento de compras",
+                description: message,
+                createdAt: Timestamp.now(),
+              } as INotification),
+              ...(!alreadySharing && !possibleSharingRequestExists
+                ? [
+                    createSharing({
+                      invitedBy: uid,
+                      status: ESharingStatus.PENDING,
+                      target: userSharing.uid,
+                      createdAt: Timestamp.now(),
+                      updatedAt: Timestamp.now(),
+                    } as ISharing),
+                  ]
+                : []),
+              sendPushNotification({
+                title: "Compartilhamento de despesa",
+                message,
+                uid: userSharing.uid,
+              }),
+            ]);
+          } catch (error) {
+            console.error("Erro ao enviar notificações:", error);
+          }
+        }
       }
-    } catch (err) {
+    } catch (error) {
+      console.error("Erro ao salvar receita:", error);
+      Toast.show("Erro ao salvar a receita", { type: "error" });
+    } finally {
       setLoading(false);
-      return console.log("erro:", err);
     }
   }
 
@@ -289,27 +277,29 @@ export function Revenue({
     description,
     selectedCategory,
   }: FormSchemaType) {
-    if (!selectedItemId) {
-      console.error("Nenhum documento selecionado para edição!");
+    if (!selectedItemId || !uid) {
+      Toast.show("Erro: Dados inválidos para edição", { type: "error" });
       return;
     }
 
-    const [day, month, year] = formattedDate.split("/");
-    const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
-    const monthNumber = selectedDate.getMonth() + 1;
-
-    const transactionValue = valueTransaction
-      ? currencyUnMask(valueTransaction)
-      : 0;
+    setLoading(true);
 
     try {
+      const [day, month, year] = formattedDate.split("/");
+      const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
+      const monthNumber = selectedDate.getMonth() + 1;
+
+      const transactionValue = valueTransaction
+        ? currencyUnMask(valueTransaction)
+        : 0;
+
       const revenueData = {
         name,
-        category: selectedCategory,
+        category: selectedCategory || "Outros",
         uid: uid,
         date: formattedDate,
         valueTransaction: transactionValue.toString(),
-        description: description,
+        description: description || "",
         repeat: removeRepeat ? false : repeat,
         type: "input",
         month: monthNumber,
@@ -336,34 +326,47 @@ export function Revenue({
         await batch.commit();
       }
 
-      setLoading(false);
       setRepeat(false);
       setIsEditing(false);
-      !!onCloseModal && onCloseModal();
+      onCloseModal?.();
     } catch (error) {
+      console.error("Erro ao editar a transação:", error);
+      Toast.show("Erro ao editar a transação", { type: "error" });
+    } finally {
       setLoading(false);
-      console.error("Erro ao editar a transação: ", error);
     }
   }
 
   function handleDeleteRevenue() {
     if (!selectedItemId) {
-      console.error("Nenhum documento selecionado para exclusão!");
+      Toast.show("Erro: Nenhum item selecionado para exclusão", { type: "error" });
       return;
     }
 
-    const revenueRef = database.collection("Revenue").doc(selectedItemId);
-    revenueRef
-      .delete()
-      .then(() => {
-        console.log("Documento de receita excluído com sucesso.");
-        if (onCloseModal) {
-          onCloseModal();
-        }
-      })
-      .catch((error) => {
-        console.error("Erro ao excluir o documento de receita:", error);
-      });
+    Alert.alert(
+      "Confirmar exclusão",
+      "Tem certeza que deseja excluir esta receita?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await database.collection("Revenue").doc(selectedItemId).delete();
+              Toast.show("Receita excluída com sucesso!", { type: "success" });
+              onCloseModal?.();
+            } catch (error) {
+              console.error("Erro ao excluir a receita:", error);
+              Toast.show("Erro ao excluir a receita", { type: "error" });
+            }
+          },
+        },
+      ]
+    );
   }
 
   const onInvalid = () => {
@@ -379,6 +382,7 @@ export function Revenue({
 
   useEffect(() => {
     if (selectedItemId) {
+      setLoading(true);
       database
         .collection("Revenue")
         .doc(selectedItemId)
@@ -397,31 +401,39 @@ export function Revenue({
               );
               setValue(
                 "sharedUsers",
-                data.shareInfo.map((si: any) => ({
+                data.shareInfo?.map((si: any) => ({
                   uid: si.uid,
                   userName: si.userName,
                   acceptedAt: si.acceptedAt,
                 })) ?? []
               );
-              setValue("description", data.description);
+              setValue("description", data.description || "");
               const [day, month, year] = data.date.split("/");
               setValue("formattedDate", data.date);
-              setValue("selectedCategory", data.category);
-              setRepeat(data.repeat);
-              setDate(new Date(year, month - 1, day));
+              setValue("selectedCategory", data.category || "Outros");
+              setRepeat(data.repeat || false);
+              setDate(new Date(Number(year), Number(month) - 1, Number(day)));
               setIsEditing(true);
-            } else {
-              console.log("Dados do documento estão vazios!");
             }
-          } else {
-            console.log("Nenhum documento encontrado!");
           }
         })
         .catch((error) => {
-          console.error("Erro ao obter o documento:", error);
+          console.error("Erro ao carregar dados da receita:", error);
+          Toast.show("Erro ao carregar dados da receita", { type: "error" });
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   }, [selectedItemId]);
+
+  if (authLoading) {
+    return <Loading />;
+  }
+
+  if (!user) {
+    return <LoadData />;
+  }
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
@@ -530,7 +542,7 @@ export function Revenue({
               <View style={{ width: "50%" }}>
                 <View>
                   <TitleTask>
-                    Categorias <Span>(opicional)</Span>{" "}
+                    Categorias <Span>(opcional)</Span>{" "}
                   </TitleTask>
                   <View style={{ height: 50, justifyContent: "center" }}>
                     <Controller
@@ -564,7 +576,7 @@ export function Revenue({
               {(!isEditing || !repeat) && (
                 <View style={{ width: "40%" }}>
                   <TitleTask>
-                    Repetir essa receita? <Span>(opicional)</Span>
+                    Repetir essa receita? <Span>(opcional)</Span>
                   </TitleTask>
                   <Switch
                     trackColor={{ false: "#767577", true: "#81b0ff" }}
@@ -643,7 +655,11 @@ export function Revenue({
           )}
           {isCreator && (
             <FormProvider {...form}>
-              <ShareWithUsers />
+              <ShareWithUsers 
+                control={control} 
+                name="sharedUsers" 
+                currentUserId={uid || ""} 
+              />
             </FormProvider>
           )}
         </View>

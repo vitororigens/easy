@@ -1,55 +1,48 @@
+import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
-import { useEffect, useState, useRef } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { FirebaseAuthTypes } from "@react-native-firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-interface UserData {
-  uid: string;
-  displayName: string | null;
-  email: string | null;
-}
+const USER_STORAGE_KEY = "@MyApp:usereasy";
 
 export function useUserAuth() {
-  const [user, setUser] = useState<UserData | null>(null);
-  const isInitialized = useRef(false);
+    const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    if (isInitialized.current) return;
-    isInitialized.current = true;
-    
-    // Recuperar dados do usuário do AsyncStorage na inicialização
-    const loadStoredUser = async () => {
-      try {
-        const storedUser = await AsyncStorage.getItem('user');
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
-        }
-      } catch (error) {
-        console.error("Error loading stored user:", error);
-      }
-    };
-
-    loadStoredUser();
-    
-    // Subscrever às mudanças de autenticação do Firebase usando a API modular
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const userData: UserData = {
-          uid: firebaseUser.uid,
-          displayName: firebaseUser.displayName,
-          email: firebaseUser.email,
+    useEffect(() => {
+        const loadUserFromStorage = async () => {
+            try {
+                const storedUser = await AsyncStorage.getItem(USER_STORAGE_KEY);
+                if (storedUser) {
+                    setUser(JSON.parse(storedUser) as FirebaseAuthTypes.User);
+                }
+            } catch (error) {
+                console.error("Erro ao carregar usuário do storage:", error);
+            } finally {
+                setLoading(false);
+            }
         };
-        setUser(userData);
-        await AsyncStorage.setItem('user', JSON.stringify(userData));
-      } else {
-        setUser(null);
-        await AsyncStorage.removeItem('user');
-      }
-    });
 
-    return unsubscribe;
-  }, []);
+        const auth = getAuth();
+        const subscriber = onAuthStateChanged(auth, async (authUser) => {
+            try {
+                if (authUser) {
+                    await AsyncStorage.setItem(USER_STORAGE_KEY, JSON.stringify(authUser));
+                } else {
+                    await AsyncStorage.removeItem(USER_STORAGE_KEY);
+                }
+                setUser(authUser);
+            } catch (error) {
+                console.error("Erro ao atualizar storage do usuário:", error);
+            } finally {
+                setLoading(false);
+            }
+        });
 
-  return user;
+        loadUserFromStorage();
+
+        return () => subscriber();
+    }, []);
+
+    return { user, loading };
 }

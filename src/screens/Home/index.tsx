@@ -59,7 +59,7 @@ export interface IRevenue {
 }
 
 export function Home() {
-  const user = useUserAuth();
+  const { user, loading: authLoading } = useUserAuth();
   const uid = user?.uid;
   const [activeButton, setActiveButton] = useState("receitas");
   const { selectedMonth } = useMonth();
@@ -85,6 +85,8 @@ export function Home() {
   const [expensesSharedWithMe, setExpensesSharedWithme] = useState<IRevenue[]>(
     []
   );
+  const [isLoadingSharedData, setIsLoadingSharedData] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Adicionando estados para o resumo
   const [paidBills, setPaidBills] = useState(0);
@@ -94,20 +96,40 @@ export function Home() {
   const navigation = useNavigation<NavigationProp>();
 
   useEffect(() => {
-    getRevenuesSharedByMe();
-    // getExpenseSharedByMe();
-    setIsLoaded(true);
-  }, []);
+    if (!authLoading && uid) {
+      setIsLoadingSharedData(true);
+      setError(null);
+      Promise.all([
+        getRevenuesSharedByMe(),
+        getExpenseSharedByMe(),
+        getRevenuesSharedWithMe(),
+        getExpenseSharedWithMe()
+      ]).catch((err) => {
+        console.error("Erro ao carregar dados compartilhados:", err);
+        setError("Erro ao carregar dados compartilhados");
+      }).finally(() => {
+        setIsLoadingSharedData(false);
+        setIsLoaded(true);
+      });
+    }
+  }, [authLoading, uid]);
 
   useEffect(() => {
-    // Calculando contas pagas e pendentes apenas para o mês selecionado e do usuário atual
-    const filteredExpenses = expense.filter(item => item.uid === uid && item.month === selectedMonth);
-    const paid = filteredExpenses.filter(item => item.status).length;
-    const pending = filteredExpenses.filter(item => !item.status).length;
-    
-    setPaidBills(paid);
-    setPendingBills(pending);
-    setTotalValue(tolalRevenueMunth - totalExpenseMunth);
+    if (uid && selectedMonth) {
+      try {
+        // Calculando contas pagas e pendentes apenas para o mês selecionado e do usuário atual
+        const filteredExpenses = expense.filter(item => item.uid === uid && item.month === selectedMonth);
+        const paid = filteredExpenses.filter(item => item.status).length;
+        const pending = filteredExpenses.filter(item => !item.status).length;
+        
+        setPaidBills(paid);
+        setPendingBills(pending);
+        setTotalValue(tolalRevenueMunth - totalExpenseMunth);
+      } catch (err) {
+        console.error("Erro ao calcular resumo:", err);
+        setError("Erro ao calcular resumo");
+      }
+    }
   }, [expense, tolalRevenueMunth, totalExpenseMunth, selectedMonth, uid]);
 
   const formattedRevenue = tolalRevenueMunth.toLocaleString("pt-BR", {
@@ -233,7 +255,7 @@ export function Home() {
   };
 
   async function getRevenuesSharedByMe() {
-    if (!uid) return;
+    if (!uid) return [];
     try {
       const data = await database
         .collection("Revenue")
@@ -247,13 +269,16 @@ export function Home() {
         );
 
       setRevenueSharedByMe(revenues);
+      return revenues;
     } catch (err) {
-      return err;
+      console.error("Erro ao buscar receitas compartilhadas:", err);
+      setError("Erro ao buscar receitas compartilhadas");
+      return [];
     }
   }
 
   async function getRevenuesSharedWithMe() {
-    if (!uid) return;
+    if (!uid) return [];
     try {
       const data = await database
         .collection("Revenue")
@@ -267,18 +292,21 @@ export function Home() {
 
       const filteredRevenues = revenues.filter((n) =>
         n.shareInfo.some(
-          ({ uid, acceptedAt }) => uid === uid && acceptedAt !== null
+          ({ uid: shareUid, acceptedAt }) => shareUid === uid && acceptedAt !== null
         )
       );
 
       setRevenueSharedWithMe(filteredRevenues);
+      return filteredRevenues;
     } catch (err) {
-      return err;
+      console.error("Erro ao buscar receitas compartilhadas comigo:", err);
+      setError("Erro ao buscar receitas compartilhadas comigo");
+      return [];
     }
   }
 
   async function getExpenseSharedByMe() {
-    if (!uid) return;
+    if (!uid) return [];
     try {
       const data = await database
         .collection("Expense")
@@ -292,13 +320,16 @@ export function Home() {
         );
 
       setExpenseSharedByMe(expenses);
+      return expenses;
     } catch (err) {
-      return err;
+      console.error("Erro ao buscar despesas compartilhadas:", err);
+      setError("Erro ao buscar despesas compartilhadas");
+      return [];
     }
   }
 
   async function getExpenseSharedWithMe() {
-    if (!uid) return;
+    if (!uid) return [];
     try {
       const data = await database
         .collection("Expense")
@@ -312,22 +343,18 @@ export function Home() {
 
       const filteredExpenses = expenses.filter((n) =>
         n.shareInfo.some(
-          ({ uid, acceptedAt }) => uid === uid && acceptedAt !== null
+          ({ uid: shareUid, acceptedAt }) => shareUid === uid && acceptedAt !== null
         )
       );
 
       setExpensesSharedWithme(filteredExpenses);
+      return filteredExpenses;
     } catch (err) {
-      return err;
+      console.error("Erro ao buscar despesas compartilhadas comigo:", err);
+      setError("Erro ao buscar despesas compartilhadas comigo");
+      return [];
     }
   }
-
-  useEffect(() => {
-    getRevenuesSharedByMe();
-    getExpenseSharedByMe();
-    getRevenuesSharedWithMe();
-    getExpenseSharedWithMe();
-  }, [uid, expense, revenue]);
 
   function handleDeleteExpense(documentId: string) {
     database
@@ -359,8 +386,33 @@ export function Home() {
     setSharedRevenueListVisible(false);
   };
 
-  if (!isLoaded || uid === undefined) {
+  if (authLoading || isLoadingSharedData) {
     return <Loading />;
+  }
+
+  if (!user) {
+    return <LoadData />;
+  }
+
+  if (error) {
+    return (
+      <DefaultContainer
+        monthButton
+        title="Erro"
+        type="SECONDARY"
+        subtitle="Ocorreu um erro ao carregar os dados"
+      >
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: 'red', marginBottom: 20 }}>{error}</Text>
+          <Button onPress={() => {
+            setError(null);
+            setIsLoaded(false);
+          }}>
+            <Title>Tentar novamente</Title>
+          </Button>
+        </View>
+      </DefaultContainer>
+    );
   }
 
   const filteredRevenue = revenue.filter(
