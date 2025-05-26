@@ -388,7 +388,7 @@ export function Revenue({
         .doc(selectedItemId)
         .get()
         .then((doc) => {
-          if (doc.exists) {
+          if (doc.exists()) {
             const data = doc.data();
             if (data) {
               setValue("name", data.name);
