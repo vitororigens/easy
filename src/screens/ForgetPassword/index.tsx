@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import auth from "@react-native-firebase/auth";
+import { getAuth, sendPasswordResetEmail } from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 import { Controller, useForm } from "react-hook-form";
 import { Alert } from "react-native";
@@ -35,8 +35,8 @@ export function ForgetPassword() {
   }
 
   function handleForgetPassword({ email }: FormSchemaType) {
-    auth()
-      .sendPasswordResetEmail(email)
+    const auth = getAuth();
+    sendPasswordResetEmail(auth, email)
       .then(() => {
         Toast.show("Um link foi enviado ao seu email", { type: "success" });
         reset()

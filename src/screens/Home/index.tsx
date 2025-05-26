@@ -13,8 +13,6 @@ import { formatCurrency } from "../../utils/formatCurrency";
 import { Timestamp } from "firebase/firestore";
 import {
   Button,
-  ContainerItems,
-  Header,
   NavBar,
   SubTitle,
   Title,
@@ -87,8 +85,6 @@ export function Home() {
   const [expensesSharedWithMe, setExpensesSharedWithme] = useState<IRevenue[]>(
     []
   );
-  const [revenues, setRevenues] = useState<IRevenue[]>([]);
-  const [expenses, setExpenses] = useState<IRevenue[]>([]);
 
   // Adicionando estados para o resumo
   const [paidBills, setPaidBills] = useState(0);
@@ -204,7 +200,7 @@ export function Home() {
       .doc(documentId)
       .get()
       .then((doc) => {
-        if (doc.exists) {
+        if (doc.exists()) {
           const currentStatus = doc.data()?.status || false;
           
           // Atualizar o status para o oposto do atual

@@ -95,7 +95,7 @@ export function Gears() {
   }
 
   function handleCalendar() {
-    navigation.navigate("calendar");
+    navigation.navigate("calendar" as never);
   }
 
   return (

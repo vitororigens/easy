@@ -1,4 +1,4 @@
-import auth from "@react-native-firebase/auth";
+import { getAuth, signOut, deleteUser } from '@react-native-firebase/auth';
 import { useState, useEffect } from "react";
 import { ScrollView, View } from "react-native";
 import { CustomModal } from "../../components/CustomModal";
@@ -29,7 +29,6 @@ import * as ImagePicker from "expo-image-picker";
 
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Toast } from "react-native-toast-notifications";
 import { database, storage } from "../../libs/firebase";
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from "@react-native-firebase/firestore";
 
@@ -86,17 +85,20 @@ export function Perfil() {
   }, [uid]);
 
   function handleLogout() {
-    auth()
-      .signOut()
+    const auth = getAuth();
+    signOut(auth)
       .then(() => console.log("User signed out"))
       .catch((error) => console.error("Error signing out: ", error));
   }
 
   function handleDeleteUser() {
-    auth()
-      .currentUser?.delete()
-      .then(() => console.log("User deleted"))
-      .catch((error) => console.error("Error deleting user: ", error));
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      deleteUser(currentUser)
+        .then(() => console.log("User deleted"))
+        .catch((error) => console.error("Error deleting user: ", error));
+    }
   }
 
   const pickImage = async () => {

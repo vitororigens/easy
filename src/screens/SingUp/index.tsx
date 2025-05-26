@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import auth from "@react-native-firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signOut } from "@react-native-firebase/auth";
 import { ActivityIndicator } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { useTheme } from "styled-components/native";
@@ -9,8 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
-import { database } from '../../libs/firebase';
-import firestore from '@react-native-firebase/firestore';
+import { database } from "../../libs/firebase";
 
 const formSchema = z
   .object({
@@ -70,7 +69,7 @@ export function SingUp() {
   });
 
   const checkUsernameExists = async (username: string) => {
-    const userRef = firestore().collection("User");
+    const userRef = database.collection("User");
     const snapshot = await userRef.where("userName", "==", username).get();
     return !snapshot.empty;
   };
@@ -91,8 +90,8 @@ export function SingUp() {
   }, [userName]);
 
   function handleLogout() {
-    auth()
-      .signOut()
+    const auth = getAuth();
+    signOut(auth)
       .then(() => console.log("User signed out"));
   }
 
@@ -102,8 +101,8 @@ export function SingUp() {
       return;
     }
 
-    auth()
-      .createUserWithEmailAndPassword(email.trim(), password.trim())
+    const auth = getAuth();
+    createUserWithEmailAndPassword(auth, email.trim(), password.trim())
       .then((userCredential) => {
         const { uid } = userCredential.user;
         userCredential.user
@@ -111,7 +110,7 @@ export function SingUp() {
             displayName: name.trim(),
           })
           .then(() => {
-            firestore().collection("User").doc(uid).set({
+            database.collection("User").doc(uid).set({
               userName: userName.trim(),
               uid,
             });

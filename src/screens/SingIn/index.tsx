@@ -1,4 +1,4 @@
-import auth from "@react-native-firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 import { Toast } from "react-native-toast-notifications";
 //
@@ -35,8 +35,8 @@ export function SingIn() {
     navigation.navigate("forgetPassword");
   }
   function handleSingIn({ email, password }: FormSchemaType) {
-    auth()
-      .signInWithEmailAndPassword(email.trim(), password.trim())
+    const auth = getAuth();
+    signInWithEmailAndPassword(auth, email.trim(), password.trim())
       .then(async (v) => {
         Toast.show("Login realizado com sucesso!", { type: "success" });
         const { user } = v;
@@ -46,7 +46,7 @@ export function SingIn() {
           tag: "user_id",
           value: user.uid,
         });
-        navigation.navigate("tabroutes");
+        navigation.navigate("tabroutes" as never);
       })
       .catch(() =>
         Toast.show("Verifique se seu e-mail ou senha estão corretos.", {
