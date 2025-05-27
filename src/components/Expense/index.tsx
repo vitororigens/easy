@@ -74,7 +74,7 @@ const formSchema = z.object({
   ),
 });
 
-type FormSchemaType = z.infer<typeof formSchema>;
+export type FormSchemaType = z.infer<typeof formSchema>;
 
 export function Expense({
   selectedItemId,
@@ -96,7 +96,7 @@ export function Expense({
   const [isEditing, setIsEditing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [loading, setLoading] = useState(false);
-  const uid = user?.uid;
+  const uid = user?.user?.uid;
   const { getValues } = useForm<FormSchemaType>();
 
   // Hooks
@@ -279,8 +279,8 @@ export function Expense({
           );
 
           const message = alreadySharing
-            ? `${user?.displayName} adicionou um novo histórico de compras`
-            : `${user?.displayName} convidou você para compartilhar uma histórico de compras`;
+            ? `${user?.user?.displayName} adicionou um novo histórico de compras`
+            : `${user?.user?.displayName} convidou você para compartilhar uma histórico de compras`;
 
           await Promise.allSettled([
             createNotification({
@@ -363,8 +363,8 @@ export function Expense({
         );
 
         const message = alreadySharing
-          ? `${user?.displayName} adicionou um novo item ao mercado`
-          : `${user?.displayName} convidou você para compartilhar um item de mercado`;
+          ? `${user?.user?.displayName} adicionou um novo item ao mercado`
+          : `${user?.user?.displayName} convidou você para compartilhar um item de mercado`;
 
         sendPushNotification({
           title: "Compartilhamento de item de mercado",
@@ -907,7 +907,7 @@ export function Expense({
               <ShareWithUsers 
                 control={control}
                 name="sharedUsers"
-                currentUserId={user.uid}
+                currentUserId={user.user?.uid as string}
               />
             </FormProvider>
           )}
