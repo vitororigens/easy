@@ -30,22 +30,29 @@ export const findUserById = async (uid: string) => {
 };
 
 export const findUserByUsername = async (username: string, me: string) => {
-  if (!username) {
+  if (!username || !me) {
     return [];
   }
 
-  const q = query(
-    collection(database, "User"),
-    where("uid", "!=", me),
-    where("userName", ">=", username),
-    where("userName", "<", username + "\uf8ff")
-  );
-  const querySnapshot = await getDocs(q);
-
-  return (querySnapshot.docs.map((docSnapshot) => ({
-    uid: docSnapshot.id,
-    ...docSnapshot.data(),
-  })) ?? []) as IUser[];
+  try {
+    const q = query(
+      collection(database, "User"),
+      where("userName", ">=", username.toLowerCase()),
+      where("userName", "<=", username.toLowerCase() + "\uf8ff")
+    );
+    
+    const querySnapshot = await getDocs(q);
+    
+    return querySnapshot.docs
+      .map((docSnapshot) => ({
+        uid: docSnapshot.id,
+        ...docSnapshot.data(),
+      }))
+      .filter(user => user.uid !== me) as IUser[];
+  } catch (error) {
+    console.error("Error in findUserByUsername:", error);
+    return [];
+  }
 };
 
 export const deleteUser = async (uid: string) => {
@@ -97,7 +104,7 @@ export const getFavorites = async (userId: string): Promise<IUser[]> => {
   const favoritesUsers = await Promise.all(
     favorites.map(async (uid) => {
       const userDoc = await getDoc(doc(database, "User", uid));
-      if (userDoc.exists) {
+      if (userDoc.exists()) {
         return { uid: userDoc.id, ...userDoc.data() } as IUser;
       }
       return null;

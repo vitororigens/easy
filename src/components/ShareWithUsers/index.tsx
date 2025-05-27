@@ -79,27 +79,39 @@ export type TShareUser = z.infer<typeof shareUserSchema>;
 interface IShareWithUsers {
   control: Control<FormSchemaType>;
   name: string;
-  currentUserId: string;
 }
 
-export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name, currentUserId }) => {
+export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState(false);
-  const [usersAlreadySharing, setUsersAlreadySharing] = useState<ISharing[]>(
-    []
-  );
+  const [usersAlreadySharing, setUsersAlreadySharing] = useState<ISharing[]>([]);
   const [favoriteUsers, setFavoriteUsers] = useState<IUser[]>([]);
 
-  const loggedUser = useUserAuth();
-
-  const uid = loggedUser?.uid;
-
   const user = useUserAuth();
+  const uid = user.user?.uid;
 
   const { watch, setValue } = useFormContext<TShareUser>();
   const sharedUsers = watch("sharedUsers");
+
+  const searchUsers = useDebouncedCallback(async (username: string) => {
+    if (!username || !uid) {
+      setUsers([]);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const results = await findUserByUsername(username, uid);
+      setUsers(results);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, 300);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -133,17 +145,6 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name, curre
     setIsModalOpen(false);
     setSearchValue("");
   };
-
-  const searchUsers = useDebouncedCallback(async (username: string) => {
-    if (!username || !user) return;
-
-    try {
-      const users = await findUserByUsername(username, user.uid);
-      setUsers(users);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  }, 300);
 
   const handleToggleSharedUser = (
     user: Pick<IUser, "uid" | "userName"> & { acceptedAt: Timestamp | null }
@@ -299,7 +300,7 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name, curre
     const getUsersInvitedByMe = async () => {
       const usersInvitedByMe = await getSharing({
         profile: "invitedBy",
-        uid: user.uid as string,
+        uid: user.user?.uid as string,
       });
 
       const usersThatAcceptInvitation = usersInvitedByMe.filter(
@@ -415,8 +416,8 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name, curre
                         }
                         style={{ 
                           borderWidth: isSelected ? 2 : 0,
-                          borderColor: '#FFD700',
-                          backgroundColor: isSelected ? 'rgba(255, 215, 0, 0.1)' : undefined
+                          borderColor: '#00ff48',
+                          backgroundColor: isSelected ? 'rgba(0, 255, 38, 0.1)' : undefined
                         }}
                       >
                         <SubTitle>{getInitials(item.userName)}</SubTitle>

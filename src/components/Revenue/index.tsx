@@ -658,7 +658,6 @@ export function Revenue({
               <ShareWithUsers 
                 control={control} 
                 name="sharedUsers" 
-                currentUserId={uid || ""} 
               />
             </FormProvider>
           )}
