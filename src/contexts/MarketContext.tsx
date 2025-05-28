@@ -99,13 +99,44 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
   const deleteMarket = useCallback(async (id: string) => {
     setLoading(true);
     try {
-      await database.collection("Markets").doc(id).delete();
+      const marketRef = database.collection("Markets").doc(id);
+      const doc = await marketRef.get();
+      
+      if (!doc.exists) {
+        throw new Error("Mercado não encontrado");
+      }
+
+      const marketData = doc.data();
+      if (!marketData) {
+        throw new Error("Dados do mercado não encontrados");
+      }
+      
+      // Se o usuário atual é o dono do mercado
+      if (marketData.uid === user.user?.uid) {
+        // Se o mercado está compartilhado, apenas remove o usuário da lista shareWith
+        if (marketData.shareWith?.length > 0) {
+          const updatedShareWith = marketData.shareWith.filter(
+            (uid: string) => uid !== user.user?.uid
+          );
+          await marketRef.update({ shareWith: updatedShareWith });
+        } else {
+          // Se não está compartilhado, exclui o documento
+          await marketRef.delete();
+        }
+      } else {
+        // Se o usuário não é o dono, apenas remove ele da lista shareWith
+        const updatedShareWith = marketData.shareWith?.filter(
+          (uid: string) => uid !== user.user?.uid
+        ) || [];
+        await marketRef.update({ shareWith: updatedShareWith });
+      }
     } catch (error) {
       console.error("Erro ao deletar mercado:", error);
+      throw error;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user.user?.uid]);
 
   const toggleMarketCompletion = useCallback(async (id: string) => {
     setLoading(true);

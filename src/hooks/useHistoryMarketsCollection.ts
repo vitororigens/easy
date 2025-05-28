@@ -1,6 +1,7 @@
-import { collection, onSnapshot, query, where, Firestore } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "@react-native-firebase/firestore";
 import { useEffect, useState } from "react";
 import { useUserAuth } from "./useUserAuth";
+import { database } from "../libs/firebase";
 
 export interface MarketplaceData {
   id: string;
@@ -16,7 +17,6 @@ export interface MarketplaceData {
 }
 
 const useMarketplaceCollections = (
-  db: Firestore,
   collectionName: string
 ): MarketplaceData[] => {
   const [data, setData] = useState<MarketplaceData[]>([]);
@@ -34,7 +34,7 @@ const useMarketplaceCollections = (
     // Usar Marketplace como coleção padrão e filtrar por uid
     const actualCollectionName = "Marketplace";
     const q = query(
-      collection(db, actualCollectionName),
+      collection(database, actualCollectionName),
       where("uid", "==", user.user?.uid)
     );
 
@@ -61,7 +61,7 @@ const useMarketplaceCollections = (
       console.log("Limpando listener do Marketplace");
       unsubscribe();
     };
-  }, [db, collectionName, user.user?.uid]);
+  }, [collectionName, user.user?.uid]);
 
   return data;
 };

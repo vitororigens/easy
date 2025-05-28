@@ -79,14 +79,14 @@ export function Market({ route }: any) {
   const { markets, loading, deleteMarket, toggleMarketCompletion } = useMarket();
 
   console.log("Componente Market renderizado");
-  console.log("Usuário atual:", user?.uid);
+  console.log("Usuário atual:", user.user?.uid);
   console.log("Mercados carregados:", markets);
   console.log("Loading:", loading);
 
   // Adicionar logs para depuração
   useEffect(() => {
     console.log("useEffect no componente Market");
-    console.log("Usuário atual:", user?.uid);
+    console.log("Usuário atual:", user.user?.uid);
     console.log("Mercados carregados:", markets);
     console.log("Loading:", loading);
   }, [user, markets, loading]);
@@ -102,15 +102,15 @@ export function Market({ route }: any) {
 
   // Filtrar apenas os itens do usuário atual
   const filteredMarketplaceData = useMemo(() => {
-    if (!marketplaceData || !user?.uid) return [];
+    if (!marketplaceData || !user?.user?.uid) return [];
     
-    console.log('Filtrando histórico para usuário:', user.uid);
-    const filtered = marketplaceData.filter(item => item.uid === user.uid);
+    console.log('Filtrando histórico para usuário:', user.user.uid);
+    const filtered = marketplaceData.filter(item => item.uid === user.user?.uid);
     console.log('Total de itens no histórico:', marketplaceData.length);
     console.log('Total após filtragem:', filtered.length);
     
     return filtered;
-  }, [marketplaceData, user?.uid]);
+  }, [marketplaceData, user.user?.uid]);
 
   const personalMarkets = useMemo(() => {
     console.log("Filtrando mercados pessoais");
@@ -255,18 +255,23 @@ export function Market({ route }: any) {
           return {
             id: market.id,
             name: market.name,
-            createdAt: dateStr
+            createdAt: dateStr,
+            price: market.price || 0,
+            quantity: market.quantity || 1,
+            measurement: market.measurement || 'un',
+            category: market.category || 'outros'
           };
         }) || [];
 
       const now = new Date();
       const marketplaceData = {
         name: groupName,
-        uid: user?.uid,
+        uid: user.user?.uid || "",
         finishedDate: format(now, "dd/MM/yyyy"),
         finishedTime: format(now, "HH:mm:ss"),
         markets: selectedMarketsInfo,
         createdAt: Timestamp.now(),
+        totalValue: selectedMarketsInfo.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0)
       };
 
       // Primeiro, adiciona ao histórico
@@ -274,7 +279,11 @@ export function Market({ route }: any) {
 
       // Depois, exclui os itens selecionados da lista original
       for (const marketId of selectedMarkets) {
-        await deleteMarket(marketId);
+        try {
+          await deleteMarket(marketId);
+        } catch (error) {
+          console.error(`Erro ao excluir mercado ${marketId}:`, error);
+        }
       }
 
       setSelectedMarkets([]);
