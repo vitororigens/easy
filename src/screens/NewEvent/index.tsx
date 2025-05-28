@@ -23,13 +23,14 @@ import {
   NotificationLabel,
 } from './styles';
 import { horaMask } from '../../utils/mask';
+import { getFirestore, doc, getDoc } from '@react-native-firebase/firestore';
 
 export function NewEvent() {
   const navigation = useNavigation();
   const route = useRoute();
   const { selectedItemId, isCreator } = route.params as { selectedItemId?: string; isCreator: boolean };
   const user = useUserAuth();
-  const { sendNotification, notificationsEnabled, setNotificationsEnabled } = useSendNotifications();
+  const { sendNotification, subscriptionId } = useSendNotifications();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -38,13 +39,55 @@ export function NewEvent() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  console.log(time.toLocaleTimeString().slice(0, 3));
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [subscriberIds, setSubscriberIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (selectedItemId) {
       loadEvent();
     }
   }, [selectedItemId]);
+
+  useEffect(() => {
+    const loadSubscriberIds = async () => {
+      if (!user.user?.uid) {
+        console.log('Usuário não está autenticado');
+        return;
+      }
+      
+      try {
+        const db = getFirestore();
+        const userRef = doc(db, "User", user.user.uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          console.log('Dados do usuário:', userData);
+          
+          if (userData?.subscribers && userData.subscribers.length > 0) {
+            console.log('Subscribers encontrados:', userData.subscribers);
+            setSubscriberIds(userData.subscribers);
+          } else if (subscriptionId) {
+            console.log('Usando subscriptionId direto:', subscriptionId);
+            setSubscriberIds([subscriptionId]);
+          } else {
+            console.log('Nenhum subscriber encontrado');
+            setSubscriberIds([]);
+          }
+        } else {
+          console.log('Documento do usuário não existe');
+          if (subscriptionId) {
+            console.log('Usando subscriptionId direto:', subscriptionId);
+            setSubscriberIds([subscriptionId]);
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar subscriberIds:", error);
+      }
+    };
+
+    loadSubscriberIds();
+  }, [user.user?.uid, subscriptionId]);
 
   const loadEvent = async () => {
     if (!selectedItemId) return;
@@ -60,6 +103,19 @@ export function NewEvent() {
       console.error('Erro ao carregar evento:', error);
       Alert.alert('Erro', 'Não foi possível carregar o evento');
     }
+  };
+
+  const formatDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const formatTime = (time: Date) => {
+    const hours = String(time.getHours()).padStart(2, '0');
+    const minutes = String(time.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
   };
 
   const handleSave = async () => {
@@ -87,17 +143,25 @@ export function NewEvent() {
           createdAt: Timestamp.now(),
         } as ICalendarEvent);
 
-        if (notificationsEnabled) {
-          const formattedDate = date.toLocaleDateString();
-          const formattedTime = time.toLocaleTimeString().slice(0, 5);
-          
+        if (notificationsEnabled && subscriberIds.length > 0) {
+          console.log('Enviando notificação com os seguintes dados:');
+          console.log('Título:', title);
+          console.log('SubscriberIds:', subscriberIds);
+          console.log('Data:', formatDate(date));
+          console.log('Hora:', formatTime(time));
+
           await sendNotification({
-            title: 'Novo evento criado',
-            message: `Novo evento: ${title}`,
-            subscriptionsIds: [user.user?.uid],
-            date: formattedDate,
-            hour: formattedTime,
+            title: title,
+            message: "Você tem um novo evento agendado!",
+            subscriptionsIds: subscriberIds,
+            date: formatDate(date),
+            hour: formatTime(time),
           });
+          console.log('Notificação enviada com sucesso');
+        } else {
+          console.log('Notificação não enviada. Motivos:');
+          console.log('NotificationsEnabled:', notificationsEnabled);
+          console.log('SubscriberIds length:', subscriberIds.length);
         }
       }
 
@@ -146,7 +210,7 @@ export function NewEvent() {
         <DateTimeContainer>
           <DateTimeLabel>Data</DateTimeLabel>
           <DateTimePickerButton onPress={() => setShowDatePicker(true)}>
-            <DateTimeValue>{date.toLocaleDateString()}</DateTimeValue>
+            <DateTimeValue>{formatDate(date)}</DateTimeValue>
           </DateTimePickerButton>
           {showDatePicker && (
             <DateTimePicker
@@ -162,9 +226,7 @@ export function NewEvent() {
           <DateTimeLabel>Hora</DateTimeLabel>
           <DateTimePickerButton onPress={() => setShowTimePicker(true)}>
             <DateTimeValue>
-              {horaMask(
-                `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`
-              )}
+              {formatTime(time)}
             </DateTimeValue>
           </DateTimePickerButton>
           {showTimePicker && (
