@@ -6,9 +6,7 @@ import { DefaultContainer } from "../../components/DefaultContainer";
 import { EventItem } from "../../components/EventItem";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import {
-  OneSignal,
-  LogLevel,
-  NotificationClickEvent,
+  OneSignal
 } from "react-native-onesignal";
 
 

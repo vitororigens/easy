@@ -21,6 +21,7 @@ import { NewSubscription } from "../screens/NewSubscription";
 import { SubscriptionHistory } from "../screens/SubscriptionHistory";
 import { CalendarScreen } from "../screens/Calendar";
 import { NewEvent } from "../screens/NewEvent";
+import { Notes } from "../screens/Notes";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
@@ -50,6 +51,7 @@ export function StackPrivateNavigation() {
       <Screen name="subscription-history" component={SubscriptionHistory} />
       <Screen name="calendar" component={CalendarScreen} />
       <Screen name="newevent" component={NewEvent} />
+      <Screen name="notes" component={Notes} />
     </Navigator>
   );
 }

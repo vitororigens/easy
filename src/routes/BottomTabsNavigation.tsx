@@ -13,6 +13,8 @@ import { ListTask } from "../screens/ListTask";
 import { Notes } from "../screens/Notes";
 import { LogoUser } from "../components/LogoUser";
 import { TabParamList } from "../@types/navigation";
+import { CalendarScreen } from "../screens/Calendar";
+
 
 const { Navigator, Screen } = createBottomTabNavigator<TabParamList>();
 const tabBarHeight = Platform.OS === "ios" ? 80 : 60;
@@ -69,11 +71,11 @@ export function BottomTabsNavigation() {
       <Screen
         options={{
           tabBarIcon: ({ color }) => (
-            <FontAwesome name="sticky-note" size={40} color={color} />
+            <FontAwesome name="calendar" size={40} color={color} />
           ),
         }}
-        name="Notas"
-        component={Notes}
+        name="Agenda"
+        component={CalendarScreen}
       />
       <Screen
         options={{

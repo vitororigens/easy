@@ -94,8 +94,8 @@ export function Gears() {
     navigation.navigate("subscriptions");
   }
 
-  function handleCalendar() {
-    navigation.navigate("calendar" as never);
+  function handleNotes() {
+    navigation.navigate("notes");
   }
 
   return (
@@ -105,18 +105,7 @@ export function Gears() {
           {user ? (
             <View>
               <ContentItems>
-                <ButtonIcon onPress={handleCalendar}>
-                  <Items>
-                    <Title>Agenda</Title>
-                    <Icon>
-                      <MaterialCommunityIcons
-                        name="calendar"
-                        size={30}
-                        color={COLORS.PURPLE_800}
-                      />
-                    </Icon>
-                  </Items>
-                </ButtonIcon>
+             
                 <ButtonIcon onPress={handleSubscriptions}>
                   <Items>
                     <Title>Assinaturas</Title>
@@ -135,6 +124,18 @@ export function Gears() {
                     <Icon>
                       <FontAwesome
                         name="bell"
+                        size={30}
+                        color={COLORS.PURPLE_800}
+                      />
+                    </Icon>
+                  </Items>
+                </ButtonIcon>
+                   <ButtonIcon onPress={handleNotes}>
+                  <Items>
+                    <Title>Notas</Title>
+                    <Icon>
+                      <FontAwesome
+                        name="sticky-note"
                         size={30}
                         color={COLORS.PURPLE_800}
                       />

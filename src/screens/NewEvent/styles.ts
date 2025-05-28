@@ -46,4 +46,17 @@ export const DateTimePickerButton = styled.TouchableOpacity`
   border: 1px solid ${({ theme }) => theme.COLORS.GRAY_300};
   border-radius: 8px;
   padding: 12px;
+`;
+
+export const NotificationContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding: 0 16px;
+`;
+
+export const NotificationLabel = styled.Text`
+  font-size: 16px;
+  color: ${({ theme }) => theme.COLORS.PURPLE_800};
 `; 

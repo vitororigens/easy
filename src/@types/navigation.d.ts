@@ -15,6 +15,7 @@ export declare global {
       market: undefined;
       perfil: undefined;
       piggybank: undefined;
+      notes: undefined;
       historic: undefined;
       filter: {
         showMonthFilter?: boolean;

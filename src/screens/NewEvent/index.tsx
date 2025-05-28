@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Alert, Platform, Switch } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { DefaultContainer } from '../../components/DefaultContainer';
 import { Input } from '../../components/Input';
@@ -19,14 +19,17 @@ import {
   DateTimeLabel,
   DateTimeValue,
   DateTimePickerButton,
+  NotificationContainer,
+  NotificationLabel,
 } from './styles';
+import { horaMask } from '../../utils/mask';
 
 export function NewEvent() {
   const navigation = useNavigation();
   const route = useRoute();
   const { selectedItemId, isCreator } = route.params as { selectedItemId?: string; isCreator: boolean };
   const user = useUserAuth();
-  const { sendNotification } = useSendNotifications();
+  const { sendNotification, notificationsEnabled, setNotificationsEnabled } = useSendNotifications();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -35,6 +38,7 @@ export function NewEvent() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  console.log(time.toLocaleTimeString().slice(0, 3));
 
   useEffect(() => {
     if (selectedItemId) {
@@ -59,7 +63,7 @@ export function NewEvent() {
   };
 
   const handleSave = async () => {
-    if (!user?.uid) return;
+    if (!user.user?.uid) return;
     if (!title.trim()) {
       Alert.alert('Erro', 'Por favor, preencha o título do evento');
       return;
@@ -79,18 +83,22 @@ export function NewEvent() {
       } else {
         await createEvent({
           ...eventData,
-          userId: user.uid,
+          userId: user.user?.uid,
           createdAt: Timestamp.now(),
         } as ICalendarEvent);
 
-        // Send notification using useSendNotifications hook
-        await sendNotification({
-          title: 'Novo evento criado',
-          message: `Novo evento: ${title}`,
-          subscriptionsIds: [user.uid],
-          date: date.toLocaleDateString(),
-          hour: time.toLocaleTimeString().slice(0, 5),
-        });
+        if (notificationsEnabled) {
+          const formattedDate = date.toLocaleDateString();
+          const formattedTime = time.toLocaleTimeString().slice(0, 5);
+          
+          await sendNotification({
+            title: 'Novo evento criado',
+            message: `Novo evento: ${title}`,
+            subscriptionsIds: [user.user?.uid],
+            date: formattedDate,
+            hour: formattedTime,
+          });
+        }
       }
 
       navigation.goBack();
@@ -153,7 +161,11 @@ export function NewEvent() {
         <DateTimeContainer>
           <DateTimeLabel>Hora</DateTimeLabel>
           <DateTimePickerButton onPress={() => setShowTimePicker(true)}>
-            <DateTimeValue>{time.toLocaleTimeString().slice(0, 5)}</DateTimeValue>
+            <DateTimeValue>
+              {horaMask(
+                `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`
+              )}
+            </DateTimeValue>
           </DateTimePickerButton>
           {showTimePicker && (
             <DateTimePicker
@@ -165,6 +177,14 @@ export function NewEvent() {
           )}
         </DateTimeContainer>
 
+        <NotificationContainer>
+          <NotificationLabel>Enviar notificação</NotificationLabel>
+          <Switch
+            value={notificationsEnabled}
+            onValueChange={setNotificationsEnabled}
+          />
+        </NotificationContainer>
+
         <Button
           title={selectedItemId ? 'Salvar' : 'Criar'}
           onPress={handleSave}
@@ -173,4 +193,4 @@ export function NewEvent() {
       </Content>
     </DefaultContainer>
   );
-} 
+}

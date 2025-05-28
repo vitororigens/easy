@@ -41,7 +41,7 @@ export function Notes({ route }: any) {
   const [isSharedListVisible, setIsSharedListVisible] = useState(false);
 
   const user = useUserAuth();
-  const uid = user?.uid;
+  const uid = user.user?.uid;
 
   const navigation = useNavigation();
 
@@ -99,7 +99,7 @@ export function Notes({ route }: any) {
   }
 
   return (
-    <DefaultContainer newNotes monthButton title="Bloco de Notas">
+    <DefaultContainer newNotes monthButton title="Bloco de Notas" backButton>
       <Content>
         <ContentTitle onPress={() => setIsMyListVisible(!isMyListVisible)}>
           <HeaderContainer>
