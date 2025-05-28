@@ -7,7 +7,7 @@ export const useSubscriptionsCollection = () => {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const user = useUserAuth() as User | null;
+  const { user } = useUserAuth() as { user: User | null };
 
   useEffect(() => {
     const fetchSubscriptions = async () => {

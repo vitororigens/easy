@@ -40,21 +40,21 @@ export const MarketHistoryTabContent = ({
 
   // Limpar dados quando o usuário mudar
   useEffect(() => {
-    if (!loggedUser?.uid) {
+    if (!loggedUser.user?.uid) {
       console.log("Limpando dados do histórico - usuário deslogado");
       setMarketHistories([]);
       setSharedMarketHistories([]);
     }
-  }, [loggedUser?.uid]);
+  }, [loggedUser.user?.uid]);
 
   // Carregar dados quando o componente for montado
   useEffect(() => {
-    if (loggedUser?.uid) {
-      console.log("Carregando dados iniciais para o usuário:", loggedUser.uid);
+    if (loggedUser.user?.uid) {
+      console.log("Carregando dados iniciais para o usuário:", loggedUser.user?.uid);
       fetchMyMarketHistory();
       fetchSharedMarketHistory();
     }
-  }, [loggedUser?.uid]);
+  }, [loggedUser.user?.uid]);
 
   const handleDeleteMarketHistory = async (marketHistory: IMarketHistory) => {
     try {
@@ -95,14 +95,14 @@ export const MarketHistoryTabContent = ({
   };
 
   const fetchMyMarketHistory = async () => {
-    if (!loggedUser?.uid) {
+    if (!loggedUser.user?.uid) {
       console.log("Usuário não autenticado ao buscar histórico");
       return;
     }
     try {
-      console.log("Buscando histórico para o usuário:", loggedUser.uid);
+      console.log("Buscando histórico para o usuário:", loggedUser.user?.uid);
       setIsRefreshingMarketHistory(true);
-      const response = await listMarketHistories(loggedUser.uid);
+      const response = await listMarketHistories(loggedUser.user!.uid);
       console.log("Histórico recebido:", response);
       setMarketHistories(response);
     } catch (error) {
@@ -114,14 +114,14 @@ export const MarketHistoryTabContent = ({
   };
 
   const fetchSharedMarketHistory = async () => {
-    if (!loggedUser?.uid) {
+    if (!loggedUser.user?.uid) {
       console.log("Usuário não autenticado ao buscar histórico compartilhado");
       return;
     }
     try {
-      console.log("Buscando histórico compartilhado para o usuário:", loggedUser.uid);
+      console.log("Buscando histórico compartilhado para o usuário:", loggedUser.user?.uid);
       setIsRefreshingSMarketHistory(true);
-      const response = await listMarketHistoriesSharedWithMe(loggedUser.uid);
+      const response = await listMarketHistoriesSharedWithMe(loggedUser.user!.uid);
       console.log("Histórico compartilhado recebido:", response);
       setSharedMarketHistories(response);
     } catch (error) {

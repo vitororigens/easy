@@ -15,21 +15,21 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
 
   // Carregar mercados do Firebase
   useEffect(() => {
-    if (!user?.uid) {
+    if (!user.user?.uid) {
       console.log("Usuário não autenticado");
       return;
     }
     
-    console.log("Iniciando carregamento de mercados para o usuário:", user.uid);
+    console.log("Iniciando carregamento de mercados para o usuário:", user.user.uid);
     setLoading(true);
     
     const fetchMarkets = async () => {
       try {
         console.log("Buscando mercados...");
         const [myMarkets, sharedWithMe, sharedByMe] = await Promise.all([
-          listMarkets(user.uid),
-          listMarketsSharedWithMe(user.uid),
-          listMarketsSharedByMe(user.uid)
+          listMarkets(user.user?.uid || ""),
+          listMarketsSharedWithMe(user.user?.uid || ""),
+          listMarketsSharedByMe(user.user?.uid || ""),
         ]);
 
         console.log("Resultados da busca:", {
@@ -67,10 +67,10 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
     };
 
     fetchMarkets();
-  }, [user?.uid]);
+  }, [user.user?.uid]);
 
   const addMarket = useCallback(async (market: Omit<IMarket, "id" | "createdAt">) => {
-    if (!user?.uid) return;
+    if (!user.user?.uid) return;
     
     setLoading(true);
     try {
@@ -112,7 +112,7 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
     try {
       const marketRef = database.collection("Markets").doc(id);
       const doc = await marketRef.get();
-      if (doc.exists) {
+      if (doc.exists()) {
         const marketData = doc.data();
         await marketRef.update({
           status: !marketData?.status,

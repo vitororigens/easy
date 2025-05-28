@@ -10,7 +10,7 @@ type LogoUserProps = {
 
 export function LogoUser({ color }: LogoUserProps) {
   const user = useUserAuth();
-  const uid = user?.uid;
+  const uid = user.user?.uid;
   const [image, setImage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -19,7 +19,7 @@ export function LogoUser({ color }: LogoUserProps) {
       
       const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
         console.log("Document snapshot received: ", docSnapshot.data());
-        if (docSnapshot.exists) {
+        if (docSnapshot.exists()) {
           const data = docSnapshot.data();
           setImage(data?.image ?? null);
         }
@@ -45,7 +45,7 @@ export function LogoUser({ color }: LogoUserProps) {
       {image ? (
         <StyledImage source={{ uri: image }} />
       ) : (
-        <Title>{getInitials(user?.displayName ?? "")}</Title>
+        <Title>{getInitials(user.user?.displayName ?? "")}</Title>
       )}
       <ContainerIcon style={{ backgroundColor: color }}>
         <Icon name="menu" />

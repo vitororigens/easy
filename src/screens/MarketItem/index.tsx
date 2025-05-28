@@ -84,7 +84,7 @@ export const MarketItem = ({
   const route = useRoute();
   const loggedUser = useUserAuth();
 
-  const uid = loggedUser?.uid;
+  const uid = loggedUser.user?.uid;
   const { isCreator = true } = route.params as {
     selectedItemId?: string;
     isCreator: boolean;
@@ -163,8 +163,8 @@ export const MarketItem = ({
           );
 
           const message = alreadySharing
-            ? `${loggedUser?.displayName} adicionou um novo item ao mercado`
-            : `${loggedUser?.displayName} convidou você para compartilhar um item de mercado`;
+            ? `${loggedUser.user?.displayName} adicionou um novo item ao mercado`
+            : `${loggedUser.user?.displayName} convidou você para compartilhar um item de mercado`;
 
           await Promise.allSettled([
             createNotification({

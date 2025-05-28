@@ -22,12 +22,12 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
   // Carregar tarefas do Firebase
   useEffect(() => {
-    if (!user?.uid) {
+    if (!user.user?.uid) {
       console.log("Usuário não autenticado");
       return;
     }
     
-    console.log("Iniciando carregamento de tarefas para o usuário:", user.uid);
+    console.log("Iniciando carregamento de tarefas para o usuário:", user.user?.uid);
     setLoading(true);
     
     // Lista para armazenar todas as tarefas
@@ -36,7 +36,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     // 1. Listener para tarefas criadas pelo usuário
     const userTasksUnsubscribe = database
       .collection("Tasks")
-      .where("uid", "==", user.uid)
+      .where("uid", "==", user.user?.uid)
       .onSnapshot((snapshot) => {
         console.log("Snapshot de tarefas do usuário recebido");
         const userTasks: ITask[] = [];
@@ -46,7 +46,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         console.log("Tarefas do usuário carregadas:", userTasks.length);
         
         // Atualiza a lista combinada
-        allTasks = [...userTasks, ...allTasks.filter(task => task.uid !== user.uid)];
+        allTasks = [...userTasks, ...allTasks.filter(task => task.uid !== user.user?.uid)];
         setTasks(allTasks);
         setLoading(false);
       }, (error) => {
@@ -57,7 +57,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     // 2. Listener para tarefas compartilhadas com o usuário
     const sharedTasksUnsubscribe = database
       .collection("Tasks")
-      .where("shareWith", "array-contains", user.uid)
+      .where("shareWith", "array-contains", user.user?.uid)
       .onSnapshot((snapshot) => {
         console.log("Snapshot de tarefas compartilhadas recebido");
         const sharedTasksData: ITask[] = [];
@@ -66,7 +66,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           const taskWithId = { ...taskData, id: doc.id } as ITask;
           
           // Verificar se o usuário tem uma entrada em shareInfo e se foi aceita
-          const userShareInfo = taskData.shareInfo?.find(info => info.uid === user.uid);
+          const userShareInfo = taskData.shareInfo?.find(info => info.uid === user.user?.uid);
           if (userShareInfo && userShareInfo.acceptedAt !== null) {
             console.log("Tarefa compartilhada aceita encontrada:", doc.id);
             sharedTasksData.push(taskWithId);
@@ -75,7 +75,16 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         console.log("Tarefas compartilhadas carregadas:", sharedTasksData.length);
         
         // Atualiza a lista combinada
-        allTasks = [...allTasks.filter(task => !task.shareWith?.includes(user.uid)), ...sharedTasksData];
+        allTasks = [
+          ...allTasks.filter(
+            task =>
+              !(
+                typeof user.user?.uid === "string" &&
+                task.shareWith?.includes(user.user.uid)
+              )
+          ),
+          ...sharedTasksData
+        ];
         setTasks(allTasks);
       }, (error) => {
         console.error("Erro ao carregar tarefas compartilhadas:", error);
@@ -86,10 +95,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       userTasksUnsubscribe();
       sharedTasksUnsubscribe();
     };
-  }, [user?.uid]);
+  }, [user?.user?.uid]);
 
   const addTask = useCallback(async (task: Omit<ITask, "id" | "createdAt" | "updatedAt">) => {
-    if (!user?.uid) return;
+    if (!user?.user?.uid) return;
     
     setLoading(true);
     try {
@@ -135,7 +144,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     try {
       const taskRef = database.collection("Tasks").doc(id);
       const doc = await taskRef.get();
-      if (doc.exists) {
+      if (doc.exists()) {
         const taskData = doc.data();
         await taskRef.update({
           status: !taskData?.status,
@@ -163,4 +172,4 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const useTask = () => useContext(TaskContext); 
+export const useTask = () => useContext(TaskContext);

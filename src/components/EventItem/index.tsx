@@ -28,8 +28,8 @@ export function EventItem({ event, onUpdate, onDelete, isSharedByMe }: EventItem
           <Time>{event.time}</Time>
         </Content>
       </TouchableOpacity>
-      <Icon name="delete-outline" onPress={onDelete} />
-      {isSharedByMe && <ShareIcon name="share-variant" />}
+      <Icon name="delete" onPress={onDelete} />
+      {isSharedByMe && <ShareIcon name="sharealt" />}
     </Container>
   );
 } 

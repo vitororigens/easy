@@ -51,8 +51,8 @@ export function CalendarScreen() {
     if (!user) return;
 
     try {
-      const userEvents = await listEvents(user.uid);
-      const userSharedEvents = await listSharedEvents(user.uid);
+      const userEvents = await listEvents(user.user?.uid || "");
+      const userSharedEvents = await listSharedEvents(user.user?.uid || "");
       setEvents(userEvents);
       setSharedEvents(userSharedEvents);
     } catch (error) {
@@ -63,7 +63,7 @@ export function CalendarScreen() {
   function handleEditEvent(event: ICalendarEvent) {
     navigation.navigate("newevent", {
       selectedItemId: event.id,
-      isCreator: event.userId === user?.uid,
+      isCreator: event.userId === user.user?.uid,
     });
   }
 

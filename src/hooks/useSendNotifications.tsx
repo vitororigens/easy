@@ -53,8 +53,8 @@ const useSendNotifications = () => {
       console.log("OneSignal ID:", id);
       setPlayerId(id); 
 
-      if (user?.uid && id) {
-        const userRef = doc(db, "User", user.uid);
+      if (user.user?.uid && id) {
+        const userRef = doc(db, "User", user.user.uid);
         await setDoc(userRef, { playerId: id }, { merge: true });
       }
     });

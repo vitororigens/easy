@@ -3,7 +3,6 @@ import { database } from "../../libs/firebase";
 import { Timestamp, collection, doc, getDoc, getDocs, query, where, runTransaction, updateDoc, deleteDoc } from "@react-native-firebase/firestore";
 import { IMarket } from "./market.firebase";
 import { IExpense } from "./expenses.firebase";
-import { endOfMonth, startOfMonth } from "date-fns";
 
 type TShareInfo = {
   acceptedAt: Timestamp | null;

@@ -8,7 +8,7 @@ export const updateNotes = async (sourceId: string, receiverId: string) => {
     const docRef = doc(database, "Notes", sourceId);
     const docSnap = await getDoc(docRef);
     
-    if (docSnap.exists) {
+    if (docSnap.exists()) {
       const data = docSnap.data() as { shareInfo?: any[] };
       console.log("Dados atuais da nota:", data);
       
@@ -46,7 +46,7 @@ export const updateNotes = async (sourceId: string, receiverId: string) => {
 export const updateExpenses = async (sourceId: string, receiverId: string) => {
   const docRef = doc(database, "Expenses", sourceId);
   const docSnap = await getDoc(docRef);
-  if (docSnap.exists) {
+  if (docSnap.exists()) {
     const data = docSnap.data();
     const updatedShareinfo = data?.shareInfo.map((item: any) => {
       if (item.uid === receiverId) {
@@ -66,7 +66,7 @@ export const updateExpenses = async (sourceId: string, receiverId: string) => {
 export const updateMarkets = async (sourceId: string, receiverId: string) => {
   const docRef = doc(database, "Markets", sourceId);
   const docSnap = await getDoc(docRef);
-  if (docSnap.exists) {
+  if (docSnap.exists()) {
     const data = docSnap.data();
     const updatedShareinfo = data?.shareInfo.map((item: any) => {
       if (item.uid === receiverId) {

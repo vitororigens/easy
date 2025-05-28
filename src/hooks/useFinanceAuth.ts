@@ -14,7 +14,7 @@ export function useFinanceData(uid: string): FinanceData | null {
     const fetchFinanceData = async () => {
       try {
         const financeDoc = await database.collection("Tasks").doc(uid).get();
-        if (financeDoc.exists) {
+        if (financeDoc.exists()) {
           const data = financeDoc.data();
           if (data) {
             const financeData: FinanceData = {

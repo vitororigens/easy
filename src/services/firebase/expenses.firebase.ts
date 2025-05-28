@@ -1,6 +1,5 @@
 import { database } from "../../libs/firebase";
 import { Timestamp, collection, addDoc, doc, updateDoc, getDoc, getDocs, query, where, deleteDoc } from "@react-native-firebase/firestore";
-import { Optional } from "../../@types/optional";
 
 type TShareInfo = {
   acceptedAt: Timestamp | null;

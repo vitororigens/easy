@@ -1,6 +1,5 @@
 import { collection, addDoc, doc, getDoc, getDocs, query, where, orderBy, updateDoc, deleteDoc, Timestamp } from '@react-native-firebase/firestore';
 import { database } from '../../libs/firebase';
-import { Optional } from "../../@types/optional";
 import { updateExpenses, updateMarkets, updateNotes } from "./updateShareInfo";
 
 export type TNotificationType =

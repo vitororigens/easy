@@ -1,6 +1,5 @@
-import { collection, onSnapshot, query, where } from "@react-native-firebase/firestore";
+import { collection, onSnapshot, query, where, Firestore } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { database } from "../libs/firebase";
 import { useUserAuth } from "./useUserAuth";
 
 export interface MarketplaceData {
@@ -17,32 +16,33 @@ export interface MarketplaceData {
 }
 
 const useMarketplaceCollections = (
+  db: Firestore,
   collectionName: string
 ): MarketplaceData[] => {
   const [data, setData] = useState<MarketplaceData[]>([]);
   const user = useUserAuth();
 
   useEffect(() => {
-    if (!user?.uid) {
+    if (!user.user?.uid) {
       console.log("Usuário não autenticado no hook useMarketplaceCollections");
       setData([]);
       return;
     }
 
-    console.log("Iniciando consulta do Marketplace para usuário:", user.uid);
-    
+    console.log("Iniciando consulta do Marketplace para usuário:", user.user?.uid);
+
     // Usar Marketplace como coleção padrão e filtrar por uid
     const actualCollectionName = "Marketplace";
     const q = query(
-      collection(database, actualCollectionName),
-      where("uid", "==", user.uid)
+      collection(db, actualCollectionName),
+      where("uid", "==", user.user?.uid)
     );
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       console.log("Snapshot do Marketplace recebido");
       const collectionData: MarketplaceData[] = [];
-      
-      snapshot.forEach((doc) => {
+
+      querySnapshot.forEach((doc) => {
         const docData = doc.data();
         console.log("Documento encontrado:", doc.id, docData.uid);
         collectionData.push({
@@ -50,7 +50,7 @@ const useMarketplaceCollections = (
           ...docData,
         } as MarketplaceData);
       });
-      
+
       console.log("Total de documentos encontrados:", collectionData.length);
       setData(collectionData);
     }, (error) => {
@@ -61,9 +61,9 @@ const useMarketplaceCollections = (
       console.log("Limpando listener do Marketplace");
       unsubscribe();
     };
-  }, [collectionName, user?.uid]);
+  }, [db, collectionName, user.user?.uid]);
 
   return data;
 };
 
-export default useMarketplaceCollections; 
+export default useMarketplaceCollections;

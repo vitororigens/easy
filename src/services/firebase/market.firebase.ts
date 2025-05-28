@@ -1,6 +1,5 @@
 import { collection, addDoc, doc, getDoc, getDocs, query, where, writeBatch, deleteDoc, updateDoc } from '@react-native-firebase/firestore';
 import { database } from '../../libs/firebase';
-import { Optional } from "../../@types/optional";
 import { Timestamp } from "@react-native-firebase/firestore";
 
 type TShareInfo = {
