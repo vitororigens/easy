@@ -61,8 +61,8 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
 
   const loggedUser = useUserAuth();
 
-  const uid = loggedUser?.uid;
-  const currentUser = loggedUser?.displayName;
+  const uid = loggedUser?.user?.uid;
+  const currentUser = loggedUser?.user?.displayName;
 
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -124,8 +124,8 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
           );
 
           const message = alreadySharing
-            ? `${loggedUser?.displayName} adicionou uma nova nota`
-            : `${loggedUser?.displayName} convidou você para compartilhar uma nota`;
+            ? `${loggedUser?.user?.displayName} adicionou uma nova nota`
+            : `${loggedUser?.user?.displayName} convidou você para compartilhar uma nota`;
 
           await Promise.allSettled([
             createNotification({

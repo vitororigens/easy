@@ -247,6 +247,12 @@ export function NewEvent() {
           />
         </NotificationContainer>
 
+        {isCreator && (
+          <FormProvider {...form}>
+            <ShareWithUsers />
+          </FormProvider>
+        )}
+
         <Button
           title={selectedItemId ? 'Salvar' : 'Criar'}
           onPress={handleSave}

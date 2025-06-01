@@ -80,12 +80,45 @@ export function CalendarScreen() {
     });
   }
 
-  const markedDates = {
+  const markedDates: {
+    [date: string]: {
+      selected?: boolean;
+      selectedColor?: string;
+      dots?: { color: string }[];
+    };
+  } = {
     [selectedDate]: {
       selected: true,
       selectedColor: COLORS.PURPLE_800,
     },
   };
+
+  // Add dots for days with events
+  events.forEach((event) => {
+    if (markedDates[event.date]) {
+      markedDates[event.date].dots = [
+        { color: COLORS.PURPLE_800 }
+      ];
+    } else {
+      markedDates[event.date] = {
+        dots: [{ color: COLORS.PURPLE_800 }]
+      };
+    }
+  });
+
+  // Add dots for days with shared events
+  sharedEvents.forEach((event) => {
+    if (markedDates[event.date]) {
+      if (!markedDates[event.date].dots) {
+        markedDates[event.date].dots = [];
+      }
+      markedDates[event.date].dots?.push({ color: COLORS.TEAL_600 });
+    } else {
+      markedDates[event.date] = {
+        dots: [{ color: COLORS.TEAL_600 }]
+      };
+    }
+  });
 
   const filteredEvents = events.filter(
     (event) => event.date === selectedDate && showPersonalEvents
@@ -102,6 +135,7 @@ export function CalendarScreen() {
           <RNCalendar
             onDayPress={(day) => setSelectedDate(day.dateString)}
             markedDates={markedDates}
+            markingType="multi-dot"
             theme={{
               calendarBackground: COLORS.WHITE,
               textSectionTitleColor: COLORS.PURPLE_800,
@@ -110,11 +144,17 @@ export function CalendarScreen() {
               todayTextColor: COLORS.PURPLE_800,
               dayTextColor: COLORS.PURPLE_800,
               textDisabledColor: COLORS.GRAY_300,
-              dotColor: COLORS.PURPLE_800,
+              dotColor: COLORS.GREEN_700,
               selectedDotColor: COLORS.WHITE,
               arrowColor: COLORS.PURPLE_800,
               monthTextColor: COLORS.PURPLE_800,
               indicatorColor: COLORS.PURPLE_800,
+              dotStyle: {
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                marginTop: 1
+              }
             }}
           />
 
