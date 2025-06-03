@@ -40,7 +40,7 @@ type FormSchemaType = z.infer<typeof formSchema>;
 
 export function Perfil() {
   const user = useUserAuth();
-  const uid = user?.uid;
+  const uid = user?.user?.uid;
   const [confirmLogoutVisible, setConfirmLogoutVisible] = useState(false);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
   const [image, setImage] = useState<string | null>(null);
@@ -59,7 +59,7 @@ export function Perfil() {
           // Buscar imagem do perfil
           const docRef = doc(database, "Perfil", uid);
           const docSnap = await getDoc(docRef);
-          if (docSnap.exists) {
+          if (docSnap.exists()) {
             const data = docSnap.data();
             if (data?.image) {
               setImage(data.image);
@@ -104,7 +104,7 @@ export function Perfil() {
   const pickImage = async () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        mediaTypes: ["images"],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
@@ -187,7 +187,7 @@ export function Perfil() {
                     <IconField name="person" />
                     <ItemContent>
                       <Title>Nome</Title>
-                      <SubTitle type="SECONDARY">{user?.displayName}</SubTitle>
+                      <SubTitle type="SECONDARY">{user?.user?.displayName}</SubTitle>
                     </ItemContent>
                   </Items>
 
@@ -203,7 +203,7 @@ export function Perfil() {
                     <IconField name="email" />
                     <ItemContent>
                       <Title>Email</Title>
-                      <SubTitle type="SECONDARY">{user?.email}</SubTitle>
+                      <SubTitle type="SECONDARY">{user?.user?.email}</SubTitle>
                     </ItemContent>
                   </Items>
 
@@ -212,10 +212,10 @@ export function Perfil() {
                     <ItemContent>
                       <Title>ID</Title>
                       <SubTitle type="SECONDARY">
-                        {user?.uid
-                          ? user.uid.length > 10
-                            ? user.uid.substring(0, 15) + "..."
-                            : user.uid
+                        {user?.user?.uid
+                          ? user.user.uid.length > 10
+                            ? user.user.uid.substring(0, 15) + "..."
+                            : user.user.uid
                           : ""}
                       </SubTitle>
                     </ItemContent>

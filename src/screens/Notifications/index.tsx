@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { ItemNotification } from "../../components/ItemNotification";
 import {
@@ -15,9 +15,9 @@ export function Notifications() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const flatListRef = useRef<FlatList | null>(null);
-  const user = useUserAuth();
+  const { user, loading: authLoading } = useUserAuth();
 
-  const handleGetNotifications = async () => {
+  const handleGetNotifications = useCallback(async () => {
     if (!user?.uid) return;
     
     try {
@@ -33,11 +33,13 @@ export function Notifications() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.uid]);
 
   useEffect(() => {
-    handleGetNotifications();
-  }, [user]);
+    if (!authLoading && user?.uid) {
+      handleGetNotifications();
+    }
+  }, [authLoading, user?.uid, handleGetNotifications]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -45,7 +47,7 @@ export function Notifications() {
     setIsRefreshing(false);
   };
 
-  if (isLoading) {
+  if (authLoading || isLoading) {
     return (
       <DefaultContainer title="Notificações" backButton>
         <Loading />

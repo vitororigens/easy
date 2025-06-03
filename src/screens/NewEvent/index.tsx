@@ -10,6 +10,11 @@ import { ICalendarEvent, createEvent, findEventById, updateEvent } from '../../s
 import { Timestamp } from '@react-native-firebase/firestore';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {OneSignal} from 'react-native-onesignal';
+import { FormProvider, useForm } from 'react-hook-form';
+import { ShareWithUsers } from '../../components/ShareWithUsers';
+import { createSharing, getSharing, ESharingStatus } from '../../services/firebase/sharing.firebase';
+import { createNotification } from '../../services/firebase/notifications.firebase';
+import { z } from 'zod';
 import {
   Container,
   Content,
@@ -25,12 +30,35 @@ import {
 import { horaMask } from '../../utils/mask';
 import { getFirestore, doc, getDoc } from '@react-native-firebase/firestore';
 
+const formSchema = z.object({
+  name: z.string().min(1, "Nome do evento é obrigatório"),
+  formattedDate: z.string().min(1, "Data é obrigatória"),
+  description: z.string().optional(),
+  sharedUsers: z.array(
+    z.object({
+      uid: z.string(),
+      userName: z.string(),
+      acceptedAt: z.union([z.null(), z.instanceof(Timestamp)]),
+    })
+  ),
+});
+
+type FormSchemaType = z.infer<typeof formSchema>;
+
 export function NewEvent() {
   const navigation = useNavigation();
   const route = useRoute();
   const { selectedItemId, isCreator } = route.params as { selectedItemId?: string; isCreator: boolean };
   const user = useUserAuth();
   const { sendNotification, subscriptionId } = useSendNotifications();
+  const form = useForm<FormSchemaType>({
+    defaultValues: {
+      name: '',
+      formattedDate: new Date().toLocaleDateString('pt-BR'),
+      description: '',
+      sharedUsers: [],
+    },
+  });
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -93,11 +121,16 @@ export function NewEvent() {
     if (!selectedItemId) return;
     try {
       const event = await findEventById(selectedItemId);
+      console.log("Evento encontrado:", event);
       if (event) {
         setTitle(event.title);
         setDescription(event.description);
         setDate(new Date(event.date));
         setTime(new Date(`2000-01-01T${event.time}`));
+        form.setValue('name', event.title);
+        form.setValue('description', event.description);
+        form.setValue('formattedDate', new Date(event.date).toLocaleDateString('pt-BR'));
+        form.setValue('sharedUsers', event.sharedWith?.map((uid) => ({ uid, userName: uid, acceptedAt: null })) || []);
       }
     } catch (error) {
       console.error('Erro ao carregar evento:', error);
@@ -127,29 +160,28 @@ export function NewEvent() {
 
     try {
       setIsLoading(true);
+      const formData = form.getValues();
+      const sharedUsers = formData.sharedUsers || [];
+
       const eventData: Partial<ICalendarEvent> = {
         title: title.trim(),
         description: description.trim(),
         date: date.toISOString().split('T')[0],
         time: time.toTimeString().split(' ')[0].slice(0, 5),
+        sharedWith: sharedUsers.map((user: any) => user.uid),
       };
 
+      let createdEvent;
       if (selectedItemId) {
         await updateEvent(selectedItemId, eventData);
       } else {
-        await createEvent({
+        createdEvent = await createEvent({
           ...eventData,
           userId: user.user?.uid,
           createdAt: Timestamp.now(),
         } as ICalendarEvent);
 
         if (notificationsEnabled && subscriberIds.length > 0) {
-          console.log('Enviando notificação com os seguintes dados:');
-          console.log('Título:', title);
-          console.log('SubscriberIds:', subscriberIds);
-          console.log('Data:', formatDate(date));
-          console.log('Hora:', formatTime(time));
-
           await sendNotification({
             title: title,
             message: "Você tem um novo evento agendado!",
@@ -157,14 +189,59 @@ export function NewEvent() {
             date: formatDate(date),
             hour: formatTime(time),
           });
-          console.log('Notificação enviada com sucesso');
-        } else {
-          console.log('Notificação não enviada. Motivos:');
-          console.log('NotificationsEnabled:', notificationsEnabled);
-          console.log('SubscriberIds length:', subscriberIds.length);
+        }
+
+        // Handle sharing
+        if (sharedUsers.length > 0) {
+          const usersInvitedByMe = await getSharing({
+            profile: "invitedBy",
+            uid: user.user.uid,
+          });
+
+          for (const sharedUser of sharedUsers) {
+            const alreadySharing = usersInvitedByMe.some(
+              (u) => u.target === sharedUser.uid && u.status === ESharingStatus.ACCEPTED
+            );
+
+            const possibleSharingRequestExists = usersInvitedByMe.some(
+              (u) => u.target === sharedUser.uid
+            );
+
+            const message = alreadySharing
+              ? `${user.user?.displayName} compartilhou um evento com você`
+              : `${user.user?.displayName} convidou você para compartilhar um evento`;
+
+            await Promise.allSettled([
+              createNotification({
+                sender: user.user.uid,
+                receiver: sharedUser.uid,
+                status: alreadySharing ? "sharing_accepted" : "pending",
+                type: "sharing_invite",
+                source: {
+                  type: "event",
+                  id: createdEvent.id,
+                },
+                title: "Compartilhamento de evento",
+                description: message,
+                createdAt: Timestamp.now(),
+              }),
+              ...(!alreadySharing && !possibleSharingRequestExists
+                ? [
+                    createSharing({
+                      invitedBy: user.user.uid,
+                      status: ESharingStatus.PENDING,
+                      target: sharedUser.uid,
+                      createdAt: Timestamp.now(),
+                      updatedAt: Timestamp.now(),
+                    }),
+                  ]
+                : []),
+            ]);
+          }
         }
       }
 
+      Alert.alert('Sucesso', 'Evento salvo com sucesso!');
       navigation.goBack();
     } catch (error) {
       console.error('Erro ao salvar evento:', error);
@@ -178,6 +255,7 @@ export function NewEvent() {
     setShowDatePicker(false);
     if (selectedDate) {
       setDate(selectedDate);
+      form.setValue('formattedDate', selectedDate.toLocaleDateString('pt-BR'));
     }
   };
 
@@ -194,14 +272,20 @@ export function NewEvent() {
         <Input
           name='title'
           value={title}
-          onChangeText={setTitle}
+          onChangeText={(text) => {
+            setTitle(text);
+            form.setValue('name', text);
+          }}
           placeholder="Digite o título do evento"
         />
 
         <Input
           name="Descrição"
           value={description}
-          onChangeText={setDescription}
+          onChangeText={(text) => {
+            setDescription(text);
+            form.setValue('description', text);
+          }}
           placeholder="Digite a descrição do evento"
           multiline
           numberOfLines={4}
@@ -249,7 +333,7 @@ export function NewEvent() {
 
         {isCreator && (
           <FormProvider {...form}>
-            <ShareWithUsers />
+            <ShareWithUsers control={form.control} name="sharedUsers" />
           </FormProvider>
         )}
 

@@ -26,6 +26,7 @@ import {
   EmptyContainer,
 } from "./styles";
 import { ICalendarEvent, listEvents, listSharedEvents } from "../../services/firebase/calendar.firebase";
+import { ICalendar } from "../../interfaces/ICalendar";
 
 export function CalendarScreen() {
   const navigation = useNavigation();
@@ -35,7 +36,7 @@ export function CalendarScreen() {
   const [events, setEvents] = useState<ICalendarEvent[]>([]);
   const [sharedEvents, setSharedEvents] = useState<ICalendarEvent[]>([]);
   const [showPersonalEvents, setShowPersonalEvents] = useState(true);
-  const [showSharedEvents, setShowSharedEvents] = useState(true);
+  const [showSharedEvents, setShowSharedEvents] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -160,20 +161,38 @@ export function CalendarScreen() {
 
           <HeaderContainer>
             <TouchableOpacity
-              onPress={() => setShowPersonalEvents(!showPersonalEvents)}
+              onPress={() => {
+                setShowPersonalEvents(true);
+                setShowSharedEvents(false);
+              }}
             >
               <SectionIcon active={showPersonalEvents}>
-                <Ionicons name="person" size={24} color={COLORS.PURPLE_800} />
-                <Title>Meus Eventos</Title>
+                <Ionicons 
+                  name="person" 
+                  size={24} 
+                  color={showPersonalEvents ? COLORS.TEAL_600 : COLORS.PURPLE_800} 
+                />
+                <Title style={{ color: showPersonalEvents ? COLORS.TEAL_600 : COLORS.PURPLE_800 }}>
+                  Meus Eventos
+                </Title>
               </SectionIcon>
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => setShowSharedEvents(!showSharedEvents)}
+              onPress={() => {
+                setShowPersonalEvents(false);
+                setShowSharedEvents(true);
+              }}
             >
               <SectionIcon active={showSharedEvents}>
-                <Ionicons name="people" size={24} color={COLORS.PURPLE_800} />
-                <Title>Compartilhados</Title>
+                <Ionicons 
+                  name="people" 
+                  size={24} 
+                  color={showSharedEvents ? COLORS.TEAL_600 : COLORS.PURPLE_800} 
+                />
+                <Title style={{ color: showSharedEvents ? COLORS.TEAL_600 : COLORS.PURPLE_800 }}>
+                  Compartilhados
+                </Title>
               </SectionIcon>
             </TouchableOpacity>
           </HeaderContainer>
@@ -195,7 +214,7 @@ export function CalendarScreen() {
               {filteredEvents.length > 0 && (
                 <>
                   <ContentTitle>
-                    <Title>Meus Eventos</Title>
+                    <Title>Meus Compromissos</Title>
                     <DividerContent />
                   </ContentTitle>
                   <FlatList
@@ -203,7 +222,11 @@ export function CalendarScreen() {
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
                       <EventItem
-                        event={item}
+                        event={{
+                          ...item,
+                          name: item.title,
+                          createdAt: new Date(item.date + 'T' + item.time)
+                        }}
                         onUpdate={() => handleEditEvent(item)}
                         onDelete={() => handleDeleteEvent(item)}
                         isSharedByMe={false}
@@ -216,7 +239,7 @@ export function CalendarScreen() {
               {filteredSharedEvents.length > 0 && (
                 <>
                   <ContentTitle>
-                    <Title>Eventos Compartilhados</Title>
+                    <Title>Compromissos Compartilhados</Title>
                     <DividerContent />
                   </ContentTitle>
                   <FlatList
@@ -224,7 +247,11 @@ export function CalendarScreen() {
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
                       <EventItem
-                        event={item}
+                        event={{
+                          ...item,
+                          name: item.title,
+                          createdAt: new Date(item.date + 'T' + item.time)
+                        }}
                         onUpdate={() => handleEditEvent(item)}
                         onDelete={() => handleDeleteEvent(item)}
                         isSharedByMe={true}

@@ -82,3 +82,37 @@ export const updateMarkets = async (sourceId: string, receiverId: string) => {
     console.log("nenhum documento encontrado");
   }
 };
+
+export const updateEvents = async (sourceId: string, receiverId: string) => {
+  console.log("Atualizando evento:", { sourceId, receiverId });
+  
+  try {
+    const docRef = doc(database, "Events", sourceId);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      const data = docSnap.data() as { sharedWith?: string[] };
+      console.log("Dados atuais do evento:", data);
+      
+      if (!data.sharedWith) {
+        console.log("Evento não tem sharedWith");
+        return;
+      }
+
+      // Add receiver to sharedWith array if not already present
+      const updatedSharedWith = data.sharedWith.includes(receiverId)
+        ? data.sharedWith
+        : [...data.sharedWith, receiverId];
+
+      await updateDoc(docRef, {
+        sharedWith: updatedSharedWith
+      });
+      
+      console.log("Evento atualizado com sucesso");
+    } else {
+      console.log("Evento não encontrado:", sourceId);
+    }
+  } catch (error) {
+    console.error("Erro ao atualizar evento:", error);
+  }
+};

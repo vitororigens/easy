@@ -1,6 +1,6 @@
 import { collection, addDoc, doc, getDoc, getDocs, query, where, orderBy, updateDoc, deleteDoc, Timestamp } from '@react-native-firebase/firestore';
 import { database } from '../../libs/firebase';
-import { updateExpenses, updateMarkets, updateNotes } from "./updateShareInfo";
+import { updateExpenses, updateMarkets, updateNotes, updateEvents } from "./updateShareInfo";
 
 export type TNotificationType =
   | "sharing_invite"
@@ -19,6 +19,7 @@ export type TNotificationSource =
   | "revenue"
   | "note"
   | "market"
+  | "event"
   | "notification";
 
 export interface INotification {
@@ -135,6 +136,8 @@ export const acceptSharingNotification = async (id: string) => {
     await updateMarkets(notification.source.id, notification.receiver);
   } else if (notification.source.type === "note") {
     await updateNotes(notification.source.id, notification.receiver);
+  } else if (notification.source.type === "event") {
+    await updateEvents(notification.source.id, notification.receiver);
   }
   
   return notification;

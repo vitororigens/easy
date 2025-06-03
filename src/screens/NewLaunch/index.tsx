@@ -48,7 +48,7 @@ export function NewLaunch({
 }: Props) {
   // States
   const user = useUserAuth();
-  const uid = user?.uid;
+  const uid = user?.user?.uid;
   const [isEditing, setIsEditing] = useState(false);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -174,7 +174,7 @@ export function NewLaunch({
         .doc(selectedItemId)
         .get()
         .then((doc) => {
-          if (doc.exists) {
+          if (doc.exists()) {
             const data = doc.data();
             if (data) {
               setValue(
