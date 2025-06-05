@@ -8,7 +8,6 @@ import {
 } from "./styles";
 import { IMarket } from "../../services/firebase/market.firebase";
 import { formatPrice } from "../../utils/price";
-import { ShareWithUsers } from "../ShareWithUsers";
 
 type ICartProps = {
   selectedItems: IMarket[];
@@ -47,7 +46,6 @@ export function Cart({ selectedItems, buttonSave }: ICartProps) {
         </View>
       </CartInfoContainer>
       <Separator />
-      <ShareWithUsers />
     </Container>
   );
 }

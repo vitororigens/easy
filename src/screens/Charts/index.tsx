@@ -14,14 +14,10 @@ import {
   Content,
   Header,
   NavBar,
-  Title,
-  ContentTitle,
-  DividerContent,
-  Icon,
+  Title
 } from "./styles";
 
 import PersonImage from "../../assets/illustrations/charts.png";
-import theme from "../../theme";
 
 const screenWidth = Dimensions.get("screen").width;
 
@@ -35,7 +31,7 @@ export function Charts() {
   const revenue = useFirestoreCollection("Revenue");
   const expense = useFirestoreCollection("Expense");
   const user = useUserAuth();
-  const uid = user?.uid;
+  const uid = user.user?.uid;
 
   const monthNames: string[] = [
     "Janeiro",
@@ -100,11 +96,11 @@ export function Charts() {
     }
 
     timer = setTimeout(() => {
-      if (revenue && revenue.length > 0) {
-        setRevenueData(revenue.filter((item) => item.uid === uid));
+      if (revenue && revenue.data && revenue.data.length > 0) {
+        setRevenueData(revenue.data.filter((item) => item.uid === uid));
       }
-      if (expense && expense.length > 0) {
-        setExpenseData(expense.filter((item) => item.uid === uid));
+      if (expense && expense.data && expense.data.length > 0) {
+        setExpenseData(expense.data.filter((item) => item.uid === uid));
       }
       setIsLoading(false);
     }, 1000);

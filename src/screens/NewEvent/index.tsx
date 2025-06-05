@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Platform, Switch } from 'react-native';
+import { Alert, Switch } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { DefaultContainer } from '../../components/DefaultContainer';
 import { Input } from '../../components/Input';
@@ -9,17 +9,13 @@ import useSendNotifications from '../../hooks/useSendNotifications';
 import { ICalendarEvent, createEvent, findEventById, updateEvent } from '../../services/firebase/calendar.firebase';
 import { Timestamp } from '@react-native-firebase/firestore';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {OneSignal} from 'react-native-onesignal';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ShareWithUsers } from '../../components/ShareWithUsers';
 import { createSharing, getSharing, ESharingStatus } from '../../services/firebase/sharing.firebase';
 import { createNotification } from '../../services/firebase/notifications.firebase';
 import { z } from 'zod';
 import {
-  Container,
   Content,
-  Title,
-  Description,
   DateTimeContainer,
   DateTimeLabel,
   DateTimeValue,
@@ -27,7 +23,6 @@ import {
   NotificationContainer,
   NotificationLabel,
 } from './styles';
-import { horaMask } from '../../utils/mask';
 import { getFirestore, doc, getDoc } from '@react-native-firebase/firestore';
 
 const formSchema = z.object({

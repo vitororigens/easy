@@ -118,7 +118,7 @@ export function Home() {
     if (uid && selectedMonth) {
       try {
         // Calculando contas pagas e pendentes apenas para o mês selecionado e do usuário atual
-        const filteredExpenses = expense.filter(item => item.uid === uid && item.month === selectedMonth);
+        const filteredExpenses = expense.data.filter(item => item.uid === uid && item.month === selectedMonth);
         const paid = filteredExpenses.filter(item => item.status).length;
         const pending = filteredExpenses.filter(item => !item.status).length;
         
@@ -415,10 +415,10 @@ export function Home() {
     );
   }
 
-  const filteredRevenue = revenue.filter(
+  const filteredRevenue = revenue.data.filter(
     (item) => item.uid === uid && item.month === selectedMonth
   );
-  const filteredExpense = expense.filter(
+  const filteredExpense = expense.data.filter(
     (item) => item.uid === uid && item.month === selectedMonth
   );
 

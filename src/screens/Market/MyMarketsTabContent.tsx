@@ -35,10 +35,10 @@ export const MyMarketsTabContent = ({
   const user = useUserAuth();
 
   const fetchMarkets = async () => {
-    if (!user?.uid) return;
+    if (!user?.user?.uid) return;
     try {
       setIsRefreshing(true);
-      const mMarkets = await listMarkets(user.uid);
+      const mMarkets = await listMarkets(user.user.uid);
 
       setMyMarkets(mMarkets);
     } catch (error) {

@@ -19,6 +19,7 @@ import {
   NotificationClickEvent,
 } from "react-native-onesignal";
 import mobileAds from "react-native-google-mobile-ads";
+import * as Updates from 'expo-updates';
 
 import Constants from "expo-constants";
 import { useEffect } from "react";
@@ -41,6 +42,23 @@ export default function App() {
       console.log("Google ads Inicializado");
     });
 
+  useEffect(() => {
+    // Check for updates
+    async function checkForUpdates() {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
+      } catch (error) {
+        console.log('Error checking for updates:', error);
+      }
+    }
+
+    checkForUpdates();
+  }
+    , []);
   useEffect(() => {
     const handleNotificationClick = (e: NotificationClickEvent): void => {
       // TODO: Add Notification Clicked Event opening <Notification />

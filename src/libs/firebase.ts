@@ -1,5 +1,5 @@
 // firebaseConfig.ts
-import { initializeApp, getApp, getApps } from '@react-native-firebase/app';
+import { initializeApp, getApps } from '@react-native-firebase/app';
 import { getFirestore } from '@react-native-firebase/firestore';
 import { getStorage } from '@react-native-firebase/storage';
 

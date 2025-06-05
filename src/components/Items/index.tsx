@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { TouchableOpacity, View, Text } from "react-native";
+import { View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { formatCurrency } from "../../utils/mask";
 import {

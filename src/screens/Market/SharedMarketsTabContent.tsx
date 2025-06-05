@@ -41,10 +41,10 @@ export const SharedMarketsTabContent = ({
   const user = useUserAuth();
 
   const fetchMarkets = async () => {
-    if (!user?.uid) return;
+    if (!user.user?.uid) return;
     try {
       setIsRefreshing(true);
-      const sMarkets = await listMarketsSharedWithMe(user.uid);
+      const sMarkets = await listMarketsSharedWithMe(user.user.uid);
 
       setSharedMarkets(sMarkets);
     } catch (error) {

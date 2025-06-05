@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Icon, Title, Container, Button } from "./styles";
 import { TouchableOpacity, View } from "react-native";
 

@@ -44,6 +44,11 @@ const formSchema = z.object({
       acceptedAt: z.union([z.null(), z.instanceof(Timestamp)]),
     })
   ),
+  formattedDate: z.string(),
+  valueTransaction: z.string().optional(),
+  selectedCategory: z.string().optional(),
+  selectedDateNotification: z.string().optional(),
+  selectedHourNotification: z.string().optional(),
 });
 
 export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
@@ -97,7 +102,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
         description,
         type: "nota",
         author: String(currentUser),
-        createdAt: Timestamp.now(),
+        createdAt: new Date(),
         uid,
         shareWith: sharedUsers.map((user) => user.uid),
         shareInfo: sharedUsers.map((user) => ({
@@ -139,6 +144,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
               },
               title: "Compartilhamento de nota",
               description: message,
+              createdAt: Timestamp.now(),
             }),
             ...(!alreadySharing && !possibleSharingRequestExists
               ? [
@@ -146,6 +152,8 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
                     invitedBy: uid as string,
                     status: ESharingStatus.PENDING,
                     target: user.uid,
+                    createdAt: Timestamp.now(),
+                    updatedAt: Timestamp.now(),
                   }),
                 ]
               : []),
@@ -345,7 +353,10 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
             />
             {isCreator && (
               <FormProvider {...form}>
-                <ShareWithUsers />
+                <ShareWithUsers
+                  control={control as any}
+                  name="sharedUsers"
+                />
               </FormProvider>
             )}
 

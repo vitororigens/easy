@@ -3,7 +3,7 @@ import { FlatList, Text } from 'react-native';
 import styled from 'styled-components/native';
 import { useUserAuth } from '../../hooks/useUserAuth';
 import { DefaultContainer } from '../../components/DefaultContainer';
-import useFirestoreCollectionLoading from "../../hooks/useFirestoreCollectionLoading";
+import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 
 const Container = styled.View`
   flex: 1;
@@ -40,7 +40,7 @@ const TaskText = styled.Text`
 
 const TaskName = styled(TaskText)`
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  color: ${({ theme }) => theme.COLORS.GRAY_800};
+  color: ${({ theme }) => theme.COLORS.PURPLE_800};
   margin-bottom: 8px;
 `;
 
@@ -61,7 +61,7 @@ export default function History() {
   const uid = user?.uid;
 
   // Carregar tarefas do Firestore
-  const { data, loading } = useFirestoreCollectionLoading('Tasks');
+  const { data, loading } = useFirestoreCollection('Tasks');
   const [searchTerm, setSearchTerm] = useState('');
 
   const completedTasks = data
@@ -83,7 +83,7 @@ export default function History() {
     });
 
   return (
-    <DefaultContainer showButtonBack title="Histórico de Tarefas">
+    <DefaultContainer backButton title="Histórico de Tarefas">
       <Container>
         <Title>Histórico de Tarefas</Title>
 

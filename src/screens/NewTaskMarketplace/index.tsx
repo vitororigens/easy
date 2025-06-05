@@ -12,7 +12,6 @@ import {
 //
 import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
-import { NewItem } from "../MarketItem";
 import { NewItemTask } from "../NewItemTask";
 
 type Props = {
@@ -54,7 +53,7 @@ export function NewTaskMarketplace({ closeBottomSheet }: Props) {
               </NavBar>
             </Header>
             {activeButton === "receitas" && <NewItemTask showButtonSave />}
-            {activeButton === "despesas" && <NewItem showButtonSave />}
+            {activeButton === "despesas" && <NewItemTask showButtonSave />}
           </Content>
         </Container>
       </DefaultContainer>

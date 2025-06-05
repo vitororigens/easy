@@ -1,14 +1,12 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { ReactNode, useRef, useState } from "react";
-import { View, ViewStyle } from "react-native";
+import { View } from "react-native";
 import { useTheme } from "styled-components/native";
 import {
   BannerAd,
-  BannerAdSize,
-  TestIds,
-  useForeground,
+  TestIds
 } from "react-native-google-mobile-ads";
-import { ModalContainer } from "../ModalContainer";
+
 import {
   Button,
   ButtonBack,
@@ -17,9 +15,7 @@ import {
   Content,
   Header,
   Icon,
-  SubTitle,
   Title,
-  ViewHomeCenter,
 } from "./style";
 
 const adUnitId = __DEV__

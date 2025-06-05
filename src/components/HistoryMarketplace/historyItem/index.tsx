@@ -1,4 +1,3 @@
-import React from "react";
 import { AntDesign } from "@expo/vector-icons";
 import {
   Container,
@@ -9,9 +8,9 @@ import {
   SubTitle,
   Title,
 } from "./styles";
-import { IMarket } from "../../../screens/Market";
 import { formatPrice } from "../../../utils/price";
 import { format } from "date-fns";
+import { IMarket } from "../../../interfaces/IMarket";
 
 interface IMarketHistoryItem {
   market: IMarket;

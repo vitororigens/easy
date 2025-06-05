@@ -5,8 +5,7 @@ import { useRoute } from "@react-navigation/native";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Revenue } from "../../components/Revenue";
 import { Expense } from "../../components/Expense";
-import { ShareWithUsers } from "../../components/ShareWithUsers";
-import { Controller, useForm, FormProvider } from "react-hook-form";
+import { useForm} from "react-hook-form";
 import { z } from "zod";
 import { Timestamp } from "firebase/firestore";
 

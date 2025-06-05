@@ -5,7 +5,6 @@ import { DefaultContainer } from "../../components/DefaultContainer";
 import { ItemNotes } from "../../components/ItemNotes";
 import { LoadData } from "../../components/LoadData";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { NewNotes } from "../NewNotes";
 import {
   Container,
   Content,

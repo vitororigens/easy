@@ -20,8 +20,9 @@ export interface ExpenseData {
   income: boolean;
 }
 
-const useFirestoreCollection = (collectionName: string): ExpenseData[] => {
+const useFirestoreCollection = (collectionName: string) => {
   const [data, setData] = useState<ExpenseData[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const q = query(collection(database, collectionName));
@@ -32,12 +33,13 @@ const useFirestoreCollection = (collectionName: string): ExpenseData[] => {
         collectionData.push({ id: doc.id, ...doc.data() } as ExpenseData);
       });
       setData(collectionData);
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, [collectionName]);
 
-  return data;
+  return { data, loading };
 };
 
 export default useFirestoreCollection;
