@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { collection, onSnapshot, query } from "@react-native-firebase/firestore";
 import { database } from "../libs/firebase";
+import { Timestamp } from "firebase/firestore";
 
 export interface ExpenseData {
   id: string;
@@ -18,10 +19,19 @@ export interface ExpenseData {
   valueItem: string;
   listAccounts: boolean;
   income: boolean;
+  createdAt?: Timestamp;
+  author?: string;
+  shareWith?: string[];
+  shareInfo?: {
+    acceptedAt: Timestamp | null;
+    uid: string;
+    userName: string;
+  }[];
 }
 
-const useFirestoreCollection = (collectionName: string): ExpenseData[] => {
+const useFirestoreCollection = (collectionName: string) => {
   const [data, setData] = useState<ExpenseData[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const q = query(collection(database, collectionName));
@@ -32,12 +42,13 @@ const useFirestoreCollection = (collectionName: string): ExpenseData[] => {
         collectionData.push({ id: doc.id, ...doc.data() } as ExpenseData);
       });
       setData(collectionData);
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, [collectionName]);
 
-  return data;
+  return { data, loading };
 };
 
 export default useFirestoreCollection;

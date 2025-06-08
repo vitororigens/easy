@@ -19,7 +19,7 @@ export function ItemSharedUser({ sharing, onDeleteSharing, onStatusChange }: Ite
   const [senderUser, setSenderUser] = useState<IUser | null>(null);
   const [currentStatus, setCurrentStatus] = useState(sharing.status);
 
-  const isReceived = user?.uid === sharing.target;
+  const isReceived = user.user?.uid === sharing.target;
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -49,7 +49,7 @@ export function ItemSharedUser({ sharing, onDeleteSharing, onStatusChange }: Ite
       // Buscar todas as notas compartilhadas e atualizar o acceptedAt
       const notes = await findNoteById(sharing.id);
       if (notes) {
-        await updateNotes(notes.id, user?.uid || '');
+        await updateNotes(notes.id, user.user?.uid || '');
       }
       
       setCurrentStatus('accepted');

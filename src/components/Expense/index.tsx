@@ -44,9 +44,7 @@ import notifee, {
   TriggerType,
   EventType,
 } from "@notifee/react-native";
-import { formatDate } from "date-fns";
 import { database } from "../../libs/firebase";
-import { Notification } from "../Notification/index";
 
 export type ExpenseProps = {
   selectedItemId?: string;
@@ -121,7 +119,7 @@ export function Expense({
     },
   });
 
-  const { control, handleSubmit, reset, setValue, watch } = form;
+  const { control, handleSubmit, reset, setValue } = form;
 
   // Functions
   const validateNotificationParams = () => {
@@ -907,7 +905,6 @@ export function Expense({
               <ShareWithUsers 
                 control={control}
                 name="sharedUsers"
-                currentUserId={user.user?.uid as string}
               />
             </FormProvider>
           )}

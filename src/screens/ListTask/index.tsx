@@ -68,7 +68,7 @@ interface HistoryItem {
 export function ListTask({ route }: any) {
   const reload = route?.params?.reload;
   const user = useUserAuth();
-  const uid = user?.uid;
+  const uid = user.user?.uid;
   const { tasks, loading, deleteTask, toggleTaskCompletion } = useTask();
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryItem | null>(null);

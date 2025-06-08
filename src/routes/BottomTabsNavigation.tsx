@@ -1,4 +1,4 @@
-import { Entypo, FontAwesome } from "@expo/vector-icons";
+import {  FontAwesome } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useTheme } from "styled-components/native";
 import LogoClipBoard from "../assets/Icones/icones_brokerx_cinza-18.svg";
@@ -10,7 +10,6 @@ import { Market } from "../screens/Market";
 import { Platform } from "react-native";
 import { Home } from "../screens/Home";
 import { ListTask } from "../screens/ListTask";
-import { Notes } from "../screens/Notes";
 import { LogoUser } from "../components/LogoUser";
 import { TabParamList } from "../@types/navigation";
 import { CalendarScreen } from "../screens/Calendar";

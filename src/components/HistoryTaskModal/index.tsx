@@ -1,5 +1,4 @@
-import React from 'react';
-import { Modal, TouchableOpacity, FlatList } from 'react-native';
+import { Modal, FlatList } from 'react-native';
 import { MaterialIcons } from "@expo/vector-icons";
 import {
   Container,

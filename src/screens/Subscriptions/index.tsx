@@ -41,7 +41,7 @@ export function Subscriptions() {
   useEffect(() => {
     const unsubscribe = firestore()
       .collection("subscriptions")
-      .where("userId", "==", user?.uid || "")
+      .where("userId", "==", user.user?.uid || "")
       .onSnapshot(
         (snapshot) => {
           const data = snapshot.docs.map((doc) => ({
@@ -59,7 +59,7 @@ export function Subscriptions() {
       );
 
     return () => unsubscribe();
-  }, [user?.uid]);
+  }, [user.user?.uid]);
 
   const filteredSubscriptions = subscriptions.filter(
     (sub) => sub.status === showActive

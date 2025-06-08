@@ -34,7 +34,7 @@ export function Shared() {
 
   const searchUsers = useDebouncedCallback(async (username: string) => {
     console.log('Iniciando busca com valor:', username);
-    if (!username || !user?.uid) {
+    if (!username || !user.user?.uid) {
       console.log('Busca cancelada - username vazio ou usuário não autenticado');
       setUsers([]);
       return;
@@ -43,7 +43,7 @@ export function Shared() {
     try {
       setIsSearching(true);
       console.log('Buscando usuários...');
-      const result = await findUserByUsername(username, user.uid);
+      const result = await findUserByUsername(username, user.user.uid);
       console.log('Resultado da busca:', result.length, 'usuários encontrados');
       setUsers(result);
     } catch (error) {
@@ -55,7 +55,7 @@ export function Shared() {
   }, 500);
 
   const addSharedUser = async (u: IUser) => {
-    if (!user?.uid) {
+    if (!user.user?.uid) {
       Alert.alert("Erro", "Usuário não autenticado");
       return;
     }
@@ -71,7 +71,7 @@ export function Shared() {
 
       // Criar o compartilhamento
       const result = await createSharing({
-        invitedBy: user.uid,
+        invitedBy: user.user.uid,
         status: ESharingStatus.PENDING,
         target: u.uid,
         createdAt: now,
@@ -80,7 +80,7 @@ export function Shared() {
 
       const sharingData = {
         id: result.id,
-        invitedBy: user.uid,
+        invitedBy: user.user.uid,
         status: ESharingStatus.PENDING,
         target: u.uid,
         createdAt: now,
@@ -91,11 +91,11 @@ export function Shared() {
       await createNotification({
         type: "sharing_invite",
         status: "pending",
-        sender: user.uid,
+        sender: user.user.uid,
         receiver: u.uid,
         createdAt: now,
         title: "Novo convite de compartilhamento",
-        description: `${user.displayName || "Um usuário"} quer compartilhar conteúdo com você`,
+        description: `${user.user.displayName || "Um usuário"} quer compartilhar conteúdo com você`,
         source: {
           id: result.id,
           type: "notification"
@@ -114,12 +114,12 @@ export function Shared() {
   };
 
   const loadSharings = useCallback(async () => {
-    if (!user?.uid) return;
+    if (!user.user?.uid) return;
 
     try {
       setIsLoading(true);
       const profile = activeTab === 'sent' ? 'invitedBy' : 'target';
-      const response = await getSharing({ uid: user.uid, profile });
+      const response = await getSharing({ uid: user.user.uid, profile });
       setSharings(response);
     } catch (error) {
       console.error('Error loading sharings:', error);
@@ -127,7 +127,7 @@ export function Shared() {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.uid, activeTab]);
+  }, [user.user?.uid, activeTab]);
 
   useEffect(() => {
     loadSharings();
@@ -235,7 +235,7 @@ export function Shared() {
               ListEmptyComponent={() => (
                 <EmptyList
                   message={
-                    activeTab === 'sent'
+                    (activeTab as 'sent' | 'received') === 'sent'
                       ? 'Você ainda não compartilhou com ninguém'
                       : 'Você ainda não recebeu compartilhamentos'
                   }
@@ -259,11 +259,11 @@ export function Shared() {
             ListEmptyComponent={() => (
               <EmptyList
                 message={
-                  activeTab === 'sent'
-                    ? 'Você ainda não compartilhou com ninguém'
-                    : 'Você ainda não recebeu compartilhamentos'
-                }
-              />
+                    (activeTab as 'sent' | 'received') === 'sent'
+                      ? 'Você ainda não compartilhou com ninguém'
+                      : 'Você ainda não recebeu compartilhamentos'
+                  }
+                />
             )}
           />
         )}

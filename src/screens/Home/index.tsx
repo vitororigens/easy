@@ -6,7 +6,7 @@ import { Items } from "../../components/Items";
 import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
 import { useMonth } from "../../context/MonthProvider";
-import useFirestoreCollection from "../../hooks/useFirestoreCollection";
+import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCollection";
 import { useTotalValue } from "../../hooks/useTotalValue";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { formatCurrency } from "../../utils/formatCurrency";
@@ -63,8 +63,8 @@ export function Home() {
   const uid = user?.uid;
   const [activeButton, setActiveButton] = useState("receitas");
   const { selectedMonth } = useMonth();
-  const revenue = useFirestoreCollection("Revenue");
-  const expense = useFirestoreCollection("Expense");
+  const { data: revenueData, loading: revenueLoading } = useFirestoreCollection("Revenue");
+  const { data: expenseData, loading: expenseLoading } = useFirestoreCollection("Expense");
   const { tolalRevenueMunth, totalExpenseMunth } = useTotalValue(
     uid || "Não foi possivel encontrar o uid"
   );
@@ -118,7 +118,7 @@ export function Home() {
     if (uid && selectedMonth) {
       try {
         // Calculando contas pagas e pendentes apenas para o mês selecionado e do usuário atual
-        const filteredExpenses = expense.filter(item => item.uid === uid && item.month === selectedMonth);
+        const filteredExpenses = expenseData.filter(item => item.uid === uid && item.month === selectedMonth);
         const paid = filteredExpenses.filter(item => item.status).length;
         const pending = filteredExpenses.filter(item => !item.status).length;
         
@@ -130,7 +130,7 @@ export function Home() {
         setError("Erro ao calcular resumo");
       }
     }
-  }, [expense, tolalRevenueMunth, totalExpenseMunth, selectedMonth, uid]);
+  }, [expenseData, tolalRevenueMunth, totalExpenseMunth, selectedMonth, uid]);
 
   const formattedRevenue = tolalRevenueMunth.toLocaleString("pt-BR", {
     style: "currency",
@@ -415,11 +415,11 @@ export function Home() {
     );
   }
 
-  const filteredRevenue = revenue.filter(
-    (item) => item.uid === uid && item.month === selectedMonth
+  const filteredRevenue = revenueData.filter(
+    (item: ExpenseData) => item.uid === uid && item.month === selectedMonth
   );
-  const filteredExpense = expense.filter(
-    (item) => item.uid === uid && item.month === selectedMonth
+  const filteredExpense = expenseData.filter(
+    (item: ExpenseData) => item.uid === uid && item.month === selectedMonth
   );
 
   return (

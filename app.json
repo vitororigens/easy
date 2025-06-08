@@ -91,7 +91,10 @@
       "restApiKey": "os_v2_app_as26hf5te5djxkpstlekekqdt4oahagr6xyejcez2hdgol5ykcixw7hqbz2qvittluo6sr5ihlq2kdzxbd5bal3uo2cx36jzpllwxxy"
     },
     "updates": {
-      "url": "https://u.expo.dev/644c7760-a5b0-4044-bcd4-9288b16c6948"
+      "url": "https://u.expo.dev/644c7760-a5b0-4044-bcd4-9288b16c6948",
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
     },
     "owner": "totalsolutionssoftware"
   }

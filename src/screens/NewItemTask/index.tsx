@@ -36,6 +36,7 @@ type FormSchemaType = z.infer<typeof formSchema>;
 
 const formSchema = z.object({
   name: z.string().min(1, "Nome da Tarefa é obrigatória"),
+  formattedDate: z.string().min(1, "Data é obrigatória"),
   sharedUsers: z.array(
     z.object({
       uid: z.string(),
@@ -58,7 +59,7 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
   // State
   const navigation = useNavigation();
   const loggedUser = useUserAuth();
-  const uid = loggedUser?.uid;
+  const uid = loggedUser.user?.uid;
   const route = useRoute();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -71,6 +72,7 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      formattedDate: format(new Date(), "dd/MM/yyyy"),
       sharedUsers: [],
     },
   });
@@ -124,8 +126,8 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
             (u) => u.target === user.uid
           );
           const message = alreadySharing
-            ? `${loggedUser.displayName} adicionou uma nova tarefa`
-            : `${loggedUser.displayName} convidou você para compartilhar uma tarefa`;
+            ? `${loggedUser.user?.displayName} adicionou uma nova tarefa`
+            : `${loggedUser.user?.displayName} convidou você para compartilhar uma tarefa`;
 
           await Promise.allSettled([
             createNotification({
@@ -138,16 +140,19 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
                 id: createNewTask.id,
               },
               title: "Compartilhamento de tarefa",
+              createdAt: Timestamp.now(),
               description: message,
             }),
             ...(!alreadySharing && !possibleSharingRequestExists
               ? [
-                  createSharing({
-                    invitedBy: uid as string,
-                    status: ESharingStatus.PENDING,
-                    target: user.uid,
-                  }),
-                ]
+                createSharing({
+                  invitedBy: uid as string,
+                  status: ESharingStatus.PENDING,
+                  target: user.uid,
+                  createdAt: Timestamp.now(),
+                  updatedAt: Timestamp.now(),
+                }),
+              ]
               : []),
             sendPushNotification({
               title: "Compartilhamento de task",
@@ -254,7 +259,7 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
         .doc(selectedItemId)
         .get()
         .then((doc) => {
-          if (doc.exists) {
+          if (doc.exists()) {
             const data = doc.data();
             if (data) {
               setValue("name", data.name);
@@ -281,7 +286,7 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
   }, [selectedItemId]);
 
   return (
-    <>
+    <View>
       <DefaultContainer
         hasHeader={false}
         title="Adicionar nova tarefa"
@@ -323,13 +328,16 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
               )}
               {isCreator && (
                 <FormProvider {...form}>
-                  <ShareWithUsers />
+                  <ShareWithUsers 
+                  control={control}
+                  name="sharedUsers"
+                  />
                 </FormProvider>
               )}
             </View>
           </Content>
         </ScrollView>
       </DefaultContainer>
-    </>
+    </View>
   );
 }

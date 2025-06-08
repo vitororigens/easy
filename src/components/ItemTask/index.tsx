@@ -1,4 +1,3 @@
-import React from "react";
 import { TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ITask } from "../../interfaces/ITask";

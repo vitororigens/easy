@@ -13,8 +13,8 @@ export interface TotalValues {
 }
 
 export function useTotalValue(uid: string | null): TotalValues {
-  const revenue = useFirestoreCollection('Revenue');
-  const expense = useFirestoreCollection('Expense');
+  const { data: revenueData } = useFirestoreCollection('Revenue');
+  const { data: expenseData } = useFirestoreCollection('Expense');
   const { selectedMonth } = useMonth()
 
   const [totalRevenueValue, setTotalRevenueValue] = useState<number>(0);
@@ -24,10 +24,10 @@ export function useTotalValue(uid: string | null): TotalValues {
 
   useEffect(() => {
     if (uid) {
-      const revenueFiltered = revenue.filter(item => item.uid === uid);
-      const expenseFiltered = expense.filter(item => item.uid === uid);
-      const revenueFilteredMunth = revenue.filter(item => item.uid === uid && item.month === selectedMonth);
-      const expenseFilteredMunth = expense.filter(item => item.uid === uid && item.month === selectedMonth);
+      const revenueFiltered = revenueData.filter(item => item.uid === uid);
+      const expenseFiltered = expenseData.filter(item => item.uid === uid);
+      const revenueFilteredMunth = revenueData.filter(item => item.uid === uid && item.month === selectedMonth);
+      const expenseFilteredMunth = expenseData.filter(item => item.uid === uid && item.month === selectedMonth);
 
       const totalRevenue = revenueFiltered.reduce((acc: number, curr: ExpenseData) => acc + parseInt(curr.valueTransaction), 0);
       const totalExpense = expenseFiltered.reduce((acc: number, curr: ExpenseData) => acc + parseFloat(curr.valueTransaction), 0);
@@ -40,7 +40,7 @@ export function useTotalValue(uid: string | null): TotalValues {
       setTotalRevenueValueMunth(totalRevenueMunth)
       setTotalExpenseValueMunth(totalExpenseMunth)
     }
-  }, [uid, revenue, expense, selectedMonth]);
+  }, [uid, revenueData, expenseData, selectedMonth]);
 
   const totalValue = totalRevenueValue - totalExpenseValue;
 

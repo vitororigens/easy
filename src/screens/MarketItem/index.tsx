@@ -56,6 +56,7 @@ const formSchema = z.object({
   category: z.string().optional(),
   measurement: z.string().optional(),
   observation: z.string().optional(),
+  formattedDate: z.string().min(1, "Data é obrigatória"),
   sharedUsers: z.array(
     z.object({
       uid: z.string(),
@@ -99,6 +100,7 @@ export const MarketItem = ({
       category: "outros",
       measurement: "un",
       observation: "",
+      formattedDate: new Date().toLocaleDateString("pt-BR"),
       sharedUsers: [],
     },
   });
@@ -178,6 +180,7 @@ export const MarketItem = ({
               },
               title: "Compartilhamento de mercado",
               description: message,
+              createdAt: Timestamp.now(),
             }),
             ...(!alreadySharing && !possibleSharingRequestExists
               ? [
@@ -185,6 +188,8 @@ export const MarketItem = ({
                   invitedBy: uid as string,
                   status: ESharingStatus.PENDING,
                   target: user.uid,
+                  createdAt: Timestamp.now(),
+                  updatedAt: Timestamp.now(),
                 }),
               ]
               : []),
@@ -226,21 +231,23 @@ export const MarketItem = ({
       return;
     }
     try {
-      await updateMarket({
-        id: selectedItemId,
-        name,
-        category,
-        measurement,
-        observation,
-        price: price ? currencyUnMask(price) : 0,
-        quantity: quantity ? parseFloat(quantity) : 1,
-        shareInfo: sharedUsers.map((user) => ({
-          uid: user.uid,
-          userName: user.userName,
-          acceptedAt: user.acceptedAt,
-        })),
-        shareWith: sharedUsers.map((user) => user.uid),
-      });
+      await updateMarket(
+        selectedItemId,
+        {
+          name,
+          category,
+          measurement,
+          observation,
+          price: price ? currencyUnMask(price) : 0,
+          quantity: quantity ? parseFloat(quantity) : 1,
+          shareInfo: sharedUsers.map((user) => ({
+            uid: user.uid,
+            userName: user.userName,
+            acceptedAt: user.acceptedAt,
+          })),
+          shareWith: sharedUsers.map((user) => user.uid),
+        }
+      );
       navigation.navigate("tabroutes", {
         screen: "Market",
         params: { reload: true },
@@ -398,7 +405,7 @@ export const MarketItem = ({
           </View>
 
           {showAdvanced && (
-            <>
+            <View>
               <Title>Categoria</Title>
               <Controller
                 control={control}
@@ -436,9 +443,6 @@ export const MarketItem = ({
                   />
                 )}
               />
-
-
-
               <Title>Medida</Title>
               <Controller
                 control={control}
@@ -465,11 +469,14 @@ export const MarketItem = ({
                   <Input onBlur={onBlur} onChangeText={onChange} value={value} />
                 )}
               />
-            </>
+            </View>
           )}
 
           <FormProvider {...form}>
-            <ShareWithUsers />
+            <ShareWithUsers
+            control={control}
+            name="sharedUsers"
+            />
           </FormProvider>
 
           <View style={{ marginBottom: 10, height: 150 }}>

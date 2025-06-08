@@ -24,7 +24,7 @@ type Props = {
 export function ListaDeContas() {
   const { selectedMonth } = useMonth();
   const user = useUserAuth();
-  const uid = user?.uid;
+  const uid = user.user?.uid;
   const [status, setStatus] = useState(false);
   const revenue = useFirestoreCollection("Revenue");
   const expense = useFirestoreCollection("Expense");
@@ -42,7 +42,7 @@ export function ListaDeContas() {
 
   function handleStatus(itemId: string) {
     const docRef = database.collection("Expense").doc(itemId);
-    const selected = expense.find((item) => item.id === itemId);
+    const selected = expense.data.find((item) => item.id === itemId);
 
     docRef
       .update({
@@ -72,7 +72,7 @@ export function ListaDeContas() {
   }
 
   return (
-    <>
+    <View>
       <DefaultContainer monthButton addButton listButtom>
         <Container
           type="SECONDARY"
@@ -81,7 +81,7 @@ export function ListaDeContas() {
         >
           <Content>
             <FlatList
-              data={expense.filter(
+              data={expense.data.filter(
                 (item) =>
                   item.uid === uid &&
                   ((item.repeat === true && item.month === selectedMonth) ||
@@ -139,6 +139,6 @@ export function ListaDeContas() {
           </Container>
         </DefaultContainer>
       </Modal>
-    </>
+    </View>
   );
 }

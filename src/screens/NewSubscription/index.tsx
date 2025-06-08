@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
 import { Toast } from "react-native-toast-notifications";
@@ -7,9 +6,7 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
-import { format, getDate } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { createSubscription, updateSubscription, getSubscriptions } from "../../services/firebase/subscription.firebase";
+import { createSubscription, updateSubscription } from "../../services/firebase/subscription.firebase";
 import { Subscription } from "../../services/firebase/subscription.firebase";
 import firestore from "@react-native-firebase/firestore";
 
@@ -62,7 +59,7 @@ export function NewSubscription() {
         .doc(selectedItemId)
         .get();
 
-      if (doc.exists) {
+      if (doc.exists()) {
         const subscription = doc.data() as Subscription;
 
         setValue("name", subscription.name);
@@ -88,7 +85,7 @@ export function NewSubscription() {
   async function onSubmit(data: FormData) {
     try {
       const subscriptionData = {
-        userId: user?.uid || '',
+        userId: user?.user?.uid || '',
         name: data.name,
         value: parseFloat(data.value),
         dueDay: parseInt(data.dueDay),
