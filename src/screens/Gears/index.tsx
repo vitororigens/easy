@@ -105,6 +105,30 @@ export function Gears() {
           {user ? (
             <View>
               <ContentItems>
+                <ButtonIcon onPress={handleSubscriptions}>
+                  <Items>
+                    <Title>Assinaturas</Title>
+                    <Icon>
+                      <FontAwesome
+                        name="pencil"
+                        size={30}
+                        color={COLORS.PURPLE_800}
+                      />
+                    </Icon>
+                  </Items>
+                </ButtonIcon>
+                         <ButtonIcon onPress={handleShared}>
+                  <Items>
+                    <Title>Compartilhamentos</Title>
+                    <Icon>
+                      <FontAwesome
+                        name="share"
+                        size={30}
+                        color={COLORS.PURPLE_800}
+                      />
+                    </Icon>
+                  </Items>
+                </ButtonIcon>
                 <ButtonIcon onPress={handleNotes}>
                   <Items>
                     <Title>Notas</Title>
@@ -135,30 +159,6 @@ export function Gears() {
                     <Icon>
                       <FontAwesome
                         name="user"
-                        size={30}
-                        color={COLORS.PURPLE_800}
-                      />
-                    </Icon>
-                  </Items>
-                </ButtonIcon>
-                <ButtonIcon onPress={handleShared}>
-                  <Items>
-                    <Title>Compartilhamentos</Title>
-                    <Icon>
-                      <FontAwesome
-                        name="share"
-                        size={30}
-                        color={COLORS.PURPLE_800}
-                      />
-                    </Icon>
-                  </Items>
-                </ButtonIcon>
-                <ButtonIcon onPress={handleSubscriptions}>
-                  <Items>
-                    <Title>Assinaturas</Title>
-                    <Icon>
-                      <FontAwesome
-                        name="pencil"
                         size={30}
                         color={COLORS.PURPLE_800}
                       />
