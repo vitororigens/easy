@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { collection, onSnapshot, query } from "@react-native-firebase/firestore";
 import { database } from "../libs/firebase";
+import { Timestamp } from "firebase/firestore";
 
 export interface ExpenseData {
   id: string;
@@ -18,6 +19,14 @@ export interface ExpenseData {
   valueItem: string;
   listAccounts: boolean;
   income: boolean;
+  createdAt?: Timestamp;
+  author?: string;
+  shareWith?: string[];
+  shareInfo?: {
+    acceptedAt: Timestamp | null;
+    uid: string;
+    userName: string;
+  }[];
 }
 
 const useFirestoreCollection = (collectionName: string) => {
