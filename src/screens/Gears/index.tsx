@@ -105,13 +105,12 @@ export function Gears() {
           {user ? (
             <View>
               <ContentItems>
-             
-                <ButtonIcon onPress={handleSubscriptions}>
+                <ButtonIcon onPress={handleNotes}>
                   <Items>
-                    <Title>Assinaturas</Title>
+                    <Title>Notas</Title>
                     <Icon>
                       <FontAwesome
-                        name="pencil"
+                        name="sticky-note"
                         size={30}
                         color={COLORS.PURPLE_800}
                       />
@@ -130,12 +129,12 @@ export function Gears() {
                     </Icon>
                   </Items>
                 </ButtonIcon>
-                   <ButtonIcon onPress={handleNotes}>
+                <ButtonIcon onPress={handlePefil}>
                   <Items>
-                    <Title>Notas</Title>
+                    <Title>Perfil</Title>
                     <Icon>
                       <FontAwesome
-                        name="sticky-note"
+                        name="user"
                         size={30}
                         color={COLORS.PURPLE_800}
                       />
@@ -154,12 +153,12 @@ export function Gears() {
                     </Icon>
                   </Items>
                 </ButtonIcon>
-                <ButtonIcon onPress={handlePefil}>
+                <ButtonIcon onPress={handleSubscriptions}>
                   <Items>
-                    <Title>Perfil</Title>
+                    <Title>Assinaturas</Title>
                     <Icon>
                       <FontAwesome
-                        name="user"
+                        name="pencil"
                         size={30}
                         color={COLORS.PURPLE_800}
                       />
