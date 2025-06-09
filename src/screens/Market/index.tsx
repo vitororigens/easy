@@ -201,6 +201,7 @@ export function Market({ route }: any) {
   };
 
   const handleEditMarket = (marketId: string) => {
+    console.log("Editando mercado com ID:", marketId);
     // @ts-ignore
     navigation.navigate("market-item", { selectedItemId: marketId });
   };

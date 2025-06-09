@@ -71,6 +71,14 @@ export const MarketItem = ({
   showButtonRemove,
   selectedItemId,
 }: IMarketItemProps) => {
+  console.log("MarketItem props:", {
+    closeBottomSheet,
+    onCloseModal,
+    showButtonEdit,
+    showButtonSave,
+    showButtonRemove,
+    selectedItemId,
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -82,10 +90,12 @@ export const MarketItem = ({
   const { addMarket, updateMarket, deleteMarket, error } = useMarket();
 
   const uid = loggedUser.user?.uid;
-  const { isCreator = true } = route.params as {
+  const { isCreator = true, selectedItemId: routeSelectedItemId } = route.params as {
     selectedItemId?: string;
     isCreator: boolean;
   };
+  console.log("isCreator:", isCreator);
+  console.log("selectedItemId from route:", routeSelectedItemId);
 
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -225,13 +235,13 @@ export const MarketItem = ({
     price,
     quantity,
   }: FormSchemaType) => {
-    if (!selectedItemId) {
+    if (!routeSelectedItemId) {
       console.error("Nenhum documento selecionado para edição!");
       return;
     }
     try {
       setLoading(true);
-      await updateMarket(selectedItemId, {
+      await updateMarket(routeSelectedItemId, {
         name,
         category,
         measurement,
@@ -262,14 +272,14 @@ export const MarketItem = ({
   };
 
   const handleDeleteMarket = async () => {
-    if (!selectedItemId) {
+    if (!routeSelectedItemId) {
       console.error("Nenhum documento selecionado para exclusão!");
       return;
     }
 
     try {
       setLoading(true);
-      await deleteMarket(selectedItemId);
+      await deleteMarket(routeSelectedItemId);
       Toast.show("Item Excluído!", { type: "success" });
       navigation.navigate("tabroutes", {
         screen: "Market",
@@ -297,12 +307,24 @@ export const MarketItem = ({
   }
 
   useEffect(() => {
-    if (selectedItemId) {
+    if (routeSelectedItemId) {
+      console.log("selectedItemId from route:", routeSelectedItemId);
       const findNote = async () => {
         try {
-          const market = await findMarketById(selectedItemId);
+          console.log("Buscando item com ID:", routeSelectedItemId);
+          const market = await findMarketById(routeSelectedItemId);
+          console.log("Item encontrado:", market);
 
           if (market) {
+            console.log("Preenchendo formulário com dados:", {
+              name: market.name,
+              category: market.category,
+              measurement: market.measurement,
+              price: market.price,
+              quantity: market.quantity,
+              observation: market.observation,
+              shareInfo: market.shareInfo
+            });
             setValue("name", market.name);
             setValue("category", market.category);
             setValue("measurement", market.measurement);
@@ -329,7 +351,7 @@ export const MarketItem = ({
       };
       findNote();
     }
-  }, [selectedItemId]);
+  }, [routeSelectedItemId]);
 
   useEffect(() => {
     if (error) {
