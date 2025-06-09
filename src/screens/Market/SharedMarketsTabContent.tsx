@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Container,
   ContentTitle,
@@ -9,17 +9,13 @@ import {
 } from "./styles";
 import { FlatList, RefreshControl, View } from "react-native";
 import { MarketItem } from "../../components/MarketItem";
-import {
-  IMarket,
-  listMarketsSharedWithMe,
-} from "../../services/firebase/market.firebase";
-import { useUserAuth } from "../../hooks/useUserAuth";
+import { IMarket } from "../../services/firebase/market.firebase";
+import { useMarket } from "../../contexts/MarketContext";
 
 interface ISharedMarketsTabContentProps {
   setIsSharedListVisible: (value: boolean) => void;
   isSharedListVisible: boolean;
   sharedMarkets: IMarket[];
-  setSharedMarkets: (value: IMarket[]) => void;
   selectedItems: IMarket[];
   handleEditItem: (id: string) => void;
   handleRemoveItem: (item: IMarket) => void;
@@ -30,33 +26,12 @@ export const SharedMarketsTabContent = ({
   setIsSharedListVisible,
   isSharedListVisible,
   sharedMarkets,
-  setSharedMarkets,
   selectedItems,
   handleEditItem,
   handleRemoveItem,
   handleAddItem,
 }: ISharedMarketsTabContentProps) => {
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const user = useUserAuth();
-
-  const fetchMarkets = async () => {
-    if (!user.user?.uid) return;
-    try {
-      setIsRefreshing(true);
-      const sMarkets = await listMarketsSharedWithMe(user.user.uid);
-
-      setSharedMarkets(sMarkets);
-    } catch (error) {
-      console.error("Erro ao buscar os mercados: ", error);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  const handleRefresh = async () => {
-    await fetchMarkets();
-  };
+  const { loading } = useMarket();
 
   return (
     <>
@@ -104,8 +79,8 @@ export const SharedMarketsTabContent = ({
             }
             refreshControl={
               <RefreshControl
-                refreshing={isRefreshing}
-                onRefresh={handleRefresh}
+                refreshing={loading}
+                onRefresh={() => {}}
               />
             }
           />

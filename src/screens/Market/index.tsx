@@ -275,7 +275,7 @@ export function Market({ route }: any) {
       };
 
       // Primeiro, adiciona ao histórico
-      await database.collection("Marketplace").add(marketplaceData);
+      await getFirestore().collection("Marketplace").add(marketplaceData);
 
       // Depois, exclui os itens selecionados da lista original
       for (const marketId of selectedMarkets) {
@@ -308,7 +308,7 @@ export function Market({ route }: any) {
           style: "destructive",
           onPress: async () => {
             try {
-              await database.collection("Marketplace").doc(itemId).delete();
+              await getFirestore().collection("Marketplace").doc(itemId).delete();
               Toast.show("Item excluído do histórico!", { type: "success" });
             } catch (error) {
               console.error("Erro ao excluir item do histórico:", error);

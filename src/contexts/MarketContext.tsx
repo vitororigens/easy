@@ -1,92 +1,126 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { IMarket } from "../interfaces/IMarket";
 import { useUserAuth } from "../hooks/useUserAuth";
-import { Timestamp } from "@react-native-firebase/firestore";
-import { database } from "../libs/firebase";
+import { 
+  getFirestore, 
+  collection, 
+  onSnapshot, 
+  query, 
+  where, 
+  doc, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  getDoc,
+  Timestamp 
+} from "@react-native-firebase/firestore";
 import { IMarketContext } from "../interfaces/IMarketContext";
-import { listMarkets, listMarketsSharedWithMe, listMarketsSharedByMe } from "../services/firebase/market.firebase";
 
 const MarketContext = createContext<IMarketContext>({} as IMarketContext);
 
 export function MarketProvider({ children }: { children: React.ReactNode }) {
   const [markets, setMarkets] = useState<IMarket[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const user = useUserAuth();
+  const db = getFirestore();
 
-  // Carregar mercados do Firebase
+  // Real-time listener for markets
   useEffect(() => {
     if (!user.user?.uid) {
       console.log("Usuário não autenticado");
       return;
     }
-    
-    console.log("Iniciando carregamento de mercados para o usuário:", user.user.uid);
+
     setLoading(true);
-    
-    const fetchMarkets = async () => {
-      try {
-        console.log("Buscando mercados...");
-        const [myMarkets, sharedWithMe, sharedByMe] = await Promise.all([
-          listMarkets(user.user?.uid || ""),
-          listMarketsSharedWithMe(user.user?.uid || ""),
-          listMarketsSharedByMe(user.user?.uid || ""),
-        ]);
+    setError(null);
 
-        console.log("Resultados da busca:", {
-          meusMercados: myMarkets.map(m => ({ id: m.id, name: m.name })),
-          compartilhadosComigo: sharedWithMe.map(m => ({ id: m.id, name: m.name, shareInfo: m.shareInfo })),
-          compartilhadosPorMim: sharedByMe.map(m => ({ id: m.id, name: m.name }))
+    // Query for user's own markets
+    const myMarketsQuery = query(
+      collection(db, "Markets"),
+      where("uid", "==", user.user.uid)
+    );
+
+    // Query for shared markets
+    const sharedMarketsQuery = query(
+      collection(db, "Markets"),
+      where("shareWith", "array-contains", user.user.uid)
+    );
+
+    // Set up real-time listeners
+    const unsubscribeMyMarkets = onSnapshot(
+      myMarketsQuery,
+      (snapshot) => {
+        const myMarkets = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          isOwner: true,
+        })) as IMarket[];
+
+        setMarkets((prevMarkets) => {
+          // Remove old markets owned by user
+          const filteredMarkets = prevMarkets.filter(
+            (market) => market.uid !== user.user?.uid
+          );
+          return [...filteredMarkets, ...myMarkets];
         });
-
-        // Combinar todos os mercados
-        const allMarkets = [
-          ...myMarkets,
-          ...sharedWithMe.filter(market => 
-            !myMarkets.some(myMarket => myMarket.id === market.id)
-          ),
-          ...sharedByMe
-            .filter(market => 
-              !myMarkets.some(myMarket => myMarket.id === market.id) &&
-              !sharedWithMe.some(sharedMarket => sharedMarket.id === market.id)
-            )
-            .map(market => ({
-              ...market,
-              isOwner: true,
-              isShared: true
-            }))
-        ];
-
-        console.log("Total de mercados combinados:", allMarkets.length);
-        console.log("Mercados combinados:", allMarkets.map(m => ({ 
-          id: m.id, 
-          name: m.name,
-          isOwner: m.isOwner,
-          isShared: m.isShared,
-          shareInfo: m.shareInfo
-        })));
-        
-        setMarkets(allMarkets);
-      } catch (error) {
+      },
+      (error) => {
         console.error("Erro ao carregar mercados:", error);
-      } finally {
-        setLoading(false);
+        setError("Erro ao carregar mercados");
       }
-    };
+    );
 
-    fetchMarkets();
+    const unsubscribeSharedMarkets = onSnapshot(
+      sharedMarketsQuery,
+      (snapshot) => {
+        const sharedMarkets = snapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            isShared: true,
+            isOwner: false,
+          }))
+          .filter((market) => market.id !== user.user?.uid) as IMarket[];
+
+        setMarkets((prevMarkets) => {
+          // Remove old shared markets
+          const filteredMarkets = prevMarkets.filter(
+            (market) => !market.shareWith?.includes(user.user?.uid || "")
+          );
+          return [...filteredMarkets, ...sharedMarkets];
+        });
+      },
+      (error) => {
+        console.error("Erro ao carregar mercados compartilhados:", error);
+        setError("Erro ao carregar mercados compartilhados");
+      }
+    );
+
+    setLoading(false);
+
+    // Cleanup listeners
+    return () => {
+      unsubscribeMyMarkets();
+      unsubscribeSharedMarkets();
+    };
   }, [user.user?.uid]);
 
   const addMarket = useCallback(async (market: Omit<IMarket, "id" | "createdAt">) => {
     if (!user.user?.uid) return;
     
     setLoading(true);
+    setError(null);
     try {
-      await database.collection("Markets").add({
+      const docRef = await addDoc(collection(db, "Markets"), {
         ...market,
         createdAt: Timestamp.now(),
       });
+      return docRef.id;
     } catch (error) {
       console.error("Erro ao adicionar mercado:", error);
+      setError("Erro ao adicionar mercado");
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -94,10 +128,14 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
 
   const updateMarket = useCallback(async (id: string, market: Partial<IMarket>) => {
     setLoading(true);
+    setError(null);
     try {
-      await database.collection("Markets").doc(id).update(market);
+      const marketRef = doc(db, "Markets", id);
+      await updateDoc(marketRef, market);
     } catch (error) {
       console.error("Erro ao atualizar mercado:", error);
+      setError("Erro ao atualizar mercado");
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -105,40 +143,38 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
 
   const deleteMarket = useCallback(async (id: string) => {
     setLoading(true);
+    setError(null);
     try {
-      const marketRef = database.collection("Markets").doc(id);
-      const doc = await marketRef.get();
+      const marketRef = doc(db, "Markets", id);
+      const docSnap = await getDoc(marketRef);
       
-      if (!doc.exists) {
+      if (!docSnap.exists()) {
         throw new Error("Mercado não encontrado");
       }
 
-      const marketData = doc.data();
+      const marketData = docSnap.data();
       if (!marketData) {
         throw new Error("Dados do mercado não encontrados");
       }
       
-      // Se o usuário atual é o dono do mercado
       if (marketData.uid === user.user?.uid) {
-        // Se o mercado está compartilhado, apenas remove o usuário da lista shareWith
         if (marketData.shareWith?.length > 0) {
           const updatedShareWith = marketData.shareWith.filter(
             (uid: string) => uid !== user.user?.uid
           );
-          await marketRef.update({ shareWith: updatedShareWith });
+          await updateDoc(marketRef, { shareWith: updatedShareWith });
         } else {
-          // Se não está compartilhado, exclui o documento
-          await marketRef.delete();
+          await deleteDoc(marketRef);
         }
       } else {
-        // Se o usuário não é o dono, apenas remove ele da lista shareWith
         const updatedShareWith = marketData.shareWith?.filter(
           (uid: string) => uid !== user.user?.uid
         ) || [];
-        await marketRef.update({ shareWith: updatedShareWith });
+        await updateDoc(marketRef, { shareWith: updatedShareWith });
       }
     } catch (error) {
       console.error("Erro ao deletar mercado:", error);
+      setError("Erro ao deletar mercado");
       throw error;
     } finally {
       setLoading(false);
@@ -147,17 +183,20 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
 
   const toggleMarketCompletion = useCallback(async (id: string) => {
     setLoading(true);
+    setError(null);
     try {
-      const marketRef = database.collection("Markets").doc(id);
-      const doc = await marketRef.get();
-      if (doc.exists()) {
-        const marketData = doc.data();
-        await marketRef.update({
+      const marketRef = doc(db, "Markets", id);
+      const docSnap = await getDoc(marketRef);
+      if (docSnap.exists()) {
+        const marketData = docSnap.data();
+        await updateDoc(marketRef, {
           status: !marketData?.status,
         });
       }
     } catch (error) {
       console.error("Erro ao alternar status do mercado:", error);
+      setError("Erro ao alternar status do mercado");
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -167,6 +206,7 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
     <MarketContext.Provider value={{
       markets,
       loading,
+      error,
       addMarket,
       updateMarket,
       deleteMarket,

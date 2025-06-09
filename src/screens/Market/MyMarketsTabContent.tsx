@@ -1,65 +1,50 @@
-import React, { useState } from "react";
-import { Container, ContentTitle, DividerContent, Icon, Title } from "./styles";
+import React from "react";
+import {
+  Container,
+  ContentTitle,
+  DividerContent,
+  Icon,
+  SubTitle,
+  Title,
+} from "./styles";
 import { FlatList, RefreshControl, View } from "react-native";
 import { MarketItem } from "../../components/MarketItem";
-import { LoadData } from "../../components/LoadData";
-import PersonImage from "../../assets/illustrations/marketplace.png";
-import { IMarket, listMarkets } from "../../services/firebase/market.firebase";
-import { useUserAuth } from "../../hooks/useUserAuth";
+import { IMarket } from "../../services/firebase/market.firebase";
+import { useMarket } from "../../contexts/MarketContext";
 
 interface IMarketTabMyContentProps {
+  setIsMyListVisible: (value: boolean) => void;
+  isMyListVisible: boolean;
   myMarkets: IMarket[];
-  setMyMarkets: (items: IMarket[]) => void;
   selectedItems: IMarket[];
-  setSelectedItems: (items: IMarket[]) => void;
   handleEditItem: (id: string) => void;
   handleRemoveItem: (item: IMarket) => void;
   handleAddItem: (item: IMarket) => void;
-  isMyListVisible: boolean;
-  setIsMyListVisible: (value: boolean) => void;
 }
 
 export const MyMarketsTabContent = ({
-  handleAddItem,
+  setIsMyListVisible,
+  isMyListVisible,
+  myMarkets,
+  selectedItems,
   handleEditItem,
   handleRemoveItem,
-  myMarkets,
-  setMyMarkets,
-  selectedItems,
-  setSelectedItems,
-  isMyListVisible,
-  setIsMyListVisible,
+  handleAddItem,
 }: IMarketTabMyContentProps) => {
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const user = useUserAuth();
-
-  const fetchMarkets = async () => {
-    if (!user?.user?.uid) return;
-    try {
-      setIsRefreshing(true);
-      const mMarkets = await listMarkets(user.user.uid);
-
-      setMyMarkets(mMarkets);
-    } catch (error) {
-      console.error("Erro ao buscar os mercados: ", error);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  const handleRefresh = async () => {
-    await fetchMarkets();
-    setSelectedItems([]);
-  };
+  const { loading } = useMarket();
 
   return (
     <>
-      <ContentTitle onPress={() => setIsMyListVisible(!isMyListVisible)}>
+      <ContentTitle
+        onPress={() => setIsMyListVisible(!isMyListVisible)}
+      >
         <Title>Minha lista de compras</Title>
         <DividerContent />
-        <Icon name={isMyListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+        <Icon
+          name={isMyListVisible ? "arrow-drop-up" : "arrow-drop-down"}
+        />
       </ContentTitle>
+
       {isMyListVisible && (
         <Container>
           <FlatList
@@ -70,26 +55,32 @@ export const MyMarketsTabContent = ({
                 onEditItem={() => handleEditItem(item.id)}
                 removeItem={() => handleRemoveItem(item)}
                 addItem={() => handleAddItem(item)}
-                measurement={item.measurement ?? ""}
-                quantity={item.quantity ?? 0}
+                measurement={item.measurement || ""}
+                quantity={item.quantity || 0}
                 title={item.name}
-                price={item.price ?? 0}
+                price={item.price || 0}
                 resetCountQuantity={!!selectedItems.length ? false : true}
               />
             )}
             contentContainerStyle={{ paddingBottom: 90 }}
             ListFooterComponent={<View style={{ height: 90 }} />}
             ListEmptyComponent={
-              <LoadData
-                imageSrc={PersonImage}
-                title="Comece agora!"
-                subtitle="Adicione um item clicando em +"
-              />
+              <View
+                style={{
+                  padding: 40,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <SubTitle>
+                  Você não possui produtos na sua lista
+                </SubTitle>
+              </View>
             }
             refreshControl={
               <RefreshControl
-                refreshing={isRefreshing}
-                onRefresh={handleRefresh}
+                refreshing={loading}
+                onRefresh={() => {}}
               />
             }
           />

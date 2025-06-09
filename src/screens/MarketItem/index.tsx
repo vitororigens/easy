@@ -8,9 +8,9 @@ import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
 import { LoadingIndicator } from "../../components/Loading/style";
-import { ModalContainer } from "../../components/ModalContainer";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { currencyMask, currencyUnMask, formatCurrency } from "../../utils/mask";
+import { findMarketById } from "../../services/firebase/market.firebase";
 import {
   Button,
   ButtonPlus,
@@ -29,16 +29,11 @@ import {
   ESharingStatus,
   getSharing,
 } from "../../services/firebase/sharing.firebase";
-import {
-  createMarket,
-  deleteMarket,
-  findMarketById,
-  updateMarket,
-} from "../../services/firebase/market.firebase";
 import { createNotification } from "../../services/firebase/notifications.firebase";
 import { sendPushNotification } from "../../services/one-signal";
 import { ShareWithUsers } from "../../components/ShareWithUsers";
 import { DefaultContainer } from "../../components/DefaultContainer";
+import { useMarket } from "../../contexts/MarketContext";
 
 type IMarketItemProps = {
   closeBottomSheet?: () => void;
@@ -84,6 +79,7 @@ export const MarketItem = ({
   const navigation = useNavigation();
   const route = useRoute();
   const loggedUser = useUserAuth();
+  const { addMarket, updateMarket, deleteMarket, error } = useMarket();
 
   const uid = loggedUser.user?.uid;
   const { isCreator = true } = route.params as {
@@ -126,19 +122,19 @@ export const MarketItem = ({
     try {
       if (!uid) return;
       setLoading(true);
+
       const usersInvitedByMe = await getSharing({
         profile: "invitedBy",
         uid: uid as string,
       });
 
-      const createdMarket = await createMarket({
+      const marketId = await addMarket({
         name,
         category,
         measurement,
         observation,
         price: price ? currencyUnMask(price) : 0,
         quantity: quantity ? parseFloat(quantity) : 1,
-        createdAt: Timestamp.now(),
         uid,
         shareWith: sharedUsers.map((user) => user.uid),
         shareInfo: sharedUsers.map((user) => ({
@@ -152,7 +148,9 @@ export const MarketItem = ({
         })),
       });
 
-      Toast.show("Item adicionado!", { type: "success" });
+      if (!marketId) {
+        throw new Error("Failed to create market");
+      }
 
       if (sharedUsers.length > 0) {
         for (const user of sharedUsers) {
@@ -176,7 +174,7 @@ export const MarketItem = ({
               type: "sharing_invite",
               source: {
                 type: "market",
-                id: createdMarket.id,
+                id: marketId,
               },
               title: "Compartilhamento de mercado",
               description: message,
@@ -202,6 +200,7 @@ export const MarketItem = ({
         }
       }
 
+      Toast.show("Item adicionado!", { type: "success" });
       reset();
       navigation.navigate("tabroutes", {
         screen: "Market",
@@ -210,8 +209,8 @@ export const MarketItem = ({
       onCloseModal && onCloseModal();
       closeBottomSheet && closeBottomSheet();
     } catch (error) {
-      setLoading(false);
       console.error("Erro ao adicionar o item: ", error);
+      Toast.show("Erro ao adicionar o item", { type: "error" });
     } finally {
       setLoading(false);
     }
@@ -231,23 +230,23 @@ export const MarketItem = ({
       return;
     }
     try {
-      await updateMarket(
-        selectedItemId,
-        {
-          name,
-          category,
-          measurement,
-          observation,
-          price: price ? currencyUnMask(price) : 0,
-          quantity: quantity ? parseFloat(quantity) : 1,
-          shareInfo: sharedUsers.map((user) => ({
-            uid: user.uid,
-            userName: user.userName,
-            acceptedAt: user.acceptedAt,
-          })),
-          shareWith: sharedUsers.map((user) => user.uid),
-        }
-      );
+      setLoading(true);
+      await updateMarket(selectedItemId, {
+        name,
+        category,
+        measurement,
+        observation,
+        price: price ? currencyUnMask(price) : 0,
+        quantity: quantity ? parseFloat(quantity) : 1,
+        shareInfo: sharedUsers.map((user) => ({
+          uid: user.uid,
+          userName: user.userName,
+          acceptedAt: user.acceptedAt,
+        })),
+        shareWith: sharedUsers.map((user) => user.uid),
+      });
+
+      Toast.show("Item atualizado!", { type: "success" });
       navigation.navigate("tabroutes", {
         screen: "Market",
         params: { reload: true },
@@ -256,6 +255,7 @@ export const MarketItem = ({
       closeBottomSheet && closeBottomSheet();
     } catch (error) {
       console.error("Erro ao atualizar o documento:", error);
+      Toast.show("Erro ao atualizar o item", { type: "error" });
     } finally {
       setLoading(false);
     }
@@ -279,6 +279,7 @@ export const MarketItem = ({
       closeBottomSheet && closeBottomSheet();
     } catch (error) {
       console.error("Erro ao excluir o documento de item:", error);
+      Toast.show("Erro ao excluir o item", { type: "error" });
     } finally {
       setLoading(false);
     }
@@ -323,11 +324,18 @@ export const MarketItem = ({
           }
         } catch (error) {
           console.error("Erro ao obter o documento:", error);
+          Toast.show("Erro ao carregar o item", { type: "error" });
         }
       };
       findNote();
     }
   }, [selectedItemId]);
+
+  useEffect(() => {
+    if (error) {
+      Toast.show(error, { type: "error" });
+    }
+  }, [error]);
 
   const handleClose = () => {
     if (closeBottomSheet) closeBottomSheet();
@@ -484,8 +492,8 @@ export const MarketItem = ({
               style={{ marginBottom: 10 }}
               onPress={
                 isEditing
-                  ? handleSubmit(handleUpdateMarket)
-                  : handleSubmit(handleCreateMarket)
+                  ? handleSubmit(handleUpdateMarket, onInvalid)
+                  : handleSubmit(handleCreateMarket, onInvalid)
               }
             >
               <Title>{loading ? <LoadingIndicator /> : "Salvar"}</Title>
