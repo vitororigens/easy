@@ -41,12 +41,19 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
         // Combinar todos os mercados
         const allMarkets = [
           ...myMarkets,
-          ...sharedWithMe,
-          ...sharedByMe.map(market => ({
-            ...market,
-            isOwner: true,
-            isShared: true
-          }))
+          ...sharedWithMe.filter(market => 
+            !myMarkets.some(myMarket => myMarket.id === market.id)
+          ),
+          ...sharedByMe
+            .filter(market => 
+              !myMarkets.some(myMarket => myMarket.id === market.id) &&
+              !sharedWithMe.some(sharedMarket => sharedMarket.id === market.id)
+            )
+            .map(market => ({
+              ...market,
+              isOwner: true,
+              isShared: true
+            }))
         ];
 
         console.log("Total de mercados combinados:", allMarkets.length);
