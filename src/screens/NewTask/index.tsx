@@ -1,29 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { ButtonBar, Content, Header, NavBar, Title } from "./styles";
 import { useRoute } from "@react-navigation/native";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Revenue } from "../../components/Revenue";
 import { Expense } from "../../components/Expense";
-import { useForm} from "react-hook-form";
-import { z } from "zod";
-import { Timestamp } from "@react-native-firebase/firestore";
-
-const formSchema = z.object({
-  name: z.string().min(1, "Nome da Tarefa é obrigatório"),
-  quantity: z.string().optional(),
-  price: z.string().optional(),
-  category: z.string().optional(),
-  measurement: z.string().optional(),
-  observation: z.string().optional(),
-  sharedUsers: z.array(
-    z.object({
-      uid: z.string(),
-      userName: z.string(),
-      acceptedAt: z.union([z.null(), z.instanceof(Timestamp)]),
-    })
-  ),
-});
 
 export function NewTask() {
   const route = useRoute();
@@ -36,25 +16,15 @@ export function NewTask() {
     initialActiveButton?: string;
     isCreator: boolean;
   };
+  console.log("selectedItemId", selectedItemId);  
+  console.log("initialActiveButton", initialActiveButton);
+  console.log("isCreator", isCreator);
+  console.log("route", route);  
 
   const [activeButton, setActiveButton] = useState<string | undefined>(
     undefined
   );
 
-  type FormSchemaType = z.infer<typeof formSchema>;
-
-  const form = useForm<FormSchemaType>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      quantity: "1",
-      price: "",
-      category: "",
-      measurement: "un",
-      observation: "",
-      sharedUsers: [],
-    },
-  });
 
   useEffect(() => {
     if (initialActiveButton) {

@@ -2,7 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import { createNotification } from "../../services/firebase/notifications.firebase";
 import { createRevenue } from "../../services/firebase/revenues.firebase";
@@ -44,6 +44,7 @@ import { database } from "../../libs/firebase";
 import { INotification } from "../../@types/notifications";
 import { ISharing } from "../../@types/sharing";
 
+// Types
 type RevenueProps = {
   selectedItemId?: string;
   showButtonRemove?: boolean;
@@ -69,14 +70,37 @@ const formSchema = z.object({
 
 type FormSchemaType = z.infer<typeof formSchema>;
 
+// Constants
+const REVENUE_CATEGORIES = [
+  { label: "Salário", value: "salario" },
+  { label: "Vendas", value: "vendas" },
+  { label: "Investimentos", value: "investimentos" },
+  { label: "Comissão", value: "Comissão" },
+  { label: "Adiantamentos", value: "Adiantamentos" },
+  { label: "Outros", value: "Outros" },
+];
+
+const REPEAT_MONTHS_LIMIT = 11;
+const CURRENT_YEAR = new Date().getFullYear();
+
 export function Revenue({
   selectedItemId,
   onCloseModal,
   showButtonSave,
 }: RevenueProps) {
-  // States
+  // Hooks
   const { user, loading: authLoading } = useUserAuth();
   const { selectedMonth } = useMonth();
+  const navigation = useNavigation();
+  const route = useRoute();
+  
+  // Route params
+  const { isCreator = true } = (route.params as {
+    selectedItemId?: string;
+    isCreator: boolean;
+  }) || {};
+
+  // States
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [repeat, setRepeat] = useState(false);
@@ -84,15 +108,10 @@ export function Revenue({
   const [loading, setLoading] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [removeRepeat, setRemoveRepeat] = useState(false);
+  
   const uid = user?.uid;
 
-  const navigation = useNavigation();
-  const route = useRoute();
-  const { isCreator = true } = (route.params as {
-    selectedItemId?: string;
-    isCreator: boolean;
-  }) || {};
-
+  // Form setup
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -104,28 +123,146 @@ export function Revenue({
       sharedUsers: [],
     },
   });
+  
   const { control, handleSubmit, reset, setValue, watch } = form;
 
-  const handleDateChange = (event: any, selectedDate: Date | undefined) => {
+  // Utility functions
+  const parseDateString = useCallback((dateString: string) => {
+    const [day, month, year] = dateString.split("/");
+    return {
+      day: Number(day),
+      month: Number(month),
+      year: Number(year),
+      date: new Date(Number(year), Number(month) - 1, Number(day)),
+    };
+  }, []);
+
+  const formatCurrencyValue = useCallback((value: number) => {
+    return value.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }, []);
+
+  // Date handling
+  const handleDateChange = useCallback((event: any, selectedDate: Date | undefined) => {
     setShowDatePicker(false);
     const currentDate = selectedDate || date;
     setDate(currentDate);
     const formattedDateString = currentDate.toLocaleDateString("pt-BR");
     setValue("formattedDate", formattedDateString);
-  };
+  }, [date, setValue]);
 
-  const showDatePickerModal = () => {
+  const showDatePickerModal = useCallback(() => {
     setShowDatePicker(true);
-  };
+  }, []);
 
-  async function handleSaveRevenue({
-    formattedDate,
-    name,
-    valueTransaction,
-    description,
-    selectedCategory,
-    sharedUsers,
-  }: FormSchemaType) {
+  // Notification handling
+  const handleUserNotifications = useCallback(async (
+    sharedUsers: FormSchemaType['sharedUsers'],
+    usersInvitedByMe: any[],
+    createdRevenueId: string
+  ) => {
+    if (!sharedUsers?.length || !uid || !user?.displayName) return;
+
+    const notificationPromises = sharedUsers.map(async (userSharing) => {
+      const alreadySharing = usersInvitedByMe.some(
+        (u) => u.target === userSharing.uid && u.status === "accepted"
+      );
+
+      const possibleSharingRequestExists = usersInvitedByMe.some(
+        (u) => u.target === userSharing.uid
+      );
+
+      const message = alreadySharing
+        ? `${user.displayName} adicionou um novo item ao mercado`
+        : `${user.displayName} convidou você para compartilhar um item de mercado`;
+
+      const notificationData = {
+        sender: uid,
+        receiver: userSharing.uid,
+        status: alreadySharing ? "sharing_accepted" : "pending",
+        type: "sharing_invite",
+        source: {
+          type: "expense",
+          id: createdRevenueId,
+        },
+        title: "Compartilhamento de compras",
+        description: message,
+        createdAt: Timestamp.now(),
+      } as INotification;
+
+      const promises = [
+        createNotification(notificationData),
+        sendPushNotification({
+          title: "Compartilhamento de despesa",
+          message,
+          uid: userSharing.uid,
+        }),
+      ];
+
+      if (!alreadySharing && !possibleSharingRequestExists) {
+        promises.push(
+          createSharing({
+            invitedBy: uid,
+            status: ESharingStatus.PENDING,
+            target: userSharing.uid,
+            createdAt: Timestamp.now(),
+            updatedAt: Timestamp.now(),
+          } as ISharing)
+        );
+      }
+
+      return Promise.allSettled(promises);
+    });
+
+    await Promise.all(notificationPromises);
+  }, [uid, user?.displayName]);
+
+  // Repeat revenue creation
+  const createRepeatedRevenues = useCallback(async (
+    revenueData: any,
+    monthNumber: number,
+    year: number,
+    day: number
+  ) => {
+    if (!repeat) return;
+
+    const repeatPromises = [];
+    
+    for (let i = 1; i <= REPEAT_MONTHS_LIMIT; i++) {
+      let nextMonth = monthNumber + i;
+      let nextYear = year;
+
+      if (nextMonth > 12) {
+        nextMonth -= 12;
+        nextYear++;
+      }
+
+      if (nextYear > CURRENT_YEAR) {
+        break;
+      }
+
+      const nextDate = `${day}/${nextMonth}/${nextYear}`;
+      const nextMonthRevenueData = {
+        ...revenueData,
+        date: nextDate,
+        month: nextMonth,
+      };
+
+      repeatPromises.push(
+        database.collection("Revenue").add(nextMonthRevenueData)
+          .catch((error) => {
+            console.error("Erro ao adicionar a transação repetida:", error);
+          })
+      );
+    }
+
+    await Promise.allSettled(repeatPromises);
+  }, [repeat]);
+
+  // Main save function
+  const handleSaveRevenue = useCallback(async (formData: FormSchemaType) => {
     if (!uid) {
       Toast.show("Erro: Usuário não autenticado", { type: "error" });
       return;
@@ -134,8 +271,7 @@ export function Revenue({
     setLoading(true);
 
     try {
-      const [day, month, year] = formattedDate.split("/");
-      const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
+      const { day, month, year, date: selectedDate } = parseDateString(formData.formattedDate);
       const monthNumber = selectedDate.getMonth() + 1;
 
       const usersInvitedByMe = await getSharing({
@@ -143,22 +279,22 @@ export function Revenue({
         uid: uid,
       });
 
-      const transactionValue = valueTransaction
-        ? currencyUnMask(valueTransaction)
+      const transactionValue = formData.valueTransaction
+        ? currencyUnMask(formData.valueTransaction)
         : 0;
 
       const revenueData = {
-        name: name,
-        category: selectedCategory || "Outros",
+        name: formData.name,
+        category: formData.selectedCategory || "Outros",
         uid: uid,
-        date: formattedDate,
+        date: formData.formattedDate,
         valueTransaction: transactionValue.toString(),
-        description: description || "",
+        description: formData.description || "",
         repeat,
         type: "input",
         month: monthNumber,
-        shareWith: sharedUsers?.map((user) => user.uid) || [],
-        shareInfo: sharedUsers?.map((user) => ({
+        shareWith: formData.sharedUsers?.map((user) => user.uid) || [],
+        shareInfo: formData.sharedUsers?.map((user) => ({
           uid: user.uid,
           userName: user.userName,
           acceptedAt: usersInvitedByMe.some(
@@ -171,7 +307,19 @@ export function Revenue({
 
       const createdRevenue = await createRevenue(revenueData);
 
+      // Handle notifications
+      await handleUserNotifications(
+        formData.sharedUsers,
+        usersInvitedByMe,
+        createdRevenue.id
+      );
+
+      // Create repeated revenues
+      await createRepeatedRevenues(revenueData, monthNumber, year, day);
+
       Toast.show("Transação adicionada!", { type: "success" });
+      
+      // Reset form and states
       setRepeat(false);
       reset();
       setLoading(false);
@@ -182,101 +330,16 @@ export function Revenue({
         params: { reload: true },
       });
 
-      if (repeat) {
-        for (let i = 1; i <= 11; i++) {
-          let nextMonth = monthNumber + i;
-          let nextYear = Number(year);
-
-          if (nextMonth > 12) {
-            nextMonth -= 12;
-            nextYear++;
-          }
-
-          if (nextYear > Number(year)) {
-            break;
-          }
-
-          const nextDate = `${day}/${nextMonth}/${nextYear}`;
-          const nextMonthRevenueData = {
-            ...revenueData,
-            date: nextDate,
-            month: nextMonth,
-          };
-
-          try {
-            await database.collection("Revenue").add(nextMonthRevenueData);
-          } catch (error) {
-            console.error("Erro ao adicionar a transação repetida:", error);
-          }
-        }
-      }
-
-      if (sharedUsers?.length > 0) {
-        for (const userSharing of sharedUsers) {
-          const alreadySharing = usersInvitedByMe.some(
-            (u) => u.target === userSharing.uid && u.status === "accepted"
-          );
-
-          const possibleSharingRequestExists = usersInvitedByMe.some(
-            (u) => u.target === userSharing.uid
-          );
-
-          const message = alreadySharing
-            ? `${user?.displayName} adicionou um novo item ao mercado`
-            : `${user?.displayName} convidou você para compartilhar um item de mercado`;
-
-          try {
-            await Promise.allSettled([
-              createNotification({
-                sender: uid,
-                receiver: userSharing.uid,
-                status: alreadySharing ? "sharing_accepted" : "pending",
-                type: "sharing_invite",
-                source: {
-                  type: "expense",
-                  id: createdRevenue.id,
-                },
-                title: "Compartilhamento de compras",
-                description: message,
-                createdAt: Timestamp.now(),
-              } as INotification),
-              ...(!alreadySharing && !possibleSharingRequestExists
-                ? [
-                    createSharing({
-                      invitedBy: uid,
-                      status: ESharingStatus.PENDING,
-                      target: userSharing.uid,
-                      createdAt: Timestamp.now(),
-                      updatedAt: Timestamp.now(),
-                    } as ISharing),
-                  ]
-                : []),
-              sendPushNotification({
-                title: "Compartilhamento de despesa",
-                message,
-                uid: userSharing.uid,
-              }),
-            ]);
-          } catch (error) {
-            console.error("Erro ao enviar notificações:", error);
-          }
-        }
-      }
     } catch (error) {
       console.error("Erro ao salvar receita:", error);
       Toast.show("Erro ao salvar a receita", { type: "error" });
     } finally {
       setLoading(false);
     }
-  }
+  }, [uid, repeat, reset, onCloseModal, navigation, parseDateString, handleUserNotifications, createRepeatedRevenues]);
 
-  async function handleEditRevenue({
-    formattedDate,
-    name,
-    valueTransaction,
-    description,
-    selectedCategory,
-  }: FormSchemaType) {
+  // Edit function
+  const handleEditRevenue = useCallback(async (formData: FormSchemaType) => {
     if (!selectedItemId || !uid) {
       Toast.show("Erro: Dados inválidos para edição", { type: "error" });
       return;
@@ -285,21 +348,20 @@ export function Revenue({
     setLoading(true);
 
     try {
-      const [day, month, year] = formattedDate.split("/");
-      const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
+      const { month, year, date: selectedDate } = parseDateString(formData.formattedDate);
       const monthNumber = selectedDate.getMonth() + 1;
 
-      const transactionValue = valueTransaction
-        ? currencyUnMask(valueTransaction)
+      const transactionValue = formData.valueTransaction
+        ? currencyUnMask(formData.valueTransaction)
         : 0;
 
       const revenueData = {
-        name,
-        category: selectedCategory || "Outros",
+        name: formData.name,
+        category: formData.selectedCategory || "Outros",
         uid: uid,
-        date: formattedDate,
+        date: formData.formattedDate,
         valueTransaction: transactionValue.toString(),
-        description: description || "",
+        description: formData.description || "",
         repeat: removeRepeat ? false : repeat,
         type: "input",
         month: monthNumber,
@@ -308,11 +370,12 @@ export function Revenue({
       await database.collection("Revenue").doc(selectedItemId).set(revenueData);
       Toast.show("Transação editada!", { type: "success" });
 
+      // Handle repeat removal
       if (removeRepeat) {
         const revenuesSnapshot = await database
           .collection("Revenue")
           .where("uid", "==", uid)
-          .where("name", "==", name)
+          .where("name", "==", formData.name)
           .get();
 
         const batch = database.batch();
@@ -335,9 +398,10 @@ export function Revenue({
     } finally {
       setLoading(false);
     }
-  }
+  }, [selectedItemId, uid, removeRepeat, repeat, selectedMonth, onCloseModal, parseDateString]);
 
-  function handleDeleteRevenue() {
+  // Delete function
+  const handleDeleteRevenue = useCallback(() => {
     if (!selectedItemId) {
       Toast.show("Erro: Nenhum item selecionado para exclusão", { type: "error" });
       return;
@@ -367,66 +431,66 @@ export function Revenue({
         },
       ]
     );
-  }
+  }, [selectedItemId, onCloseModal]);
 
-  const onInvalid = () => {
+  // Form validation
+  const onInvalid = useCallback(() => {
     Alert.alert(
       "Atenção!",
       "Por favor, preencha os campos obrigatórios antes de salvar."
     );
-  };
+  }, []);
 
-  function handleShowAdvanced() {
+  // UI handlers
+  const handleShowAdvanced = useCallback(() => {
     setShowAdvanced((prevState) => !prevState);
-  }
+  }, []);
 
+  // Load existing revenue data
   useEffect(() => {
-    if (selectedItemId) {
-      setLoading(true);
-      database
-        .collection("Revenue")
-        .doc(selectedItemId)
-        .get()
-        .then((doc) => {
-          if (doc.exists()) {
-            const data = doc.data();
-            if (data) {
-              setValue("name", data.name);
-              setValue(
-                "valueTransaction",
-                data.valueTransaction.toLocaleString("pt-BR", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-              );
-              setValue(
-                "sharedUsers",
-                data.shareInfo?.map((si: any) => ({
-                  uid: si.uid,
-                  userName: si.userName,
-                  acceptedAt: si.acceptedAt,
-                })) ?? []
-              );
-              setValue("description", data.description || "");
-              const [day, month, year] = data.date.split("/");
-              setValue("formattedDate", data.date);
-              setValue("selectedCategory", data.category || "Outros");
-              setRepeat(data.repeat || false);
-              setDate(new Date(Number(year), Number(month) - 1, Number(day)));
-              setIsEditing(true);
-            }
-          }
-        })
-        .catch((error) => {
-          console.error("Erro ao carregar dados da receita:", error);
-          Toast.show("Erro ao carregar dados da receita", { type: "error" });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [selectedItemId]);
+    if (!selectedItemId) return;
 
+    const loadRevenueData = async () => {
+      setLoading(true);
+      
+      try {
+        const doc = await database.collection("Revenue").doc(selectedItemId).get();
+        
+        if (doc.exists()) {
+          const data = doc.data();
+          if (data) {
+            setValue("name", data.name);
+            setValue("valueTransaction", formatCurrencyValue(data.valueTransaction));
+            setValue(
+              "sharedUsers",
+              data.shareInfo?.map((si: any) => ({
+                uid: si.uid,
+                userName: si.userName,
+                acceptedAt: si.acceptedAt,
+              })) ?? []
+            );
+            setValue("description", data.description || "");
+            setValue("formattedDate", data.date);
+            setValue("selectedCategory", data.category || "Outros");
+            setRepeat(data.repeat || false);
+            
+            const { date: parsedDate } = parseDateString(data.date);
+            setDate(parsedDate);
+            setIsEditing(true);
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados da receita:", error);
+        Toast.show("Erro ao carregar dados da receita", { type: "error" });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRevenueData();
+  }, [selectedItemId, setValue, formatCurrencyValue, parseDateString]);
+
+  // Loading states
   if (authLoading) {
     return <Loading />;
   }
@@ -536,6 +600,7 @@ export function Revenue({
             />
           </TouchableOpacity>
         </View>
+        
         {showAdvanced && (
           <>
             <View style={{ flexDirection: "row", marginBottom: 10 }}>
@@ -553,14 +618,7 @@ export function Revenue({
                         <RNPickerSelect
                           value={value}
                           onValueChange={(value) => onChange(value)}
-                          items={[
-                            { label: "Salário", value: "salario" },
-                            { label: "Vendas", value: "vendas" },
-                            { label: "Investimentos", value: "investimentos" },
-                            { label: "Comissão", value: "Comissão" },
-                            { label: "Adiantamentos", value: "Adiantamentos" },
-                            { label: "Outros", value: "Outros" },
-                          ]}
+                          items={REVENUE_CATEGORIES}
                           placeholder={{
                             label: "Selecione",
                             value: "Selecione",
@@ -628,6 +686,7 @@ export function Revenue({
             </View>
           </>
         )}
+        
         <View style={{ marginBottom: 250 }}>
           {showButtonSave && (
             <Button
@@ -648,11 +707,13 @@ export function Revenue({
               {loading && <LoadingIndicator style={{ marginTop: 2 }} />}
             </Button>
           )}
+          
           {isEditing && (
             <Button style={{ marginBottom: 10 }} onPress={handleDeleteRevenue}>
               <TitleTask>Excluir</TitleTask>
             </Button>
           )}
+          
           {isCreator && (
             <FormProvider {...form}>
               <ShareWithUsers 

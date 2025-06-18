@@ -1,7 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import {
   Alert,
@@ -23,7 +23,6 @@ import { Timestamp } from "@react-native-firebase/firestore";
 import { ShareWithUsers } from "../../components/ShareWithUsers";
 import { useRoute } from "@react-navigation/native";
 import { createNotification } from "../../services/firebase/notifications.firebase";
-
 import {
   createSharing,
   ESharingStatus,
@@ -46,6 +45,7 @@ import notifee, {
 } from "@notifee/react-native";
 import { database } from "../../libs/firebase";
 
+// Types
 export type ExpenseProps = {
   selectedItemId?: string;
   showButtonRemove?: boolean;
@@ -74,6 +74,57 @@ const formSchema = z.object({
 
 export type FormSchemaType = z.infer<typeof formSchema>;
 
+// Constants
+const EXPENSE_CATEGORIES = [
+  { label: "Investimentos", value: "Investimentos" },
+  { label: "Contas", value: "Contas" },
+  { label: "Compras", value: "Compras" },
+  { label: "Faculdade", value: "Faculdade" },
+  { label: "Internet", value: "Internet" },
+  { label: "Academia", value: "Academia" },
+  { label: "Emprestimo", value: "Emprestimo" },
+  { label: "Comida", value: "Comida" },
+  { label: "Telefone", value: "Telefone" },
+  { label: "Entretenimento", value: "Entretenimento" },
+  { label: "Educação", value: "Educacao" },
+  { label: "Beleza", value: "beleza" },
+  { label: "Esporte", value: "esporte" },
+  { label: "Social", value: "social" },
+  { label: "Transporte", value: "transporte" },
+  { label: "Roupas", value: "roupas" },
+  { label: "Carro", value: "carro" },
+  { label: "Bebida", value: "bebida" },
+  { label: "Cigarro", value: "cigarro" },
+  { label: "Eletrônicos", value: "eletronicos" },
+  { label: "Viagem", value: "viagem" },
+  { label: "Saúde", value: "saude" },
+  { label: "Estimação", value: "estimacao" },
+  { label: "Reparar", value: "reparar" },
+  { label: "Moradia", value: "moradia" },
+  { label: "Presente", value: "presente" },
+  { label: "Doações", value: "doacoes" },
+  { label: "Loteria", value: "loteria" },
+  { label: "Lanches", value: "lanches" },
+  { label: "Filhos", value: "filhos" },
+  { label: "Outros", value: "outros" },
+];
+
+const NOTIFICATION_DATE_OPTIONS = [
+  { label: "No dia", value: "no dia" },
+  { label: "Um dia antes", value: "um dia antes" },
+  { label: "Tres dia antes", value: "tres dia antes" },
+  { label: "Cinco dia antes de vencer", value: "cinco dias antes de vencer" },
+];
+
+const NOTIFICATION_HOUR_OPTIONS = [
+  { label: "07:00", value: "07:00" },
+  { label: "08:00", value: "08:00" },
+  { label: "09:00", value: "09:00" },
+];
+
+const REPEAT_MONTHS_LIMIT = 11;
+const CURRENT_YEAR = new Date().getFullYear();
+
 export function Expense({
   selectedItemId,
   showButtonRemove,
@@ -81,9 +132,12 @@ export function Expense({
   showButtonEdit,
   showButtonSave,
 }: ExpenseProps) {
-  // States
+  // Hooks
   const user = useUserAuth();
   const { selectedMonth } = useMonth();
+  const route = useRoute();
+
+  // States
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [repeat, setRepeat] = useState(false);
@@ -94,17 +148,10 @@ export function Expense({
   const [isEditing, setIsEditing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [loading, setLoading] = useState(false);
+  
   const uid = user?.user?.uid;
-  const { getValues } = useForm<FormSchemaType>();
 
-  // Hooks
-  // const route = useRoute();
-
-  // const { isCreator = true } = route.params as {
-  //   selectedItemId?: string;
-  //   isCreator: boolean;
-  // };
-
+  // Form setup
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -119,10 +166,28 @@ export function Expense({
     },
   });
 
-  const { control, handleSubmit, reset, setValue } = form;
+  const { control, handleSubmit, reset, setValue, getValues } = form;
 
-  // Functions
-  const validateNotificationParams = () => {
+  // Utility functions
+  const parseDateString = useCallback((dateString: string) => {
+    const [day, month, year] = dateString.split("/");
+    return {
+      day: Number(day),
+      month: Number(month),
+      year: Number(year),
+      date: new Date(Number(year), Number(month) - 1, Number(day)),
+    };
+  }, []);
+
+  const formatCurrencyValue = useCallback((value: number) => {
+    return value.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }, []);
+
+  // Notification validation
+  const validateNotificationParams = useCallback(() => {
     const { selectedHourNotification, selectedDateNotification } = getValues();
 
     if (!selectedHourNotification || !selectedDateNotification) {
@@ -165,9 +230,10 @@ export function Expense({
     }
 
     return { isValid: true, notificationDate };
-  };
+  }, [getValues, date]);
 
-  const scheduleNotification = async (notificationDate: any) => {
+  // Schedule notification
+  const scheduleNotification = useCallback(async (notificationDate: Date) => {
     const trigger: TimestampTrigger = {
       type: TriggerType.TIMESTAMP,
       timestamp: notificationDate.getTime(),
@@ -192,62 +258,162 @@ export function Expense({
     } catch (error) {
       console.error("Erro ao agendar notificação:", error);
     }
-  };
+  }, []);
 
-  const handleDateChange = (event: any, selectedDate: Date | undefined) => {
+  // Date handling
+  const handleDateChange = useCallback((event: any, selectedDate: Date | undefined) => {
     setShowDatePicker(false);
     const currentDate = selectedDate || date;
     setDate(currentDate);
     const formattedDateString = currentDate.toLocaleDateString("pt-BR");
     setValue("formattedDate", formattedDateString);
-  };
+  }, [date, setValue]);
 
-  const showDatePickerModal = () => {
+  const showDatePickerModal = useCallback(() => {
     setShowDatePicker(true);
-  };
+  }, []);
 
-  const handleSaveExpense = async ({
-    formattedDate,
-    name,
-    valueTransaction,
-    description,
-    selectedCategory,
-    sharedUsers,
-  }: FormSchemaType) => {
+  // Notification handling
+  const handleUserNotifications = useCallback(async (
+    sharedUsers: FormSchemaType['sharedUsers'],
+    usersInvitedByMe: any[],
+    createdExpenseId: string
+  ) => {
+    if (!sharedUsers?.length || !uid || !user?.user?.displayName) return;
+
+    const notificationPromises = sharedUsers.map(async (userSharing) => {
+      const alreadySharing = usersInvitedByMe.some(
+        (u) => u.target === userSharing.uid && u.status === "accepted"
+      );
+
+      const possibleSharingRequestExists = usersInvitedByMe.some(
+        (u) => u.target === userSharing.uid
+      );
+
+      const message = alreadySharing
+        ? `${user.user?.displayName} adicionou um novo histórico de compras`
+        : `${user.user?.displayName} convidou você para compartilhar uma histórico de compras`;
+
+      const notificationData = {
+        sender: uid,
+        receiver: userSharing.uid,
+        status: alreadySharing ? "sharing_accepted" as const : "pending" as const,
+        type: "sharing_invite" as const,
+        source: {
+          type: "expense" as const,
+          id: createdExpenseId,
+        },
+        title: "Compartilhamento de compras",
+        description: message,
+        createdAt: Timestamp.now(),
+      };
+
+      const promises = [
+        createNotification(notificationData),
+        sendPushNotification({
+          title: "Compartilhamento de despesa",
+          message,
+          uid: userSharing.uid,
+        }),
+      ];
+
+      if (!alreadySharing && !possibleSharingRequestExists) {
+        promises.push(
+          createSharing({
+            invitedBy: uid,
+            status: ESharingStatus.PENDING,
+            target: userSharing.uid,
+            createdAt: Timestamp.now(),
+            updatedAt: Timestamp.now(),
+          })
+        );
+      }
+
+      return Promise.allSettled(promises);
+    });
+
+    await Promise.all(notificationPromises);
+  }, [uid, user?.user?.displayName]);
+
+  // Repeat expense creation
+  const createRepeatedExpenses = useCallback(async (
+    expenseData: any,
+    monthNumber: number,
+    year: number,
+    day: number
+  ) => {
+    if (!repeat) return;
+
+    const repeatPromises = [];
+    
+    for (let i = 1; i <= REPEAT_MONTHS_LIMIT; i++) {
+      let nextMonth = monthNumber + i;
+      let nextYear = year;
+
+      if (nextMonth > 12) {
+        nextMonth -= 12;
+        nextYear++;
+      }
+
+      if (nextYear > CURRENT_YEAR) {
+        break;
+      }
+
+      const nextDate = `${day}/${nextMonth}/${nextYear}`;
+      const nextMonthExpenseData = {
+        ...expenseData,
+        date: nextDate,
+        month: nextMonth,
+      };
+
+      repeatPromises.push(
+        database.collection("Expense").add(nextMonthExpenseData)
+          .catch((error) => {
+            console.error("Erro ao adicionar a transação repetida:", error);
+          })
+      );
+    }
+
+    await Promise.allSettled(repeatPromises);
+  }, [repeat]);
+
+  // Main save function
+  const handleSaveExpense = useCallback(async (formData: FormSchemaType) => {
+    if (!uid) {
+      Toast.show("Erro: Usuário não autenticado", { type: "error" });
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const [day, month, year] = formattedDate.split("/");
-      const selectedDate = new Date(
-        Number(year),
-        Number(month) - 1,
-        Number(day)
-      );
+      const { day, month, year, date: selectedDate } = parseDateString(formData.formattedDate);
       const monthNumber = selectedDate.getMonth() + 1;
 
-      const transactionValue = valueTransaction
-        ? currencyUnMask(valueTransaction)
+      const transactionValue = formData.valueTransaction
+        ? currencyUnMask(formData.valueTransaction)
         : 0;
 
       const usersInvitedByMe = await getSharing({
         profile: "invitedBy",
-        uid: uid as string,
-      });
-      const expenseData = {
-        name: name,
-        category: selectedCategory,
-        date: formattedDate,
-        valueTransaction: transactionValue,
-        description: description,
-        repeat: repeat,
-        status: status,
-        alert: alert,
-        type: "output",
         uid: uid,
+      });
+
+      const expenseData = {
+        name: formData.name,
+        category: formData.selectedCategory,
+        date: formData.formattedDate,
+        valueTransaction: transactionValue,
+        description: formData.description,
+        repeat,
+        status,
+        alert,
+        type: "output",
+        uid,
         month: monthNumber,
         income,
-        shareWith: sharedUsers.map((user) => user.uid),
-        shareInfo: sharedUsers.map((user) => ({
+        shareWith: formData.sharedUsers.map((user) => user.uid),
+        shareInfo: formData.sharedUsers.map((user) => ({
           uid: user.uid,
           userName: user.userName,
           acceptedAt: usersInvitedByMe.some(
@@ -262,145 +428,78 @@ export function Expense({
       const saveExpenseData = await database
         .collection("Expense")
         .add(expenseData);
+      
       Toast.show("Transação adicionada!", { type: "success" });
 
-      // await handleNotification();
+      // Handle notifications
+      await handleUserNotifications(
+        formData.sharedUsers,
+        usersInvitedByMe,
+        saveExpenseData.id
+      );
 
-      if (sharedUsers.length > 0) {
-        for (const userSharing of sharedUsers) {
-          const alreadySharing = usersInvitedByMe.some(
-            (u) => u.target === userSharing.uid && u.status === "accepted"
-          );
+      // Create repeated expenses
+      await createRepeatedExpenses(expenseData, monthNumber, year, day);
 
-          const possibleSharingRequestExists = usersInvitedByMe.some(
-            (u) => u.target === userSharing.uid
-          );
-
-          const message = alreadySharing
-            ? `${user?.user?.displayName} adicionou um novo histórico de compras`
-            : `${user?.user?.displayName} convidou você para compartilhar uma histórico de compras`;
-
-          await Promise.allSettled([
-            createNotification({
-              sender: uid as string,
-              receiver: userSharing.uid,
-              status: alreadySharing ? "sharing_accepted" : "pending",
-              type: "sharing_invite",
-              source: {
-                type: "expense",
-                id: saveExpenseData.id,
-              },
-              title: "Compartilhamento de compras",
-              description: message,
-              createdAt: Timestamp.now(),
-            }),
-            ...(!alreadySharing && !possibleSharingRequestExists
-              ? [
-                  createSharing({
-                    invitedBy: uid as string,
-                    status: ESharingStatus.PENDING,
-                    target: userSharing.uid as string,
-                    createdAt: Timestamp.now(),
-                    updatedAt: Timestamp.now(),
-                  }),
-                ]
-              : []),
-            sendPushNotification({
-              title: "Compartilhamento de despesa",
-              message,
-              uid: userSharing?.uid,
-            }),
-          ]);
-        }
-      }
+      // Reset form and states
       setLoading(false);
       setRepeat(false);
       setAlert(false);
       setStatus(false);
       setIncome(false);
       reset();
+      
       if (onCloseModal) {
         onCloseModal();
       }
 
-      // If the repeat switch is on, create copies for the next 11 months
-      if (repeat) {
-        for (let i = 1; i <= 11; i++) {
-          let nextMonth = monthNumber + i;
-          let nextYear: any = year;
-
-          if (nextMonth > 12) {
-            nextMonth -= 12;
-            nextYear++;
-          }
-
-          // Adiciona verificação para garantir que não passe do ano corrente
-          if (nextYear > year) {
-            break;
-          }
-
-          const nextDate = `${day}/${nextMonth}/${nextYear}`;
-          const nextMonthExpenseData = {
-            ...expenseData,
-            date: nextDate,
-            month: nextMonth,
-          };
-
-          database
-            .collection("Expense")
-            .add(nextMonthExpenseData)
-            .catch((error) => {
-              console.error("Erro ao adicionar a transação repetida: ", error);
-            });
-        }
-      }
-
-      for (const userSharing of sharedUsers) {
-        const alreadySharing = usersInvitedByMe.some(
-          (u) => u.target === userSharing.uid
-        );
-
-        const message = alreadySharing
-          ? `${user?.user?.displayName} adicionou um novo item ao mercado`
-          : `${user?.user?.displayName} convidou você para compartilhar um item de mercado`;
-
-        sendPushNotification({
-          title: "Compartilhamento de item de mercado",
-          message,
-          uid: userSharing.uid,
-        });
-      }
     } catch (error) {
       setLoading(false);
-      console.error("Erro ao adicionar a transação: ", error);
+      console.error("Erro ao adicionar a transação:", error);
       Toast.show("Erro ao adicionar a transação", { type: "danger" });
     }
-  };
+  }, [uid, repeat, status, alert, income, reset, onCloseModal, parseDateString, handleUserNotifications, createRepeatedExpenses]);
 
-  const handleDeleteExpense = () => {
+  // Delete function
+  const handleDeleteExpense = useCallback(() => {
     if (!selectedItemId) {
-      console.error("Nenhum documento selecionado para exclusão!");
+      Toast.show("Erro: Nenhum item selecionado para exclusão", { type: "error" });
       return;
     }
 
-    const expenseRef = database.collection("Expense").doc(selectedItemId);
-    expenseRef
-      .delete()
-      .then(() => {
-        console.log("Documento de despesa excluído com sucesso.");
-        if (onCloseModal) {
-          onCloseModal();
-        }
-      })
-      .catch((error) => {
-        console.error("Erro ao excluir o documento de despesa:", error);
-      });
-  };
+    Alert.alert(
+      "Confirmar exclusão",
+      "Tem certeza que deseja excluir esta despesa?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await database.collection("Expense").doc(selectedItemId).delete();
+              Toast.show("Despesa excluída com sucesso!", { type: "success" });
+              if (onCloseModal) {
+                onCloseModal();
+              }
+            } catch (error) {
+              console.error("Erro ao excluir a despesa:", error);
+              Toast.show("Erro ao excluir a despesa", { type: "error" });
+            }
+          },
+        },
+      ]
+    );
+  }, [selectedItemId, onCloseModal]);
 
-  async function handleNotification() {
+  // Notification handler
+  const handleNotification = useCallback(async () => {
     try {
-      const validationResult = await validateNotificationParams();
-      if (validationResult.isValid) {
+      const validationResult = validateNotificationParams();
+      if (validationResult.isValid && validationResult.notificationDate) {
         await scheduleNotification(validationResult.notificationDate);
         console.log("Notificação agendada com sucesso!");
       } else {
@@ -409,36 +508,31 @@ export function Expense({
     } catch (error) {
       console.error("Erro inesperado:", error);
     }
-  }
+  }, [validateNotificationParams, scheduleNotification]);
 
-  const handleEditExpense = async ({
-    formattedDate,
-    name,
-    valueTransaction,
-    description,
-    selectedCategory,
-  }: FormSchemaType) => {
-    if (!selectedItemId) {
-      console.error("Nenhum documento selecionado para edição!");
+  // Edit function
+  const handleEditExpense = useCallback(async (formData: FormSchemaType) => {
+    if (!selectedItemId || !uid) {
+      Toast.show("Erro: Dados inválidos para edição", { type: "error" });
       return;
     }
+
     setLoading(true);
 
-    const [day, month, year] = formattedDate.split("/");
-    const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
-    const monthNumber = selectedDate.getMonth() + 1;
-
-    const transactionValue = valueTransaction
-      ? currencyUnMask(valueTransaction)
-      : 0;
-
     try {
+      const { month, year, date: selectedDate } = parseDateString(formData.formattedDate);
+      const monthNumber = selectedDate.getMonth() + 1;
+
+      const transactionValue = formData.valueTransaction
+        ? currencyUnMask(formData.valueTransaction)
+        : 0;
+
       const expenseData = {
-        name,
-        category: selectedCategory,
-        date: formattedDate,
+        name: formData.name,
+        category: formData.selectedCategory,
+        date: formData.formattedDate,
         valueTransaction: transactionValue,
-        description,
+        description: formData.description,
         repeat: removeRepeat ? false : repeat,
         status,
         alert,
@@ -451,11 +545,12 @@ export function Expense({
       await database.collection("Expense").doc(selectedItemId).set(expenseData);
       Toast.show("Transação editada!", { type: "success" });
 
+      // Handle repeat removal
       if (removeRepeat) {
         const expensesSnapshot = await database
           .collection("Expense")
           .where("uid", "==", uid)
-          .where("name", "==", name)
+          .where("name", "==", formData.name)
           .get();
 
         const batch = database.batch();
@@ -474,78 +569,76 @@ export function Expense({
       setAlert(false);
       setStatus(false);
       setIncome(false);
-      !!onCloseModal && onCloseModal();
+      
+      if (onCloseModal) {
+        onCloseModal();
+      }
     } catch (error) {
       setLoading(false);
-      console.error("Erro ao editar a transação: ", error);
+      console.error("Erro ao editar a transação:", error);
+      Toast.show("Erro ao editar a transação", { type: "error" });
     }
-  };
+  }, [selectedItemId, uid, removeRepeat, repeat, status, alert, income, selectedMonth, onCloseModal, parseDateString]);
 
-  const onInvalid = () => {
+  // Form validation
+  const onInvalid = useCallback(() => {
     Alert.alert(
       "Atenção!",
       "Por favor, preencha todos os campos obrigatórios antes de salvar."
     );
-  };
+  }, []);
 
-  function handleShowAdvanced() {
+  // UI handlers
+  const handleShowAdvanced = useCallback(() => {
     setShowAdvanced((prevState) => !prevState);
-  }
+  }, []);
 
+  // Load existing expense data
   useEffect(() => {
-    if (selectedItemId) {
-      database
-        .collection("Expense")
-        .doc(selectedItemId)
-        .get()
-        .then((doc) => {
-          if (doc.exists()) {
-            const data = doc.data();
-            if (data) {
-              setValue("name", data.name);
-              setValue(
-                "valueTransaction",
-                data.valueTransaction.toLocaleString("pt-BR", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-              );
-              setValue("description", data.description);
+    if (!selectedItemId) return;
 
-              const [day, month, year] = data.date.split("/");
-              setValue("formattedDate", data.date);
+    const loadExpenseData = async () => {
+      try {
+        const doc = await database.collection("Expense").doc(selectedItemId).get();
+        
+        if (doc.exists()) {
+          const data = doc.data();
+          if (data) {
+            setValue("name", data.name);
+            setValue("valueTransaction", formatCurrencyValue(data.valueTransaction));
+            setValue("description", data.description);
 
-              setValue("selectedCategory", data.category);
-              setRepeat(data.repeat);
-              setAlert(data.alert);
-              setStatus(data.status);
-              setDate(new Date(year, month - 1, day));
-              setIsEditing(true);
-              setIncome(data.income);
-            } else {
-              console.log("Dados do documento estão vazios!");
-            }
-          } else {
-            console.log("Nenhum documento encontrado!");
+            const { date: parsedDate } = parseDateString(data.date);
+            setValue("formattedDate", data.date);
+            setValue("selectedCategory", data.category);
+            
+            setRepeat(data.repeat);
+            setAlert(data.alert);
+            setStatus(data.status);
+            setDate(parsedDate);
+            setIsEditing(true);
+            setIncome(data.income);
           }
-        })
-        .catch((error) => {
-          console.error("Erro ao obter o documento:", error);
-        });
-    }
-  }, [selectedItemId]);
+        }
+      } catch (error) {
+        console.error("Erro ao obter o documento:", error);
+        Toast.show("Erro ao carregar dados da despesa", { type: "error" });
+      }
+    };
 
+    loadExpenseData();
+  }, [selectedItemId, setValue, formatCurrencyValue, parseDateString]);
+
+  // Notification event handlers
   useEffect(() => {
     const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
       switch (type) {
         case EventType.DISMISSED:
           console.log("Usuário descartou a notificação");
           break;
-
         case EventType.ACTION_PRESS:
           console.log("Usuário pressionou a notificação", detail.notification);
           break;
-
         default:
           break;
       }
@@ -641,6 +734,7 @@ export function Expense({
             )}
           </View>
         )}
+        
         <View style={{ marginTop: 40, marginBottom: 20 }}>
           {!isEditing && (
             <>
@@ -694,6 +788,7 @@ export function Expense({
             </TouchableOpacity>
           </View>
         </View>
+        
         {showAdvanced && (
           <View>
             <View
@@ -716,42 +811,7 @@ export function Expense({
                         <RNPickerSelect
                           value={value}
                           onValueChange={(value) => onChange(value)}
-                          items={[
-                            { label: "Investimentos", value: "Investimentos" },
-                            { label: "Contas", value: "Contas" },
-                            { label: "Compras", value: "Compras" },
-                            { label: "Faculdade", value: "Faculdade" },
-                            { label: "Internet", value: "Internet" },
-                            { label: "Academia", value: "Academia" },
-                            { label: "Emprestimo", value: "Emprestimo" },
-                            { label: "Comida", value: "Comida" },
-                            { label: "Telefone", value: "Telefone" },
-                            {
-                              label: "Entretenimento",
-                              value: "Entretenimento",
-                            },
-                            { label: "Educação", value: "Educacao" },
-                            { label: "Beleza", value: "beleza" },
-                            { label: "Esporte", value: "esporte" },
-                            { label: "Social", value: "social" },
-                            { label: "Transporte", value: "transporte" },
-                            { label: "Roupas", value: "roupas" },
-                            { label: "Carro", value: "carro" },
-                            { label: "Bebida", value: "bebida" },
-                            { label: "Cigarro", value: "cigarro" },
-                            { label: "Eletrônicos", value: "eletronicos" },
-                            { label: "Viagem", value: "viagem" },
-                            { label: "Saúde", value: "saude" },
-                            { label: "Estimação", value: "estimacao" },
-                            { label: "Reparar", value: "reparar" },
-                            { label: "Moradia", value: "moradia" },
-                            { label: "Presente", value: "presente" },
-                            { label: "Doações", value: "doacoes" },
-                            { label: "Loteria", value: "loteria" },
-                            { label: "Lanches", value: "lanches" },
-                            { label: "Filhos", value: "filhos" },
-                            { label: "Outros", value: "outros" },
-                          ]}
+                          items={EXPENSE_CATEGORIES}
                           placeholder={{
                             label: "Selecione",
                             value: "Selecione",
@@ -762,6 +822,7 @@ export function Expense({
                     />
                   </View>
                 </View>
+                
                 {alert && (
                   <>
                     <TitleTask>Data da notificação</TitleTask>
@@ -773,18 +834,7 @@ export function Expense({
                           <RNPickerSelect
                             value={value}
                             onValueChange={(value) => onChange(value)}
-                            items={[
-                              { label: "No dia", value: "no dia" },
-                              { label: "Um dia antes", value: "um dia antes" },
-                              {
-                                label: "Tres dia antes",
-                                value: "tres dia antes",
-                              },
-                              {
-                                label: "Cinco dia antes de vencer",
-                                value: "cinco dias antes de vencer",
-                              },
-                            ]}
+                            items={NOTIFICATION_DATE_OPTIONS}
                             placeholder={{
                               label: "Selecione",
                               value: "Selecione",
@@ -802,11 +852,7 @@ export function Expense({
                           <RNPickerSelect
                             value={value}
                             onValueChange={(value) => onChange(value)}
-                            items={[
-                              { label: "07:00", value: "07:00" },
-                              { label: "08:00", value: "08:00" },
-                              { label: "09:00", value: "09:00" },
-                            ]}
+                            items={NOTIFICATION_HOUR_OPTIONS}
                             placeholder={{
                               label: "Selecione",
                               value: "Selecione",
@@ -818,7 +864,9 @@ export function Expense({
                   </>
                 )}
               </View>
+              
               <DividerTask />
+              
               <View>
                 <TitleTask>
                   Essa conta já está paga? <Span>(opcional)</Span>
@@ -855,6 +903,7 @@ export function Expense({
                 />
               </View>
             </View>
+            
             <View style={{ marginBottom: 5 }}>
               <TitleTask>
                 Descrição <Span>(opcional)</Span>
@@ -877,6 +926,7 @@ export function Expense({
             </View>
           </View>
         )}
+        
         <View
           style={{
             marginBottom: 250,
@@ -895,11 +945,13 @@ export function Expense({
               <TitleTask>{loading ? <LoadingIndicator /> : "Salvar"}</TitleTask>
             </Button>
           )}
+          
           {isEditing && (
             <Button style={{ marginBottom: 10 }} onPress={handleDeleteExpense}>
               <TitleTask>Excluir</TitleTask>
             </Button>
           )}
+          
           {user && (
             <FormProvider {...form}>
               <ShareWithUsers 
