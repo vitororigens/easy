@@ -85,6 +85,7 @@ export const ModalContent = styled.View`
   shadow-offset: 0px -2px;
   shadow-opacity: 0.25;
   shadow-radius: 3.84px;
+  max-height: 80%;
 `;
 
 export const ButtonSelect = styled(TouchableOpacity)`
