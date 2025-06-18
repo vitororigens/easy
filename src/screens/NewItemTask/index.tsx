@@ -7,8 +7,8 @@ import { z } from "zod";
 import { LoadingIndicator } from "../../components/Loading/style";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { currencyMask, currencyUnMask } from "../../utils/mask";
-import { findTaskById } from "../../services/firebase/tasks.firebase";
-import { Button, Content, Input, Plus, Separator, Span, SubTitle, Title } from "./styles";
+import { findTaskById } from "../../services/firebase/tasks";
+import { Button, Content, Input, Span, Title } from "./styles";
 import { getInitials } from "../../utils/getInitials";
 import { Timestamp } from "@react-native-firebase/firestore";
 import {
@@ -70,6 +70,7 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
     selectedItemId?: string;
     isCreator: boolean;
   };
+  console.log("selectedItemId", selectedItemId);
 
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -256,37 +257,42 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
   // };
 
   useEffect(() => {
-    if (selectedItemId) {
-      database
-        .collection("Task")
-        .doc(selectedItemId)
-        .get()
-        .then((doc) => {
-          if (doc.exists()) {
-            const data = doc.data();
-            if (data) {
-              setValue("name", data.name);
+    const loadTaskData = async () => {
+      if (selectedItemId) {
+        try {
+          console.log("Carregando dados da tarefa:", selectedItemId);
+          const task = await findTaskById(selectedItemId);
+          
+          if (task) {
+            console.log("Dados da tarefa carregados:", task);
+            setValue("name", task.name);
+            
+            // Carregar usuários compartilhados se existirem
+            if (task.shareInfo && Array.isArray(task.shareInfo)) {
               setValue(
                 "sharedUsers",
-                data.shareInfo.map((si: any) => ({
+                task.shareInfo.map((si: any) => ({
                   uid: si.uid,
                   userName: si.userName,
                   acceptedAt: si.acceptedAt,
-                })) ?? []
+                }))
               );
-              setIsEditing(true);
             } else {
-              console.log("Dados do documento estão vazios!");
+              setValue("sharedUsers", []);
             }
+            
+            setIsEditing(true);
           } else {
-            console.log("Nenhum documento encontrado!");
+            console.log("Tarefa não encontrada:", selectedItemId);
           }
-        })
-        .catch((error) => {
-          console.error("Erro ao obter o documento:", error);
-        });
-    }
-  }, [selectedItemId]);
+        } catch (error) {
+          console.error("Erro ao carregar dados da tarefa:", error);
+        }
+      }
+    };
+
+    loadTaskData();
+  }, [selectedItemId, setValue]);
 
   return (
     <View>

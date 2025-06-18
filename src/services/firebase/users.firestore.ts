@@ -203,34 +203,3 @@ export const getFavorites = async (userId: string): Promise<IUser[]> => {
     return [];
   }
 };
-
-// Função de teste para verificar se o Firestore está funcionando
-export const testFirestoreConnection = async (userId: string) => {
-  try {
-    console.log("testFirestoreConnection: Testando conexão com Firestore...");
-    const userRef = doc(database, "User", userId);
-    
-    // Tentar criar um documento de teste
-    await setDoc(userRef, {
-      uid: userId,
-      testField: "test",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-    
-    console.log("testFirestoreConnection: Documento de teste criado com sucesso");
-    
-    // Verificar se foi criado
-    const userDoc = await getDoc(userRef);
-    if (userDoc.exists()) {
-      console.log("testFirestoreConnection: Documento existe após criação");
-      return true;
-    } else {
-      console.log("testFirestoreConnection: Documento não existe após criação");
-      return false;
-    }
-  } catch (error) {
-    console.error("testFirestoreConnection: Erro:", error);
-    return false;
-  }
-};

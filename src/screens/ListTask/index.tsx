@@ -79,6 +79,7 @@ export function ListTask({ route }: any) {
   const [activeButton, setActiveButton] = useState("tarefas");
   const [isListVisible, setIsListVisible] = useState(true);
   const [isSharedListVisible, setIsSharedListVisible] = useState(false);
+  const [isCompletedListVisible, setIsCompletedListVisible] = useState(false);
   const [modalActive, setModalActive] = useState(false);
   const { COLORS } = useTheme();
 
@@ -91,10 +92,12 @@ export function ListTask({ route }: any) {
 
   // Filtrar tarefas para cada seção
   const personalTasks = tasks?.filter(task => 
-    (!task.shareWith || task.shareWith.length === 0) && !task.status
+    // Tarefas pessoais (não compartilhadas) + tarefas que você compartilhou
+    (!task.shareWith || task.shareWith.length === 0 || task.uid === uid) && !task.status
   ) || [];
   
-  const sharedTasks = tasks?.filter(task => {
+  // Tarefas que foram compartilhadas COM você (você está na lista shareWith)
+  const sharedWithMeTasks = tasks?.filter(task => {
     // Verificar se a tarefa tem shareWith e o usuário está incluído
     const isShared = task.shareWith && 
                     task.shareWith.length > 0 && 
@@ -112,8 +115,8 @@ export function ListTask({ route }: any) {
   const completedTasks = tasks?.filter(task => task.status) || [];
 
   console.log("Tarefas no ListTask:", tasks);
-  console.log("Tarefas pessoais:", personalTasks);
-  console.log("Tarefas compartilhadas:", sharedTasks);
+  console.log("Minhas tarefas (pessoais + que compartilhei):", personalTasks);
+  console.log("Tarefas compartilhadas comigo:", sharedWithMeTasks);
   console.log("Tarefas concluídas:", completedTasks);
   
   // Log detalhado da primeira tarefa concluída para debug
@@ -129,7 +132,7 @@ export function ListTask({ route }: any) {
 
   const handleEditTask = (taskId: string) => {
     // @ts-ignore
-    navigation.navigate("newtask", { selectedTaskId: taskId });
+    navigation.navigate("newitemtask", { selectedItemId: taskId });
   };
 
   const handleDeleteTask = async (taskId: string) => {
@@ -331,7 +334,7 @@ export function ListTask({ route }: any) {
               <Container>
                 <FlatList
                   showsVerticalScrollIndicator={false}
-                  data={sharedTasks}
+                  data={sharedWithMeTasks}
                   renderItem={({ item, index }) => (
                     <View>
                       <ItemTask
@@ -350,7 +353,46 @@ export function ListTask({ route }: any) {
                   contentContainerStyle={{ paddingBottom: 20 }}
                   ListEmptyComponent={
                     <EmptyContainer>
-                      <SubTitle>Nenhuma tarefa compartilhada</SubTitle>
+                      <SubTitle>Nenhuma tarefa compartilhada com você</SubTitle>
+                    </EmptyContainer>
+                  }
+                />
+              </Container>
+            )}
+
+            {completedTasks.length > 0 && (
+              <ContentTitle type="PRIMARY" onPress={() => setIsCompletedListVisible(!isCompletedListVisible)}>
+                <HeaderContainer >
+                  <SectionIcon type="PRIMARY" name="checkbox-marked-circle-outline" />
+                  <Title type="PRIMARY">Tarefas concluídas</Title>
+                </HeaderContainer>
+                <Icon type="PRIMARY" name={isCompletedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+              </ContentTitle>
+            )}
+            {isCompletedListVisible && completedTasks.length > 0 && (
+              <Container>
+                <FlatList
+                  showsVerticalScrollIndicator={false}
+                  data={completedTasks}
+                  renderItem={({ item, index }) => (
+                    <View>
+                      <ItemTask
+                        task={item}
+                        handleDelete={() => handleDeleteTask(item.id)}
+                        handleUpdate={() => handleEditTask(item.id)}
+                        isSelected={selectedTasks.includes(item.id)}
+                        onSelect={() => handleSelectTask(item.id)}
+                      />
+                      {index % 5 === 0 && index !== 0 && (
+                        <NativeAdComponent style={{ marginVertical: 10 }} />
+                      )}
+                    </View>
+                  )}
+                  keyExtractor={(item) => item.id}
+                  contentContainerStyle={{ paddingBottom: 20 }}
+                  ListEmptyComponent={
+                    <EmptyContainer>
+                      <SubTitle>Nenhuma tarefa concluída</SubTitle>
                     </EmptyContainer>
                   }
                 />

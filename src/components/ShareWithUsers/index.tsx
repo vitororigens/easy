@@ -44,7 +44,6 @@ import {
   addToFavorites,
   removeFromFavorites,
   getFavorites,
-  testFirestoreConnection,
 } from "../../services/firebase/users.firestore";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { Button } from "../Button";
@@ -335,11 +334,6 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
     const loadFavorites = async () => {
       try {
         console.log("Carregando favoritos para usuário:", uid);
-        
-        // Teste temporário para verificar conexão com Firestore
-        console.log("Testando conexão com Firestore...");
-        const testResult = await testFirestoreConnection(uid);
-        console.log("Resultado do teste:", testResult);
         
         const favorites = await getFavorites(uid);
         console.log("Favoritos carregados:", favorites.length);
