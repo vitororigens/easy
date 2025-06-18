@@ -1,4 +1,4 @@
-import { collection, addDoc, doc, getDoc, getDocs, query, where, updateDoc, deleteDoc } from '@react-native-firebase/firestore';
+import { collection, addDoc, doc, getDoc, getDocs, query, where, updateDoc, deleteDoc, setDoc } from '@react-native-firebase/firestore';
 import { database } from '../../libs/firebase';
 
 export interface IUser {
@@ -14,32 +14,58 @@ export interface IUser {
 // Função para garantir que a propriedade favorites existe no documento do usuário
 const ensureFavoritesProperty = async (userId: string): Promise<string[]> => {
   try {
+    console.log("ensureFavoritesProperty: Iniciando para usuário:", userId);
     const userRef = doc(database, "User", userId);
+    
+    console.log("ensureFavoritesProperty: Verificando se documento existe...");
     const userDoc = await getDoc(userRef);
     
-    if (!userDoc.exists) {
-      console.error("Usuário não encontrado:", userId);
+    if (!userDoc.exists()) {
+      console.log("ensureFavoritesProperty: Documento não existe, criando...");
+      
+      // Criar o documento do usuário com a propriedade favorites
+      const userData = {
+        uid: userId,
+        favorites: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      
+      console.log("ensureFavoritesProperty: Dados para criar:", userData);
+      await setDoc(userRef, userData);
+      
+      console.log("ensureFavoritesProperty: Documento criado com sucesso");
       return [];
     }
     
+    console.log("ensureFavoritesProperty: Documento existe, verificando dados...");
     const userData = userDoc.data();
-    if (!userData) {
-      console.error("Dados do usuário não encontrados:", userId);
-      return [];
-    }
     
-    // Se a propriedade favorites não existe, inicializa com array vazio
-    if (!Array.isArray(userData.favorites)) {
-      console.log("Inicializando propriedade favorites para usuário:", userId);
+    if (!userData) {
+      console.log("ensureFavoritesProperty: Dados vazios, inicializando...");
       await updateDoc(userRef, {
-        favorites: []
+        favorites: [],
+        updatedAt: new Date()
       });
       return [];
     }
     
+    console.log("ensureFavoritesProperty: Dados encontrados:", userData);
+    
+    // Se a propriedade favorites não existe, inicializa com array vazio
+    if (!Array.isArray(userData.favorites)) {
+      console.log("ensureFavoritesProperty: Propriedade favorites não existe, inicializando...");
+      await updateDoc(userRef, {
+        favorites: [],
+        updatedAt: new Date()
+      });
+      return [];
+    }
+    
+    console.log("ensureFavoritesProperty: Favoritos encontrados:", userData.favorites);
     return userData.favorites;
   } catch (error) {
-    console.error("Erro ao garantir propriedade favorites:", error);
+    console.error("ensureFavoritesProperty: Erro:", error);
     return [];
   }
 };
@@ -95,51 +121,63 @@ export const deleteUser = async (uid: string) => {
 
 export const addToFavorites = async (userId: string, favoriteUserId: string) => {
   try {
-    // Garantir que a propriedade favorites existe
+    console.log("addToFavorites: Iniciando para usuário:", userId, "favorito:", favoriteUserId);
+    
+    // Garantir que a propriedade favorites existe (e criar documento se necessário)
     const favorites = await ensureFavoritesProperty(userId);
+    console.log("addToFavorites: Favoritos atuais:", favorites);
     
     if (!favorites.includes(favoriteUserId)) {
+      console.log("addToFavorites: Adicionando favorito...");
       const userRef = doc(database, "User", userId);
       await updateDoc(userRef, {
-        favorites: [...favorites, favoriteUserId]
+        favorites: [...favorites, favoriteUserId],
+        updatedAt: new Date()
       });
-      console.log("Favorito adicionado com sucesso");
+      console.log("addToFavorites: Favorito adicionado com sucesso");
     } else {
-      console.log("Usuário já está nos favoritos");
+      console.log("addToFavorites: Usuário já está nos favoritos");
     }
   } catch (error) {
-    console.error("Erro ao adicionar favorito:", error);
+    console.error("addToFavorites: Erro:", error);
     throw error;
   }
 };
 
 export const removeFromFavorites = async (userId: string, favoriteUserId: string) => {
   try {
-    // Garantir que a propriedade favorites existe
+    console.log("removeFromFavorites: Iniciando para usuário:", userId, "favorito:", favoriteUserId);
+    
+    // Garantir que a propriedade favorites existe (e criar documento se necessário)
     const favorites = await ensureFavoritesProperty(userId);
+    console.log("removeFromFavorites: Favoritos atuais:", favorites);
     
     const userRef = doc(database, "User", userId);
     await updateDoc(userRef, {
-      favorites: favorites.filter(id => id !== favoriteUserId)
+      favorites: favorites.filter(id => id !== favoriteUserId),
+      updatedAt: new Date()
     });
-    console.log("Favorito removido com sucesso");
+    console.log("removeFromFavorites: Favorito removido com sucesso");
   } catch (error) {
-    console.error("Erro ao remover favorito:", error);
+    console.error("removeFromFavorites: Erro:", error);
     throw error;
   }
 };
 
 export const getFavorites = async (userId: string): Promise<IUser[]> => {
   try {
-    // Garantir que a propriedade favorites existe
+    console.log("getFavorites: Iniciando para usuário:", userId);
+    
+    // Garantir que a propriedade favorites existe (e criar documento se necessário)
     const favorites = await ensureFavoritesProperty(userId);
+    console.log("getFavorites: Favoritos encontrados:", favorites);
     
     if (favorites.length === 0) {
-      console.log("Nenhum favorito encontrado");
+      console.log("getFavorites: Nenhum favorito encontrado");
       return [];
     }
     
-    console.log("Buscando favoritos:", favorites);
+    console.log("getFavorites: Buscando dados dos usuários favoritos...");
     
     const favoritesUsers = await Promise.all(
       favorites.map(async (uid) => {
@@ -148,20 +186,51 @@ export const getFavorites = async (userId: string): Promise<IUser[]> => {
           if (userDoc.exists()) {
             return { uid: userDoc.id, ...userDoc.data() } as IUser;
           }
-          console.log("Usuário favorito não encontrado:", uid);
+          console.log("getFavorites: Usuário favorito não encontrado:", uid);
           return null;
         } catch (error) {
-          console.error("Erro ao buscar usuário favorito:", uid, error);
+          console.error("getFavorites: Erro ao buscar usuário favorito:", uid, error);
           return null;
         }
       })
     );
     
     const validUsers = favoritesUsers.filter((user): user is IUser => user !== null);
-    console.log("Favoritos encontrados:", validUsers.length);
+    console.log("getFavorites: Usuários válidos encontrados:", validUsers.length);
     return validUsers;
   } catch (error) {
-    console.error("Erro ao buscar favoritos:", error);
+    console.error("getFavorites: Erro:", error);
     return [];
+  }
+};
+
+// Função de teste para verificar se o Firestore está funcionando
+export const testFirestoreConnection = async (userId: string) => {
+  try {
+    console.log("testFirestoreConnection: Testando conexão com Firestore...");
+    const userRef = doc(database, "User", userId);
+    
+    // Tentar criar um documento de teste
+    await setDoc(userRef, {
+      uid: userId,
+      testField: "test",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    
+    console.log("testFirestoreConnection: Documento de teste criado com sucesso");
+    
+    // Verificar se foi criado
+    const userDoc = await getDoc(userRef);
+    if (userDoc.exists()) {
+      console.log("testFirestoreConnection: Documento existe após criação");
+      return true;
+    } else {
+      console.log("testFirestoreConnection: Documento não existe após criação");
+      return false;
+    }
+  } catch (error) {
+    console.error("testFirestoreConnection: Erro:", error);
+    return false;
   }
 };

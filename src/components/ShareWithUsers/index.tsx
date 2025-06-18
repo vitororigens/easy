@@ -44,12 +44,13 @@ import {
   addToFavorites,
   removeFromFavorites,
   getFavorites,
+  testFirestoreConnection,
 } from "../../services/firebase/users.firestore";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { Button } from "../Button";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { database } from "../../libs/firebase";
-import { doc, updateDoc } from '@react-native-firebase/firestore';
+import { doc, updateDoc, getDoc } from '@react-native-firebase/firestore';
 import {
   ESharingStatus,
   getSharing,
@@ -222,10 +223,21 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
           text: "Limpar",
           onPress: async () => {
             try {
-              // Atualizar o documento do usuário para remover todos os favoritos
+              // Usar a função ensureFavoritesProperty para garantir que o documento existe
               const userRef = doc(database, "User", uid);
+              const userDoc = await getDoc(userRef);
+              
+              if (!userDoc.exists) {
+                // Se o documento não existe, não há favoritos para limpar
+                setFavoriteUsers([]);
+                Alert.alert("Sucesso", "Todos os favoritos foram removidos");
+                return;
+              }
+              
+              // Atualizar o documento do usuário para remover todos os favoritos
               await updateDoc(userRef, {
-                favorites: []
+                favorites: [],
+                updatedAt: new Date()
               });
               
               setFavoriteUsers([]);
@@ -323,6 +335,12 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
     const loadFavorites = async () => {
       try {
         console.log("Carregando favoritos para usuário:", uid);
+        
+        // Teste temporário para verificar conexão com Firestore
+        console.log("Testando conexão com Firestore...");
+        const testResult = await testFirestoreConnection(uid);
+        console.log("Resultado do teste:", testResult);
+        
         const favorites = await getFavorites(uid);
         console.log("Favoritos carregados:", favorites.length);
         setFavoriteUsers(favorites);
