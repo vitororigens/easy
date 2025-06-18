@@ -44,7 +44,11 @@ export function NewSubscription() {
     reset,
     setValue,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: {
+      status: true
+    }
+  });
 
   useEffect(() => {
     if (selectedItemId) {
@@ -84,6 +88,7 @@ export function NewSubscription() {
 
   async function onSubmit(data: FormData) {
     try {
+      console.log('Status sendo enviado:', data.status);
       const subscriptionData = {
         userId: user?.user?.uid || '',
         name: data.name,
@@ -92,6 +97,8 @@ export function NewSubscription() {
         description: data.description || '',
         status: data.status,
       };
+
+      console.log('Dados da assinatura:', subscriptionData);
 
       if (selectedItemId) {
         await updateSubscription(selectedItemId, subscriptionData);

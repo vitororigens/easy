@@ -19,7 +19,6 @@ export const createSubscription = async (subscription: Omit<Subscription, 'id' |
       ...subscription,
       createdAt: new Date(),
       updatedAt: new Date(),
-      status: true,
     };
 
     const docRef = await addDoc(collection(db, 'subscriptions'), subscriptionData);

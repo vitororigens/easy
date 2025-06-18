@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, TouchableOpacity, View, Alert } from "react-native";
+import { ScrollView, View, Alert, Text } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { LoadingIndicator } from "../../components/Loading/style";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { currencyMask, currencyUnMask } from "../../utils/mask";
 import { findNoteById } from "../../services/firebase/notes.firebase";
-import { Button, Content, Input, InputContainer, Plus, Separator, Span, SubTitle, Title } from "./styles";
-import { getInitials } from "../../utils/getInitials";
+import { Button, Content, Input, InputContainer, Title } from "./styles";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -25,6 +23,7 @@ import {
   deleteNote,
   updateNote,
 } from "../../services/firebase/notes.firebase";
+import { DefaultContainer } from "../../components/DefaultContainer";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -34,22 +33,17 @@ type Props = {
 type FormSchemaType = z.infer<typeof formSchema>;
 
 const formSchema = z.object({
-  name: z.string().min(1, "Nome da Tarefa é obrigatória"),
+  name: z.string().min(1, "Nome da nota é obrigatório"),
   description: z.string().min(1, "Descrição é obrigatória"),
-  author: z.string(),
-  type: z.string(),
+  author: z.string().optional(),
+  type: z.string().optional(),
   sharedUsers: z.array(
     z.object({
       uid: z.string(),
       userName: z.string(),
       acceptedAt: z.union([z.null(), z.instanceof(Timestamp)]),
     })
-  ),
-  formattedDate: z.string(),
-  valueTransaction: z.string().optional(),
-  selectedCategory: z.string().optional(),
-  selectedDateNotification: z.string().optional(),
-  selectedHourNotification: z.string().optional(),
+  ).default([]),
 });
 
 export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
@@ -81,7 +75,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
     },
   });
 
-  const { control, handleSubmit, reset, setValue, watch } = form;
+  const { control, handleSubmit, reset, setValue, watch, formState: { errors } } = form;
 
   const sharedUsers = watch("sharedUsers");
 
@@ -90,7 +84,21 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
     description,
     sharedUsers,
   }: FormSchemaType) => {
+    console.log('=== INÍCIO handleCreateNote ===');
+    console.log('Valores do formulário:', { name, description, sharedUsers });
+    
     try {
+      // Validação manual adicional
+      if (!name || name.trim() === '') {
+        Alert.alert("Erro", "Nome da nota é obrigatório");
+        return;
+      }
+      
+      if (!description || description.trim() === '') {
+        Alert.alert("Erro", "Descrição é obrigatória");
+        return;
+      }
+      
       if (!uid) return;
       setLoading(true);
       const usersInvitedByMe = await getSharing({
@@ -215,6 +223,18 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
       console.error("Nenhum documento selecionado para edição!");
       return;
     }
+    
+    // Validação manual adicional
+    if (!name || name.trim() === '') {
+      Alert.alert("Erro", "Nome da nota é obrigatório");
+      return;
+    }
+    
+    if (!description || description.trim() === '') {
+      Alert.alert("Erro", "Descrição é obrigatória");
+      return;
+    }
+    
     try {
       await updateNote({
         id: selectedItemId,
@@ -242,10 +262,35 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
     }
   };
 
-  const onInvalid = () => {
+  const onInvalid = (errors: any) => {
+    console.log('Erros de validação:', errors);
+    console.log('Valores atuais do formulário:', form.getValues());
+    
+    const errorMessages = [];
+    
+    if (errors.name) {
+      errorMessages.push(`Nome: ${errors.name.message}`);
+    }
+    
+    if (errors.description) {
+      errorMessages.push(`Descrição: ${errors.description.message}`);
+    }
+    
+    if (errors.author) {
+      errorMessages.push(`Autor: ${errors.author.message}`);
+    }
+    
+    if (errors.type) {
+      errorMessages.push(`Tipo: ${errors.type.message}`);
+    }
+    
+    if (errors.sharedUsers) {
+      errorMessages.push(`Usuários compartilhados: ${errors.sharedUsers.message}`);
+    }
+    
     Alert.alert(
       "Atenção!",
-      "Por favor, preencha todos os campos obrigatórios antes de salvar."
+      `Por favor, corrija os seguintes campos:\n\n${errorMessages.join('\n')}`
     );
   };
 
@@ -301,9 +346,15 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
                   onChangeText={onChange}
                   value={value}
                   editable={isCreator}
+                  style={errors.name ? { borderColor: 'red' } : {}}
                 />
               )}
             />
+            {errors.name && (
+              <Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>
+                {errors.name.message}
+              </Text>
+            )}
 
             {selectedItemId && (
               <>
@@ -343,15 +394,22 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
               render={({ field: { onChange, onBlur, value } }) => (
                 <InputContainer
                   multiline
-                  numberOfLines={20}
+                  numberOfLines={40}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
                   textAlignVertical="top"
                   editable={isCreator}
+                  style={errors.description ? { borderColor: 'red' } : {}}
                 />
               )}
             />
+            {errors.description && (
+              <Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>
+                {errors.description.message}
+              </Text>
+            )}
+
             {isCreator && (
               <FormProvider {...form}>
                 <ShareWithUsers
