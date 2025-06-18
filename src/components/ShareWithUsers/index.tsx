@@ -55,7 +55,6 @@ import {
   getSharing,
   ISharing,
 } from "../../services/firebase/sharing.firebase";
-import { FormSchemaType } from '../Expense';
 
 export const shareUserSchema = z.object({
   sharedUsers: z.array(
@@ -78,8 +77,18 @@ export const shareUserSchema = z.object({
 
 export type TShareUser = z.infer<typeof shareUserSchema>;
 
+// Tipo genérico para o formulário
+type FormData = {
+  sharedUsers: Array<{
+    uid: string;
+    userName: string;
+    acceptedAt: Timestamp | null;
+  }>;
+  [key: string]: any; // Permitir outras propriedades
+};
+
 interface IShareWithUsers {
-  control: Control<FormSchemaType>;
+  control: Control<any>; // Usar any para ser mais flexível
   name: string;
 }
 
@@ -94,7 +103,7 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
   const user = useUserAuth();
   const uid = user.user?.uid;
 
-  const { watch, setValue } = useFormContext<TShareUser>();
+  const { watch, setValue } = useFormContext<FormData>();
   const sharedUsers = watch("sharedUsers");
 
   const searchUsers = useDebouncedCallback(async (username: string) => {

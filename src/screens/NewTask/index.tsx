@@ -4,6 +4,7 @@ import { useRoute } from "@react-navigation/native";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Revenue } from "../../components/Revenue";
 import { Expense } from "../../components/Expense";
+import { View, Text } from "react-native";
 
 export function NewTask() {
   const route = useRoute();
@@ -16,25 +17,57 @@ export function NewTask() {
     initialActiveButton?: string;
     isCreator: boolean;
   };
-  console.log("selectedItemId", selectedItemId);  
-  console.log("initialActiveButton", initialActiveButton);
-  console.log("isCreator", isCreator);
-  console.log("route", route);  
 
-  const [activeButton, setActiveButton] = useState<string | undefined>(
-    undefined
+  // Log para debug
+  console.log("NewTask - selectedItemId:", selectedItemId);  
+  console.log("NewTask - initialActiveButton:", initialActiveButton);
+  console.log("NewTask - isCreator:", isCreator);
+
+  // Inicializar com "receitas" como padrão se não houver initialActiveButton
+  const [activeButton, setActiveButton] = useState<string>(
+    initialActiveButton || "receitas"
   );
-
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     if (initialActiveButton) {
       setActiveButton(initialActiveButton);
+    } else if (!activeButton) {
+      // Fallback para garantir que sempre tenha um valor
+      setActiveButton("receitas");
     }
-  }, [initialActiveButton]);
+    
+    // Marcar como pronto após um pequeno delay
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [initialActiveButton, activeButton]);
 
   const handleButtonClick = (buttonName: string) => {
+    console.log("NewTask - handleButtonClick:", buttonName);
     setActiveButton(buttonName);
   };
+
+  console.log("NewTask - activeButton final:", activeButton);
+
+  // Não renderizar nada até estar pronto
+  if (!isReady) {
+    return (
+      <DefaultContainer
+        hasHeader={false}
+        title="Adicionar Lançamento"
+        backButton
+      >
+        <Content>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Carregando...</Text>
+          </View>
+        </Content>
+      </DefaultContainer>
+    );
+  }
 
   return (
     <>
@@ -48,14 +81,14 @@ export function NewTask() {
             <NavBar>
               <ButtonBar
                 onPress={() => handleButtonClick("receitas")}
-                active={activeButton !== "receitas"}
+                active={activeButton === "receitas"}
                 style={{ borderTopLeftRadius: 40 }}
               >
                 <Title>Receitas</Title>
               </ButtonBar>
               <ButtonBar
                 onPress={() => handleButtonClick("despesas")}
-                active={activeButton !== "despesas"}
+                active={activeButton === "despesas"}
                 style={{ borderTopRightRadius: 40 }}
               >
                 <Title>Despesas</Title>
@@ -63,10 +96,22 @@ export function NewTask() {
             </NavBar>
           </Header>
           {activeButton === "receitas" && (
-            <Revenue selectedItemId={selectedItemId} showButtonSave />
+            <Revenue 
+              selectedItemId={selectedItemId} 
+              showButtonSave 
+            />
           )}
           {activeButton === "despesas" && (
-            <Expense selectedItemId={selectedItemId} showButtonSave />
+            <Expense 
+              selectedItemId={selectedItemId} 
+              showButtonSave 
+            />
+          )}
+          {!activeButton && (
+            <Revenue 
+              selectedItemId={selectedItemId} 
+              showButtonSave 
+            />
           )}
         </Content>
       </DefaultContainer>

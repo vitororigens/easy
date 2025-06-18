@@ -370,10 +370,27 @@ export function Home() {
   }
 
   function handleCreateItem(documentId: string, initialActiveButton: string) {
-    navigation.navigate("newtask", {
-      selectedItemId: documentId,
-      initialActiveButton,
-    } as never);
+    console.log("handleCreateItem - documentId:", documentId);
+    console.log("handleCreateItem - initialActiveButton:", initialActiveButton);
+    
+    // Se documentId estiver vazio, não passar selectedItemId
+    const params: any = {
+      initialActiveButton: initialActiveButton || "receitas",
+      isCreator: true,
+    };
+    
+    // Só adicionar selectedItemId se não estiver vazio
+    if (documentId && documentId.trim() !== "") {
+      params.selectedItemId = documentId;
+    }
+    
+    console.log("handleCreateItem - params:", params);
+    
+    try {
+      navigation.navigate("newtask", params as never);
+    } catch (error) {
+      console.error("Erro ao navegar para newtask:", error);
+    }
   }
 
   const handleSharedRevenueVisibility = () => {
@@ -428,7 +445,7 @@ export function Home() {
       title={activeButton === "receitas" ? "Receitas" : "Despesas"}
       type="SECONDARY"
       subtitle={formattedTotalValue}
-      addActionFn={() => handleCreateItem(selectedItemId, activeButton)}
+      addActionFn={() => handleCreateItem("", activeButton)}
     >
       <AppOpenAdComponent />
       <NavBar>

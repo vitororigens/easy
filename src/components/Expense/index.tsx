@@ -44,6 +44,7 @@ import notifee, {
   EventType,
 } from "@notifee/react-native";
 import { database } from "../../libs/firebase";
+import { LoadData } from "../LoadData";
 
 // Types
 export type ExpenseProps = {
@@ -595,7 +596,7 @@ export function Expense({
 
   // Load existing expense data
   useEffect(() => {
-    if (!selectedItemId) return;
+    if (!selectedItemId || !selectedItemId.trim()) return;
 
     const loadExpenseData = async () => {
       try {
@@ -604,20 +605,30 @@ export function Expense({
         if (doc.exists()) {
           const data = doc.data();
           if (data) {
-            setValue("name", data.name);
-            setValue("valueTransaction", formatCurrencyValue(data.valueTransaction));
-            setValue("description", data.description);
+            setValue("name", data.name || "");
+            setValue("valueTransaction", formatCurrencyValue(data.valueTransaction || 0));
+            setValue("description", data.description || "");
 
-            const { date: parsedDate } = parseDateString(data.date);
-            setValue("formattedDate", data.date);
-            setValue("selectedCategory", data.category);
+            if (data.date) {
+              try {
+                const { date: parsedDate } = parseDateString(data.date);
+                setValue("formattedDate", data.date);
+                setDate(parsedDate);
+              } catch (dateError) {
+                console.error("Erro ao parsear data:", dateError);
+                setValue("formattedDate", date.toLocaleDateString("pt-BR"));
+                setDate(new Date());
+              }
+            } else {
+              setValue("formattedDate", date.toLocaleDateString("pt-BR"));
+            }
             
-            setRepeat(data.repeat);
-            setAlert(data.alert);
-            setStatus(data.status);
-            setDate(parsedDate);
+            setValue("selectedCategory", data.category || "outros");
+            setRepeat(data.repeat || false);
+            setAlert(data.alert || false);
+            setStatus(data.status || false);
             setIsEditing(true);
-            setIncome(data.income);
+            setIncome(data.income || false);
           }
         }
       } catch (error) {
@@ -627,7 +638,7 @@ export function Expense({
     };
 
     loadExpenseData();
-  }, [selectedItemId, setValue, formatCurrencyValue, parseDateString]);
+  }, [selectedItemId, setValue, formatCurrencyValue, parseDateString, date]);
 
   // Notification event handlers
   useEffect(() => {
@@ -653,6 +664,16 @@ export function Expense({
       }
     });
   }, []);
+
+  // Loading states
+  if (!user || !user.user || !user.user.uid) {
+    return <LoadData />;
+  }
+
+  // Verificação adicional de segurança
+  if (!uid) {
+    return <LoadData />;
+  }
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
