@@ -4,10 +4,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { TextInput } from 'react-native';
 
 export const Container = styled.View`
-  position: absolute;
-  bottom: 80px;
-  left: 0;
-  right: 0;
   background-color: ${({ theme }) => theme.COLORS.TEAL_600};
   padding: 16px;
   border-top-left-radius: 16px;

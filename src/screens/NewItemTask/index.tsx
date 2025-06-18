@@ -293,11 +293,7 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
         closeModalFn={closeBottomSheet}
         backButton
       >
-        <ScrollView
-          keyboardShouldPersistTaps="always"
-          showsVerticalScrollIndicator={false}
-        >
-          <Content>
+     <Content>
             <Title>Nome da tarefa*</Title>
             <Controller
               control={control}
@@ -336,7 +332,6 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
               )}
             </View>
           </Content>
-        </ScrollView>
       </DefaultContainer>
     </View>
   );

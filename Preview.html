@@ -1,327 +1,443 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>deliver - Easy Finanças Pessoais
-</title>
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-        <style>
-          .app-name {
-              font-size: 42px;
-              font-family: 'Helvetica Neue', HelveticaNeue, Helvetica Neue;
-              font-weight: 300;
-              margin-top: 22px;
-              margin-left: 25px;
-              margin-right: 25px;
-          }
-
-          .app-subtitle {
-              font-size: 26px;
-              font-family: 'Helvetica Neue', HelveticaNeue, Helvetica Neue;
-              font-weight: 300;
-              margin-left: 25px;
-              margin-right: 25px;
-          }
-
-          .app-urls {
-              margin-left: 25px;
-              font-size: 14px;
-              margin-top: 4px;
-              margin-right: 25px;
-          }
-
-          body {
-              font-family: 'Helvetica Neue', HelveticaNeue;
-          }
-
-          hr {
-            margin-top: 40px;
-            margin-bottom: 40px;
-          }
-
-          .app-url-descr {
-              height:22px;
-              display: inline-block;
-              font-weight: 500;
-          }
-
-          .app-url {
-              color: #0056ba;
-              font-weight: 300;
-              margin-right: 10px;
-          }
-
-          .app-keyword {
-              margin-left: 25px;
-              margin-right: 25px;
-              margin-top: 22px;
-          }
-
-          .cat-headline {
-              font-weight: 700;
-              margin-bottom: 5px;
-          }
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estrutura Organizacional - DER/DF</title>
+    <style>
 
 
+        .card-content {
+            display: flex;
+            padding: 25px;
+            align-items: flex-start;
+            gap: 25px;
+        }
 
-          .app-description {
-              margin-left: 25px;
-              margin-right: 25px;
-              margin-top: 22px;
-          }
+        .card-content.reverse {
+            flex-direction: row-reverse;
+        }
 
-          .app-description-text {
-              font-weight: 300;
-          }
+        .photo-container {
+            flex-shrink: 0;
+        }
 
-          .app-changelog {
-              margin-left: 25px;
-              margin-right: 25px;
-              margin-top: 22px;
-              font-weight: 300;
-          }
-
-          .app-screenshots {
-              margin-left: 15px;
-              margin-right: 15px;
-              margin-top: 22px;
-          }
-
-          .app-keyword-list {
-              font-weight: 300;
-          }
-
-          .app-changelog-list {
-              list-style-type: square;
-
-              font-weight: 300;
-          }
-
-          ul {
-              margin-top: 6px;
-          }
-
-          .app-screenshot-row {
-              width: 100%;
-              margin-top: 10px;
-              margin-bottom: 10px;
-          }
-
-          .app-screenshot {
-              width: calc(20% - 30px);
-              margin-left: 10px;
-              margin-right: 10px;
-          }
-
-          #app-screenshots .cat-headline {
-              margin-left: 10px;
-              margin-right: 10px;
-          }
-          .app-icons {
-            overflow: hidden;
-          }
-          .app-icons img {
+        .photo {
             width: 150px;
-          }
-          .app-icons .app-icon {
-              float: left;
-              margin-right: 20px;
-          }
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
 
-          .app-minor-information {
-            margin-left: 15px;
-            margin-right: 15px;
-            margin-top: 22px;
-          }
+        @media (max-width: 768px) {
+            .card-content,
+            .card-content.reverse {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .photo {
+                width: 120px;
+                height: 160px;
+                margin: 0 auto;
+            }
 
-          .app-minor-information-key {
-            font-weight: 700;
-          }
-        </style>
-    </head>
+            .header h1 {
+                font-size: 2rem;
+            }
 
-    <body>
-      <div class="app-icons">
+            .contact-info {
+                grid-template-columns: 1fr;
+            }
+        }
 
         
-        
-      </div>
-      
-        
-          <div class="app-name">
-            pt-BR: Easy Finanças Pessoais
-
-          </div>
-        
-
-        
-          <div class="app-subtitle">
-            Subtitle:  
-
-          </div>
-        
-
-        <div class="app-urls">
-          
-          
-            
-            
-              <div class="app-url-descr">
-                support_url: <a target="_blank" class="app-url" href="https://useoeasy.com/
-">https://useoeasy.com/
-</a>
-              </div>
-            
-          
-            
-            
-              <div class="app-url-descr">
-                marketing_url: <a target="_blank" class="app-url" href="
-">
-</a>
-              </div>
-            
-          
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Estrutura Organizacional</h1>
+            <p>Departamento de Estradas de Rodagem do Distrito Federal - DER/DF</p>
         </div>
 
-        
-          <div class="app-keyword">
-              <div class="cat-headline">Keywords</div>
-              <ul class="app-keyword-list">
+        <div class="organogram">
+            <!-- Presidência -->
+            <div class="position-card presidency">
+                <div class="card-content">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/ALL0699.jpg" alt="Fauzi Nacfur Junior" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Presidência</div>
+                        <div class="person-name">Fauzi Nacfur Junior</div>
+                        <div class="description">
+                            A presidência é a unidade que coordena e supervisiona todas as atividades do DER/DF, cumpre e garante o cumprimento da legislação e as normas dos sistemas nacionais de transporte e de trânsito no âmbito de sua competência, assim como as decisões do Conselho Rodoviário. Gerencia e coordena, junto com a diretoria colegiada, as superintendências de obras, trânsito e operações, entre outras atribuições.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5506 / 5503
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:agenda.presidencia@der.df.gov.br">agenda.presidencia@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/Presidente.pdf">Fauzi Nacfur Junior</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Superintendência Executiva -->
+            <div class="position-card">
+                <div class="card-content reverse">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Murilo-de-Melo-Santos-200x300.jpg" alt="Murilo de Melo Santos" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Superintendência Executiva</div>
+                        <div class="person-name">Murilo de Melo Santos</div>
+                        <div class="description">
+                            À Superintendência Executiva compete auxiliar a Presidência direta no exercício de suas funções; orientar e apoiar, estrategicamente, as áreas da Autarquia em demandas voltadas ao planejamento, à construção, à conservação, à operação e à fiscalização das vias do SRDF; e desenvolver outras atividades que lhe forem atribuídas na sua área de atuação.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5503
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:murilo.santos@der.df.gov.br">murilo.santos@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/Curriculo-atualizado-Murilo.pdf">Murilo de Melo Santos</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Superintendência de Obras -->
+            <div class="position-card">
+                <div class="card-content">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Cristiano-Alves-Cavalcante-721x1080.jpg" alt="Cristiano Alves Cavalcante" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Superintendência de Obras</div>
+                        <div class="person-name">Cristiano Alves Cavalcante</div>
+                        <div class="description">
+                            À SUOBRA compete planejar, organizar, coordenar, acompanhar, controlar e avaliar a execução de obras de construção, conservação e melhoramento de rodovias, de modo a otimizar o transporte de cargas e deslocamento de pessoas entre outras atribuições, conforme prevê o regimento do órgão.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5706
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:suobra@der.df.gov.br">suobra@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/CURRICULO-Superintendente-de-Obras-CRISTIANO.pdf">Cristiano Cavalcante</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Superintendência de Trânsito -->
+            <div class="position-card">
+                <div class="card-content reverse">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Elcy-Ozorio-dos-Santos-200x300.jpg" alt="Elcy Ozorio dos Santos" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Superintendência de Trânsito</div>
+                        <div class="person-name">Elcy Ozorio dos Santos</div>
+                        <div class="description">
+                            À SUTRAN compete fiscalizar o cumprimento da legislação e das normas de trânsito, no âmbito de suas atribuições, estabelecer as diretrizes para planejar, projetar, regulamentar e operar o trânsito de veículos, de pedestres, de ciclistas e de animais, promover e participar de projetos e programas de educação e segurança de trânsito, entre outras atribuições.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5668
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:sutran@der.df.gov.br">sutran@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/CURRICULUM-ELCY.pdf">Elcy Santos</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Superintendência de Operações -->
+            <div class="position-card">
+                <div class="card-content">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Fabio-Cardoso-da-Silva-200x300.jpg" alt="Fábio Cardoso" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Superintendência de Operações</div>
+                        <div class="person-name">Fábio Cardoso</div>
+                        <div class="description">
+                            À SUOPER compete planejar, dirigir e supervisionar as atividades de produção industrial do Departamento e os serviços de demarcação viária e sinalização horizontal no Sistema Rodoviário do Distrito Federal e planejar, disciplinar e controlar a ocupação e utilização das faixas de domínio do sistema rodoviário do DF.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5716
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:pres.suoper@der.df.gov.br">pres.suoper@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/Superintendente-Executivo.pdf">Fábio Cardoso</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Superintendência Técnica -->
+            <div class="position-card">
+                <div class="card-content reverse">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Plinio-Fabricio-Mendonca-Fragassi-200x300.jpg" alt="Plínio Fabrício Mendonça Fragassi" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Superintendência Técnica</div>
+                        <div class="person-name">Plínio Fabrício Mendonça Fragassi</div>
+                        <div class="description">
+                            À SUTEC compete promover, planejar, coordenar e supervisionar o desenvolvimento de atividades relacionadas ao planejamento físico urbano, aos estudos, anteprojetos e projetos rodoviários, e as pesquisas de caráter técnico-científico, orientadas para as áreas de arquitetura e engenharia civil.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5630
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:sutec@der.df.gov.br">sutec@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/CURRICULO-Superintendente-Tecnico-PLINIO.pdf">Plínio Fragassi</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coordenação de Planejamento -->
+            <div class="position-card">
+                <div class="card-content">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Mauricio-Theodosio-Mattos-Marques-200x300.jpg" alt="Maurício Theodósio Mattos Marques" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Coordenação de Planejamento e Captação de Recursos</div>
+                        <div class="person-name">Maurício Theodósio Mattos Marques</div>
+                        <div class="description">
+                            À Coordenação de Planejamento e Captação de Recursos compete estruturar, disciplinar, coordenar, desenvolver e supervisionar as atividades de planejamento, acompanhamento e avaliação, estatística, estudos e pesquisas e modernização administrativa do DER/DF, garantindo a eficácia e eficiência do gerenciamento estratégico administrativo da autarquia.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5534
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:coplan@der.df.gov.br">coplan@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/CURRICULO-Coordenador-de-Planejamento-Mauricio-Marques.pdf">Maurício Marques</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Superintendência Administrativa e Financeira -->
+            <div class="position-card">
+                <div class="card-content reverse">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Carlos-Geraldo-Caixeta-Cruz-200x300.jpg" alt="Carlos Geraldo Caixeta Cruz" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Superintendência Administrativa e Financeira</div>
+                        <div class="person-name">Carlos Geraldo Caixeta Cruz</div>
+                        <div class="description">
+                            À Superintendência Administrativa e Financeira compete planejar, dirigir, coordenar e supervisionar as atividades relacionadas com as áreas administrativa, orçamentária e financeira do DER/DF, compreendendo os sistemas de administração geral, pessoal, material, patrimônio, orçamento, contabilidade, finanças e serviços gerais.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5560
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:suafin@der.df.gov.br">suafin@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/CURRICULO-Superintendente-Administrativo-e-Financeiro-CARLOS.pdf">Carlos Caixeta</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ouvidoria -->
+            <div class="position-card">
+                <div class="card-content">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Arlanio-Duarte-Lima-200x300.jpg" alt="Arlânio Duarte Lima" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Ouvidoria</div>
+                        <div class="person-name">Arlânio Duarte Lima</div>
+                        <div class="description">
+                            À Ouvidoria compete facilitar o acesso do cidadão ao serviço de ouvidoria, atender com cortesia e respeito a questão apresentada, afastando qualquer discriminação ou prejulgamento, registrar as manifestações recebidas no sistema informatizado definido pelo órgão superior.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5517
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:ouvidoria@der.df.gov.br">ouvidoria@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/CURRICULO-Ouvidor-Arlanio.pdf">Arlânio Duarte</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Procuradoria Jurídica -->
+            <div class="position-card">
+                <div class="card-content reverse">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Marzo-Endrigo-de-Almeida-200x300.jpg" alt="Marzo Endrigo de Almeida" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Procuradoria Jurídica</div>
+                        <div class="person-name">Marzo Endrigo de Almeida</div>
+                        <div class="description">
+                            À Procuradoria Jurídica compete preparar minuta de informações em mandado de segurança impetrado contra ato de autoridade do DER/DF ou em qualquer ação constitucional, auxiliar e assessorar, na forma da lei, os servidores efetivos e os ocupantes de cargos de direção e assessoramento do órgão.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5521
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:projur@der.df.gov.br">projur@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/CURRICULUM-MARZO.pdf">Marzo Endrigo</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Corregedoria -->
+            <div class="position-card">
+                <div class="card-content">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Paulo-Cesar-Lapa-de-Souza-200x300.jpg" alt="Paulo Cesar Lapa de Souza" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Corregedoria</div>
+                        <div class="person-name">Paulo Cesar Lapa de Souza</div>
+                        <div class="description">
+                            À Corregedoria compete coordenar, orientar, mediar e supervisionar as atividades de disciplina, recebendo e apurando denúncias ou representações sobre atos irregulares ou ilícitos cometidos por servidores, despachantes ou empregados de empresas terceirizadas pelo DER/DF.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5528
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:corregedoria@der.df.gov.br">corregedoria@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/CURRICULO-PAULO-ATUALIZADO.pdf">Paulo Lapa</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coordenação de TI -->
+            <div class="position-card">
+                <div class="card-content reverse">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Jesse-Gouvea-de-Oliveira-200x300.jpg" alt="Jessé Gouvea de Oliveira" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Coordenação de Tecnologia da Informação</div>
+                        <div class="person-name">Jessé Gouvea de Oliveira</div>
+                        <div class="description">
+                            À Coordenação de Tecnologia da Informação compete elaborar propostas para a estratégia e a política de informatização do DER/DF e coordenar a preparação e revisão dos seus planos anuais e plurianuais de informática, realizar estudos e estabelecer normas e padrões para a construção, aquisição, locação e utilização de equipamentos.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5545
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:ctinf@der.df.gov.br">ctinf@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/CURRICULUM-CTINF-Jesse.pdf">Jessé Gouvea</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chefia de Gabinete -->
+            <div class="position-card">
+                <div class="card-content">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Lucilia-de-Fatima-Cintra-200x300.jpg" alt="Lucília de Fátima Cintra" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Chefia de Gabinete</div>
+                        <div class="person-name">Lucília de Fátima Cintra</div>
+                        <div class="description">
+                            À Chefia de Gabinete da Diretoria Geral, cabe supervisionar, apoiar e assistir à execução das atividades de apoio administrativo ao Presidente no exercício de suas funções e atribuições; supervisionar a agenda de reuniões, audiências e compromissos externos e internos do Presidente.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5599
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:lucilia.cintra@der.df.gov.br">lucilia.cintra@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/Chefe-de-Gabinete.pdf">Lucília Cintra</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ASCOM -->
+            <div class="position-card">
+                <div class="card-content reverse">
+                    <div class="photo-container">
+                        <img src="/documents/29819491/30594990/Isabelle-Gomes-de-Amaral-200x300.jpg" alt="Isabelle Gomes de Amaral" class="photo">
+                    </div>
+                    <div class="info-container">
+                        <div class="position-title">Assessoria de Comunicação Social (ASCOM)</div>
+                        <div class="person-name">Isabelle Gomes de Amaral</div>
+                        <div class="description">
+                            À ASCOM compete: elaborar e coordenar a execução do plano de comunicação social do DER/DF; desenvolver a comunicação interna do órgão; articular-se com os meios de comunicação e agência de notícias do Governo do Distrito Federal para divulgação das iniciativas, ações, operações e campanhas do órgão.
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Telefone:</strong> (61) 3111-5511
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:ascom@der.df.gov.br">ascom@der.df.gov.br</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Currículo:</strong> <a href="/documents/29819491/30594990/IsabelleGomes.pdf">Isabelle Amaral</a>
+                            </div>
+                        </div>
+                    </div>
                 
-              </ul>
-          </div>
-        
-
-        
-          <div class="app-description">
-               <div class="cat-headline">Description</div>
-               <div class="app-description-text">
-                  O nosso aplicativo de gestão financeira oferece uma maneira simples e eficiente de gerenciar suas finanças pessoais, ajudando você a manter o controle das suas receitas e despesas diárias. Com uma interface intuitiva e funcionalidades poderosas, o aplicativo permite que você insira facilmente suas transações de entrada e saída, categorize-as e visualize informações essenciais por meio de gráficos claros e informativos.<br />
-               </div>
-          </div>
-        
-
-        
-          <div class="app-changelog">
-              <div class="cat-headline">Changelog</div>
-              <br />
-          </div>
-        
-
-        
-          <div class="app-changelog">
-              <div class="cat-headline">Promotional Text</div>
-              Uma maneira simples e eficiente de gerenciar suas finanças<br />
-          </div>
-        
-
-        <div class="app-screenshots">
-          <div class="cat-headline">Screenshots</div>
-
-          
-            
-            
-
-            
-              
-              
-              <h4>iPhone 6 Plus</h4>
-              <div class="app-screenshot-row">
-
-              
-                <a href="screenshots/pt-BR/0_APP_IPHONE_55_0.jpg" target="_blank"><img class="app-screenshot" src="screenshots/pt-BR/0_APP_IPHONE_55_0.jpg" title="Screenshot #0 for pt-BR"></a>
-              
-                <a href="screenshots/pt-BR/1_APP_IPHONE_55_1.jpg" target="_blank"><img class="app-screenshot" src="screenshots/pt-BR/1_APP_IPHONE_55_1.jpg" title="Screenshot #1 for pt-BR"></a>
-              
-                <a href="screenshots/pt-BR/2_APP_IPHONE_55_2.jpg" target="_blank"><img class="app-screenshot" src="screenshots/pt-BR/2_APP_IPHONE_55_2.jpg" title="Screenshot #2 for pt-BR"></a>
-              
-                <a href="screenshots/pt-BR/3_APP_IPHONE_55_3.jpg" target="_blank"><img class="app-screenshot" src="screenshots/pt-BR/3_APP_IPHONE_55_3.jpg" title="Screenshot #3 for pt-BR"></a>
-              
-              </div>
-            
-              
-              
-              <h4>iPhone 14 Pro Max</h4>
-              <div class="app-screenshot-row">
-
-              
-                <a href="screenshots/pt-BR/0_APP_IPHONE_67_0.jpg" target="_blank"><img class="app-screenshot" src="screenshots/pt-BR/0_APP_IPHONE_67_0.jpg" title="Screenshot #0 for pt-BR"></a>
-              
-                <a href="screenshots/pt-BR/1_APP_IPHONE_67_1.jpg" target="_blank"><img class="app-screenshot" src="screenshots/pt-BR/1_APP_IPHONE_67_1.jpg" title="Screenshot #1 for pt-BR"></a>
-              
-                <a href="screenshots/pt-BR/2_APP_IPHONE_67_2.jpg" target="_blank"><img class="app-screenshot" src="screenshots/pt-BR/2_APP_IPHONE_67_2.jpg" title="Screenshot #2 for pt-BR"></a>
-              
-                <a href="screenshots/pt-BR/3_APP_IPHONE_67_3.jpg" target="_blank"><img class="app-screenshot" src="screenshots/pt-BR/3_APP_IPHONE_67_3.jpg" title="Screenshot #3 for pt-BR"></a>
-              
-              </div>
-            
-          
-          </div>
-
-        <hr />
-      
-      
-
-      
-        <div class="app-minor-information">
-          <div class="cat-headline">Review Information</div>
-          <dl class="app-minor-information">
-            
-                <dt class="app-minor-information-key">
-                  First name
-                </dt>
-                <dd class="app-minor-information-text">
-                  Vitor
-                  <br />
-                </dd>
-            
-                <dt class="app-minor-information-key">
-                  Last name
-                </dt>
-                <dd class="app-minor-information-text">
-                  Abreu
-                  <br />
-                </dd>
-            
-                <dt class="app-minor-information-key">
-                  Phone number
-                </dt>
-                <dd class="app-minor-information-text">
-                  +44 844 209 0611
-                  <br />
-                </dd>
-            
-                <dt class="app-minor-information-key">
-                  Email address
-                </dt>
-                <dd class="app-minor-information-text">
-                  vitorabreufjb@hotmail.com
-                  <br />
-                </dd>
-            
-                <dt class="app-minor-information-key">
-                  Demo user
-                </dt>
-                <dd class="app-minor-information-text">
-                  joaopedross.ti9@gmail.com<br />
-                </dd>
-            
-                <dt class="app-minor-information-key">
-                  Demo password
-                </dt>
-                <dd class="app-minor-information-text">
-                  123a456b<br />
-                </dd>
-            
-                <dt class="app-minor-information-key">
-                  Notes
-                </dt>
-                <dd class="app-minor-information-text">
-                  <br />
-                </dd>
-            
-          </dl>
-        </div>
-      
-    </body>
-</html>
