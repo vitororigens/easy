@@ -1,27 +1,28 @@
-import { useEffect, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { Controller, useForm, FormProvider } from "react-hook-form";
-import { Alert, ScrollView, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ScrollView, TouchableOpacity, View, Alert } from "react-native";
 import { Toast } from "react-native-toast-notifications";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
-import { DefaultContainer } from "../../components/DefaultContainer";
 import { LoadingIndicator } from "../../components/Loading/style";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { Button, Content, Input, InputContainer, Title } from "./styles";
-import { sendPushNotification } from "../../services/one-signal";
-import { createNotification } from "../../services/firebase/notifications.firebase";
+import { currencyMask, currencyUnMask } from "../../utils/mask";
+import { findNoteById } from "../../services/firebase/notes.firebase";
+import { Button, Content, Input, InputContainer, Plus, Separator, Span, SubTitle, Title } from "./styles";
+import { getInitials } from "../../utils/getInitials";
+import { Timestamp } from "@react-native-firebase/firestore";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   createSharing,
   ESharingStatus,
   getSharing,
 } from "../../services/firebase/sharing.firebase";
+import { sendPushNotification } from "../../services/one-signal";
+import { createNotification } from "../../services/firebase/notifications.firebase";
 import { ShareWithUsers } from "../../components/ShareWithUsers";
-import { Timestamp } from "firebase/firestore";
 import {
   createNote,
   deleteNote,
-  findNoteById,
   updateNote,
 } from "../../services/firebase/notes.firebase";
 

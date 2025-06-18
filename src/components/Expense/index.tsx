@@ -19,7 +19,7 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import { currencyMask, currencyUnMask } from "../../utils/mask";
 import { LoadingIndicator } from "../Loading/style";
 import { sendPushNotification } from "../../services/one-signal";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore";
 import { ShareWithUsers } from "../../components/ShareWithUsers";
 import { useRoute } from "@react-navigation/native";
 import { createNotification } from "../../services/firebase/notifications.firebase";

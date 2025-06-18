@@ -1,27 +1,30 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { format } from "date-fns";
-import { useEffect, useState } from "react";
-import { Controller, useForm, FormProvider } from "react-hook-form";
-import { Alert, ScrollView, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ScrollView, TouchableOpacity, View, Alert } from "react-native";
 import { Toast } from "react-native-toast-notifications";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
-import { DefaultContainer } from "../../components/DefaultContainer";
 import { LoadingIndicator } from "../../components/Loading/style";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { Button, Content, Input, Title } from "./styles";
-import { database } from "../../libs/firebase";
-import { ShareWithUsers } from "../../components/ShareWithUsers";
-import { Timestamp } from "firebase/firestore";
-import { createTask } from "../../services/firebase/tasks";
-import { createNotification } from "../../services/firebase/notifications.firebase";
-import { sendPushNotification } from "../../services/one-signal";
-
+import { currencyMask, currencyUnMask } from "../../utils/mask";
+import { findTaskById } from "../../services/firebase/tasks.firebase";
+import { Button, Content, Input, Plus, Separator, Span, SubTitle, Title } from "./styles";
+import { getInitials } from "../../utils/getInitials";
+import { Timestamp } from "@react-native-firebase/firestore";
 import {
   createSharing,
   ESharingStatus,
   getSharing,
 } from "../../services/firebase/sharing.firebase";
+import { createNotification } from "../../services/firebase/notifications.firebase";
+import { sendPushNotification } from "../../services/one-signal";
+import { ShareWithUsers } from "../../components/ShareWithUsers";
+import { DefaultContainer } from "../../components/DefaultContainer";
+import { useTask } from "../../contexts/TaskContext";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { format } from "date-fns";
+import { createTask } from "../../services/firebase/tasks";
+import { database } from "../../libs/firebase";
 
 type Props = {
   closeBottomSheet?: () => void;

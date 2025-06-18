@@ -21,7 +21,7 @@ import { useMonth } from "../../context/MonthProvider";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { currencyMask, currencyUnMask } from "../../utils/mask";
 import { sendPushNotification } from "../../services/one-signal";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore";
 import { LoadingIndicator } from "../Loading/style";
 import {
   createSharing,

@@ -10,7 +10,7 @@ import useFirestoreCollection, { ExpenseData } from "../../hooks/useFirestoreCol
 import { useTotalValue } from "../../hooks/useTotalValue";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore";
 import {
   Button,
   NavBar,

@@ -7,6 +7,7 @@ import {
   View,
   ScrollView,
   Alert,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { DefaultContainer } from "../../components/DefaultContainer";
@@ -252,53 +253,143 @@ export function ListTask({ route }: any) {
   }
 
   return (
-    <DefaultContainer newItem monthButton title="Lista de Tarefas">
-      <Header>
-        <NavBar>
-          <Button
-            onPress={() => handleButtonClick("tarefas")}
-            active={activeButton === "tarefas"}
-            style={{ borderTopLeftRadius: 40 }}
-          >
-            <Title>Tarefas</Title>
-          </Button>
-          <Button
-            onPress={() => handleButtonClick("historico")}
-            active={activeButton === "historico"}
-            style={{ borderTopRightRadius: 40 }}
-          >
-            <Title>Histórico de tarefas</Title>
-          </Button>
-        </NavBar>
-      </Header>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <DefaultContainer newItem monthButton title="Lista de Tarefas">
+        <Header>
+          <NavBar>
+            <Button
+              onPress={() => handleButtonClick("tarefas")}
+              active={activeButton === "tarefas"}
+              style={{ borderTopLeftRadius: 40 }}
+            >
+              <Title>Tarefas</Title>
+            </Button>
+            <Button
+              onPress={() => handleButtonClick("historico")}
+              active={activeButton === "historico"}
+              style={{ borderTopRightRadius: 40 }}
+            >
+              <Title>Histórico de tarefas</Title>
+            </Button>
+          </NavBar>
+        </Header>
 
-      {activeButton === "tarefas" && (
-        <Content>
-          <ContentTitle onPress={() => setIsListVisible(!isListVisible)}>
-            <HeaderContainer>
-              <SectionIcon name="checkbox-marked-circle-outline" />
-              <Title>Minhas tarefas</Title>
-            </HeaderContainer>
-            <Icon name={isListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
-          </ContentTitle>
-          {isListVisible && (
+        {activeButton === "tarefas" && (
+          <Content>
+            <ContentTitle onPress={() => setIsListVisible(!isListVisible)}>
+              <HeaderContainer>
+                <SectionIcon name="checkbox-marked-circle-outline" />
+                <Title>Minhas tarefas</Title>
+              </HeaderContainer>
+              <Icon name={isListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+            </ContentTitle>
+            {isListVisible && (
+              <Container>
+                <FlatList
+                  showsVerticalScrollIndicator={false}
+                  data={personalTasks}
+                  renderItem={({ item, index }) => (
+                    <View>
+                      <ItemTask
+                        task={item}
+                        handleDelete={() => handleDeleteTask(item.id)}
+                        handleUpdate={() => handleEditTask(item.id)}
+                        isSelected={selectedTasks.includes(item.id)}
+                        onSelect={() => handleSelectTask(item.id)}
+                      />
+                      {index % 5 === 0 && index !== 0 && (
+                        <NativeAdComponent style={{ marginVertical: 10 }} />
+                      )}
+                    </View>
+                  )}
+                  keyExtractor={(item) => item.id}
+                  contentContainerStyle={{ paddingBottom: 20 }}
+                  ListEmptyComponent={
+                    <EmptyContainer>
+                      <LoadData
+                        imageSrc={PersonImage}
+                        title="Comece agora!"
+                        subtitle="Adicione uma tarefa clicando em +"
+                      />
+                    </EmptyContainer>
+                  }
+                />
+              </Container>
+            )}
+
+            <ContentTitle type="PRIMARY" onPress={() => setIsSharedListVisible(!isSharedListVisible)}>
+              <HeaderContainer >
+                <SectionIcon type="PRIMARY" name="share-variant" />
+                <Title type="PRIMARY">Tarefas compartilhadas</Title>
+              </HeaderContainer>
+              <Icon type="PRIMARY" name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
+            </ContentTitle>
+            {isSharedListVisible && (
+              <Container>
+                <FlatList
+                  showsVerticalScrollIndicator={false}
+                  data={sharedTasks}
+                  renderItem={({ item, index }) => (
+                    <View>
+                      <ItemTask
+                        task={item}
+                        handleDelete={() => handleDeleteTask(item.id)}
+                        handleUpdate={() => handleEditTask(item.id)}
+                        isSelected={selectedTasks.includes(item.id)}
+                        onSelect={() => handleSelectTask(item.id)}
+                      />
+                      {index % 5 === 0 && index !== 0 && (
+                        <NativeAdComponent style={{ marginVertical: 10 }} />
+                      )}
+                    </View>
+                  )}
+                  keyExtractor={(item) => item.id}
+                  contentContainerStyle={{ paddingBottom: 20 }}
+                  ListEmptyComponent={
+                    <EmptyContainer>
+                      <SubTitle>Nenhuma tarefa compartilhada</SubTitle>
+                    </EmptyContainer>
+                  }
+                />
+              </Container>
+            )}
+          </Content>
+        )}
+
+        {activeButton === "historico" && (
+          <Content>
+            <ContentTitle>
+              <HeaderContainer>
+                <SectionIcon name="history" />
+                <Title>Histórico de tarefas</Title>
+              </HeaderContainer>
+            </ContentTitle>
             <Container>
               <FlatList
                 showsVerticalScrollIndicator={false}
-                data={personalTasks}
-                renderItem={({ item, index }) => (
-                  <View>
-                    <ItemTask
-                      task={item}
-                      handleDelete={() => handleDeleteTask(item.id)}
-                      handleUpdate={() => handleEditTask(item.id)}
-                      isSelected={selectedTasks.includes(item.id)}
-                      onSelect={() => handleSelectTask(item.id)}
-                    />
-                    {index % 5 === 0 && index !== 0 && (
-                      <NativeAdComponent style={{ marginVertical: 10 }} />
-                    )}
-                  </View>
+                data={historyUserMonth}
+                renderItem={({ item }) => (
+                  <TaskCard onPress={() => {
+                    setModalActive(true);
+                    setSelectedHistoryItem(item);
+                  }}>
+                    <TaskName>{item.name}</TaskName>
+                    <DateText>
+                      📅 Finalizado em: {item.finishedDate} às {item.finishedTime}
+                    </DateText>
+                    <DateText>
+                      ✅ Total de tarefas: {item.tasks.length}
+                    </DateText>
+                    <TouchableOpacity 
+                      onPress={() => handleDeleteHistoryTaskHistory(item.id)}
+                      style={{ position: 'absolute', right: 10, top: 10 }}
+                    >
+                      <Icon name="delete" size={24} color={COLORS.RED_700} />
+                    </TouchableOpacity>
+                  </TaskCard>
                 )}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ paddingBottom: 20 }}
@@ -306,128 +397,43 @@ export function ListTask({ route }: any) {
                   <EmptyContainer>
                     <LoadData
                       imageSrc={PersonImage}
-                      title="Comece agora!"
-                      subtitle="Adicione uma tarefa clicando em +"
+                      title="Nenhum conjunto de tarefas"
+                      subtitle="Finalize algumas tarefas para ver seu histórico"
                     />
                   </EmptyContainer>
                 }
               />
             </Container>
-          )}
-
-          <ContentTitle type="PRIMARY" onPress={() => setIsSharedListVisible(!isSharedListVisible)}>
-            <HeaderContainer >
-              <SectionIcon type="PRIMARY" name="share-variant" />
-              <Title type="PRIMARY">Tarefas compartilhadas</Title>
-            </HeaderContainer>
-            <Icon type="PRIMARY" name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
-          </ContentTitle>
-          {isSharedListVisible && (
-            <Container>
-              <FlatList
-                showsVerticalScrollIndicator={false}
-                data={sharedTasks}
-                renderItem={({ item, index }) => (
-                  <View>
-                    <ItemTask
-                      task={item}
-                      handleDelete={() => handleDeleteTask(item.id)}
-                      handleUpdate={() => handleEditTask(item.id)}
-                      isSelected={selectedTasks.includes(item.id)}
-                      onSelect={() => handleSelectTask(item.id)}
-                    />
-                    {index % 5 === 0 && index !== 0 && (
-                      <NativeAdComponent style={{ marginVertical: 10 }} />
-                    )}
-                  </View>
-                )}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingBottom: 20 }}
-                ListEmptyComponent={
-                  <EmptyContainer>
-                    <SubTitle>Nenhuma tarefa compartilhada</SubTitle>
-                  </EmptyContainer>
-                }
-              />
-            </Container>
-          )}
-        </Content>
-      )}
-
-      {activeButton === "historico" && (
-        <Content>
-          <ContentTitle>
-            <HeaderContainer>
-              <SectionIcon name="history" />
-              <Title>Histórico de tarefas</Title>
-            </HeaderContainer>
-          </ContentTitle>
-          <Container>
-            <FlatList
-              showsVerticalScrollIndicator={false}
-              data={historyUserMonth}
-              renderItem={({ item }) => (
-                <TaskCard onPress={() => {
-                  setModalActive(true);
-                  setSelectedHistoryItem(item);
-                }}>
-                  <TaskName>{item.name}</TaskName>
-                  <DateText>
-                    📅 Finalizado em: {item.finishedDate} às {item.finishedTime}
-                  </DateText>
-                  <DateText>
-                    ✅ Total de tarefas: {item.tasks.length}
-                  </DateText>
-                  <TouchableOpacity 
-                    onPress={() => handleDeleteHistoryTaskHistory(item.id)}
-                    style={{ position: 'absolute', right: 10, top: 10 }}
-                  >
-                    <Icon name="delete" size={24} color={COLORS.RED_700} />
-                  </TouchableOpacity>
-                </TaskCard>
-              )}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={{ paddingBottom: 20 }}
-              ListEmptyComponent={
-                <EmptyContainer>
-                  <LoadData
-                    imageSrc={PersonImage}
-                    title="Nenhum conjunto de tarefas"
-                    subtitle="Finalize algumas tarefas para ver seu histórico"
-                  />
-                </EmptyContainer>
-              }
-            />
-          </Container>
-        </Content>
-      )}
-
-      <FinishTasks
-        selectedCount={selectedTasks.length}
-        onFinish={(groupName: string) => handleFinishSelectedTasks(groupName)}
-      />
-
-      <Modal
-        visible={modalActive}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setModalActive(false)}
-      >
-        {selectedHistoryItem && (
-          <HistoryTaskModal
-            onClose={() => setModalActive(false)}
-            groupName={selectedHistoryItem.name}
-            finishedDate={selectedHistoryItem.finishedDate}
-            finishedTime={selectedHistoryItem.finishedTime}
-            tasks={selectedHistoryItem.tasks.map(task => ({
-              ...task,
-              createdAt: typeof task.createdAt === 'string' 
-                ? task.createdAt 
-                : new Date(task.createdAt.toDate()).toISOString()
-            }))}
-          />
+          </Content>
         )}
-      </Modal>
-    </DefaultContainer>
+
+        <FinishTasks
+          selectedCount={selectedTasks.length}
+          onFinish={(groupName: string) => handleFinishSelectedTasks(groupName)}
+        />
+
+        <Modal
+          visible={modalActive}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setModalActive(false)}
+        >
+          {selectedHistoryItem && (
+            <HistoryTaskModal
+              onClose={() => setModalActive(false)}
+              groupName={selectedHistoryItem.name}
+              finishedDate={selectedHistoryItem.finishedDate}
+              finishedTime={selectedHistoryItem.finishedTime}
+              tasks={selectedHistoryItem.tasks.map(task => ({
+                ...task,
+                createdAt: typeof task.createdAt === 'string' 
+                  ? task.createdAt 
+                  : new Date(task.createdAt.toDate()).toISOString()
+              }))}
+            />
+          )}
+        </Modal>
+      </DefaultContainer>
+    </KeyboardAvoidingView>
   );
 }

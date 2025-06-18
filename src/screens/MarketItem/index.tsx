@@ -23,7 +23,7 @@ import {
   Title,
 } from "./styles";
 import { getInitials } from "../../utils/getInitials";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore";
 import {
   createSharing,
   ESharingStatus,

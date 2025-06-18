@@ -45,7 +45,7 @@ import {
 } from "../../services/firebase/users.firestore";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { Button } from "../Button";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore";
 import { database } from "../../libs/firebase";
 import { doc, updateDoc } from '@react-native-firebase/firestore';
 import {
@@ -161,7 +161,10 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
   };
 
   const handleToggleFavorite = async (userToToggle: IUser) => {
-    if (!uid) return;
+    if (!uid) {
+      Alert.alert("Erro", "Usuário não autenticado");
+      return;
+    }
     
     const isFavorite = favoriteUsers.some(u => u.uid === userToToggle.uid);
     
@@ -177,7 +180,8 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
       }
     } catch (error) {
       console.error("Erro ao gerenciar favoritos:", error);
-      Alert.alert("Erro", "Não foi possível gerenciar os favoritos. Tente novamente.");
+      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+      Alert.alert("Erro", `Não foi possível gerenciar os favoritos: ${errorMessage}`);
     }
   };
 
@@ -315,8 +319,16 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
   useEffect(() => {
     if (!uid) return;
     const loadFavorites = async () => {
-      const favorites = await getFavorites(uid);
-      setFavoriteUsers(favorites);
+      try {
+        console.log("Carregando favoritos para usuário:", uid);
+        const favorites = await getFavorites(uid);
+        console.log("Favoritos carregados:", favorites.length);
+        setFavoriteUsers(favorites);
+      } catch (error) {
+        console.error("Erro ao carregar favoritos:", error);
+        // Não mostrar alerta aqui para não incomodar o usuário
+        setFavoriteUsers([]);
+      }
     };
     loadFavorites();
   }, [uid]);

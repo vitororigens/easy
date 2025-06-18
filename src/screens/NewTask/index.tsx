@@ -7,7 +7,7 @@ import { Revenue } from "../../components/Revenue";
 import { Expense } from "../../components/Expense";
 import { useForm} from "react-hook-form";
 import { z } from "zod";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore";
 
 const formSchema = z.object({
   name: z.string().min(1, "Nome da Tarefa é obrigatório"),
