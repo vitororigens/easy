@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useRef } from "react";
 import RNPickerSelect from "react-native-picker-select";
-import { Container, SelectWrapper, ErrorText, IconInput } from "./styles";
+import { Container, SelectWrapper, ErrorText, IconInput, ChevronIcon } from "./styles";
 import { FontAwesome5 } from '@expo/vector-icons';
 
 type SelectOption = {
@@ -49,22 +49,30 @@ export function Select({
   errorMessage,
   disabled = false,
 }: SelectProps) {
+  const pickerRef = useRef<any>(null);
+
+  const handlePress = () => {
+    if (!disabled && pickerRef.current) {
+      pickerRef.current.togglePicker();
+    }
+  };
+
   return (
-    <Container>
+    <Container onPress={handlePress} disabled={disabled}>
       <SelectWrapper error={!!errorMessage} disabled={disabled}>
         {showIcon && name && <IconInput name={name} />}
         
         <RNPickerSelect
+          ref={pickerRef}
           onValueChange={(value) => onValueChange?.(value)}
           value={value}
           items={items}
           disabled={disabled}
           placeholder={{ label: placeholder, value: null }}
+          useNativeAndroidPickerStyle={false}
           style={{
             inputIOS: {
               flex: 1,
-              minHeight: 60,
-              maxHeight: 60,
               color: '#4B5563', // GRAY_600
               fontFamily: 'Inter_400Regular',
               fontSize: 16,
@@ -73,8 +81,6 @@ export function Select({
             },
             inputAndroid: {
               flex: 1,
-              minHeight: 60,
-              maxHeight: 60,
               color: '#4B5563', // GRAY_600
               fontFamily: 'Inter_400Regular',
               fontSize: 16,
@@ -87,20 +93,16 @@ export function Select({
               fontSize: 16,
             },
             iconContainer: {
-              top: 15,
-              right: 15,
+              display: 'none', // Hide the default icon
             },
           }}
-          Icon={() => (
-            <FontAwesome5 
-              name="chevron-down" 
-              size={16} 
-              color="#9CA3AF" 
-              style={{ marginTop: 2 }}
-            />
-          )}
         />
       </SelectWrapper>
+      <ChevronIcon 
+        name="chevron-down" 
+        size={16} 
+        color="#9CA3AF"
+      />
       {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
     </Container>
   );
