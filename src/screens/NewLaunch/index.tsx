@@ -6,7 +6,7 @@ import { Input } from "../../components/Input";
 import { Container, Content, InputDescription, InputValue, TextError } from "./styles";
 import { useEffect, useState } from "react";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Toast } from "react-native-toast-notifications";
 import {
@@ -26,6 +26,8 @@ import { View, KeyboardAvoidingView, Platform, ScrollView, TouchableWithoutFeedb
 import { InputTime } from "../../components/InputTime";
 import { InputDate } from "../../components/InputDate";
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
+import { Timestamp } from "@react-native-firebase/firestore";
+import { ShareWithUsers } from '../../components/ShareWithUsers';
 
 const formSchema = z.object({
     category: z.string().min(1, "Categoria é obrigatória"),
@@ -37,6 +39,13 @@ const formSchema = z.object({
     hasNotification: z.boolean().optional(),
     status: z.boolean().optional(),
     expenseType: z.boolean().optional(),
+    sharedUsers: z.array(
+      z.object({
+        uid: z.string(),
+        userName: z.string(),
+        acceptedAt: z.union([z.null(), z.instanceof(Timestamp)]),
+      })
+    ),
 });
 
 type FormSchemaType = z.infer<typeof formSchema>;
@@ -44,7 +53,26 @@ type FormSchemaType = z.infer<typeof formSchema>;
 export function NewLaunch() {
     const route = useRoute();
     const navigation = useNavigation();
-    const { type, selectedItemId } = route.params as { type: "revenue" | "expense"; selectedItemId?: string };
+    const { 
+        type, 
+        selectedItemId, 
+        initialActiveButton, 
+        collectionType, 
+        isCreator 
+    } = route.params as { 
+        type?: "revenue" | "expense"; 
+        selectedItemId?: string; 
+        initialActiveButton?: string;
+        collectionType?: string;
+        isCreator?: boolean;
+    };
+    
+    // Determinar o tipo baseado no initialActiveButton se não estiver definido
+    const determinedType = type || (initialActiveButton === "receitas" ? "revenue" : "expense");
+    
+    // Determinar a coleção baseada no collectionType ou initialActiveButton
+    const determinedCollectionType = collectionType || (initialActiveButton === "receitas" ? "Revenue" : "Expense");
+
     const { sendNotification, notificationId } = useSendNotificaitons();
     const { data: dataExpense, loading: loadingExpense } = useFirestoreCollection("Expense");
     const { data: dataRevenue, loading: loadingRevenue } = useFirestoreCollection("Revenue");
@@ -68,21 +96,14 @@ export function NewLaunch() {
             status: false
         },
     });
+    const { control, handleSubmit, reset, setValue, watch } = form;
 
     const notifications = watch('hasNotification')
 
     useEffect(() => {
         if (!loadingExpense && dataExpense) {
-            // Aqui, você precisa ajustar a lógica para carregar os subscribers a partir dos dados disponíveis
-            const currentUserSubscribers = dataExpense
-                .flatMap(item => item.subscribers || [])
-                .filter((subscriberId): subscriberId is string => typeof subscriberId === 'string');
-
-            const areEqual = JSON.stringify(currentUserSubscribers) === JSON.stringify(subscriberIds);
-            if (!areEqual) {
-                setSubscriberIds(currentUserSubscribers);
-                console.log("Current User Subscribers:", currentUserSubscribers);
-            }
+            // Removendo a lógica de subscribers que não existe no tipo ExpenseData
+            console.log("Dados de despesas carregados");
         }
     }, [loadingExpense, dataExpense]);
 
@@ -131,7 +152,7 @@ export function NewLaunch() {
         setIsLoading(true);
 
         const db = getFirestore();
-        const collectionName = type === "revenue" ? "Revenue" : "Expense";
+        const collectionName = determinedType === "revenue" ? "Revenue" : "Expense";
         const docId = selectedItemId || Date.now().toString();
 
         if (data.hasNotification) {
@@ -142,13 +163,13 @@ export function NewLaunch() {
             ...data,
             uid,
             value: currencyUnMask(data.value),
-            type,
+            type: determinedType,
             createdAt: new Date().toISOString(),
             notificationId: null,
         };
 
         try {
-            if (type === "expense" && data.expenseType) {
+            if (determinedType === "expense" && data.expenseType) {
                 const currentDate = new Date();
                 const currentMonth = currentDate.getMonth() + 1;
                 const currentYear = currentDate.getFullYear();
@@ -221,7 +242,7 @@ export function NewLaunch() {
 
     useEffect(() => {
         if (selectedItemId) {
-            const collectionName = type === "revenue" ? "Revenue" : "Expense";
+            const collectionName = determinedType === "revenue" ? "Revenue" : "Expense";
             const db = getFirestore();
 
             db
@@ -252,7 +273,7 @@ export function NewLaunch() {
                     Toast.show("Erro ao carregar dados do lançamento!", { type: "danger" });
                 });
         }
-    }, [selectedItemId, type, reset]);
+    }, [selectedItemId, determinedType, reset]);
 
     return (
         <KeyboardAvoidingView
@@ -264,7 +285,7 @@ export function NewLaunch() {
                     contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <DefaultContainer title={type === "revenue" ? "Nova Entrada" : "Nova Saída"} showButtonBack>
+                    <DefaultContainer title={determinedType === "revenue" ? "Nova Entrada" : "Nova Saída"} backButton>
                         <Container>
                             <Controller
                                 control={control}
@@ -288,12 +309,13 @@ export function NewLaunch() {
                                     render={({ field: { onChange, onBlur, value } }) => (
                                         <View>
                                             <Input
+                                                name="category"
                                                 placeholder="Categoria"
                                                 onBlur={onBlur}
                                                 onChangeText={onChange}
                                                 value={value}
+                                                errorMessage={errors.category?.message}
                                             />
-                                            {errors.category && <TextError>{errors.category.message}</TextError>}
                                         </View>
                                     )}
                                 />
@@ -301,16 +323,14 @@ export function NewLaunch() {
                                     control={control}
                                     name="name"
                                     render={({ field: { onChange, onBlur, value } }) => (
-                                        <>
-                                            <Input
-                                                placeholder="Nome"
-                                                name='user'
-                                                onBlur={onBlur}
-                                                onChangeText={onChange}
-                                                value={value}
-                                            />
-                                            {errors.name && <TextError>{errors.name.message}</TextError>}
-                                        </>
+                                        <Input
+                                            name="name"
+                                            placeholder="Nome"
+                                            value={value}
+                                            onChangeText={onChange}
+                                            onBlur={onBlur}
+                                            errorMessage={errors.name?.message}
+                                        />
                                     )}
                                 />
                                 <Controller
@@ -357,7 +377,7 @@ export function NewLaunch() {
                                         />
                                     )}
                                 />
-                                {type === "expense" && (
+                                {determinedType === "expense" && (
                                     <Controller
                                         control={control}
                                         name="expenseType"
@@ -372,7 +392,7 @@ export function NewLaunch() {
                                         )}
                                     />
                                 )}
-                                {type === "expense" && (
+                                {determinedType === "expense" && (
                                     <Controller
                                         control={control}
                                         name="status"
@@ -404,6 +424,14 @@ export function NewLaunch() {
                                         </>
                                     )}
                                 />
+                                {isCreator && (
+                                    <FormProvider {...form}>
+                                        <ShareWithUsers 
+                                            control={control} 
+                                            name="sharedUsers" 
+                                        />
+                                    </FormProvider>
+                                )}
                             </Content>
                             <Button title="Salvar" onPress={handleSubmit(onSubmit)} isLoading={isLoading} />
                         </Container>

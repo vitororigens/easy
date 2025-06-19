@@ -8,7 +8,7 @@ export declare global {
         screen?: keyof TabParamList;
         params?: TabParamList[keyof TabParamList];
       };
-      newlaunch: { selectedItemId?: string, initialActiveButton: string };
+      newlaunch: { selectedItemId?: string, initialActiveButton: string, collectionType?: string, isCreator?: boolean };
       newtask: undefined;
       privateroutes: undefined;
       list: undefined;

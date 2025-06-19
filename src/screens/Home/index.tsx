@@ -154,16 +154,24 @@ export function Home() {
   }
 
   function handleRevenueEdit(documentId: string, initialActiveButton: string) {
+    // Mapear o botão ativo para o tipo de coleção
+    const collectionType = initialActiveButton === "receitas" ? "Revenue" : "Expense";
+    
     navigation.navigate("newlaunch", {
       selectedItemId: documentId,
       initialActiveButton,
+      collectionType,
     } as never);
   }
 
   function handleExpenseEdit(documentId: string, initialActiveButton: string) {
+    // Mapear o botão ativo para o tipo de coleção
+    const collectionType = initialActiveButton === "receitas" ? "Revenue" : "Expense";
+    
     navigation.navigate("newlaunch", {
       selectedItemId: documentId,
       initialActiveButton,
+      collectionType,
     } as never);
   }
 
@@ -373,9 +381,13 @@ export function Home() {
     console.log("handleCreateItem - documentId:", documentId);
     console.log("handleCreateItem - initialActiveButton:", initialActiveButton);
     
+    // Mapear o botão ativo para o tipo de coleção
+    const collectionType = initialActiveButton === "receitas" ? "Revenue" : "Expense";
+    
     // Se documentId estiver vazio, não passar selectedItemId
     const params: any = {
       initialActiveButton: initialActiveButton || "receitas",
+      collectionType,
       isCreator: true,
     };
     

@@ -3,11 +3,8 @@ import styled from "styled-components/native";
 
 export const Container = styled.View`
     flex: 1;
+    padding: 16px;
     align-items: center;
-    padding: 20px;
-    background-color: ${({ theme }) => theme.COLORS.GRAY_300};
-    border-top-right-radius: 30px;
-    border-top-left-radius: 30px;
 `;
 
 
@@ -39,7 +36,7 @@ export const InputDescription = styled(TextInput).attrs(({ theme }) => ({
     font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
     font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
     padding: 16px;
-    background-color: ${({ theme }) => theme.COLORS.WHITE};
+    background-color: ${({ theme }) => theme.COLORS.GRAY_300};
     border-radius: 8px;
     margin-top: 10px;
     margin-bottom: 10px;
