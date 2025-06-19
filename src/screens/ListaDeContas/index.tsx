@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, Modal, TouchableOpacity, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { Container } from "../../components/Container";
 import { DefaultContainer } from "../../components/DefaultContainer";
-import { Expense } from "../../components/Expense";
 import { ItemsAccounts } from "../../components/ItemsAccounts";
 import { LoadData } from "../../components/LoadData";
 import { Loading } from "../../components/Loading";
@@ -12,6 +11,7 @@ import useFirestoreCollection from "../../hooks/useFirestoreCollection";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { ButtonClose, Content, Title } from "./styles";
 import { database } from "../../libs/firebase";
+import { NewLaunch } from "../NewLaunch";
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -130,12 +130,7 @@ export function ListaDeContas() {
             <Title style={{ color: "white" }}>Fechar</Title>
           </ButtonClose>
           <Container type="SECONDARY" title={"Editar Saída"}>
-            <Expense
-              selectedItemId={selectedItemId}
-              showButtonRemove
-              onCloseModal={() => setConfirmExpenseVisible(false)}
-              showButtonEdit
-            />
+            <NewLaunch />
           </Container>
         </DefaultContainer>
       </Modal>

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Button } from "../../components/Button";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Input } from "../../components/Input";
+import { Select } from "../../components/Select";
 import { Container, Content, InputDescription, InputValue, TextError } from "./styles";
 import { useEffect, useState } from "react";
 import { useUserAuth } from "../../hooks/useUserAuth";
@@ -28,6 +29,79 @@ import { InputDate } from "../../components/InputDate";
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { Timestamp } from "@react-native-firebase/firestore";
 import { ShareWithUsers } from '../../components/ShareWithUsers';
+import notifee, {
+    AndroidImportance,
+    TimestampTrigger,
+    TriggerType,
+} from "@notifee/react-native";
+import { createNotification } from "../../services/firebase/notifications.firebase";
+import {
+    createSharing,
+    ESharingStatus,
+    getSharing,
+} from "../../services/firebase/sharing.firebase";
+import { sendPushNotification } from "../../services/one-signal";
+import { useMonth } from "../../context/MonthProvider";
+
+// Categorias específicas
+const REVENUE_CATEGORIES = [
+    { label: "Salário", value: "salario" },
+    { label: "Vendas", value: "vendas" },
+    { label: "Investimentos", value: "investimentos" },
+    { label: "Comissão", value: "Comissão" },
+    { label: "Adiantamentos", value: "Adiantamentos" },
+    { label: "Outros", value: "Outros" },
+];
+
+const EXPENSE_CATEGORIES = [
+    { label: "Investimentos", value: "Investimentos" },
+    { label: "Contas", value: "Contas" },
+    { label: "Compras", value: "Compras" },
+    { label: "Faculdade", value: "Faculdade" },
+    { label: "Internet", value: "Internet" },
+    { label: "Academia", value: "Academia" },
+    { label: "Emprestimo", value: "Emprestimo" },
+    { label: "Comida", value: "Comida" },
+    { label: "Telefone", value: "Telefone" },
+    { label: "Entretenimento", value: "Entretenimento" },
+    { label: "Educação", value: "Educacao" },
+    { label: "Beleza", value: "beleza" },
+    { label: "Esporte", value: "esporte" },
+    { label: "Social", value: "social" },
+    { label: "Transporte", value: "transporte" },
+    { label: "Roupas", value: "roupas" },
+    { label: "Carro", value: "carro" },
+    { label: "Bebida", value: "bebida" },
+    { label: "Cigarro", value: "cigarro" },
+    { label: "Eletrônicos", value: "eletronicos" },
+    { label: "Viagem", value: "viagem" },
+    { label: "Saúde", value: "saude" },
+    { label: "Estimação", value: "estimacao" },
+    { label: "Reparar", value: "reparar" },
+    { label: "Moradia", value: "moradia" },
+    { label: "Presente", value: "presente" },
+    { label: "Doações", value: "doacoes" },
+    { label: "Loteria", value: "loteria" },
+    { label: "Lanches", value: "lanches" },
+    { label: "Filhos", value: "filhos" },
+    { label: "Outros", value: "outros" },
+];
+
+const NOTIFICATION_DATE_OPTIONS = [
+    { label: "No dia", value: "no dia" },
+    { label: "Um dia antes", value: "um dia antes" },
+    { label: "Tres dias antes", value: "tres dias antes" },
+    { label: "Cinco dias antes", value: "cinco dias antes" },
+];
+
+const NOTIFICATION_HOUR_OPTIONS = [
+    { label: "07:00", value: "07:00" },
+    { label: "08:00", value: "08:00" },
+    { label: "09:00", value: "09:00" },
+];
+
+const REPEAT_MONTHS_LIMIT = 11;
+const CURRENT_YEAR = new Date().getFullYear();
 
 const formSchema = z.object({
     category: z.string().min(1, "Categoria é obrigatória"),
@@ -39,12 +113,15 @@ const formSchema = z.object({
     hasNotification: z.boolean().optional(),
     status: z.boolean().optional(),
     expenseType: z.boolean().optional(),
+    repeat: z.boolean().optional(),
+    notificationDate: z.string().optional(),
+    notificationHour: z.string().optional(),
     sharedUsers: z.array(
-      z.object({
-        uid: z.string(),
-        userName: z.string(),
-        acceptedAt: z.union([z.null(), z.instanceof(Timestamp)]),
-      })
+        z.object({
+            uid: z.string(),
+            userName: z.string(),
+            acceptedAt: z.union([z.null(), z.instanceof(Timestamp)]),
+        })
     ),
 });
 
@@ -72,7 +149,7 @@ export function NewLaunch() {
     
     // Determinar a coleção baseada no collectionType ou initialActiveButton
     const determinedCollectionType = collectionType || (initialActiveButton === "receitas" ? "Revenue" : "Expense");
-
+    
     const { sendNotification, notificationId } = useSendNotificaitons();
     const { data: dataExpense, loading: loadingExpense } = useFirestoreCollection("Expense");
     const { data: dataRevenue, loading: loadingRevenue } = useFirestoreCollection("Revenue");
@@ -81,9 +158,11 @@ export function NewLaunch() {
     const uid = user?.uid;
     const [totalRevenue, setTotalRevenue] = useState(0);
     const [totalExpense, setTotalExpense] = useState(0);
+    const { selectedMonth } = useMonth();
 
     const [subscriberIds, setSubscriberIds] = useState<string[]>([]);
-    const { control, handleSubmit, reset, formState: { errors }, watch } = useForm<FormSchemaType>({
+    
+    const form = useForm<FormSchemaType>({
         defaultValues: {
             name: '',
             category: '',
@@ -93,20 +172,197 @@ export function NewLaunch() {
             description: '',
             hasNotification: false,
             expenseType: false,
-            status: false
+            status: false,
+            repeat: false,
+            notificationDate: 'no dia',
+            notificationHour: '08:00',
+            sharedUsers: []
         },
     });
-    const { control, handleSubmit, reset, setValue, watch } = form;
+    
+    const { control, handleSubmit, reset, setValue, watch, formState: { errors } } = form;
 
     const notifications = watch('hasNotification')
+    const repeat = watch('repeat')
+    const isExpense = determinedType === "expense";
 
-    useEffect(() => {
-        if (!loadingExpense && dataExpense) {
-            // Removendo a lógica de subscribers que não existe no tipo ExpenseData
-            console.log("Dados de despesas carregados");
+    // Obter categorias baseadas no tipo
+    const getCategories = () => {
+        return isExpense ? EXPENSE_CATEGORIES : REVENUE_CATEGORIES;
+    };
+
+    // Função para validar parâmetros de notificação
+    const validateNotificationParams = () => {
+        const notificationDate = watch('notificationDate');
+        const notificationHour = watch('notificationHour');
+
+        if (!notificationHour || !notificationDate) {
+            return {
+                isValid: false,
+                errorMessage: "Horário ou data de notificação não definido.",
+            };
         }
-    }, [loadingExpense, dataExpense]);
 
+        const [hour, minute] = notificationHour.split(":");
+        if (isNaN(Number(hour)) || isNaN(Number(minute))) {
+            return { isValid: false, errorMessage: "Hora ou minuto inválido." };
+        }
+
+        const [day, month, year] = watch('date').split('/');
+        const notificationDateObj = new Date(Number(year), Number(month) - 1, Number(day));
+        notificationDateObj.setHours(Number(hour), Number(minute), 0, 0);
+
+        switch (notificationDate) {
+            case "um dia antes":
+                notificationDateObj.setDate(notificationDateObj.getDate() - 1);
+                break;
+            case "tres dias antes":
+                notificationDateObj.setDate(notificationDateObj.getDate() - 3);
+                break;
+            case "cinco dias antes":
+                notificationDateObj.setDate(notificationDateObj.getDate() - 5);
+                break;
+            default:
+                // "no dia" - não altera a data
+                break;
+        }
+
+        if (notificationDateObj < new Date()) {
+            return {
+                isValid: false,
+                errorMessage: "A data de notificação está no passado.",
+            };
+        }
+
+        return { isValid: true, notificationDate: notificationDateObj };
+    };
+
+    // Agendar notificação local
+    const scheduleNotification = async (notificationDate: Date) => {
+        const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: notificationDate.getTime(),
+        };
+
+        try {
+            const channelId = await notifee.createChannel({
+                id: "notificacao",
+                name: "Expense Notification",
+                vibration: true,
+                importance: AndroidImportance.HIGH,
+            });
+
+            await notifee.createTriggerNotification(
+                {
+                    title: "Lembrete de conta!",
+                    body: `Você tem uma ${isExpense ? 'despesa' : 'receita'} agendada: ${watch('name')}`,
+                    android: { channelId },
+                },
+                trigger
+            );
+        } catch (error) {
+            console.error("Erro ao agendar notificação:", error);
+        }
+    };
+
+    // Criar itens recorrentes
+    const createRepeatedItems = async (itemData: any, monthNumber: number, year: number, day: number) => {
+        if (!repeat) return;
+
+        const repeatPromises = [];
+        
+        for (let i = 1; i <= REPEAT_MONTHS_LIMIT; i++) {
+            let nextMonth = monthNumber + i;
+            let nextYear = year;
+
+            if (nextMonth > 12) {
+                nextMonth -= 12;
+                nextYear++;
+            }
+
+            if (nextYear > CURRENT_YEAR) {
+                break;
+            }
+
+            const nextDate = `${day}/${nextMonth}/${nextYear}`;
+            const nextMonthItemData = {
+                ...itemData,
+                date: nextDate,
+                month: nextMonth,
+            };
+
+            repeatPromises.push(
+                getFirestore().collection(determinedCollectionType).add(nextMonthItemData)
+                    .catch((error) => {
+                        console.error("Erro ao adicionar a transação repetida:", error);
+                    })
+            );
+        }
+
+        await Promise.allSettled(repeatPromises);
+    };
+
+    // Notificações para usuários compartilhados
+    const handleUserNotifications = async (
+        sharedUsers: FormSchemaType['sharedUsers'],
+        usersInvitedByMe: any[],
+        createdItemId: string
+    ) => {
+        if (!sharedUsers?.length || !uid || !user?.displayName) return;
+
+        const notificationPromises = sharedUsers.map(async (userSharing) => {
+            const alreadySharing = usersInvitedByMe.some(
+                (u) => u.target === userSharing.uid && u.status === "accepted"
+            );
+
+            const possibleSharingRequestExists = usersInvitedByMe.some(
+                (u) => u.target === userSharing.uid
+            );
+
+            const message = alreadySharing
+                ? `${user.displayName} adicionou um novo item`
+                : `${user.displayName} convidou você para compartilhar um item`;
+
+            const notificationData = {
+                sender: uid,
+                receiver: userSharing.uid,
+                status: alreadySharing ? "sharing_accepted" as const : "pending" as const,
+                type: "sharing_invite" as const,
+                source: {
+                    type: isExpense ? "expense" as const : "expense" as const,
+                    id: createdItemId,
+                },
+                title: `Compartilhamento de ${isExpense ? 'despesa' : 'receita'}`,
+                description: message,
+                createdAt: Timestamp.now(),
+            };
+
+            const promises = [
+                createNotification(notificationData),
+                sendPushNotification({
+                    title: `Compartilhamento de ${isExpense ? 'despesa' : 'receita'}`,
+                    message,
+                    uid: userSharing.uid,
+                }),
+            ];
+
+            if (!alreadySharing && !possibleSharingRequestExists) {
+                promises.push(
+                    createSharing({
+                        invitedBy: uid,
+                        status: ESharingStatus.PENDING,
+                        target: userSharing.uid,
+                        createdAt: Timestamp.now(),
+                        updatedAt: Timestamp.now(),
+                    })
+                );
+            }
+
+            return Promise.allSettled(promises);
+        });
+
+        await Promise.all(notificationPromises);
+    };
 
     const handleScheduleNotification = async (data: FormSchemaType) => {
         if (!subscriberIds || subscriberIds.length === 0 || !uid) {
@@ -151,49 +407,82 @@ export function NewLaunch() {
 
         setIsLoading(true);
 
-        const db = getFirestore();
-        const collectionName = determinedType === "revenue" ? "Revenue" : "Expense";
-        const docId = selectedItemId || Date.now().toString();
-
-        if (data.hasNotification) {
-            await handleScheduleNotification(data);
-        }
-
-        const baseData = {
-            ...data,
-            uid,
-            value: currencyUnMask(data.value),
-            type: determinedType,
-            createdAt: new Date().toISOString(),
-            notificationId: null,
-        };
-
         try {
-            if (determinedType === "expense" && data.expenseType) {
-                const currentDate = new Date();
-                const currentMonth = currentDate.getMonth() + 1;
-                const currentYear = currentDate.getFullYear();
+            const db = getFirestore();
+            const collectionName = determinedCollectionType;
+            const docId = selectedItemId || Date.now().toString();
 
-                const promises = [];
-                for (let month = currentMonth; month <= 12; month++) {
-                    const date = `${currentYear}-${month.toString().padStart(2, "0")}-01`;
-                    const monthData = { ...baseData, date };
-                    const newDocRef = doc(collection(db, collectionName));
-                    promises.push(setDoc(newDocRef, monthData));
+            // Validar notificação se habilitada
+            if (data.hasNotification) {
+                const notificationValidation = validateNotificationParams();
+                if (!notificationValidation.isValid) {
+                    Toast.show(notificationValidation.errorMessage, { type: 'danger' });
+                    setIsLoading(false);
+                    return;
                 }
-
-                await Promise.all(promises);
-                await updateTotals();
-                Toast.show('Despesa fixa salva para todos os meses!', { type: 'success' });
-            } else {
-                const docRef = doc(db, collectionName, docId);
-                await setDoc(docRef, baseData, { merge: true });
-                await updateTotals();
-                Toast.show(
-                    selectedItemId ? 'Lançamento atualizado!' : 'Lançamento adicionado!',
-                    { type: 'success' }
-                );
+                if (notificationValidation.notificationDate) {
+                    await scheduleNotification(notificationValidation.notificationDate);
+                }
             }
+
+            // Parse da data para obter mês, ano e dia
+            const [day, month, year] = data.date.split('/');
+            const monthNumber = Number(month);
+            const yearNumber = Number(year);
+            const dayNumber = Number(day);
+
+            // Obter usuários convidados por mim para verificar status de compartilhamento
+            const usersInvitedByMe = await getSharing({
+                profile: "invitedBy",
+                uid: uid || "",
+            });
+
+            const transactionValue = data.value ? currencyUnMask(data.value) : "0";
+
+            const baseData = {
+                name: data.name,
+                category: data.category,
+                uid: uid || "",
+                date: data.date,
+                valueTransaction: transactionValue,
+                description: data.description || "",
+                repeat: data.repeat || false,
+                type: isExpense ? "output" : "input",
+                month: monthNumber,
+                status: data.status || false,
+                shareWith: data.sharedUsers?.map((user) => user.uid) || [],
+                shareInfo: data.sharedUsers?.map((user) => ({
+                    uid: user.uid,
+                    userName: user.userName,
+                    acceptedAt: usersInvitedByMe.some(
+                        (u) => u.target === user.uid && u.status === ESharingStatus.ACCEPTED
+                    )
+                        ? Timestamp.now()
+                        : null,
+                })) || [],
+                createdAt: new Date().toISOString(),
+            };
+
+            // Criar ou atualizar o item principal
+            const docRef = doc(db, collectionName, docId);
+            await setDoc(docRef, baseData, { merge: true });
+
+            // Criar itens recorrentes se habilitado
+            await createRepeatedItems(baseData, monthNumber, yearNumber, dayNumber);
+
+            // Enviar notificações para usuários compartilhados
+            await handleUserNotifications(
+                data.sharedUsers,
+                usersInvitedByMe,
+                docId
+            );
+
+            await updateTotals();
+            
+            Toast.show(
+                selectedItemId ? 'Lançamento atualizado!' : 'Lançamento adicionado!',
+                { type: 'success' }
+            );
 
             reset();
             navigation.goBack();
@@ -242,7 +531,7 @@ export function NewLaunch() {
 
     useEffect(() => {
         if (selectedItemId) {
-            const collectionName = determinedType === "revenue" ? "Revenue" : "Expense";
+            const collectionName = determinedCollectionType;
             const db = getFirestore();
 
             db
@@ -259,11 +548,14 @@ export function NewLaunch() {
                                 category: data.category || '',
                                 date: data.date || '',
                                 time: data.time || '',
-                                value: data.value || '',
+                                value: data.valueTransaction || '',
                                 description: data.description || '',
                                 hasNotification: data.hasNotification || false,
-                                expenseType: data.expenseType || false,
-                                status: data.status || false
+                                status: data.status || false,
+                                repeat: data.repeat || false,
+                                notificationDate: data.notificationDate || 'no dia',
+                                notificationHour: data.notificationHour || '08:00',
+                                sharedUsers: data.shareInfo || []
                             });
                         }
                     }
@@ -273,9 +565,10 @@ export function NewLaunch() {
                     Toast.show("Erro ao carregar dados do lançamento!", { type: "danger" });
                 });
         }
-    }, [selectedItemId, determinedType, reset]);
+    }, [selectedItemId, determinedCollectionType, reset]);
 
     return (
+      <DefaultContainer title={determinedType === "revenue" ? "Nova Entrada" : "Nova Saída"} backButton>
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
@@ -285,7 +578,7 @@ export function NewLaunch() {
                     contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <DefaultContainer title={determinedType === "revenue" ? "Nova Entrada" : "Nova Saída"} backButton>
+                  
                         <Container>
                             <Controller
                                 control={control}
@@ -308,12 +601,11 @@ export function NewLaunch() {
                                     name="category"
                                     render={({ field: { onChange, onBlur, value } }) => (
                                         <View>
-                                            <Input
-                                                name="category"
-                                                placeholder="Categoria"
-                                                onBlur={onBlur}
-                                                onChangeText={onChange}
+                                            <Select
+                                                onValueChange={onChange}
                                                 value={value}
+                                                placeholder="Selecione uma categoria"
+                                                items={getCategories()}
                                                 errorMessage={errors.category?.message}
                                             />
                                         </View>
@@ -367,32 +659,59 @@ export function NewLaunch() {
                                 />
                                 <Controller
                                     control={control}
+                                    name="repeat"
+                                    render={({ field: { onChange, value } }) => (
+                                        <Switch
+                                            onValueChange={onChange}
+                                            title="Repetir mensalmente?"
+                                            value={value}
+                                        />
+                                    )}
+                                />
+                                <Controller
+                                    control={control}
                                     name="hasNotification"
                                     render={({ field: { onChange, onBlur, value } }) => (
                                         <Switch
                                             onValueChange={onChange}
-                                            title="Adiconar notificação"
+                                            title="Adicionar notificação"
                                             value={value}
-
                                         />
                                     )}
                                 />
-                                {determinedType === "expense" && (
-                                    <Controller
-                                        control={control}
-                                        name="expenseType"
-                                        render={({ field: { onChange, value } }) => (
-
-                                            <Switch
-                                                onValueChange={onChange}
-                                                title="Despesa fixa?"
-                                                value={value}
-                                            />
-
-                                        )}
-                                    />
+                                {notifications && (
+                                    <>
+                                        <Controller
+                                            control={control}
+                                            name="notificationDate"
+                                            render={({ field: { onChange, onBlur, value } }) => (
+                                                <View>
+                                                    <Select
+                                                        onValueChange={onChange}
+                                                        value={value}
+                                                        placeholder="Quando notificar?"
+                                                        items={NOTIFICATION_DATE_OPTIONS}
+                                                    />
+                                                </View>
+                                            )}
+                                        />
+                                        <Controller
+                                            control={control}
+                                            name="notificationHour"
+                                            render={({ field: { onChange, onBlur, value } }) => (
+                                                <View>
+                                                    <Select
+                                                        onValueChange={onChange}
+                                                        value={value}
+                                                        placeholder="Horário da notificação"
+                                                        items={NOTIFICATION_HOUR_OPTIONS}
+                                                    />
+                                                </View>
+                                            )}
+                                        />
+                                    </>
                                 )}
-                                {determinedType === "expense" && (
+                                {isExpense && (
                                     <Controller
                                         control={control}
                                         name="status"
@@ -435,9 +754,10 @@ export function NewLaunch() {
                             </Content>
                             <Button title="Salvar" onPress={handleSubmit(onSubmit)} isLoading={isLoading} />
                         </Container>
-                    </DefaultContainer>
+           
                 </ScrollView>
             </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
+        </DefaultContainer>
     );
 }
