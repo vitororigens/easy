@@ -111,14 +111,14 @@ export const ItemContent = styled.View`
 `;
 
 export const Title = styled.Text`
-    font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+    font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
     font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
     color: ${({ theme }) => theme.COLORS.GRAY_400};
     margin-bottom: 2px;
 `;
 
 export const SubTitle = styled.Text<Props>`
-    font-size: ${({ theme }) => theme.FONTE_SIZE.GG}px;
+    font-size: ${({ theme }) => theme.FONT_SIZE.GG}px;
     font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
     color: ${({ theme, type }) => type === 'PRIMARY'
         ? theme.COLORS.TEAL_600
@@ -150,7 +150,7 @@ export const ActionButton = styled(TouchableOpacity)`
 `;
 
 export const ButtonText = styled.Text`
-    font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+    font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
     font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
     color: ${({ theme }) => theme.COLORS.WHITE};
     margin-left: 8px;

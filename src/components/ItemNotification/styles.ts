@@ -40,7 +40,7 @@ export const Time = styled.Text`
 
 export const Icon = styled(AntDesign).attrs<Props>(({ theme }) => ({
   // color: type === "PRIMARY" ? theme.COLORS.GREEN_700 : theme.COLORS.RED_700,
-  size: theme.FONTE_SIZE.LG,
+  size: theme.FONT_SIZE.LG,
 }))`
   ${(props) =>
     props.type === "success" &&

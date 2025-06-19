@@ -35,7 +35,7 @@ align-items: center;
 `;
 
 export const Title = styled.Text`
-    font-size: ${({theme}) => theme.FONTE_SIZE.LG}px;
+    font-size: ${({theme}) => theme.FONT_SIZE.LG}px;
     font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
 `;
 
@@ -47,7 +47,7 @@ export const Divider = styled.View`
 
 
 export const SubTitle = styled.Text<Props>`
-font-size: ${({theme}) => theme.FONTE_SIZE.XL}px;
+font-size: ${({theme}) => theme.FONT_SIZE.XL}px;
 font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
 color: ${({theme, type}) => type === 'PRIMARY' 
     ? theme.COLORS.TEAL_600 

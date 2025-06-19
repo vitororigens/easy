@@ -110,7 +110,7 @@ interface IBadgeProps {
 
 export const BadgeText = styled.Text<IBadgeProps>`
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
 
   ${({ status, theme }) => css`
     ${status === "accepted" &&
@@ -155,5 +155,5 @@ export const Badge = styled.View<IBadgeProps>`
 
 export const Icon = styled(FontAwesome).attrs(({ theme }) => ({
   color: theme.COLORS.RED_700,
-  size: theme.FONTE_SIZE.XL,
+  size: theme.FONT_SIZE.XL,
 }))``;

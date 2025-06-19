@@ -9,7 +9,7 @@ export const Container = styled.View`
 `;
 
 export const Title = styled.Text`
-    font-size: ${({theme}) => theme.FONTE_SIZE.SM}px;
+    font-size: ${({theme}) => theme.FONT_SIZE.SM}px;
     font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
     color: ${({theme}) => theme.COLORS.GRAY_600};
     width: 150px;
@@ -18,14 +18,14 @@ export const Title = styled.Text`
 `;
 
 export const Span = styled.Text`
-    font-size: ${({theme}) => theme.FONTE_SIZE.SM}px;
+    font-size: ${({theme}) => theme.FONT_SIZE.SM}px;
     font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
     color: ${({theme}) => theme.COLORS.PURPLE_600};
 `;
 
 
 export const Text = styled.Text`
-    font-size: ${({theme}) => theme.FONTE_SIZE.SM}px;
+    font-size: ${({theme}) => theme.FONT_SIZE.SM}px;
     font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
     color: ${({theme}) => theme.COLORS.GRAY_400};
     text-align: center;
@@ -34,7 +34,7 @@ export const Text = styled.Text`
 `;
 
 export const TextError = styled.Text`
-    font-size: ${({theme}) => theme.FONTE_SIZE.SM}px;
+    font-size: ${({theme}) => theme.FONT_SIZE.SM}px;
     font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
     color: ${({theme}) => theme.COLORS.GRAY_400};
     text-align: center;

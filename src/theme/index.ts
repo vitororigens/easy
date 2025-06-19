@@ -22,7 +22,7 @@ export default {
     BOLD: 'Roboto_700Bold',
 
   },
-  FONTE_SIZE: {
+  FONT_SIZE: {
     SM: 12,
     MD: 14,
     LG: 16,

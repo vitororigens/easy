@@ -45,7 +45,7 @@ export const ContentItems = styled.View`
 
 export const Title = styled.Text<Props>`
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   color: ${({ theme, type }) =>
     type === "primary"
       ? theme.COLORS.GREEN_700
@@ -56,7 +56,7 @@ export const Title = styled.Text<Props>`
 
 export const SubTitle = styled.Text`
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
   color: ${({ theme }) => theme.COLORS.GRAY_400};
 `;
 
@@ -73,7 +73,7 @@ export const IconMenu = styled(Entypo).attrs<Props>(({ theme, type }) => ({
       : type === "secondary"
       ? theme.COLORS.RED_700
       : theme.COLORS.YELLOW_700,
-  size: theme.FONTE_SIZE.XL,
+  size: theme.FONT_SIZE.XL,
 }))``;
 
 export const ContainerMenu = styled.View`

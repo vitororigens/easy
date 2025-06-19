@@ -7,7 +7,7 @@ export const Container = styled.View`
 
 export const Title = styled.Text`
   font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
-  font-size: ${({theme}) => theme.FONTE_SIZE.XL}px;
+  font-size: ${({theme}) => theme.FONT_SIZE.XL}px;
   color: ${({theme}) => theme.COLORS.GRAY_600};
   margin-bottom: 24px;
 `;
@@ -22,7 +22,7 @@ export const InputContainer = styled.View`
 
 export const Label = styled.Text`
   font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({theme}) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({theme}) => theme.FONT_SIZE.MD}px;
   color: ${({theme}) => theme.COLORS.GRAY_600};
   margin-bottom: 8px;
 `;
@@ -42,6 +42,6 @@ export const SelectButton = styled.TouchableOpacity<{ active?: boolean }>`
 
 export const SelectText = styled.Text<{ active?: boolean }>`
   font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({theme}) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({theme}) => theme.FONT_SIZE.MD}px;
   color: ${({theme, active}) => active ? theme.COLORS.WHITE : theme.COLORS.GRAY_600};
 `; 

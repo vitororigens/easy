@@ -12,7 +12,7 @@ type ListItemProps = {
 
 export const Title = styled.Text<ListItemProps>`
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.GG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.GG}px;
   color: ${({ theme, type }) =>
     type === "primary" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
   text-decoration-line: ${({ type }) =>
@@ -42,12 +42,12 @@ export const CircleContainer = styled(TouchableOpacity)`
 
 export const Plus = styled(FontAwesome).attrs(({ theme }) => ({
   color: theme.COLORS.WHITE,
-  size: theme.FONTE_SIZE.GG,
+  size: theme.FONT_SIZE.GG,
 }))``;
 
 export const Remove = styled(AntDesign).attrs(({ theme }) => ({
   color: theme.COLORS.WHITE,
-  size: theme.FONTE_SIZE.SM,
+  size: theme.FONT_SIZE.SM,
 }))`
   position: absolute;
   top: -2px;
@@ -64,7 +64,7 @@ export const Remove = styled(AntDesign).attrs(({ theme }) => ({
 
 export const TextCircle = styled.Text`
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
   color: ${({ theme }) => theme.COLORS.PURPLE_800};
 `;
 
@@ -102,7 +102,7 @@ export const ButtonSelect = styled(TouchableOpacity)`
 export const IconCheck = styled(MaterialCommunityIcons).attrs<ListItemProps>(
   ({ theme, type }) => ({
     color: type === "primary" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800,
-    size: theme.FONTE_SIZE.XL,
+    size: theme.FONT_SIZE.XL,
   })
 )`
   margin-right: 5px;
@@ -129,7 +129,7 @@ export const ActionButton = styled(TouchableOpacity)`
 export const ActionButtonText = styled.Text`
   color: ${({ theme }) => theme.COLORS.PURPLE_800};
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
 `;
 
 export const FavoritesContainer = styled.View`
@@ -169,5 +169,5 @@ export const CloseButton = styled(TouchableOpacity)`
 export const CloseButtonText = styled.Text`
   color: ${({ theme }) => theme.COLORS.WHITE};
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.GG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.GG}px;
 `;

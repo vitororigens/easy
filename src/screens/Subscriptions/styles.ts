@@ -8,7 +8,7 @@ export const Container = styled.View`
 
 export const Title = styled.Text`
   font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
-  font-size: ${({theme}) => theme.FONTE_SIZE.XL}px;
+  font-size: ${({theme}) => theme.FONT_SIZE.XL}px;
   color: ${({theme}) => theme.COLORS.GRAY_600};
   margin-bottom: 24px;
 `;
@@ -29,7 +29,7 @@ export const FilterButton = styled.TouchableOpacity<{ active: boolean }>`
 
 export const FilterText = styled.Text<{ active: boolean }>`
   font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({theme}) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({theme}) => theme.FONT_SIZE.MD}px;
   color: ${({theme, active}) => active ? theme.COLORS.WHITE : theme.COLORS.GRAY_600};
 `;
 
@@ -47,28 +47,28 @@ export const ItemContainer = styled(TouchableOpacity)`
 
 export const ItemTitle = styled.Text`
   font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
-  font-size: ${({theme}) => theme.FONTE_SIZE.LG}px;
+  font-size: ${({theme}) => theme.FONT_SIZE.LG}px;
   color: ${({theme}) => theme.COLORS.GRAY_600};
   margin-bottom: 8px;
 `;
 
 export const ItemValue = styled.Text`
   font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({theme}) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({theme}) => theme.FONT_SIZE.MD}px;
   color: ${({theme}) => theme.COLORS.GRAY_600};
   margin-bottom: 4px;
 `;
 
 export const ItemDate = styled.Text`
   font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({theme}) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({theme}) => theme.FONT_SIZE.SM}px;
   color: ${({theme}) => theme.COLORS.GRAY_400};
   margin-bottom: 4px;
 `;
 
 export const ItemStatus = styled.Text<{ active: boolean }>`
   font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({theme}) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({theme}) => theme.FONT_SIZE.SM}px;
   color: ${({theme, active}) => active ? theme.COLORS.GREEN_700 : theme.COLORS.RED_700};
 `;
 
@@ -81,7 +81,7 @@ export const EmptyContainer = styled.View`
 
 export const EmptyText = styled.Text`
   font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({theme}) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({theme}) => theme.FONT_SIZE.MD}px;
   color: ${({theme}) => theme.COLORS.GRAY_400};
   text-align: center;
   margin-top: 8px;
@@ -133,7 +133,7 @@ export const DividerContent = styled.View`
 
 export const SubTitle = styled.Text`
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   color: ${({ theme }) => theme.COLORS.WHITE};
   margin-top: 5px;
 `;

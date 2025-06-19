@@ -9,7 +9,7 @@ export const Container = styled.View`
 `;
 
 export const Title = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.XL}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.XL}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme }) => theme.COLORS.PURPLE_600};
   text-align: center;
@@ -18,7 +18,7 @@ export const Title = styled.Text`
 `;
 
 export const SubTitle = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme }) => theme.COLORS.TEAL_600};
   text-align: center;

@@ -154,14 +154,14 @@ export function Home() {
   }
 
   function handleRevenueEdit(documentId: string, initialActiveButton: string) {
-    navigation.navigate("newtask", {
+    navigation.navigate("newlaunch", {
       selectedItemId: documentId,
       initialActiveButton,
     } as never);
   }
 
   function handleExpenseEdit(documentId: string, initialActiveButton: string) {
-    navigation.navigate("newtask", {
+    navigation.navigate("newlaunch", {
       selectedItemId: documentId,
       initialActiveButton,
     } as never);
@@ -387,7 +387,7 @@ export function Home() {
     console.log("handleCreateItem - params:", params);
     
     try {
-      navigation.navigate("newtask", params as never);
+      navigation.navigate("newlaunch", params as never);
     } catch (error) {
       console.error("Erro ao navegar para newtask:", error);
     }

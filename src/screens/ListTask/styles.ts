@@ -66,7 +66,7 @@ export const HeaderContainer = styled.View`
 `;
 
 export const Title = styled.Text<Props>`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme, type }) =>
     type === "PRIMARY" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_600};
@@ -106,7 +106,7 @@ export const EmptyContainer = styled.View`
 `;
 
 export const SubTitle = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   text-align: center;
   color: ${({ theme }) => theme.COLORS.GRAY_400};
@@ -126,14 +126,14 @@ export const TaskCard = styled.TouchableOpacity`
 `;
 
 export const TaskName = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   color: ${({ theme }) => theme.COLORS.GRAY_600};
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   margin-bottom: 8px;
 `;
 
 export const DateText = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
   color: ${({ theme }) => theme.COLORS.GRAY_400};
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   margin-bottom: 4px;

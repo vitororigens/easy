@@ -1,65 +1,54 @@
-import { TextInput, TouchableOpacity } from "react-native";
+import { TextInput } from "react-native";
 import styled from "styled-components/native";
 
-export type subTitleTypeStyleProps = 'PRIMARY' | 'SECONDARY';
-
-type Props = {
-    type: subTitleTypeStyleProps;
-}
-
-
-export const Content = styled.View`
+export const Container = styled.View`
     flex: 1;
+    align-items: center;
     padding: 20px;
+    background-color: ${({ theme }) => theme.COLORS.GRAY_300};
+    border-top-right-radius: 30px;
+    border-top-left-radius: 30px;
 `;
 
-export const Header = styled.View`
-    width: 100%;
 
-`;
-
-export const Title = styled.Text`
-    font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
-    font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-    color: ${({ theme }) => theme.COLORS.GRAY_600};
-`;
-
-export const Divider = styled.View`
-    width: 100%;
-    height: 4px;
-    background-color: ${({ theme }) => theme.COLORS.TEAL_600};
-`;
-
-export const ButtonClose = styled(TouchableOpacity)`
-    height: 40px;
-    padding: 10px;
-`;
-
-export const Input = styled(TextInput).attrs(({ theme }) => ({
+export const InputValue = styled(TextInput).attrs(({ theme }) => ({
     placeholderTextColor: theme.COLORS.GRAY_400
 }))`
-    flex: 1;
-
-    min-height: 40px;
-    max-height: 40px;
-
-
-    color: ${({ theme }) => theme.COLORS.GRAY_600};
-    font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-    font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
-    border-bottom-width: 2px; 
-    border-bottom-color: ${({ theme }) => theme.COLORS.PURPLE_800};
-    margin-bottom: 15px;
+    min-height: 80px;
+    max-height: 80px;
+    color: ${({ theme }) => theme.COLORS.TEAL_600};
+    font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+    font-size: ${({ theme }) => theme.FONT_SIZE.XL}px;
+    padding: 10px;
+    margin-bottom: 20px;
 `;
 
-export const Button = styled(TouchableOpacity)`
-    flex: 1;
-    min-height: 60px;
-    max-height: 60px;
-    background-color: ${({ theme }) => theme.COLORS.TEAL_600};
+export const Content = styled.View`
     width: 100%;
-    border-bottom-width: 5px; 
-    border-bottom-color: ${({ theme }) => theme.COLORS.PURPLE_800};
-    align-items: center;
-    justify-content: center;
+    margin-bottom: 20px;
+    flex: 1;
+`;
+
+export const InputDescription = styled(TextInput).attrs(({ theme }) => ({
+    placeholderTextColor: theme.COLORS.GRAY_400,
+}))`
+    width: 100%;
+    min-height: 100px;
+    max-height: 100px;
+    color: ${({ theme }) => theme.COLORS.GRAY_600};
+    font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+    font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
+    padding: 16px;
+    background-color: ${({ theme }) => theme.COLORS.WHITE};
+    border-radius: 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+`;
+
+export const TextError = styled.Text`
+    font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
+    color: ${({ theme }) => theme.COLORS.RED_700};
+    font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+    
+    margin-bottom: 5px;
 `;

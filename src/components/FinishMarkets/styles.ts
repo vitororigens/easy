@@ -33,7 +33,7 @@ export const ButtonText = styled.View`
 
 export const Title = styled.Text`
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   color: ${({ theme }) => theme.COLORS.WHITE};
 `;
 
@@ -58,7 +58,7 @@ export const Input = styled(TextInput)`
   border-radius: 8px;
   padding: 8px 16px;
   margin: 8px 0;
-  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   color: ${({ theme }) => theme.COLORS.GRAY_600};
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
 `; 

@@ -28,20 +28,20 @@ export const Header = styled.View<Props>`
 
 export const Title = styled.Text`
     font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
-    font-size: ${({theme}) => theme.FONTE_SIZE.XL}px;
+    font-size: ${({theme}) => theme.FONT_SIZE.XL}px;
     color: ${({theme}) => theme.COLORS.WHITE};
 `;
 
 export const SubTitle = styled.Text`
     font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-    font-size: ${({theme}) => theme.FONTE_SIZE.LG}px;
+    font-size: ${({theme}) => theme.FONT_SIZE.LG}px;
     color: ${({theme}) => theme.COLORS.GRAY_400};
 `;
 
 
 export const Icon = styled(FontAwesome5).attrs(({theme}) => ({
     color: theme.COLORS.WHITE,
-    size: theme.FONTE_SIZE.XL
+    size: theme.FONT_SIZE.XL
 }))`
 margin-right: 10px;
 `;

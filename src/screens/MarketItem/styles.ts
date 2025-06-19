@@ -20,7 +20,7 @@ export const Header = styled.View`
 `;
 
 export const Title = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme }) => theme.COLORS.GRAY_600};
 `;
@@ -46,7 +46,7 @@ export const Input = styled(TextInput).attrs(({ theme }) => ({
 
   color: ${({ theme }) => theme.COLORS.GRAY_600};
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   border-bottom-width: 2px;
   border-bottom-color: ${({ theme }) => theme.COLORS.PURPLE_800};
   margin-bottom: 15px;
@@ -65,7 +65,7 @@ export const Button = styled(TouchableOpacity)`
 `;
 
 export const Span = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme }) => theme.COLORS.GRAY_600};
 `;
@@ -84,11 +84,11 @@ export const ButtonPlus = styled(TouchableOpacity)`
 
 export const Plus = styled(FontAwesome).attrs(({ theme }) => ({
   color: theme.COLORS.WHITE,
-  size: theme.FONTE_SIZE.GG,
+  size: theme.FONT_SIZE.GG,
 }))``;
 
 export const SubTitle = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme }) => theme.COLORS.WHITE};
 `;

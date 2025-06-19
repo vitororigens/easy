@@ -33,7 +33,7 @@ export const ContentTitle = styled(TouchableOpacity)`
 `;
 
 export const Title = styled.Text<{ active?: boolean }>`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme, active }) => 
     active ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
@@ -41,7 +41,7 @@ export const Title = styled.Text<{ active?: boolean }>`
 `;
 
 export const SubTitle = styled.Text<{ type?: "PRIMARY" | "SECONDARY" }>`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme, type }) =>
     type === "PRIMARY" ? theme.COLORS.GREEN_700 : theme.COLORS.RED_700};
@@ -55,7 +55,7 @@ export const DividerContent = styled.View`
 `;
 
 export const Icon = styled(MaterialIcons)`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.XL}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.XL}px;
   color: ${({ theme }) => theme.COLORS.GRAY_600};
 `;
 
@@ -121,14 +121,14 @@ export const StatItem = styled.View`
 `;
 
 export const StatValue = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
   font-weight: bold;
   color: ${({ theme }) => theme.COLORS.PURPLE_800};
   margin-bottom: 4px;
 `;
 
 export const StatLabel = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
   color: ${({ theme }) => theme.COLORS.GRAY_600};
   text-align: center;
 `;

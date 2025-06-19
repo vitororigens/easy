@@ -35,7 +35,7 @@ export const ButtonBar = styled(TouchableOpacity)`
     width: 50%;
 `;
 export const Title = styled.Text`
-    font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+    font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
     font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
 `;
 
@@ -47,7 +47,7 @@ export const Divider = styled.View`
 
 
 export const SubTitle = styled.Text<Props>`
-    font-size: ${({ theme }) => theme.FONTE_SIZE.XL}px;
+    font-size: ${({ theme }) => theme.FONT_SIZE.XL}px;
     font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
     color: ${({ theme, type }) => type === 'PRIMARY'
         ? theme.COLORS.TEAL_600
@@ -86,7 +86,7 @@ export const Input = styled(TextInput).attrs(({ theme }) => ({
 
     color: ${({ theme }) => theme.COLORS.GRAY_600};
     font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-    font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+    font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
     border-bottom-width: 2px; 
     border-bottom-color: ${({ theme }) => theme.COLORS.PURPLE_800};
     margin-bottom: 15px;
@@ -94,7 +94,7 @@ export const Input = styled(TextInput).attrs(({ theme }) => ({
 
 
 export const TitleTask = styled.Text`
-    font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+    font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
     font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
     color: ${({theme}) => theme.COLORS.GRAY_600};
 `;
@@ -109,7 +109,7 @@ export const InputDescription = styled(TextInput).attrs(({ theme }) => ({
     color: ${({ theme }) => theme.COLORS.GRAY_600};
     background-color: ${({theme}) => theme.COLORS.GRAY_300};
     font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-    font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+    font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
     margin-bottom: 15px;
 `;
 
@@ -119,7 +119,7 @@ export const ButtonClose = styled(TouchableOpacity)`
 `;
 
 export const Span = styled.Text`
-    font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+    font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
     font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
     color: ${({ theme }) => theme.COLORS.GRAY_600};
 `;

@@ -47,7 +47,7 @@ export const ContentInfo = styled.View`
 `;
 
 export const Title = styled.Text<Props>`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color:  ${({ theme, status }) => {
     switch (status) {
@@ -64,27 +64,27 @@ export const Title = styled.Text<Props>`
 `;
 
 export const Description = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme }) => theme.COLORS.GRAY_600};
   margin-top: 4px;
 `;
 
 export const Value = styled.Text<{ color: string }>`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ color }) => color};
   margin-bottom: 4px;
 `;
 
 export const DateText = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme }) => theme.COLORS.GRAY_400};
 `;
 
 export const Status = styled.Text<Props>`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme, status }) => {
     switch (status) {
@@ -128,7 +128,7 @@ export const Icon = styled.View<Props>`
 
 export const SubTitle = styled.Text`
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
   color: ${({ theme }) => theme.COLORS.GRAY_400};
 `;
 
@@ -150,7 +150,7 @@ export const IconMenu = styled(Entypo).attrs<Props>(({ theme, type }) => ({
       : type === "SECONDARY"
       ? theme.COLORS.RED_700
       : theme.COLORS.YELLOW_700,
-  size: theme.FONTE_SIZE.XL,
+  size: theme.FONT_SIZE.XL,
 }))``;
 
 export const ContainerMenu = styled.View`
@@ -186,7 +186,7 @@ export const PopoverItem = styled(TouchableOpacity)`
 `;
 
 export const PopoverItemText = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme }) => theme.COLORS.GRAY_600};
   margin-left: 12px;

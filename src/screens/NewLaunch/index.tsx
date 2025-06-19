@@ -1,331 +1,415 @@
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { useEffect, useState } from "react";
-import {
-  Alert,
-  Platform,
-  ScrollView,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { Toast } from "react-native-toast-notifications";
-//
-import { Button, Content, Input, Title } from "./styles";
-//
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import React from 'react';
 import { z } from "zod";
+import { Button } from "../../components/Button";
+import { DefaultContainer } from "../../components/DefaultContainer";
+import { Input } from "../../components/Input";
+import { Container, Content, InputDescription, InputValue, TextError } from "./styles";
+import { useEffect, useState } from "react";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { currencyMask, currencyUnMask } from "../../utils/mask";
-import { database } from "../../libs/firebase";
-import { sendPushNotification } from "../../services/one-signal";
-import { ModalContainer } from "../../components/ModalContainer";
-
-type Props = {
-  closeBottomSheet?: () => void;
-  onCloseModal?: () => void;
-  showButtonEdit?: boolean;
-  showButtonSave?: boolean;
-  showButtonRemove?: boolean;
-  selectedItemId?: string;
-};
+import { Controller, useForm } from "react-hook-form";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { Toast } from "react-native-toast-notifications";
+import {
+    getFirestore,
+    collection,
+    doc,
+    setDoc,
+    getDocs,
+    query,
+    where,
+    addDoc
+} from '@react-native-firebase/firestore';
+import { currencyMask, currencyUnMask, dataMask, horaMask } from "../../utils/mask";
+import useSendNotificaitons from "../../hooks/useSendNotifications";
+import { Switch } from "../../components/Switch";
+import { View, KeyboardAvoidingView, Platform, ScrollView, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { InputTime } from "../../components/InputTime";
+import { InputDate } from "../../components/InputDate";
+import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 
 const formSchema = z.object({
-  name: z.string().min(1, "Nome da Tarefa é obrigatório"),
-  valueItem: z.string().min(1, "Valor é obrigatório"),
-  formattedDate: z.string().min(1, "Data é obrigatória"),
-  description: z.string().optional(),
+    category: z.string().min(1, "Categoria é obrigatória"),
+    name: z.string().min(1, "Nome é obrigatório"),
+    date: z.string().min(1, "Data é obrigatória"),
+    time: z.string().min(1, "Hora é obrigatória"),
+    value: z.string().min(1, "Valor é obrigatório"),
+    description: z.string().min(1, "Descrição é obrigatória"),
+    hasNotification: z.boolean().optional(),
+    status: z.boolean().optional(),
+    expenseType: z.boolean().optional(),
 });
 
 type FormSchemaType = z.infer<typeof formSchema>;
 
-export function NewLaunch({
-  closeBottomSheet,
-  onCloseModal,
-  showButtonEdit,
-  showButtonSave,
-  showButtonRemove,
-  selectedItemId,
-}: Props) {
-  // States
-  const user = useUserAuth();
-  const uid = user?.user?.uid;
-  const [isEditing, setIsEditing] = useState(false);
-  const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+export function NewLaunch() {
+    const route = useRoute();
+    const navigation = useNavigation();
+    const { type, selectedItemId } = route.params as { type: "revenue" | "expense"; selectedItemId?: string };
+    const { sendNotification, notificationId } = useSendNotificaitons();
+    const { data: dataExpense, loading: loadingExpense } = useFirestoreCollection("Expense");
+    const { data: dataRevenue, loading: loadingRevenue } = useFirestoreCollection("Revenue");
+    const [isLoading, setIsLoading] = useState(false);
+    const { user } = useUserAuth();
+    const uid = user?.uid;
+    const [totalRevenue, setTotalRevenue] = useState(0);
+    const [totalExpense, setTotalExpense] = useState(0);
 
-  // Hooks
-  const { control, handleSubmit, reset, setValue } = useForm<FormSchemaType>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      valueItem: "",
-      formattedDate: date.toLocaleDateString("pt-BR"),
-      description: "",
-    },
-  });
+    const [subscriberIds, setSubscriberIds] = useState<string[]>([]);
+    const { control, handleSubmit, reset, formState: { errors }, watch } = useForm<FormSchemaType>({
+        defaultValues: {
+            name: '',
+            category: '',
+            date: '',
+            time: '',
+            value: '',
+            description: '',
+            hasNotification: false,
+            expenseType: false,
+            status: false
+        },
+    });
 
-  // Functions
+    const notifications = watch('hasNotification')
 
-  const handleDateChange = (event: any, selectedDate: Date | undefined) => {
-    setShowDatePicker(false);
-    const currentDate = selectedDate || date;
-    setDate(currentDate);
-    const formattedDateString = currentDate.toLocaleDateString("pt-BR");
-    setValue("formattedDate", formattedDateString);
-  };
+    useEffect(() => {
+        if (!loadingExpense && dataExpense) {
+            // Aqui, você precisa ajustar a lógica para carregar os subscribers a partir dos dados disponíveis
+            const currentUserSubscribers = dataExpense
+                .flatMap(item => item.subscribers || [])
+                .filter((subscriberId): subscriberId is string => typeof subscriberId === 'string');
 
-  const showDatePickerModal = () => {
-    setShowDatePicker(true);
-  };
-
-  const handleSaveItem = ({
-    name,
-    valueItem,
-    formattedDate,
-    description,
-  }: FormSchemaType) => {
-    const [day, month, year] = formattedDate.split("/");
-    const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
-    const monthNumber = selectedDate.getMonth() + 1;
-    database
-      .collection("PiggyBank")
-      .doc()
-      .set({
-        valueItem: currencyUnMask(valueItem),
-        name,
-        description,
-        uid: uid,
-        month: monthNumber,
-        date: formattedDate,
-      })
-      .then(() => {
-        Toast.show("Item adicionado!", { type: "success" });
-        reset();
-        !!closeBottomSheet && closeBottomSheet();
-      })
-      .catch((error) => {
-        console.error("Erro ao adicionar o item: ", error);
-      });
-  };
-
-  const handleDeleteExpense = () => {
-    if (!selectedItemId) {
-      console.error("Nenhum documento selecionado para exclusão!");
-      return;
-    }
-
-    const expenseRef = database.collection("PiggyBank").doc(selectedItemId);
-    expenseRef
-      .delete()
-      .then(() => {
-        Toast.show("Item Excluido!", { type: "success" });
-        onCloseModal && onCloseModal();
-      })
-      .catch((error) => {
-        console.error("Erro ao excluir o documento de item:", error);
-      });
-  };
-
-  const handleEditExpense = ({
-    name,
-    description,
-    valueItem,
-    formattedDate,
-  }: FormSchemaType) => {
-    if (!selectedItemId) {
-      console.error("Nenhum documento selecionado para edição!");
-      return;
-    }
-    const [day, month, year] = formattedDate.split("/");
-    const selectedDate = new Date(Number(year), Number(month) - 1, Number(day));
-    const monthNumber = selectedDate.getMonth() + 1;
-
-    database
-      .collection("PiggyBank")
-      .doc(selectedItemId)
-      .set({
-        valueItem: currencyUnMask(valueItem),
-        name,
-        description,
-        uid: uid,
-        month: monthNumber,
-        date: formattedDate,
-      })
-      .then(() => {
-        Toast.show("Item adicionado!", { type: "success" });
-        !!closeBottomSheet && closeBottomSheet();
-      })
-      .catch((error) => {
-        console.error("Erro ao adicionar o item: ", error);
-      });
-  };
-
-  const onInvalid = () => {
-    Alert.alert(
-      "Atenção!",
-      "Por favor, preencha todos os campos obriatórios antes de salvar."
-    );
-  };
-
-  useEffect(() => {
-    if (selectedItemId) {
-      database
-        .collection("PiggyBank")
-        .doc(selectedItemId)
-        .get()
-        .then((doc) => {
-          if (doc.exists()) {
-            const data = doc.data();
-            if (data) {
-              setValue(
-                "valueItem",
-                data.valueItem.toLocaleString("pt-BR", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-              );
-              setValue("description", data.description || "");
-              setValue("name", data.name);
-              setIsEditing(true);
-              const [day, month, year] = data.date.split("/");
-              const formattedDate = `${day}/${month}/${year}`;
-              setValue("formattedDate", formattedDate);
-              setDate(new Date(year, month - 1, day));
-            } else {
-              console.log("Dados do documento estão vazios!");
+            const areEqual = JSON.stringify(currentUserSubscribers) === JSON.stringify(subscriberIds);
+            if (!areEqual) {
+                setSubscriberIds(currentUserSubscribers);
+                console.log("Current User Subscribers:", currentUserSubscribers);
             }
-          } else {
-            console.log("Nenhum documento encontrado!");
-          }
-        })
-        .catch((error) => {
-          console.error("Erro ao obter o documento:", error);
-        });
-    }
-  }, [selectedItemId]);
+        }
+    }, [loadingExpense, dataExpense]);
 
-  const handleClose = () => {
-    if (closeBottomSheet) closeBottomSheet();
-    if (onCloseModal) onCloseModal();
-  };
 
-  return (
-    <ModalContainer visible={true} onClose={handleClose}>
-      <ScrollView
-        keyboardShouldPersistTaps="always"
-        showsVerticalScrollIndicator={false}
-      >
-        <Content>
-          <Title>Nome*</Title>
-          <Controller
-            control={control}
-            name="name"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input onBlur={onBlur} onChangeText={onChange} value={value} />
-            )}
-          />
+    const handleScheduleNotification = async (data: FormSchemaType) => {
+        if (!subscriberIds || subscriberIds.length === 0 || !uid) {
+            console.warn("Nenhum assinante encontrado para enviar notificações.");
+            return;
+        }
 
-          <Title>Valor</Title>
-          <Controller
-            control={control}
-            name="valueItem"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                value={value}
-                onChangeText={(value) => onChange(currencyMask(value))}
-                onBlur={onBlur}
-                placeholder="0,00"
-                keyboardType="numeric"
-              />
-            )}
-          />
+        const [day, month, year] = data.date.split('/');
+        const formattedDate = `${year}-${month}-${day}`;
 
-          {Platform.OS === "ios" ? (
-            <View>
-              <Title>Data*</Title>
-              <View
-                style={{
-                  width: 100,
-                  marginTop: 10,
-                  marginBottom: 10,
-                }}
-              >
-                <DateTimePicker
-                  value={date}
-                  mode="date"
-                  display="calendar"
-                  onChange={handleDateChange}
-                  accessibilityLanguage="pt-BR"
-                />
-              </View>
-            </View>
-          ) : (
-            <View>
-              <Title>Data* </Title>
+        try {
+            await sendNotification({
+                title: data.name,
+                message: "Você tem um novo evento agendado!",
+                subscriptionsIds: subscriberIds,
+                date: formattedDate,
+                hour: data.time,
+            });
 
-              <Controller
-                control={control}
-                name="formattedDate"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TouchableOpacity
-                    style={{ height: 50 }}
-                    onPress={showDatePickerModal}
-                  >
-                    <Input
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      editable={false}
-                      onFocus={showDatePickerModal}
-                    />
-                  </TouchableOpacity>
-                )}
-              />
+            const db = getFirestore();
+            const notificationsRef = collection(db, "User", uid, "Notifications");
+            await addDoc(notificationsRef, {
+                title: data.name,
+                message: "Você tem um novo evento agendado!",
+                date: formattedDate,
+                hour: data.time,
+                createdAt: new Date(),
+            });
 
-              {showDatePicker && (
-                <DateTimePicker
-                  display="inline"
-                  value={date}
-                  mode="date"
-                  onChange={handleDateChange}
-                  locale="pt-BR"
-                />
-              )}
-            </View>
-          )}
+            console.log("Notificação enviada e salva com sucesso!");
+        } catch (error) {
+            console.error("Erro ao enviar e salvar notificação:", error);
+            Toast.show("Erro ao enviar a notificação.", { type: 'danger' });
+        }
+    };
 
-          <Title>Descrição</Title>
-          <Controller
-            control={control}
-            name="description"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input value={value} onChangeText={onChange} onBlur={onBlur} />
-            )}
-          />
-          <View style={{ marginBottom: 10, height: 150 }}>
-            {showButtonSave && (
-              <Button
-                style={{ marginBottom: 10 }}
-                onPress={
-                  isEditing
-                    ? handleSubmit(handleEditExpense, onInvalid)
-                    : handleSubmit(handleSaveItem, onInvalid)
+    const onSubmit = async (data: FormSchemaType) => {
+        if (!data.name || !data.value || !data.category || !data.date || !data.time) {
+            Toast.show('Por favor, preencha todos os campos obrigatórios antes de salvar.', { type: 'danger' });
+            return;
+        }
+
+        setIsLoading(true);
+
+        const db = getFirestore();
+        const collectionName = type === "revenue" ? "Revenue" : "Expense";
+        const docId = selectedItemId || Date.now().toString();
+
+        if (data.hasNotification) {
+            await handleScheduleNotification(data);
+        }
+
+        const baseData = {
+            ...data,
+            uid,
+            value: currencyUnMask(data.value),
+            type,
+            createdAt: new Date().toISOString(),
+            notificationId: null,
+        };
+
+        try {
+            if (type === "expense" && data.expenseType) {
+                const currentDate = new Date();
+                const currentMonth = currentDate.getMonth() + 1;
+                const currentYear = currentDate.getFullYear();
+
+                const promises = [];
+                for (let month = currentMonth; month <= 12; month++) {
+                    const date = `${currentYear}-${month.toString().padStart(2, "0")}-01`;
+                    const monthData = { ...baseData, date };
+                    const newDocRef = doc(collection(db, collectionName));
+                    promises.push(setDoc(newDocRef, monthData));
                 }
-              >
-                <Title>{isEditing ? "Salvar" : "Salvar"}</Title>
-              </Button>
-            )}
-            {showButtonRemove && (
-              <Button
-                style={{ marginBottom: 10 }}
-                onPress={handleDeleteExpense}
-              >
-                <Title>Excluir</Title>
-              </Button>
-            )}
-          </View>
-        </Content>
-      </ScrollView>
-    </ModalContainer>
-  );
+
+                await Promise.all(promises);
+                await updateTotals();
+                Toast.show('Despesa fixa salva para todos os meses!', { type: 'success' });
+            } else {
+                const docRef = doc(db, collectionName, docId);
+                await setDoc(docRef, baseData, { merge: true });
+                await updateTotals();
+                Toast.show(
+                    selectedItemId ? 'Lançamento atualizado!' : 'Lançamento adicionado!',
+                    { type: 'success' }
+                );
+            }
+
+            reset();
+            navigation.goBack();
+        } catch (error) {
+            console.error('Erro ao criar/atualizar lançamento: ', error);
+            Toast.show('Erro ao criar/atualizar lançamento!', { type: 'danger' });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const updateTotals = async () => {
+        if (!uid) return;
+
+        try {
+            const db = getFirestore();
+            const revenueQuery = query(
+                collection(db, "Revenue"),
+                where("uid", "==", uid)
+            );
+            const expenseQuery = query(
+                collection(db, "Expense"),
+                where("uid", "==", uid)
+            );
+
+            const [revenueSnapshot, expenseSnapshot] = await Promise.all([
+                getDocs(revenueQuery),
+                getDocs(expenseQuery)
+            ]);
+
+            const totalRevenue = revenueSnapshot.docs.reduce(
+                (sum, doc) => sum + Number(doc.data().value),
+                0
+            );
+            const totalExpense = expenseSnapshot.docs.reduce(
+                (sum, doc) => sum + Number(doc.data().value),
+                0
+            );
+
+            setTotalRevenue(totalRevenue);
+            setTotalExpense(totalExpense);
+        } catch (error) {
+            console.error("Erro ao calcular totais:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (selectedItemId) {
+            const collectionName = type === "revenue" ? "Revenue" : "Expense";
+            const db = getFirestore();
+
+            db
+                .collection(collectionName)
+                .doc(selectedItemId)
+                .get()
+                .then((doc) => {
+                    if (doc.exists()) {
+                        const data = doc.data();
+
+                        if (data) {
+                            reset({
+                                name: data.name || '',
+                                category: data.category || '',
+                                date: data.date || '',
+                                time: data.time || '',
+                                value: data.value || '',
+                                description: data.description || '',
+                                hasNotification: data.hasNotification || false,
+                                expenseType: data.expenseType || false,
+                                status: data.status || false
+                            });
+                        }
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erro ao buscar lançamento: ", error);
+                    Toast.show("Erro ao carregar dados do lançamento!", { type: "danger" });
+                });
+        }
+    }, [selectedItemId, type, reset]);
+
+    return (
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}
+        >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <ScrollView
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <DefaultContainer title={type === "revenue" ? "Nova Entrada" : "Nova Saída"} showButtonBack>
+                        <Container>
+                            <Controller
+                                control={control}
+                                name="value"
+                                render={({ field: { onChange, onBlur, value } }) => (
+                                    <View>
+                                        <InputValue
+                                            placeholder="R$ 00,00"
+                                            onBlur={onBlur}
+                                            onChangeText={onChange}
+                                            value={selectedItemId ? currencyMask((Number(value) * 100).toString()) : currencyMask(value)}
+                                        />
+                                        {errors.value && <TextError>{errors.value.message}</TextError>}
+                                    </View>
+                                )}
+                            />
+                            <Content>
+                                <Controller
+                                    control={control}
+                                    name="category"
+                                    render={({ field: { onChange, onBlur, value } }) => (
+                                        <View>
+                                            <Input
+                                                placeholder="Categoria"
+                                                onBlur={onBlur}
+                                                onChangeText={onChange}
+                                                value={value}
+                                            />
+                                            {errors.category && <TextError>{errors.category.message}</TextError>}
+                                        </View>
+                                    )}
+                                />
+                                <Controller
+                                    control={control}
+                                    name="name"
+                                    render={({ field: { onChange, onBlur, value } }) => (
+                                        <>
+                                            <Input
+                                                placeholder="Nome"
+                                                name='user'
+                                                onBlur={onBlur}
+                                                onChangeText={onChange}
+                                                value={value}
+                                            />
+                                            {errors.name && <TextError>{errors.name.message}</TextError>}
+                                        </>
+                                    )}
+                                />
+                                <Controller
+                                    control={control}
+                                    name="date"
+                                    render={({ field: { onChange, onBlur, value } }) => (
+                                        <>
+                                             <InputDate
+                                                placeholder="Data"
+                                                name="calendar"
+                                                onBlur={onBlur}
+                                                onChange={onChange}
+                                                value={dataMask(value)}
+                                            />
+                                            {errors.date && <TextError>{errors.date.message}</TextError>}
+                                        </>
+                                    )}
+                                />
+                                <Controller
+                                    control={control}
+                                    name="time"
+                                    render={({ field: { onChange, onBlur, value } }) => (
+                                        <>
+                                             <InputTime
+                                                placeholder="Hora"
+                                                name="clock"
+                                                onBlur={onBlur}
+                                                onChange={onChange}
+                                                value={horaMask(value ?? "")}
+                                            />
+                                            {errors.time && <TextError>{errors.time.message}</TextError>}
+                                        </>
+                                    )}
+                                />
+                                <Controller
+                                    control={control}
+                                    name="hasNotification"
+                                    render={({ field: { onChange, onBlur, value } }) => (
+                                        <Switch
+                                            onValueChange={onChange}
+                                            title="Adiconar notificação"
+                                            value={value}
+
+                                        />
+                                    )}
+                                />
+                                {type === "expense" && (
+                                    <Controller
+                                        control={control}
+                                        name="expenseType"
+                                        render={({ field: { onChange, value } }) => (
+
+                                            <Switch
+                                                onValueChange={onChange}
+                                                title="Despesa fixa?"
+                                                value={value}
+                                            />
+
+                                        )}
+                                    />
+                                )}
+                                {type === "expense" && (
+                                    <Controller
+                                        control={control}
+                                        name="status"
+                                        render={({ field: { onChange, value } }) => (
+                                            <Switch
+                                                onValueChange={onChange}
+                                                title="Essa conta já está paga?"
+                                                value={value}
+                                            />
+                                        )}
+                                    />
+                                )}
+
+                                <Controller
+                                    control={control}
+                                    name="description"
+                                    render={({ field: { onChange, onBlur, value } }) => (
+                                        <>
+                                            <InputDescription
+                                                multiline
+                                                numberOfLines={5}
+                                                placeholder="Descrição"
+                                                textAlignVertical="top"
+                                                onBlur={onBlur}
+                                                onChangeText={onChange}
+                                                value={value}
+                                            />
+                                            {errors.description && <TextError>{errors.description.message}</TextError>}
+                                        </>
+                                    )}
+                                />
+                            </Content>
+                            <Button title="Salvar" onPress={handleSubmit(onSubmit)} isLoading={isLoading} />
+                        </Container>
+                    </DefaultContainer>
+                </ScrollView>
+            </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+    );
 }

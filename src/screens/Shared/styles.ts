@@ -36,14 +36,14 @@ export const SharedUser = styled.View`
 
 export const IconCheck = styled(MaterialCommunityIcons).attrs<ListItemProps>(({theme, type}) => ({
     color: type === 'PRIMARY' ?  theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800, 
-    size: theme.FONTE_SIZE.XL
+    size: theme.FONT_SIZE.XL
 }))`
     margin-right: 5px;
 `;
 
 export const Title = styled.Text<ListItemProps>`
     font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-    font-size: ${({theme}) => theme.FONTE_SIZE.GG}px;
+    font-size: ${({theme}) => theme.FONT_SIZE.GG}px;
     color: ${({theme, type}) => type === 'PRIMARY' ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800 };
     text-decoration-line: ${({type}) => type === 'PRIMARY' ? 'line-through' :  'none'};
 `;
@@ -73,7 +73,7 @@ export const FilterButton = styled.TouchableOpacity<{ active: boolean }>`
 
 export const FilterText = styled.Text<{ active: boolean }>`
   font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-  font-size: ${({theme}) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({theme}) => theme.FONT_SIZE.MD}px;
   color: ${({theme, active}) => active ? theme.COLORS.WHITE : theme.COLORS.GRAY_600};
 `;
 

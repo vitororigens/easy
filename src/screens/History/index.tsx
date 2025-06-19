@@ -13,7 +13,7 @@ const Container = styled.View`
 `;
 
 const Title = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.XL}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.XL}px;
   color: ${({ theme }) => theme.COLORS.PURPLE_600};
   margin-bottom: 20px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
@@ -32,7 +32,7 @@ const TaskCard = styled.View`
 `;
 
 const TaskText = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   color: ${({ theme }) => theme.COLORS.GRAY_600};
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   margin-bottom: 4px;
@@ -45,7 +45,7 @@ const TaskName = styled(TaskText)`
 `;
 
 const DateText = styled(TaskText)`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
   color: ${({ theme }) => theme.COLORS.GRAY_400};
 `;
 

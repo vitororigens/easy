@@ -44,7 +44,7 @@ export const Checkbox = styled.View<{ checked: boolean }>`
 `;
 
 export const Title = styled.Text<{ status: boolean }>`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme, status }) => 
     status ? theme.COLORS.GRAY_400 : theme.COLORS.GRAY_600};
@@ -53,7 +53,7 @@ export const Title = styled.Text<{ status: boolean }>`
 `;
 
 export const Description = styled.Text<{ status: boolean }>`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.SM}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme, status }) => 
     status ? theme.COLORS.GRAY_400 : theme.COLORS.GRAY_600};
@@ -82,7 +82,7 @@ export const Button = styled(TouchableOpacity)`
 
 export const Icon = styled(Entypo).attrs(({ theme }) => ({
     color: theme.COLORS.TEAL_600,
-    size: theme.FONTE_SIZE.XL,
+    size: theme.FONT_SIZE.XL,
 }))`
     margin-right: 5px;
 `
@@ -104,7 +104,7 @@ export const ContainerMenu = styled.View`
 
 export const IconCheck = styled(MaterialCommunityIcons).attrs<ListItemProps>(({theme, type}) => ({
     color: type === 'PRIMARY' ?  theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800, 
-    size: theme.FONTE_SIZE.XL
+    size: theme.FONT_SIZE.XL
 }))`
     margin-right: 5px;
 `;

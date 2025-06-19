@@ -44,7 +44,7 @@ export const NavBar = styled.View`
 export const ButtonIcon = styled(TouchableOpacity)``;
 
 export const Title = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.GG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.GG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme }) => theme.COLORS.GRAY_600};
 `;
@@ -56,7 +56,7 @@ export const Divider = styled.View`
 `;
 
 export const SubTitle = styled.Text<Props>`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.GG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.GG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme, type }) =>
     type === "PRIMARY" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};

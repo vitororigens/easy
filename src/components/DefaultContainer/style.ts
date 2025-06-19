@@ -65,7 +65,7 @@ export const ButtonBack = styled(TouchableOpacity)`
 export const Title = styled.Text<Props>`
   color: ${({ theme }) => theme.COLORS.WHITE};
   font-family: 'Roboto';
-  font-size: ${({ theme }) => theme.FONTE_SIZE.GG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.GG}px;
   font-weight: 700;
   text-align: center;
   flex: 1;
@@ -75,7 +75,7 @@ export const Title = styled.Text<Props>`
 export const SubTitle = styled.Text`
   color: ${({ theme }) => theme.COLORS.WHITE};
   font-family: 'Roboto';
-  font-size: ${({ theme }) => theme.FONTE_SIZE.XL}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.XL}px;
   font-weight: 700;
 `;
 

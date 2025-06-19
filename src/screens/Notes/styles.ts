@@ -46,7 +46,7 @@ export const Button = styled(TouchableOpacity)`
 `;
 
 export const Title = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.LG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme }) => theme.COLORS.PURPLE_800};
   text-align: left;
@@ -55,7 +55,7 @@ export const Title = styled.Text`
 `;
 
 export const SectionTitle = styled(Title)`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.GG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.GG}px;
   margin-bottom: 16px;
   color: ${({ theme }) => theme.COLORS.PURPLE_600};
 `;
@@ -115,7 +115,7 @@ export const Container = styled.View`
 `;
 
 export const SubTitle = styled.Text`
-  font-size: ${({ theme }) => theme.FONTE_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   text-align: center;
   color: ${({ theme }) => theme.COLORS.GRAY_400};

@@ -50,7 +50,7 @@ export const Button = styled(TouchableOpacity)<ButtonProps>`
 `;
 
 export const Title = styled.Text`
-    font-size: ${({theme}) => theme.FONTE_SIZE.GG}px;
+    font-size: ${({theme}) => theme.FONT_SIZE.GG}px;
     font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
     text-align: center;
     padding-horizontal: ${Math.min(height * 0.02, 15)}px;

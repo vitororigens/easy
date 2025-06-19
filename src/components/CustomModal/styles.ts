@@ -29,7 +29,7 @@ export const ModalContainer = styled.View`
 
 export const Title = styled.Text`
     font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-    font-size: ${({theme}) => theme.FONTE_SIZE.MD}px;
+    font-size: ${({theme}) => theme.FONT_SIZE.MD}px;
     color: ${({theme}) => theme.COLORS.GRAY_600};
 `;
 
@@ -47,7 +47,7 @@ export const Button = styled(TouchableOpacity)<Props>`
 
 export const TitleButton = styled.Text`
     font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
-    font-size: ${({theme}) => theme.FONTE_SIZE.MD}px;
+    font-size: ${({theme}) => theme.FONT_SIZE.MD}px;
     color: ${({theme}) => theme.COLORS.WHITE};
 `;
 
