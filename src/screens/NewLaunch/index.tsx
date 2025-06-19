@@ -87,22 +87,6 @@ const EXPENSE_CATEGORIES = [
     { label: "Outros", value: "outros" },
 ];
 
-const NOTIFICATION_DATE_OPTIONS = [
-    { label: "No dia", value: "no dia" },
-    { label: "Um dia antes", value: "um dia antes" },
-    { label: "Tres dias antes", value: "tres dias antes" },
-    { label: "Cinco dias antes", value: "cinco dias antes" },
-];
-
-const NOTIFICATION_HOUR_OPTIONS = [
-    { label: "07:00", value: "07:00" },
-    { label: "08:00", value: "08:00" },
-    { label: "09:00", value: "09:00" },
-];
-
-const REPEAT_MONTHS_LIMIT = 11;
-const CURRENT_YEAR = new Date().getFullYear();
-
 const formSchema = z.object({
     category: z.string().min(1, "Categoria é obrigatória"),
     name: z.string().min(1, "Nome é obrigatório"),
@@ -114,6 +98,8 @@ const formSchema = z.object({
     status: z.boolean().optional(),
     expenseType: z.boolean().optional(),
     repeat: z.boolean().optional(),
+    repeatType: z.enum(["finite", "infinite"]).optional(),
+    repeatCount: z.number().min(1).optional(),
     notificationDate: z.string().optional(),
     notificationHour: z.string().optional(),
     sharedUsers: z.array(
@@ -174,6 +160,8 @@ export function NewLaunch() {
             expenseType: false,
             status: false,
             repeat: false,
+            repeatType: 'finite',
+            repeatCount: 1,
             notificationDate: 'no dia',
             notificationHour: '08:00',
             sharedUsers: []
@@ -274,39 +262,59 @@ export function NewLaunch() {
 
     // Criar itens recorrentes
     const createRepeatedItems = async (itemData: any, monthNumber: number, year: number, day: number) => {
-        if (!repeat) return;
+        if (!itemData.repeat) return;
 
-        const repeatPromises = [];
+        const repeatType = itemData.repeatType || 'finite';
+        const repeatCount = itemData.repeatCount || 1;
         
-        for (let i = 1; i <= REPEAT_MONTHS_LIMIT; i++) {
-            let nextMonth = monthNumber + i;
-            let nextYear = year;
+        console.log('=== CRIANDO ITENS REPETIDOS ===');
+        console.log('Tipo de repetição:', repeatType);
+        console.log('Quantidade:', repeatCount);
 
-            if (nextMonth > 12) {
-                nextMonth -= 12;
-                nextYear++;
+        try {
+            const db = getFirestore();
+            const collectionName = determinedCollectionType;
+            
+            // Determinar quantos meses criar
+            let monthsToCreate = 0;
+            if (repeatType === 'finite') {
+                monthsToCreate = repeatCount - 1; // -1 porque o item principal já conta como 1
+            } else {
+                // Para infinito, criar para os próximos 12 meses
+                monthsToCreate = 12;
             }
 
-            if (nextYear > CURRENT_YEAR) {
-                break;
+            console.log('Meses a criar:', monthsToCreate);
+
+            for (let i = 1; i <= monthsToCreate; i++) {
+                const nextMonth = monthNumber + i;
+                const nextYear = year + Math.floor((nextMonth - 1) / 12);
+                const adjustedMonth = ((nextMonth - 1) % 12) + 1;
+
+                // Verificar se o dia existe no mês
+                const daysInMonth = new Date(nextYear, adjustedMonth, 0).getDate();
+                const adjustedDay = Math.min(day, daysInMonth);
+
+                const repeatedItemData = {
+                    ...itemData,
+                    month: adjustedMonth,
+                    date: `${adjustedDay.toString().padStart(2, '0')}/${adjustedMonth.toString().padStart(2, '0')}/${nextYear}`,
+                    createdAt: new Date().toISOString(),
+                    isRepeated: true,
+                    originalItemId: itemData.id || Date.now().toString(),
+                    repeatIndex: i
+                };
+
+                console.log(`Criando item para ${adjustedMonth}/${nextYear} - Dia: ${adjustedDay}`);
+
+                await addDoc(collection(db, collectionName), repeatedItemData);
             }
 
-            const nextDate = `${day}/${nextMonth}/${nextYear}`;
-            const nextMonthItemData = {
-                ...itemData,
-                date: nextDate,
-                month: nextMonth,
-            };
-
-            repeatPromises.push(
-                getFirestore().collection(determinedCollectionType).add(nextMonthItemData)
-                    .catch((error) => {
-                        console.error("Erro ao adicionar a transação repetida:", error);
-                    })
-            );
+            console.log('Itens repetidos criados com sucesso');
+        } catch (error) {
+            console.error('Erro ao criar itens repetidos:', error);
+            Toast.show('Erro ao criar itens repetidos!', { type: 'danger' });
         }
-
-        await Promise.allSettled(repeatPromises);
     };
 
     // Notificações para usuários compartilhados
@@ -372,37 +380,80 @@ export function NewLaunch() {
     };
 
     const handleScheduleNotification = async (data: FormSchemaType) => {
-        if (!subscriberIds || subscriberIds.length === 0 || !uid) {
-            console.warn("Nenhum assinante encontrado para enviar notificações.");
-            return;
-        }
-
-        const [day, month, year] = data.date.split('/');
-        const formattedDate = `${year}-${month}-${day}`;
+        if (!data.hasNotification) return;
 
         try {
-            await sendNotification({
-                title: data.name,
-                message: "Você tem um novo evento agendado!",
-                subscriptionsIds: subscriberIds,
-                date: formattedDate,
-                hour: data.time,
-            });
+            const notificationValidation = validateNotificationParams();
+            if (!notificationValidation.isValid) {
+                Toast.show(notificationValidation.errorMessage, { type: 'danger' });
+                return;
+            }
 
-            const db = getFirestore();
-            const notificationsRef = collection(db, "User", uid, "Notifications");
-            await addDoc(notificationsRef, {
-                title: data.name,
-                message: "Você tem um novo evento agendado!",
-                date: formattedDate,
-                hour: data.time,
-                createdAt: new Date(),
-            });
+            if (notificationValidation.notificationDate) {
+                // Se for repetição, criar notificações para todos os meses
+                if (data.repeat) {
+                    const repeatType = data.repeatType || 'finite';
+                    const repeatCount = data.repeatCount || 1;
+                    
+                    let monthsToNotify = 0;
+                    if (repeatType === 'finite') {
+                        monthsToNotify = repeatCount;
+                    } else {
+                        // Para infinito, criar notificações para os próximos 12 meses
+                        monthsToNotify = 12;
+                    }
 
-            console.log("Notificação enviada e salva com sucesso!");
+                    console.log('=== CRIANDO NOTIFICAÇÕES REPETIDAS ===');
+                    console.log('Meses para notificar:', monthsToNotify);
+
+                    // Parse da data para obter mês, ano e dia
+                    const [day, month, year] = data.date.split('/');
+                    const monthNumber = Number(month);
+                    const yearNumber = Number(year);
+                    const dayNumber = Number(day);
+
+                    for (let i = 0; i < monthsToNotify; i++) {
+                        const nextMonth = monthNumber + i;
+                        const nextYear = yearNumber + Math.floor((nextMonth - 1) / 12);
+                        const adjustedMonth = ((nextMonth - 1) % 12) + 1;
+
+                        // Verificar se o dia existe no mês
+                        const daysInMonth = new Date(nextYear, adjustedMonth, 0).getDate();
+                        const adjustedDay = Math.min(dayNumber, daysInMonth);
+
+                        const notificationDate = new Date(nextYear, adjustedMonth - 1, adjustedDay);
+                        
+                        // Ajustar a data baseado na opção de notificação
+                        switch (data.notificationDate) {
+                            case 'um dia antes':
+                                notificationDate.setDate(notificationDate.getDate() - 1);
+                                break;
+                            case 'tres dias antes':
+                                notificationDate.setDate(notificationDate.getDate() - 3);
+                                break;
+                            case 'cinco dias antes':
+                                notificationDate.setDate(notificationDate.getDate() - 5);
+                                break;
+                            default: // 'no dia'
+                                break;
+                        }
+
+                        // Definir a hora da notificação
+                        const [hour, minute] = (data.notificationHour || '08:00').split(':');
+                        notificationDate.setHours(Number(hour), Number(minute), 0, 0);
+
+                        console.log(`Agendando notificação para ${notificationDate.toLocaleDateString()} ${notificationDate.toLocaleTimeString()}`);
+
+                        await scheduleNotification(notificationDate);
+                    }
+                } else {
+                    // Notificação única
+                    await scheduleNotification(notificationValidation.notificationDate);
+                }
+            }
         } catch (error) {
-            console.error("Erro ao enviar e salvar notificação:", error);
-            Toast.show("Erro ao enviar a notificação.", { type: 'danger' });
+            console.error('Erro ao agendar notificações:', error);
+            Toast.show('Erro ao agendar notificações!', { type: 'danger' });
         }
     };
 
@@ -424,17 +475,7 @@ export function NewLaunch() {
             const docId = selectedItemId || Date.now().toString();
 
             // Validar notificação se habilitada
-            if (data.hasNotification) {
-                const notificationValidation = validateNotificationParams();
-                if (!notificationValidation.isValid) {
-                    Toast.show(notificationValidation.errorMessage, { type: 'danger' });
-                    setIsLoading(false);
-                    return;
-                }
-                if (notificationValidation.notificationDate) {
-                    await scheduleNotification(notificationValidation.notificationDate);
-                }
-            }
+            await handleScheduleNotification(data);
 
             // Parse da data para obter mês, ano e dia
             const [day, month, year] = data.date.split('/');
@@ -459,6 +500,8 @@ export function NewLaunch() {
                 valueTransaction: transactionValue,
                 description: data.description || "",
                 repeat: data.repeat || false,
+                repeatType: data.repeatType || 'finite',
+                repeatCount: data.repeatCount || 1,
                 type: isExpense ? "output" : "input",
                 month: monthNumber,
                 status: data.status || false,
@@ -619,6 +662,8 @@ export function NewLaunch() {
                                 hasNotification: data.hasNotification || false,
                                 status: data.status || false,
                                 repeat: data.repeat || false,
+                                repeatType: data.repeatType || 'finite',
+                                repeatCount: data.repeatCount || 1,
                                 notificationDate: data.notificationDate || 'no dia',
                                 notificationHour: data.notificationHour || '08:00',
                                 sharedUsers: data.shareInfo || []
@@ -758,6 +803,47 @@ export function NewLaunch() {
                                         />
                                     )}
                                 />
+                                {repeat && (
+                                    <>
+                                        <Controller
+                                            control={control}
+                                            name="repeatType"
+                                            render={({ field: { onChange, value } }) => (
+                                                <View>
+                                                    <Select
+                                                        onValueChange={onChange}
+                                                        value={value}
+                                                        placeholder="Tipo de repetição"
+                                                        items={[
+                                                            { label: "Quantidade definida", value: "finite" },
+                                                            { label: "Infinitamente", value: "infinite" },
+                                                        ]}
+                                                    />
+                                                </View>
+                                            )}
+                                        />
+                                        
+                                        {watch('repeatType') === 'finite' && (
+                                            <Controller
+                                                control={control}
+                                                name="repeatCount"
+                                                render={({ field: { onChange, onBlur, value } }) => (
+                                                    <Input
+                                                        name="repeatCount"
+                                                        placeholder="Quantidade de vezes"
+                                                        value={value ? String(value) : "1"}
+                                                        onChangeText={(text) => {
+                                                            const numValue = parseInt(text.replace(/\D/g, '')) || 1;
+                                                            onChange(Math.min(Math.max(numValue, 1), 60)); // Limitar entre 1 e 60
+                                                        }}
+                                                        onBlur={onBlur}
+                                                        keyboardType="numeric"
+                                                    />
+                                                )}
+                                            />
+                                        )}
+                                    </>
+                                )}
                                 <Controller
                                     control={control}
                                     name="hasNotification"
@@ -780,7 +866,12 @@ export function NewLaunch() {
                                                         onValueChange={onChange}
                                                         value={value}
                                                         placeholder="Quando notificar?"
-                                                        items={NOTIFICATION_DATE_OPTIONS}
+                                                        items={[
+                                                            { label: "No dia", value: "no dia" },
+                                                            { label: "Um dia antes", value: "um dia antes" },
+                                                            { label: "Tres dias antes", value: "tres dias antes" },
+                                                            { label: "Cinco dias antes", value: "cinco dias antes" },
+                                                        ]}
                                                     />
                                                 </View>
                                             )}
@@ -794,7 +885,11 @@ export function NewLaunch() {
                                                         onValueChange={onChange}
                                                         value={value}
                                                         placeholder="Horário da notificação"
-                                                        items={NOTIFICATION_HOUR_OPTIONS}
+                                                        items={[
+                                                            { label: "07:00", value: "07:00" },
+                                                            { label: "08:00", value: "08:00" },
+                                                            { label: "09:00", value: "09:00" },
+                                                        ]}
                                                     />
                                                 </View>
                                             )}
