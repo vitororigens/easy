@@ -5,7 +5,7 @@ import { DefaultContainer } from "../../components/DefaultContainer";
 import { Input } from "../../components/Input";
 import { Select } from "../../components/Select";
 import { Container, Content, InputDescription, InputValue, TextError } from "./styles";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -181,6 +181,13 @@ export function NewLaunch() {
     });
     
     const { control, handleSubmit, reset, setValue, watch, formState: { errors } } = form;
+
+    // Função para resetar o formulário com dados específicos
+    const resetFormWithData = useCallback((data: any) => {
+        console.log('=== RESET FORM WITH DATA ===');
+        console.log('Dados para reset:', data);
+        reset(data);
+    }, [reset]);
 
     const notifications = watch('hasNotification')
     const repeat = watch('repeat')
@@ -400,6 +407,10 @@ export function NewLaunch() {
     };
 
     const onSubmit = async (data: FormSchemaType) => {
+        console.log('=== INÍCIO DO SUBMIT ===');
+        console.log('Hora no formulário:', data.time);
+        console.log('selectedItemId:', selectedItemId);
+        
         if (!data.name || !data.value || !data.category || !data.date || !data.time) {
             Toast.show('Por favor, preencha todos os campos obrigatórios antes de salvar.', { type: 'danger' });
             return;
@@ -444,6 +455,7 @@ export function NewLaunch() {
                 category: data.category,
                 uid: uid || "",
                 date: data.date,
+                time: data.time,
                 valueTransaction: transactionValue,
                 description: data.description || "",
                 repeat: data.repeat || false,
@@ -462,6 +474,8 @@ export function NewLaunch() {
                 })) || [],
                 createdAt: new Date().toISOString(),
             };
+
+            console.log('Hora no baseData:', baseData.time);
 
             // Criar ou atualizar o item principal
             const docRef = doc(db, collectionName, docId);
@@ -484,7 +498,16 @@ export function NewLaunch() {
                 { type: 'success' }
             );
 
-            reset();
+            console.log('Vou resetar?', !selectedItemId);
+
+            // Só resetar o formulário se for uma criação nova, não uma atualização
+            if (!selectedItemId) {
+                console.log('RESETANDO FORMULÁRIO (criação nova)');
+                reset();
+            } else {
+                console.log('NÃO RESETANDO FORMULÁRIO (atualização)');
+            }
+            
             navigation.goBack();
         } catch (error) {
             console.error('Erro ao criar/atualizar lançamento: ', error);
@@ -530,24 +553,67 @@ export function NewLaunch() {
     };
 
     useEffect(() => {
+        console.log('=== USEEFFECT CARREGAMENTO ===');
+        console.log('selectedItemId:', selectedItemId);
+        console.log('determinedCollectionType:', determinedCollectionType);
+        
         if (selectedItemId) {
             const collectionName = determinedCollectionType;
             const db = getFirestore();
+
+            console.log('Buscando documento na coleção:', collectionName);
 
             db
                 .collection(collectionName)
                 .doc(selectedItemId)
                 .get()
                 .then((doc) => {
+                    console.log('Documento encontrado:', doc.exists());
                     if (doc.exists()) {
                         const data = doc.data();
+                        console.log('Dados brutos do documento:', data);
 
                         if (data) {
-                            reset({
+                            // Formatar a hora corretamente se existir
+                            let formattedTime = '';
+                            if (data.time) {
+                                console.log('Hora original:', data.time, 'Tipo:', typeof data.time);
+                                // Se o time já estiver no formato HH:MM, usar diretamente
+                                if (typeof data.time === 'string' && data.time.includes(':')) {
+                                    formattedTime = data.time;
+                                } else {
+                                    // Se for um timestamp ou outro formato, converter
+                                    try {
+                                        const timeDate = new Date(data.time);
+                                        formattedTime = timeDate.toLocaleTimeString('pt-BR', {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: false
+                                        });
+                                    } catch (error) {
+                                        console.error('Erro ao formatar hora:', error);
+                                        formattedTime = '';
+                                    }
+                                }
+                                console.log('Hora formatada:', formattedTime);
+                            } else {
+                                console.log('Nenhuma hora encontrada nos dados, definindo hora padrão');
+                                // Definir hora padrão quando não existir no banco
+                                const now = new Date();
+                                formattedTime = now.toLocaleTimeString('pt-BR', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false
+                                });
+                                console.log('Hora padrão definida:', formattedTime);
+                            }
+                            console.log(data.shareInfo);
+                            
+                            const formData = {
                                 name: data.name || '',
                                 category: data.category || '',
                                 date: data.date || '',
-                                time: data.time || '',
+                                time: formattedTime,
                                 value: data.valueTransaction || '',
                                 description: data.description || '',
                                 hasNotification: data.hasNotification || false,
@@ -556,7 +622,16 @@ export function NewLaunch() {
                                 notificationDate: data.notificationDate || 'no dia',
                                 notificationHour: data.notificationHour || '08:00',
                                 sharedUsers: data.shareInfo || []
-                            });
+                            };
+                            
+                            console.log('=== DADOS DO FORMULÁRIO ===');
+                            console.log('Dados que serão setados no formulário:', formData);
+                            console.log('Hora que será setada:', formData.time);
+                            
+                            resetFormWithData(formData);
+                            
+                            console.log('=== APÓS RESET ===');
+                            console.log('Formulário resetado com os dados');
                         }
                     }
                 })
@@ -564,8 +639,10 @@ export function NewLaunch() {
                     console.error("Erro ao buscar lançamento: ", error);
                     Toast.show("Erro ao carregar dados do lançamento!", { type: "danger" });
                 });
+        } else {
+            console.log('Nenhum selectedItemId, não carregando dados');
         }
-    }, [selectedItemId, determinedCollectionType, reset]);
+    }, [selectedItemId, determinedCollectionType, resetFormWithData]);
 
     return (
       <DefaultContainer title={determinedType === "revenue" ? "Nova Entrada" : "Nova Saída"} backButton>
@@ -644,18 +721,31 @@ export function NewLaunch() {
                                 <Controller
                                     control={control}
                                     name="time"
-                                    render={({ field: { onChange, onBlur, value } }) => (
-                                        <>
-                                             <InputTime
-                                                placeholder="Hora"
-                                                name="clock"
-                                                onBlur={onBlur}
-                                                onChange={onChange}
-                                                value={horaMask(value ?? "")}
-                                            />
-                                            {errors.time && <TextError>{errors.time.message}</TextError>}
-                                        </>
-                                    )}
+                                    render={({ field: { onChange, onBlur, value } }) => {
+                                        console.log('=== CONTROLLER TIME ===');
+                                        console.log('Value no controller:', value);
+                                        console.log('Tipo do value:', typeof value);
+                                        console.log('Value é string vazia?', value === '');
+                                        console.log('Value é null?', value === null);
+                                        console.log('Value é undefined?', value === undefined);
+                                        
+                                        return (
+                                            <>
+                                                 <InputTime
+                                                    placeholder="Hora"
+                                                    name="clock"
+                                                    onBlur={onBlur}
+                                                    onChange={(newValue) => {
+                                                        console.log('=== ONCHANGE TIME ===');
+                                                        console.log('Novo valor:', newValue);
+                                                        onChange(newValue);
+                                                    }}
+                                                    value={value || ""}
+                                                />
+                                                {errors.time && <TextError>{errors.time.message}</TextError>}
+                                            </>
+                                        );
+                                    }}
                                 />
                                 <Controller
                                     control={control}

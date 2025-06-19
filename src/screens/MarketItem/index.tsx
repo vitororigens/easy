@@ -4,7 +4,6 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
-import RNPickerSelect from "react-native-picker-select";
 import { Toast } from "react-native-toast-notifications";
 import { z } from "zod";
 import { LoadingIndicator } from "../../components/Loading/style";
@@ -34,6 +33,7 @@ import { sendPushNotification } from "../../services/one-signal";
 import { ShareWithUsers } from "../../components/ShareWithUsers";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { useMarket } from "../../contexts/MarketContext";
+import { Select } from "../../components/Select";
 
 type IMarketItemProps = {
   closeBottomSheet?: () => void;
@@ -441,7 +441,8 @@ export const MarketItem = ({
                 control={control}
                 name="category"
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <RNPickerSelect
+                  <Select
+                    placeholder="Selecione uma categoria"
                     onValueChange={onChange}
                     value={value}
                     items={[
@@ -465,11 +466,6 @@ export const MarketItem = ({
                       { label: "Produtos naturais", value: "naturais" },
                       { label: "Utilidades domésticas", value: "utilidades" },
                     ]}
-                    style={{
-                      placeholder: {
-                        color: "#d10000",
-                      },
-                    }}
                   />
                 )}
               />
@@ -478,7 +474,8 @@ export const MarketItem = ({
                 control={control}
                 name="measurement"
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <RNPickerSelect
+                  <Select
+                    placeholder="Selecione uma medida"
                     onValueChange={onChange}
                     value={value}
                     items={[

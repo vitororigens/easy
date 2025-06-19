@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { collection, onSnapshot, query, where, orderBy } from "@react-native-firebase/firestore";
-import { database } from "../libs/firebase";
-import { Timestamp } from "firebase/firestore";
+import firestore from "@react-native-firebase/firestore";
+import { useUserAuth } from "./useUserAuth";
+import { useMonth } from "../context/MonthProvider";
+import { Alert, Linking } from "react-native";
 
 export interface ExpenseData {
   id: string;
@@ -19,11 +20,11 @@ export interface ExpenseData {
   valueItem: string;
   listAccounts: boolean;
   income: boolean;
-  createdAt?: Timestamp;
+  createdAt?: any;
   author?: string;
   shareWith?: string[];
   shareInfo?: {
-    acceptedAt: Timestamp | null;
+    acceptedAt: any;
     uid: string;
     userName: string;
   }[];
@@ -33,60 +34,107 @@ const useFirestoreCollection = (collectionName: string) => {
   const [data, setData] = useState<ExpenseData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useUserAuth();
+  const { selectedMonth } = useMonth();
+
+  const handleIndexError = (error: any, type: 'own' | 'shared') => {
+    console.error(`Erro ao observar documentos ${type} de ${collectionName}:`, error);
+    
+    if (error.code === 'firestore/failed-precondition' && error.message.includes('index')) {
+      const indexUrl = error.message.match(/https:\/\/console\.firebase\.google\.com[^\s]*/)?.[0];
+      
+      if (indexUrl) {
+        Alert.alert(
+          'Índice necessário',
+          'É necessário criar um índice no Firebase para esta consulta. Deseja criar agora?',
+          [
+            {
+              text: 'Criar índice',
+              onPress: () => Linking.openURL(indexUrl)
+            },
+            {
+              text: 'Cancelar',
+              style: 'cancel'
+            }
+          ]
+        );
+      }
+    }
+    
+    setError(error.message);
+  };
 
   useEffect(() => {
     let isMounted = true;
     
+    if (!user?.uid) {
+      setLoading(false);
+      return;
+    }
+
     try {
       console.log(`Iniciando listener para coleção: ${collectionName}`);
-      const q = query(
-        collection(database, collectionName),
-        orderBy("createdAt", "desc")
-      );
       
-      const unsubscribe = onSnapshot(q, 
+      // Query for user's own documents
+      const ownQuery = firestore()
+        .collection(collectionName)
+        .where('month', '==', selectedMonth)
+        .where('uid', '==', user.uid)
+        .orderBy('createdAt', 'desc');
+
+      // Query for shared documents
+      const sharedQuery = firestore()
+        .collection(collectionName)
+        .where('month', '==', selectedMonth)
+        .where('shareWith', 'array-contains', user.uid)
+        .orderBy('createdAt', 'desc');
+      
+      // Subscribe to both queries
+      const unsubscribe1 = ownQuery.onSnapshot(
         (snapshot) => {
-          if (!isMounted) return;
+          if (!isMounted || !snapshot) return;
           
-          console.log(`Snapshot recebido para ${collectionName}. Total de documentos: ${snapshot.docs.length}`);
-          const collectionData: ExpenseData[] = [];
+          console.log(`Snapshot recebido para ${collectionName} (próprios). Total de documentos: ${snapshot.size}`);
           
-          snapshot.docChanges().forEach((change) => {
-            const docData = { id: change.doc.id, ...change.doc.data() } as ExpenseData;
-            
-            if (change.type === "added") {
-              console.log(`Novo documento adicionado: ${docData.id}`);
-              collectionData.push(docData);
-            } else if (change.type === "modified") {
-              console.log(`Documento modificado: ${docData.id}`);
-              const index = collectionData.findIndex(item => item.id === docData.id);
-              if (index !== -1) {
-                collectionData[index] = docData;
-              }
-            } else if (change.type === "removed") {
-              console.log(`Documento removido: ${docData.id}`);
-              const index = collectionData.findIndex(item => item.id === docData.id);
-              if (index !== -1) {
-                collectionData.splice(index, 1);
-              }
-            }
+          const ownData = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as ExpenseData[];
+          
+          setData(prev => {
+            const sharedDocs = prev.filter(doc => doc.shareWith?.includes(user.uid));
+            return [...ownData, ...sharedDocs];
           });
-          
-          setData(collectionData);
-          setLoading(false);
         },
-        (error) => {
-          if (!isMounted) return;
-          console.error(`Erro ao observar coleção ${collectionName}:`, error);
-          setError(error.message);
-          setLoading(false);
-        }
+        (error) => handleIndexError(error, 'own')
       );
 
+      const unsubscribe2 = sharedQuery.onSnapshot(
+        (snapshot) => {
+          if (!isMounted || !snapshot) return;
+
+          console.log(`Snapshot recebido para ${collectionName} (compartilhados). Total de documentos: ${snapshot.size}`);
+
+          const sharedData = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as ExpenseData[];
+
+          setData(prev => {
+            const ownDocs = prev.filter(doc => doc.uid === user.uid);
+            return [...ownDocs, ...sharedData];
+          });
+        },
+        (error) => handleIndexError(error, 'shared')
+      );
+
+      setLoading(false);
+
       return () => {
-        console.log(`Limpando listener da coleção: ${collectionName}`);
+        console.log(`Limpando listeners da coleção: ${collectionName}`);
         isMounted = false;
-        unsubscribe();
+        unsubscribe1();
+        unsubscribe2();
       };
     } catch (err) {
       if (!isMounted) return;
@@ -94,7 +142,7 @@ const useFirestoreCollection = (collectionName: string) => {
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
       setLoading(false);
     }
-  }, [collectionName]);
+  }, [collectionName, user?.uid, selectedMonth]);
 
   return { data, loading, error };
 };
