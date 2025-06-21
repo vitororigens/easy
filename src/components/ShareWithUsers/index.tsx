@@ -55,6 +55,7 @@ import {
   getSharing,
   ISharing,
 } from "../../services/firebase/sharing.firebase";
+import { sendPushNotification } from "../../services/one-signal";
 
 export const shareUserSchema = z.object({
   sharedUsers: z.array(
@@ -157,7 +158,7 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
     setSearchValue("");
   };
 
-  const handleToggleSharedUser = (
+  const handleToggleSharedUser = async (
     user: Pick<IUser, "uid" | "userName"> & { acceptedAt: Timestamp | null }
   ) => {
     const isAdded = sharedUsers.some((u) => u.uid === user.uid);
@@ -168,7 +169,22 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
       );
       return;
     }
+    
+    // Add user to shared list
     setValue("sharedUsers", [...sharedUsers, user]);
+    
+    // Send notification to the added user
+    try {
+      await sendPushNotification({
+        title: "Novo compartilhamento",
+        message: `${user.userName}, você foi adicionado a um compartilhamento!`,
+        uid: user.uid,
+      });
+      console.log("Notification sent to:", user.userName);
+    } catch (error) {
+      console.error("Error sending notification:", error);
+      // Don't show error to user as the sharing still works
+    }
   };
 
   const handleToggleFavorite = async (userToToggle: IUser) => {
@@ -260,11 +276,12 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
     );
   };
 
-  const handleAddAllFavorites = () => {
+  const handleAddAllFavorites = async () => {
     if (favoriteUsers.length === 0) return;
     
     const newSharedUsers = [...sharedUsers];
     let addedCount = 0;
+    const usersToNotify: IUser[] = [];
     
     favoriteUsers.forEach(favoriteUser => {
       // Verificar se o usuário já está na lista de compartilhamento
@@ -280,11 +297,30 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
             ? Timestamp.now()
             : null,
         });
+        usersToNotify.push(favoriteUser);
         addedCount++;
       }
     });
     
     setValue("sharedUsers", newSharedUsers);
+    
+    // Send notifications to all added users
+    if (usersToNotify.length > 0) {
+      try {
+        const notificationPromises = usersToNotify.map(user =>
+          sendPushNotification({
+            title: "Novo compartilhamento",
+            message: `${user.userName}, você foi adicionado a um compartilhamento!`,
+            uid: user.uid,
+          })
+        );
+        
+        await Promise.allSettled(notificationPromises);
+        console.log("Notifications sent to", usersToNotify.length, "users");
+      } catch (error) {
+        console.error("Error sending notifications:", error);
+      }
+    }
     
     if (addedCount > 0) {
       Alert.alert("Sucesso", `${addedCount} favorito(s) adicionado(s) à lista de compartilhamento`);
