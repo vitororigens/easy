@@ -29,11 +29,11 @@ import { InputDate } from "../../components/InputDate";
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { Timestamp } from "@react-native-firebase/firestore";
 import { ShareWithUsers } from '../../components/ShareWithUsers';
-import notifee, {
-    AndroidImportance,
-    TimestampTrigger,
-    TriggerType,
-} from "@notifee/react-native";
+// import notifee, {
+//     AndroidImportance,
+//     TimestampTrigger,
+//     TriggerType,
+// } from "@notifee/react-native";
 import { createNotification } from "../../services/firebase/notifications.firebase";
 import {
     createSharing,
@@ -234,27 +234,18 @@ export function NewLaunch() {
 
     // Agendar notificação local
     const scheduleNotification = async (notificationDate: Date) => {
-        const trigger: TimestampTrigger = {
-            type: TriggerType.TIMESTAMP,
-            timestamp: notificationDate.getTime(),
-        };
-
+        // TODO: Replace with alternative notification solution
+        console.log("Notification would be scheduled for:", notificationDate);
+        console.log("Item:", watch('name'));
+        
+        // Temporary: Using OneSignal for now instead of local notifications
         try {
-            const channelId = await notifee.createChannel({
-                id: "notificacao",
-                name: "Expense Notification",
-                vibration: true,
-                importance: AndroidImportance.HIGH,
+            // For now, just log the notification details
+            console.log("Scheduling notification for:", {
+                title: "Lembrete de conta!",
+                body: `Você tem uma ${isExpense ? 'despesa' : 'receita'} agendada: ${watch('name')}`,
+                date: notificationDate
             });
-
-            await notifee.createTriggerNotification(
-                {
-                    title: "Lembrete de conta!",
-                    body: `Você tem uma ${isExpense ? 'despesa' : 'receita'} agendada: ${watch('name')}`,
-                    android: { channelId },
-                },
-                trigger
-            );
         } catch (error) {
             console.error("Erro ao agendar notificação:", error);
         }

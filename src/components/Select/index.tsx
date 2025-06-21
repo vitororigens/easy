@@ -1,5 +1,6 @@
-import React, { useRef } from "react";
-import RNPickerSelect from "react-native-picker-select";
+import React, { useRef, useState } from "react";
+import {Picker} from '@react-native-picker/picker';
+import { Platform } from "react-native";
 import { Container, SelectWrapper, ErrorText, IconInput, ChevronIcon } from "./styles";
 import { FontAwesome5 } from '@expo/vector-icons';
 
@@ -50,59 +51,100 @@ export function Select({
   disabled = false,
 }: SelectProps) {
   const pickerRef = useRef<any>(null);
+  const [selectedValue, setSelectedValue] = useState<string | number | undefined>(value);
+
+  const handleValueChange = (itemValue: string | number) => {
+    setSelectedValue(itemValue);
+    onValueChange?.(itemValue);
+  };
 
   const handlePress = () => {
-    if (!disabled && pickerRef.current) {
-      pickerRef.current.togglePicker();
+    if (!disabled && pickerRef.current && Platform.OS === 'android') {
+      pickerRef.current.focus();
     }
   };
 
+  // For Android, render the picker normally without custom press handling
+  if (Platform.OS === 'android') {
+    return (
+      <Container onPress={handlePress} disabled={disabled}>
+        <SelectWrapper error={!!errorMessage} disabled={disabled}>
+          {showIcon && name && <IconInput name={name} />}
+          
+          <Picker
+            ref={pickerRef}
+            selectedValue={selectedValue}
+            onValueChange={handleValueChange}
+            enabled={!disabled}
+            mode="dropdown"
+            style={{
+              flex: 1,
+              color: '#4B5563', // GRAY_600
+              fontFamily: 'Inter_400Regular',
+              fontSize: 16,
+              backgroundColor: 'transparent',
+            }}
+            dropdownIconColor="#9CA3AF"
+          >
+            <Picker.Item 
+              label={placeholder} 
+              value={undefined} 
+              color="#9CA3AF"
+            />
+            {items.map((item, index) => (
+              <Picker.Item
+                key={index}
+                label={item.label}
+                value={item.value}
+                color="#4B5563"
+              />
+            ))}
+          </Picker>
+        </SelectWrapper>
+        {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
+      </Container>
+    );
+  }
+
+  // For iOS, keep the custom press handling
   return (
     <Container onPress={handlePress} disabled={disabled}>
       <SelectWrapper error={!!errorMessage} disabled={disabled}>
         {showIcon && name && <IconInput name={name} />}
         
-        <RNPickerSelect
+        <Picker
           ref={pickerRef}
-          onValueChange={(value) => onValueChange?.(value)}
-          value={value}
-          items={items}
-          disabled={disabled}
-          placeholder={{ label: placeholder, value: null }}
-          useNativeAndroidPickerStyle={false}
+          selectedValue={selectedValue}
+          onValueChange={handleValueChange}
+          enabled={!disabled}
           style={{
-            inputIOS: {
-              flex: 1,
-              color: '#4B5563', // GRAY_600
-              fontFamily: 'Inter_400Regular',
-              fontSize: 16,
-              padding: 15,
-              backgroundColor: 'transparent',
-            },
-            inputAndroid: {
-              flex: 1,
-              color: '#4B5563', // GRAY_600
-              fontFamily: 'Inter_400Regular',
-              fontSize: 16,
-              padding: 15,
-              backgroundColor: 'transparent',
-            },
-            placeholder: {
-              color: '#9CA3AF', // GRAY_400
-              fontFamily: 'Inter_400Regular',
-              fontSize: 16,
-            },
-            iconContainer: {
-              display: 'none', // Hide the default icon
-            },
+            flex: 1,
+            color: '#4B5563', // GRAY_600
+            fontFamily: 'Inter_400Regular',
+            fontSize: 16,
+            backgroundColor: 'transparent',
           }}
-        />
+          itemStyle={{
+            color: '#4B5563',
+            fontFamily: 'Inter_400Regular',
+            fontSize: 16,
+          }}
+        >
+          <Picker.Item 
+            label={placeholder} 
+            value={undefined} 
+            color="#9CA3AF"
+          />
+          {items.map((item, index) => (
+            <Picker.Item
+              key={index}
+              label={item.label}
+              value={item.value}
+              color="#4B5563"
+            />
+          ))}
+        </Picker>
       </SelectWrapper>
-      <ChevronIcon 
-        name="chevron-down" 
-        size={16} 
-        color="#9CA3AF"
-      />
       {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
     </Container>
   );

@@ -18,6 +18,7 @@ export function ItemSharedUser({ sharing, onDeleteSharing, onStatusChange }: Ite
   const [targetUser, setTargetUser] = useState<IUser | null>(null);
   const [senderUser, setSenderUser] = useState<IUser | null>(null);
   const [currentStatus, setCurrentStatus] = useState(sharing.status);
+  console.log('sharing', sharing);
 
   const isReceived = user.user?.uid === sharing.target;
 
@@ -98,14 +99,47 @@ export function ItemSharedUser({ sharing, onDeleteSharing, onStatusChange }: Ite
   };
 
   const formatDate = (timestamp: any) => {
-    if (!timestamp || !timestamp.toDate) return 'Data não disponível';
+    if (!timestamp) return 'Data não disponível';
+    
     try {
-      return timestamp.toDate().toLocaleDateString('pt-BR', {
+      let date: Date;
+      
+      // Check if it's a Firestore Timestamp object
+      if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+        date = timestamp.toDate();
+      }
+      // Check if it's a plain timestamp object with seconds and nanoseconds
+      else if (timestamp.seconds && timestamp.nanoseconds) {
+        date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
+      }
+      // Check if it's already a Date object
+      else if (timestamp instanceof Date) {
+        date = timestamp;
+      }
+      // Check if it's a number (milliseconds)
+      else if (typeof timestamp === 'number') {
+        date = new Date(timestamp);
+      }
+      // Check if it's a string that can be parsed
+      else if (typeof timestamp === 'string') {
+        date = new Date(timestamp);
+      }
+      else {
+        return 'Data não disponível';
+      }
+      
+      // Validate if the date is valid
+      if (isNaN(date.getTime())) {
+        return 'Data não disponível';
+      }
+      
+      return date.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
         year: '2-digit'
       });
     } catch (error) {
+      console.error('Error formatting date:', error);
       return 'Data não disponível';
     }
   };
