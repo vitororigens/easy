@@ -822,10 +822,10 @@ export function NewLaunch() {
                                                     <Input
                                                         name="repeatCount"
                                                         placeholder="Quantidade de vezes"
-                                                        value={value ? String(value) : "1"}
+                                                        value={String(value || '')}
                                                         onChangeText={(text) => {
-                                                            const numValue = parseInt(text.replace(/\D/g, '')) || 1;
-                                                            onChange(Math.min(Math.max(numValue, 1), 60)); // Limitar entre 1 e 60
+                                                            const numValue = parseInt(text.replace(/\D/g, ''));
+                                                            onChange(numValue || '');
                                                         }}
                                                         onBlur={onBlur}
                                                         keyboardType="numeric"
