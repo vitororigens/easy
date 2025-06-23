@@ -109,3 +109,35 @@ export async function findEventById(id: string) {
     throw error;
   }
 }
+
+export async function deleteCalendarEvent(eventId: string, userId: string) {
+  try {
+    const docRef = doc(database, EVENTS_COLLECTION, eventId);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      throw new Error("Evento não encontrado");
+    }
+
+    const eventData = docSnap.data();
+    if (!eventData) {
+      throw new Error("Dados do evento não encontrados");
+    }
+
+    // Se o usuário é o criador, excluir completamente
+    if (eventData.userId === userId) {
+      await deleteDoc(docRef);
+      console.log("Evento excluído completamente:", eventId);
+    } else {
+      // Se não é o criador, apenas remover do compartilhamento
+      if (eventData.sharedWith && Array.isArray(eventData.sharedWith)) {
+        const updatedSharedWith = eventData.sharedWith.filter((uid: string) => uid !== userId);
+        await updateDoc(docRef, { sharedWith: updatedSharedWith });
+        console.log("Usuário removido do compartilhamento:", eventId);
+      }
+    }
+  } catch (error) {
+    console.error("Erro ao deletar evento:", error);
+    throw error;
+  }
+}

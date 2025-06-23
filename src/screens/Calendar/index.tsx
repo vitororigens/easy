@@ -25,8 +25,9 @@ import {
   SectionIcon,
   EmptyContainer,
 } from "./styles";
-import { ICalendarEvent, listEvents, listSharedEvents } from "../../services/firebase/calendar.firebase";
+import { ICalendarEvent, listEvents, listSharedEvents, deleteCalendarEvent } from "../../services/firebase/calendar.firebase";
 import { ICalendar } from "../../interfaces/ICalendar";
+import { Toast } from "react-native-toast-notifications";
 
 export function CalendarScreen() {
   const navigation = useNavigation();
@@ -59,15 +60,34 @@ export function CalendarScreen() {
     }
   }
 
+  async function handleDeleteEvent(event: ICalendarEvent) {
+    try {
+      // Verificar se o usuário pode excluir este evento
+      const isCreator = event.userId === user.user?.uid;
+      const canDelete = isCreator || event.sharedWith?.includes(user.user?.uid || "");
+
+      if (!canDelete) {
+        Toast.show("Você não pode excluir eventos compartilhados por outros usuários", { type: "warning" });
+        return;
+      }
+
+      await deleteCalendarEvent(event.id, user.user?.uid || "");
+      
+      // Atualizar a lista de eventos após a exclusão
+      await fetchEvents();
+      
+      Toast.show("Evento excluído!", { type: "success" });
+    } catch (error) {
+      console.error("Erro ao excluir evento:", error);
+      Toast.show("Erro ao excluir evento", { type: "error" });
+    }
+  }
+
   function handleEditEvent(event: ICalendarEvent) {
     navigation.navigate("newevent", {
       selectedItemId: event.id,
       isCreator: event.userId === user.user?.uid,
     });
-  }
-
-  function handleDeleteEvent(event: ICalendarEvent) {
-    // Implement delete functionality
   }
 
   function handleShareEvent(event: ICalendarEvent) {
