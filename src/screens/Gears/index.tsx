@@ -16,6 +16,8 @@ import {
   Icon,
   Items,
   Title,
+  SectionTitle,
+  SectionContainer,
 } from "./styles";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -100,96 +102,120 @@ export function Gears() {
 
   return (
     <DefaultContainer title="Configurações">
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false}
+      style={{
+        flex: 1,
+        borderTopRightRadius: 40,
+        borderTopLeftRadius: 40,
+      }}
+      >
         <Content>
           {user ? (
             <View>
-              <ContentItems>
-                <ButtonIcon onPress={handleSubscriptions}>
-                  <Items>
-                    <Title>Assinaturas</Title>
-                    <Icon>
-                      <FontAwesome
-                        name="pencil"
-                        size={30}
-                        color={COLORS.PURPLE_800}
-                      />
-                    </Icon>
-                  </Items>
-                </ButtonIcon>
-                         <ButtonIcon onPress={handleShared}>
-                  <Items>
-                    <Title>Compartilhamentos</Title>
-                    <Icon>
-                      <FontAwesome
-                        name="share"
-                        size={30}
-                        color={COLORS.PURPLE_800}
-                      />
-                    </Icon>
-                  </Items>
-                </ButtonIcon>
-                <ButtonIcon onPress={handleNotes}>
-                  <Items>
-                    <Title>Notas</Title>
-                    <Icon>
-                      <FontAwesome
-                        name="sticky-note"
-                        size={30}
-                        color={COLORS.PURPLE_800}
-                      />
-                    </Icon>
-                  </Items>
-                </ButtonIcon>
-                <ButtonIcon onPress={handleNotifications}>
-                  <Items>
-                    <Title>Notificações</Title>
-                    <Icon>
-                      <FontAwesome
-                        name="bell"
-                        size={30}
-                        color={COLORS.PURPLE_800}
-                      />
-                    </Icon>
-                  </Items>
-                </ButtonIcon>
-                <ButtonIcon onPress={handlePefil}>
-                  <Items>
-                    <Title>Perfil</Title>
-                    <Icon>
-                      <FontAwesome
-                        name="user"
-                        size={30}
-                        color={COLORS.PURPLE_800}
-                      />
-                    </Icon>
-                  </Items>
-                </ButtonIcon>
-                <ButtonIcon onPress={handleDeleteUserConfirmation}>
-                  <Items>
-                    <Title>Deletar Conta</Title>
-                    <Icon>
-                      <FontAwesome
-                        name="trash"
-                        size={30}
-                        color={COLORS.PURPLE_800}
-                      />
-                    </Icon>
-                  </Items>
-                </ButtonIcon>
-                <ButtonIcon onPress={handleLogoutConfirmation}>
-                  <Items>
-                    <Title>Sair</Title>
-                    <Icon>
-                      <Entypo
-                        name="log-out"
-                        size={30}
-                        color={COLORS.PURPLE_800}
-                      />
-                    </Icon>
-                  </Items>
-                </ButtonIcon>
-              </ContentItems>
+              {/* Seção Funcionalidades */}
+              <SectionContainer>
+                <SectionTitle>Funcionalidades</SectionTitle>
+                <ContentItems>
+                  <ButtonIcon onPress={handleSubscriptions}>
+                    <Items>
+                      <Title>Assinaturas</Title>
+                      <Icon>
+                        <FontAwesome
+                          name="pencil"
+                          size={30}
+                          color={COLORS.PURPLE_800}
+                        />
+                      </Icon>
+                    </Items>
+                  </ButtonIcon>
+                  <ButtonIcon onPress={handleShared}>
+                    <Items>
+                      <Title>Compartilhamentos</Title>
+                      <Icon>
+                        <FontAwesome
+                          name="share"
+                          size={30}
+                          color={COLORS.PURPLE_800}
+                        />
+                      </Icon>
+                    </Items>
+                  </ButtonIcon>
+                  <ButtonIcon onPress={handleNotes}>
+                    <Items>
+                      <Title>Notas</Title>
+                      <Icon>
+                        <FontAwesome
+                          name="sticky-note"
+                          size={30}
+                          color={COLORS.PURPLE_800}
+                        />
+                      </Icon>
+                    </Items>
+                  </ButtonIcon>
+                </ContentItems>
+              </SectionContainer>
+
+              {/* Seção Configurações */}
+              <SectionContainer>
+                <SectionTitle>Configurações</SectionTitle>
+                <ContentItems>
+                  <ButtonIcon onPress={handleNotifications}>
+                    <Items>
+                      <Title>Notificações</Title>
+                      <Icon>
+                        <FontAwesome
+                          name="bell"
+                          size={30}
+                          color={COLORS.PURPLE_800}
+                        />
+                      </Icon>
+                    </Items>
+                  </ButtonIcon>
+                  <ButtonIcon onPress={handlePefil}>
+                    <Items>
+                      <Title>Perfil</Title>
+                      <Icon>
+                        <FontAwesome
+                          name="user"
+                          size={30}
+                          color={COLORS.PURPLE_800}
+                        />
+                      </Icon>
+                    </Items>
+                  </ButtonIcon>
+                </ContentItems>
+              </SectionContainer>
+
+              {/* Seção Conta */}
+              <SectionContainer>
+                <SectionTitle>Conta</SectionTitle>
+                <ContentItems>
+                  <ButtonIcon onPress={handleLogoutConfirmation}>
+                    <Items>
+                      <Title>Sair</Title>
+                      <Icon>
+                        <Entypo
+                          name="log-out"
+                          size={30}
+                          color={COLORS.PURPLE_800}
+                        />
+                      </Icon>
+                    </Items>
+                  </ButtonIcon>
+                  <ButtonIcon onPress={handleDeleteUserConfirmation}>
+                    <Items>
+                      <Title>Deletar Conta</Title>
+                      <Icon>
+                        <FontAwesome
+                          name="trash"
+                          size={30}
+                          color={COLORS.PURPLE_800}
+                        />
+                      </Icon>
+                    </Items>
+                  </ButtonIcon>
+                </ContentItems>
+              </SectionContainer>
             </View>
           ) : (
             <Loading />

@@ -26,6 +26,20 @@ export const ContentItems = styled.View`
   margin-bottom: 20px;
 `;
 
+export const SectionContainer = styled.View`
+  margin-bottom: 25px;
+`;
+
+export const SectionTitle = styled.Text`
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+  color: ${({ theme }) => theme.COLORS.GRAY_600};
+  margin-bottom: 10px;
+  margin-left: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
 export const Header = styled.View`
   width: 100%;
   align-items: center;
