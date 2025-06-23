@@ -13,6 +13,7 @@ import {
   CheckboxContainer,
 } from "./styles";
 import { formatPrice } from "../../utils/price";
+import { useUserAuth } from "../../hooks/useUserAuth";
 
 interface ItemMarketProps {
   market: IMarket;
@@ -29,6 +30,13 @@ export function ItemMarket({
   isSelected,
   onSelect,
 }: ItemMarketProps) {
+  const { user } = useUserAuth();
+  
+  // Verificar se o usuário pode excluir este item
+  // Pode excluir se for o criador (uid) OU se for o proprietário (isOwner)
+  const isCreator = market.uid === user?.uid;
+  const canDelete = isCreator || market.isOwner;
+
   return (
     <Container>
       <Content>
@@ -49,9 +57,11 @@ export function ItemMarket({
           <ActionButton onPress={handleUpdate}>
             <MaterialIcons name="edit" size={24} color="#6B7280" />
           </ActionButton>
-          <ActionButton onPress={handleDelete}>
-            <MaterialIcons name="delete" size={24} color="#EF4444" />
-          </ActionButton>
+          {canDelete && (
+            <ActionButton onPress={handleDelete}>
+              <MaterialIcons name="delete" size={24} color="#EF4444" />
+            </ActionButton>
+          )}
         </Actions>
       </Content>
     </Container>

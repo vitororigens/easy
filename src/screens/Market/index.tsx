@@ -78,19 +78,6 @@ export function Market({ route }: any) {
   const user = useUserAuth();
   const { markets, loading, deleteMarket, toggleMarketCompletion } = useMarket();
 
-  console.log("Componente Market renderizado");
-  console.log("Usuário atual:", user.user?.uid);
-  console.log("Mercados carregados:", markets);
-  console.log("Loading:", loading);
-
-  // Adicionar logs para depuração
-  useEffect(() => {
-    console.log("useEffect no componente Market");
-    console.log("Usuário atual:", user.user?.uid);
-    console.log("Mercados carregados:", markets);
-    console.log("Loading:", loading);
-  }, [user, markets, loading]);
-
   const [activeButton, setActiveButton] = useState("mercado");
   const [isListVisible, setIsListVisible] = useState(true);
   const [isSharedListVisible, setIsSharedListVisible] = useState(false);
@@ -104,69 +91,27 @@ export function Market({ route }: any) {
   const filteredMarketplaceData = useMemo(() => {
     if (!marketplaceData || !user?.user?.uid) return [];
     
-    console.log('Filtrando histórico para usuário:', user.user.uid);
     const filtered = marketplaceData.filter(item => item.uid === user.user?.uid);
-    console.log('Total de itens no histórico:', marketplaceData.length);
-    console.log('Total após filtragem:', filtered.length);
     
     return filtered;
   }, [marketplaceData, user.user?.uid]);
 
   const personalMarkets = useMemo(() => {
-    console.log("Filtrando mercados pessoais");
-    console.log("Total de mercados:", markets?.length);
     const filtered = markets?.filter(market => market.isOwner) || [];
-    console.log("Mercados pessoais encontrados:", filtered.map(m => ({ 
-      id: m.id, 
-      name: m.name,
-      isOwner: m.isOwner,
-      isShared: m.isShared
-    })));
     return filtered;
   }, [markets]);
 
   const sharedMarkets = useMemo(() => {
-    console.log("Filtrando mercados compartilhados");
-    console.log("Total de mercados:", markets?.length);
-    console.log("Mercados disponíveis:", markets?.map(m => ({
-      id: m.id,
-      name: m.name,
-      isOwner: m.isOwner,
-      isShared: m.isShared,
-      shareInfo: m.shareInfo,
-      shareWith: m.shareWith
-    })));
-    
     const filtered = markets?.filter(market => {
       const isShared = market.isShared && !market.isOwner;
-      console.log("Verificando mercado:", {
-        id: market.id,
-        name: market.name,
-        isShared: market.isShared,
-        isOwner: market.isOwner,
-        shareInfo: market.shareInfo,
-        shareWith: market.shareWith
-      });
       return isShared;
     }) || [];
     
-    console.log("Mercados compartilhados encontrados:", filtered.map(m => ({ 
-      id: m.id, 
-      name: m.name,
-      isOwner: m.isOwner,
-      isShared: m.isShared,
-      shareInfo: m.shareInfo,
-      shareWith: m.shareWith
-    })));
     return filtered;
   }, [markets]);
 
   // Adicionar informações úteis sobre os mercados
   const marketStats = useMemo(() => {
-    console.log("Calculando estatísticas dos mercados");
-    console.log("Mercados pessoais:", personalMarkets.length);
-    console.log("Mercados compartilhados:", sharedMarkets.length);
-    
     // Garantir que todos os preços sejam números válidos
     const allMarkets = [...personalMarkets, ...sharedMarkets];
     const totalValue = allMarkets.reduce((acc, curr) => {
@@ -182,38 +127,42 @@ export function Market({ route }: any) {
       totalValue: totalValue
     };
     
-    console.log("Estatísticas calculadas:", stats);
     return stats;
   }, [personalMarkets, sharedMarkets]);
-
-  // Adicionar logs para depuração
-  useEffect(() => {
-    console.log("Estatísticas dos mercados:", {
-      total: marketStats.totalItems,
-      completed: marketStats.completedItems,
-      pending: marketStats.pendingItems,
-      value: marketStats.totalValue
-    });
-  }, [marketStats]);
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
   };
 
   const handleEditMarket = (marketId: string) => {
-    console.log("Editando mercado com ID:", marketId);
     // @ts-ignore
     navigation.navigate("market-item", { selectedItemId: marketId });
   };
 
   const handleDeleteMarket = async (marketId: string) => {
     try {
+      // Encontrar o mercado que está sendo excluído
+      const marketToDelete = markets?.find(market => market.id === marketId);
+      
+      if (!marketToDelete) {
+        Toast.show("Item não encontrado", { type: "error" });
+        return;
+      }
+
+      // Verificar se o usuário é o criador do item OU se é o proprietário
+      const isCreator = marketToDelete.uid === user?.user?.uid;
+      const canDelete = isCreator || marketToDelete.isOwner;
+
+      if (!canDelete) {
+        Toast.show("Você não pode excluir itens compartilhados por outros usuários", { type: "warning" });
+        return;
+      }
+
       await deleteMarket(marketId);
       // Remove o item da lista de selecionados quando ele é excluído
       setSelectedMarkets(prev => prev.filter(id => id !== marketId));
       Toast.show("Item excluído!", { type: "success" });
     } catch (error) {
-      console.error("Erro ao excluir o item: ", error);
       Toast.show("Erro ao excluir o item", { type: "error" });
     }
   };
@@ -222,7 +171,6 @@ export function Market({ route }: any) {
     try {
       await toggleMarketCompletion(marketId);
     } catch (error) {
-      console.error("Erro ao alternar status do item: ", error);
       Toast.show("Erro ao alternar status do item", { type: "error" });
     }
   };
@@ -290,7 +238,6 @@ export function Market({ route }: any) {
       setSelectedMarkets([]);
       Toast.show("Itens finalizados com sucesso!", { type: "success" });
     } catch (error) {
-      console.error("Erro ao finalizar itens:", error);
       Toast.show("Erro ao finalizar itens", { type: "error" });
     }
   };
@@ -312,7 +259,6 @@ export function Market({ route }: any) {
               await getFirestore().collection("Marketplace").doc(itemId).delete();
               Toast.show("Item excluído do histórico!", { type: "success" });
             } catch (error) {
-              console.error("Erro ao excluir item do histórico:", error);
               Toast.show("Erro ao excluir item do histórico", { type: "error" });
             }
           }

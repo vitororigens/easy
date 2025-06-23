@@ -157,16 +157,11 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
         throw new Error("Dados do mercado não encontrados");
       }
       
+      // Se o usuário é o proprietário, excluir completamente
       if (marketData.uid === user.user?.uid) {
-        if (marketData.shareWith?.length > 0) {
-          const updatedShareWith = marketData.shareWith.filter(
-            (uid: string) => uid !== user.user?.uid
-          );
-          await updateDoc(marketRef, { shareWith: updatedShareWith });
-        } else {
-          await deleteDoc(marketRef);
-        }
+        await deleteDoc(marketRef);
       } else {
+        // Se não é o proprietário, apenas remover do compartilhamento
         const updatedShareWith = marketData.shareWith?.filter(
           (uid: string) => uid !== user.user?.uid
         ) || [];
