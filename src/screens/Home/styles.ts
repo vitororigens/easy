@@ -132,3 +132,20 @@ export const StatLabel = styled.Text`
   color: ${({ theme }) => theme.COLORS.GRAY_600};
   text-align: center;
 `;
+
+export const EmptyContainer = styled.View`
+  padding: 32px;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.COLORS.GRAY_300};
+  border-radius: 10px;
+  margin: 8px 0;
+`;
+
+export const TextEmpty = styled.Text`
+  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  text-align: center;
+  color: ${({ theme }) => theme.COLORS.GRAY_400};
+  margin-top: 8px;
+`;

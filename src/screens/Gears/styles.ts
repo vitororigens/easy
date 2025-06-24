@@ -9,35 +9,34 @@ type Props = {
 
 export const Content = styled.View`
   flex: 1;
-  padding: 12px;
-  border-top-width: 4px;
-  border-top-style: solid;
-  border-top-color: ${({ theme }) => theme.COLORS.TEAL_600};
-  border-top-right-radius: 40px;
-  border-top-left-radius: 40px;
-  /* background-color: ${({ theme }) => theme.COLORS.WHITE}; */
+  padding: 20px;
+  background-color: ${({ theme }) => theme.COLORS.GRAY_300};
 `;
 
 export const ContentItems = styled.View`
-  flex: 1;
   background-color: ${({ theme }) => theme.COLORS.WHITE};
-  padding-left: 15px;
-  padding-right: 15px;
-  margin-bottom: 20px;
+  border-radius: 16px;
+  padding: 8px;
+  margin-bottom: 24px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 8px;
+  elevation: 3;
 `;
 
 export const SectionContainer = styled.View`
-  margin-bottom: 25px;
+  margin-bottom: 32px;
 `;
 
 export const SectionTitle = styled.Text`
-  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme }) => theme.COLORS.GRAY_600};
-  margin-bottom: 10px;
-  margin-left: 5px;
+  margin-bottom: 16px;
+  margin-left: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 `;
 
 export const Header = styled.View`
@@ -55,12 +54,23 @@ export const NavBar = styled.View`
   padding-top: 10px;
 `;
 
-export const ButtonIcon = styled(TouchableOpacity)``;
+export const ButtonIcon = styled(TouchableOpacity)`
+  border-radius: 12px;
+  margin-bottom: 4px;
+  margin-top: 4px;
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
+  shadow-color: #000;
+  shadow-offset: 0px 1px;
+  shadow-opacity: 0.05;
+  shadow-radius: 4px;
+  elevation: 1;
+`;
 
 export const Title = styled.Text`
-  font-size: ${({ theme }) => theme.FONT_SIZE.GG}px;
-  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme }) => theme.COLORS.GRAY_600};
+  flex: 1;
 `;
 
 export const Divider = styled.View`
@@ -70,7 +80,7 @@ export const Divider = styled.View`
 `;
 
 export const SubTitle = styled.Text<Props>`
-  font-size: ${({ theme }) => theme.FONT_SIZE.GG}px;
+  font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme, type }) =>
     type === "PRIMARY" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
@@ -80,17 +90,64 @@ export const Items = styled.View`
   width: 100%;
   flex-direction: row;
   justify-content: space-between;
-  min-height: 40px;
-  max-height: 80px;
   align-items: center;
-  padding: 10px;
-  margin-bottom: 5px;
-  margin-top: 5px;
+  padding: 16px 20px;
+  min-height: 64px;
+  border-radius: 12px;
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
 `;
 
 export const Icon = styled.View`
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   justify-content: center;
   align-items: center;
+  background-color: ${({ theme }) => theme.COLORS.PURPLE_50};
+  border-radius: 12px;
+  margin-left: 12px;
+`;
+
+export const ItemContent = styled.View`
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const ItemTextContainer = styled.View`
+  flex: 1;
+`;
+
+export const ItemSubtitle = styled.Text`
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  color: ${({ theme }) => theme.COLORS.GRAY_400};
+  margin-top: 2px;
+`;
+
+export const ArrowIcon = styled.View`
+  width: 24px;
+  height: 24px;
+  justify-content: center;
+  align-items: center;
+  margin-left: 8px;
+`;
+
+export const DangerIcon = styled.View`
+  width: 48px;
+  height: 48px;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }) => theme.COLORS.RED_700}20;
+  border-radius: 12px;
+  margin-left: 12px;
+`;
+
+export const WarningIcon = styled.View`
+  width: 48px;
+  height: 48px;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }) => theme.COLORS.YELLOW_700}20;
+  border-radius: 12px;
+  margin-left: 12px;
 `;

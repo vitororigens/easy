@@ -25,6 +25,8 @@ import {
   StatItem,
   StatValue,
   StatLabel,
+  EmptyContainer,
+  TextEmpty,
 } from "./styles";
 
 import { useNavigation } from "@react-navigation/native";
@@ -584,6 +586,13 @@ export function Home() {
                   )}
                   keyExtractor={(item) => item.id}
                   contentContainerStyle={{ paddingBottom: 10 }}
+                  ListEmptyComponent={
+                    <EmptyContainer>
+                      <TextEmpty>
+                        Você não possui receitas compartilhadas
+                      </TextEmpty>
+                    </EmptyContainer>
+                  }
                 />
               </Container>
             )}
@@ -678,6 +687,13 @@ export function Home() {
                   )}
                   keyExtractor={(item) => item.id}
                   contentContainerStyle={{ paddingBottom: 10 }}
+                  ListEmptyComponent={
+                    <EmptyContainer>
+                      <TextEmpty>
+                        Você não possui despesas compartilhadas
+                      </TextEmpty>
+                    </EmptyContainer>
+                  }
                 />
               </Container>
             )}

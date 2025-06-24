@@ -33,7 +33,7 @@ export const SelectWrapper = styled.View<SelectWrapperProps>`
     disabled ? theme.COLORS.GRAY_300 : theme.COLORS.WHITE};
   border-width: 1px;
   border-color: ${({theme, error}: ThemeProps & { error?: boolean }) => 
-    error ? theme.COLORS.RED_500 : 'transparent'};
+    error ? theme.COLORS.RED_700 : 'transparent'};
   border-radius: 8px;
   opacity: ${({disabled}: { disabled?: boolean }) => disabled ? 0.6 : 1};
 `;
@@ -52,7 +52,7 @@ export const ChevronIcon = styled(FontAwesome5)`
 `;
 
 export const ErrorText = styled.Text`
-  color: ${({theme}: ThemeProps) => theme.COLORS.RED_500};
+  color: ${({theme}: ThemeProps) => theme.COLORS.RED_700};
   font-family: ${({theme}: ThemeProps) => theme.FONT_FAMILY.REGULAR};
   font-size: ${({theme}: ThemeProps) => theme.FONT_SIZE.SM}px;
   margin-top: -8px;

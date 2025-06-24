@@ -1,8 +1,8 @@
-import { Entypo, FontAwesome, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo, FontAwesome, FontAwesome5, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { getAuth, signOut, deleteUser } from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, View, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "styled-components/native";
 import { CustomModal } from "../../components/CustomModal";
@@ -18,9 +18,75 @@ import {
   Title,
   SectionTitle,
   SectionContainer,
+  ItemContent,
+  ItemTextContainer,
+  ItemSubtitle,
+  ArrowIcon,
+  DangerIcon,
+  WarningIcon,
 } from "./styles";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+// Interface para os itens de menu
+interface MenuItemProps {
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  onPress: () => void;
+  accessibilityLabel: string;
+  accessibilityHint: string;
+  iconType?: 'default' | 'warning' | 'danger';
+}
+
+// Componente reutilizável para itens de menu
+const MenuItem: React.FC<MenuItemProps> = ({
+  title,
+  subtitle,
+  icon,
+  onPress,
+  accessibilityLabel,
+  accessibilityHint,
+  iconType = 'default'
+}) => {
+  const { COLORS } = useTheme();
+  
+  const renderIcon = () => {
+    switch (iconType) {
+      case 'warning':
+        return <WarningIcon>{icon}</WarningIcon>;
+      case 'danger':
+        return <DangerIcon>{icon}</DangerIcon>;
+      default:
+        return <Icon>{icon}</Icon>;
+    }
+  };
+
+  return (
+    <ButtonIcon 
+      onPress={onPress}
+      activeOpacity={0.7}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
+    >
+      <Items>
+        <ItemContent>
+          <ItemTextContainer>
+            <Title>{title}</Title>
+            <ItemSubtitle>{subtitle}</ItemSubtitle>
+          </ItemTextContainer>
+          {renderIcon()}
+        </ItemContent>
+        <ArrowIcon>
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color={COLORS.GRAY_400}
+          />
+        </ArrowIcon>
+      </Items>
+    </ButtonIcon>
+  );
+};
 
 export function Gears() {
   const navigation = useNavigation();
@@ -47,6 +113,7 @@ export function Gears() {
       }, 1000);
     } catch (error) {
       console.error("Error signing out: ", error);
+      Alert.alert("Erro", "Não foi possível fazer logout. Tente novamente.");
     }
   }
 
@@ -69,6 +136,7 @@ export function Gears() {
       }
     } catch (error) {
       console.error("Error delete account: ", error);
+      Alert.alert("Erro", "Não foi possível deletar a conta. Tente novamente.");
     }
   }
 
@@ -102,12 +170,10 @@ export function Gears() {
 
   return (
     <DefaultContainer title="Configurações">
-      <ScrollView showsVerticalScrollIndicator={false}
-      style={{
-        flex: 1,
-        borderTopRightRadius: 40,
-        borderTopLeftRadius: 40,
-      }}
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+        style={{ flex: 1 }}
       >
         <Content>
           {user ? (
@@ -116,42 +182,23 @@ export function Gears() {
               <SectionContainer>
                 <SectionTitle>Funcionalidades</SectionTitle>
                 <ContentItems>
-                  <ButtonIcon onPress={handleSubscriptions}>
-                    <Items>
-                      <Title>Assinaturas</Title>
-                      <Icon>
-                        <FontAwesome
-                          name="pencil"
-                          size={30}
-                          color={COLORS.PURPLE_800}
-                        />
-                      </Icon>
-                    </Items>
-                  </ButtonIcon>
-                  <ButtonIcon onPress={handleShared}>
-                    <Items>
-                      <Title>Compartilhamentos</Title>
-                      <Icon>
-                        <FontAwesome
-                          name="share"
-                          size={30}
-                          color={COLORS.PURPLE_800}
-                        />
-                      </Icon>
-                    </Items>
-                  </ButtonIcon>
-                  <ButtonIcon onPress={handleNotes}>
-                    <Items>
-                      <Title>Notas</Title>
-                      <Icon>
-                        <FontAwesome
-                          name="sticky-note"
-                          size={30}
-                          color={COLORS.PURPLE_800}
-                        />
-                      </Icon>
-                    </Items>
-                  </ButtonIcon>
+                  <MenuItem
+                    title="Assinaturas"
+                    subtitle="Gerencie suas assinaturas mensais"
+                    icon={<FontAwesome name="pencil" size={24} color={COLORS.PURPLE_800} />}
+                    onPress={handleSubscriptions}
+                    accessibilityLabel="Ir para Assinaturas"
+                    accessibilityHint="Navega para a tela de gerenciamento de assinaturas"
+                  />
+                  
+                  <MenuItem
+                    title="Notas"
+                    subtitle="Suas anotações e lembretes"
+                    icon={<FontAwesome name="sticky-note" size={24} color={COLORS.PURPLE_800} />}
+                    onPress={handleNotes}
+                    accessibilityLabel="Ir para Notas"
+                    accessibilityHint="Navega para a tela de notas pessoais"
+                  />
                 </ContentItems>
               </SectionContainer>
 
@@ -159,30 +206,32 @@ export function Gears() {
               <SectionContainer>
                 <SectionTitle>Configurações</SectionTitle>
                 <ContentItems>
-                  <ButtonIcon onPress={handleNotifications}>
-                    <Items>
-                      <Title>Notificações</Title>
-                      <Icon>
-                        <FontAwesome
-                          name="bell"
-                          size={30}
-                          color={COLORS.PURPLE_800}
-                        />
-                      </Icon>
-                    </Items>
-                  </ButtonIcon>
-                  <ButtonIcon onPress={handlePefil}>
-                    <Items>
-                      <Title>Perfil</Title>
-                      <Icon>
-                        <FontAwesome
-                          name="user"
-                          size={30}
-                          color={COLORS.PURPLE_800}
-                        />
-                      </Icon>
-                    </Items>
-                  </ButtonIcon>
+                  <MenuItem
+                    title="Compartilhamentos"
+                    subtitle="Gerencie o que você compartilha"
+                    icon={<FontAwesome name="share" size={24} color={COLORS.PURPLE_800} />}
+                    onPress={handleShared}
+                    accessibilityLabel="Ir para Compartilhamentos"
+                    accessibilityHint="Navega para a tela de compartilhamentos"
+                  />
+                  
+                  <MenuItem
+                    title="Notificações"
+                    subtitle="Configure alertas e lembretes"
+                    icon={<FontAwesome name="bell" size={24} color={COLORS.PURPLE_800} />}
+                    onPress={handleNotifications}
+                    accessibilityLabel="Ir para Notificações"
+                    accessibilityHint="Navega para a tela de configurações de notificações"
+                  />
+                  
+                  <MenuItem
+                    title="Perfil"
+                    subtitle="Edite suas informações pessoais"
+                    icon={<FontAwesome name="user" size={24} color={COLORS.PURPLE_800} />}
+                    onPress={handlePefil}
+                    accessibilityLabel="Ir para Perfil"
+                    accessibilityHint="Navega para a tela de perfil do usuário"
+                  />
                 </ContentItems>
               </SectionContainer>
 
@@ -190,30 +239,25 @@ export function Gears() {
               <SectionContainer>
                 <SectionTitle>Conta</SectionTitle>
                 <ContentItems>
-                  <ButtonIcon onPress={handleLogoutConfirmation}>
-                    <Items>
-                      <Title>Sair</Title>
-                      <Icon>
-                        <Entypo
-                          name="log-out"
-                          size={30}
-                          color={COLORS.PURPLE_800}
-                        />
-                      </Icon>
-                    </Items>
-                  </ButtonIcon>
-                  <ButtonIcon onPress={handleDeleteUserConfirmation}>
-                    <Items>
-                      <Title>Deletar Conta</Title>
-                      <Icon>
-                        <FontAwesome
-                          name="trash"
-                          size={30}
-                          color={COLORS.PURPLE_800}
-                        />
-                      </Icon>
-                    </Items>
-                  </ButtonIcon>
+                  <MenuItem
+                    title="Sair"
+                    subtitle="Encerrar sessão atual"
+                    icon={<Entypo name="log-out" size={24} color={COLORS.YELLOW_700} />}
+                    onPress={handleLogoutConfirmation}
+                    accessibilityLabel="Sair da conta"
+                    accessibilityHint="Confirma o logout da conta atual"
+                    iconType="warning"
+                  />
+                  
+                  <MenuItem
+                    title="Deletar Conta"
+                    subtitle="Excluir conta permanentemente"
+                    icon={<FontAwesome name="trash" size={24} color={COLORS.RED_700} />}
+                    onPress={handleDeleteUserConfirmation}
+                    accessibilityLabel="Deletar conta"
+                    accessibilityHint="Confirma a exclusão permanente da conta"
+                    iconType="danger"
+                  />
                 </ContentItems>
               </SectionContainer>
             </View>
@@ -222,6 +266,7 @@ export function Gears() {
           )}
         </Content>
       </ScrollView>
+      
       <CustomModal
         animationType="slide"
         transparent={true}
@@ -236,6 +281,7 @@ export function Gears() {
         title="Deseja realmente sair da conta?"
         visible={confirmLogoutVisible}
       />
+      
       <CustomModal
         animationType="slide"
         transparent={true}
