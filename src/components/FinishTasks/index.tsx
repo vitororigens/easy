@@ -47,7 +47,7 @@ export function FinishTasks({ selectedCount, onFinish }: FinishTasksProps) {
     <Animated.View
       style={{
         position: 'absolute',
-        bottom: 80,
+        bottom: 60,
         left: 0,
         right: 0,
         transform: [{

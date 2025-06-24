@@ -47,7 +47,7 @@ export function FinishMarkets({ selectedCount, onFinish }: FinishMarketsProps) {
     <Animated.View
       style={{
         position: 'absolute',
-        bottom: 80,
+        bottom: 60,
         left: 0,
         right: 0,
         transform: [{

@@ -53,6 +53,8 @@ import {
 
 const modalBottom = Platform.OS === "ios" ? 90 : 70;
 
+type ActiveButtonType = "mercado" | "historico";
+
 interface HistoryItem {
   id: string;
   name: string;
@@ -78,9 +80,10 @@ export function Market({ route }: any) {
   const user = useUserAuth();
   const { markets, loading, deleteMarket, toggleMarketCompletion } = useMarket();
 
-  const [activeButton, setActiveButton] = useState("mercado");
+  const [activeButton, setActiveButton] = useState<ActiveButtonType>("mercado");
   const [isListVisible, setIsListVisible] = useState(true);
   const [isSharedListVisible, setIsSharedListVisible] = useState(false);
+  const [isSummaryVisible, setIsSummaryVisible] = useState(true);
   const [selectedMarkets, setSelectedMarkets] = useState<string[]>([]);
   const [modalActive, setModalActive] = useState(false);
   const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryItem | null>(null);
@@ -130,8 +133,29 @@ export function Market({ route }: any) {
     return stats;
   }, [personalMarkets, sharedMarkets]);
 
-  const handleButtonClick = (buttonName: string) => {
+  const handleButtonClick = (buttonName: ActiveButtonType) => {
     setActiveButton(buttonName);
+  };
+
+  const handleToggleSummary = () => {
+    setIsSummaryVisible(!isSummaryVisible);
+  };
+
+  const handleToggleMyItems = () => {
+    setIsListVisible(!isListVisible);
+    // Se estiver abrindo meus itens, fecha itens compartilhados
+    if (!isListVisible) {
+      setIsSharedListVisible(false);
+    }
+  };
+
+  const handleToggleSharedItems = () => {
+    setIsSharedListVisible(!isSharedListVisible);
+    // Se estiver abrindo itens compartilhados, fecha resumo e meus itens
+    if (!isSharedListVisible) {
+      setIsSummaryVisible(false);
+      setIsListVisible(false);
+    }
   };
 
   const handleEditMarket = (marketId: string) => {
@@ -294,37 +318,40 @@ export function Market({ route }: any) {
 
       {activeButton === "mercado" && (
         <Content>
-          <ContentTitle>
+          <ContentTitle type="PRIMARY" onPress={handleToggleSummary}>
             <HeaderContainer>
-              <SectionIcon name="chart-bar" />
-              <Title>Resumo</Title>
+              <SectionIcon type="PRIMARY" name="chart-bar" />
+              <Title type="PRIMARY">Resumo</Title>
             </HeaderContainer>
+            <Icon name={isSummaryVisible ? "arrow-drop-up" : "arrow-drop-down"} type="PRIMARY" />
           </ContentTitle>
-          <Container>
-            <StatsContainer>
-              
-              <StatItem>
-                <StatValue>{marketStats.totalItems}</StatValue>
-                <StatLabel>Total de itens</StatLabel>
-              </StatItem>
-              {selectedMarkets.length > 0 && (
+          {isSummaryVisible && (
+            <Container>
+              <StatsContainer>
+                
                 <StatItem>
-                  <StatValue>{selectedMarkets.length}</StatValue>
-                  <StatLabel>Itens selecionados</StatLabel>
+                  <StatValue>{marketStats.totalItems}</StatValue>
+                  <StatLabel>Total de itens</StatLabel>
                 </StatItem>
-              )}
-              <StatItem>
-                <StatValue>{marketStats.pendingItems}</StatValue>
-                <StatLabel>Itens pendentes</StatLabel>
-              </StatItem>
-              <StatItem>
-                <StatValue>{formatCurrency(marketStats.totalValue).formatted}</StatValue>
-                <StatLabel>Valor total</StatLabel>
-              </StatItem>
-            </StatsContainer>
-          </Container>
+                {selectedMarkets.length > 0 && (
+                  <StatItem>
+                    <StatValue>{selectedMarkets.length}</StatValue>
+                    <StatLabel>Itens selecionados</StatLabel>
+                  </StatItem>
+                )}
+                <StatItem>
+                  <StatValue>{marketStats.pendingItems}</StatValue>
+                  <StatLabel>Itens pendentes</StatLabel>
+                </StatItem>
+                <StatItem>
+                  <StatValue>{formatCurrency(marketStats.totalValue).formatted}</StatValue>
+                  <StatLabel>Valor total</StatLabel>
+                </StatItem>
+              </StatsContainer>
+            </Container>
+          )}
 
-          <ContentTitle type="PRIMARY" onPress={() => setIsListVisible(!isListVisible)}>
+          <ContentTitle type="PRIMARY" onPress={() => handleToggleMyItems()}>
             <HeaderContainer>
               <SectionIcon type="PRIMARY" name="cart-variant" />
               <Title type="PRIMARY">Meus itens</Title>
@@ -365,7 +392,7 @@ export function Market({ route }: any) {
             </Container>
           )}
 
-          <ContentTitle type="PRIMARY" onPress={() => setIsSharedListVisible(!isSharedListVisible)}>
+          <ContentTitle type="PRIMARY" onPress={() => handleToggleSharedItems()}>
             <HeaderContainer>
               <SectionIcon type="PRIMARY" name="share-variant" />
               <Title type="PRIMARY">Itens compartilhados</Title>
@@ -406,10 +433,10 @@ export function Market({ route }: any) {
 
       {activeButton === "historico" && (
         <Content>
-          <ContentTitle>
+          <ContentTitle type="PRIMARY">
             <HeaderContainer>
-              <SectionIcon name="history" />
-              <Title>Histórico de compras</Title>
+              <SectionIcon type="PRIMARY" name="history" />
+              <Title type="PRIMARY">Histórico de compras</Title>
             </HeaderContainer>
           </ContentTitle>
           <ContainerHistory>
