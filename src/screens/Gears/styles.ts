@@ -11,6 +11,7 @@ export const Content = styled.View`
   flex: 1;
   padding: 20px;
   background-color: ${({ theme }) => theme.COLORS.GRAY_300};
+    border-radius: 20px;
 `;
 
 export const ContentItems = styled.View`
