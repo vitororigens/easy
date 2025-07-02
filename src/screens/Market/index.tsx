@@ -326,29 +326,29 @@ export function Market({ route }: any) {
             <Icon name={isSummaryVisible ? "arrow-drop-up" : "arrow-drop-down"} type="PRIMARY" />
           </ContentTitle>
           {isSummaryVisible && (
-            <Container>
-              <StatsContainer>
-                
+          <Container>
+            <StatsContainer>
+              
+              <StatItem>
+                <StatValue>{marketStats.totalItems}</StatValue>
+                <StatLabel>Total de itens</StatLabel>
+              </StatItem>
+              {selectedMarkets.length > 0 && (
                 <StatItem>
-                  <StatValue>{marketStats.totalItems}</StatValue>
-                  <StatLabel>Total de itens</StatLabel>
+                  <StatValue>{selectedMarkets.length}</StatValue>
+                  <StatLabel>Itens selecionados</StatLabel>
                 </StatItem>
-                {selectedMarkets.length > 0 && (
-                  <StatItem>
-                    <StatValue>{selectedMarkets.length}</StatValue>
-                    <StatLabel>Itens selecionados</StatLabel>
-                  </StatItem>
-                )}
-                <StatItem>
-                  <StatValue>{marketStats.pendingItems}</StatValue>
-                  <StatLabel>Itens pendentes</StatLabel>
-                </StatItem>
-                <StatItem>
-                  <StatValue>{formatCurrency(marketStats.totalValue).formatted}</StatValue>
-                  <StatLabel>Valor total</StatLabel>
-                </StatItem>
-              </StatsContainer>
-            </Container>
+              )}
+              <StatItem>
+                <StatValue>{marketStats.pendingItems}</StatValue>
+                <StatLabel>Itens pendentes</StatLabel>
+              </StatItem>
+              <StatItem>
+                <StatValue>{formatCurrency(marketStats.totalValue).formatted}</StatValue>
+                <StatLabel>Valor total</StatLabel>
+              </StatItem>
+            </StatsContainer>
+          </Container>
           )}
 
           <ContentTitle type="PRIMARY" onPress={() => handleToggleMyItems()}>

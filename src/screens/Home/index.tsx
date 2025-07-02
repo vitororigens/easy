@@ -53,6 +53,7 @@ export interface IRevenue {
   author: string;
   type: "input" | "output";
   date: string;
+  month: number;
   repeat: boolean;
   description: string;
   shareWith: string[];
@@ -119,10 +120,18 @@ export function Home() {
   useEffect(() => {
     if (uid && selectedMonth) {
       try {
-        // Calculando contas pagas e pendentes apenas para o mês selecionado e do usuário atual
+        // Calculando contas pagas e pendentes para o mês selecionado
+        // Incluindo dados do usuário atual
         const filteredExpenses = expenseData.filter(item => item.uid === uid && item.month === selectedMonth);
-        const paid = filteredExpenses.filter(item => item.status).length;
-        const pending = filteredExpenses.filter(item => !item.status).length;
+        
+        // Incluindo despesas compartilhadas com o usuário
+        const sharedExpenses = expensesSharedWithMe.filter(item => item.month === selectedMonth);
+        
+        // Combinando todas as despesas
+        const allExpenses = [...filteredExpenses, ...sharedExpenses];
+        
+        const paid = allExpenses.filter(item => item.status).length;
+        const pending = allExpenses.filter(item => !item.status).length;
         
         setPaidBills(paid);
         setPendingBills(pending);
@@ -132,7 +141,7 @@ export function Home() {
         setError("Erro ao calcular resumo");
       }
     }
-  }, [expenseData, tolalRevenueMunth, totalExpenseMunth, selectedMonth, uid]);
+  }, [expenseData, tolalRevenueMunth, totalExpenseMunth, selectedMonth, uid, expensesSharedWithMe]);
 
   const formattedRevenue = tolalRevenueMunth.toLocaleString("pt-BR", {
     style: "currency",
@@ -159,22 +168,22 @@ export function Home() {
     // Mapear o botão ativo para o tipo de coleção
     const collectionType = initialActiveButton === "receitas" ? "Revenue" : "Expense";
     
-    navigation.navigate("newlaunch", {
+    navigation.navigate("newlaunch" as any, {
       selectedItemId: documentId,
       initialActiveButton,
       collectionType,
-    } as never);
+    });
   }
 
   function handleExpenseEdit(documentId: string, initialActiveButton: string) {
     // Mapear o botão ativo para o tipo de coleção
     const collectionType = initialActiveButton === "receitas" ? "Revenue" : "Expense";
     
-    navigation.navigate("newlaunch", {
+    navigation.navigate("newlaunch" as any, {
       selectedItemId: documentId,
       initialActiveButton,
       collectionType,
-    } as never);
+    });
   }
 
   const handleButtonClick = (buttonName: string) => {
@@ -401,7 +410,7 @@ export function Home() {
     console.log("handleCreateItem - params:", params);
     
     try {
-      navigation.navigate("newlaunch", params as never);
+      navigation.navigate("newlaunch" as any, params);
     } catch (error) {
       console.error("Erro ao navegar para newtask:", error);
     }
