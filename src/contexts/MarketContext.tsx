@@ -145,6 +145,7 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     setError(null);
     try {
+      console.log('deleteMarket chamado para ID:', id, 'usuário:', user.user?.uid);
       const marketRef = doc(db, "Markets", id);
       const docSnap = await getDoc(marketRef);
       
@@ -157,16 +158,21 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
         throw new Error("Dados do mercado não encontrados");
       }
       
+      console.log('Dados do mercado:', { uid: marketData.uid, shareWith: marketData.shareWith, meuUid: user.user?.uid });
+      
       // Se o usuário é o proprietário, excluir completamente
       if (marketData.uid === user.user?.uid) {
+        console.log('Usuário é proprietário, deletando documento');
         await deleteDoc(marketRef);
       } else {
         // Se não é o proprietário, apenas remover do compartilhamento
+        console.log('Usuário não é proprietário, removendo do shareWith');
         const updatedShareWith = marketData.shareWith?.filter(
           (uid: string) => uid !== user.user?.uid
         ) || [];
         await updateDoc(marketRef, { shareWith: updatedShareWith });
       }
+      console.log('Operação concluída com sucesso');
     } catch (error) {
       console.error("Erro ao deletar mercado:", error);
       setError("Erro ao deletar mercado");

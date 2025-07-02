@@ -3,13 +3,15 @@ import { ITask } from "../interfaces/ITask";
 import { useUserAuth } from "../hooks/useUserAuth";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { database } from "../libs/firebase";
+import firestore from "@react-native-firebase/firestore";
+import { Toast } from "react-native-toast-notifications";
 
 interface ITaskContext {
   tasks: ITask[];
   loading: boolean;
   addTask: (task: Omit<ITask, "id" | "createdAt" | "updatedAt">) => Promise<void>;
   updateTask: (id: string, task: Partial<ITask>) => Promise<void>;
-  deleteTask: (id: string) => Promise<void>;
+  deleteTask: (id: string, task?: ITask) => Promise<void>;
   toggleTaskCompletion: (id: string) => Promise<void>;
 }
 
@@ -128,16 +130,30 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const deleteTask = useCallback(async (id: string) => {
+  const deleteTask = useCallback(async (id: string, task?: ITask) => {
     setLoading(true);
     try {
-      await database.collection("Tasks").doc(id).delete();
+      // Se o item for compartilhado com você (não é seu), remova seu UID do array shareWith no Firestore
+      if (task && task.uid !== user.user?.uid) {
+        await database
+          .collection("Tasks")
+          .doc(id)
+          .update({
+            shareWith: firestore.FieldValue.arrayRemove(user.user?.uid),
+          });
+        Toast.show("Item removido da sua lista!", { type: "success" });
+      } else {
+        // Se for seu, delete do banco normalmente
+        await database.collection("Tasks").doc(id).delete();
+        Toast.show("Tarefa excluída!", { type: "success" });
+      }
     } catch (error) {
       console.error("Erro ao deletar task:", error);
+      Toast.show("Erro ao excluir a tarefa", { type: "error" });
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user.user?.uid]);
 
   const toggleTaskCompletion = useCallback(async (id: string) => {
     setLoading(true);

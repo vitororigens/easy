@@ -46,15 +46,16 @@ export function Notes({ route }: any) {
     navigation.navigate("newnotes", { selectedItemId: documentId, isCreator });
   };
 
-  const handleDeleteNote = async (documentId: string) => {
+  const handleDeleteNote = async (documentId: string, note?: INote) => {
     try {
-      await deleteNote(documentId);
+      await deleteNote(documentId, note, uid);
       setMyNotes((prev) => prev.filter((n) => n.id !== documentId));
       setSharedNotesWithMe((prev) => prev.filter((n) => n.id !== documentId));
       setSharedNotesByMe((prev) => prev.filter((n) => n.id !== documentId));
-      Toast.show("Nota excluída!", { type: "success" });
+      Toast.show(note && note.uid !== uid ? "Item removido da sua lista!" : "Nota excluída!", { type: "success" });
     } catch (error) {
       console.error("Erro ao excluir a nota: ", error);
+      Toast.show("Erro ao excluir a nota", { type: "error" });
     }
   };
 
@@ -119,7 +120,7 @@ export function Notes({ route }: any) {
               const isSharedByMe = sharedNotesByMe.some(note => note.id === item.id);
               return (
                 <ItemNotes
-                  onDelete={() => handleDeleteNote(item.id)}
+                  onDelete={() => handleDeleteNote(item.id, item)}
                   onUpdate={() => handleEditItem(item.id, !item.isShared)}
                   note={item}
                   isSharedByMe={isSharedByMe}

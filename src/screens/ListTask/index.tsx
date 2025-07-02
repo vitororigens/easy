@@ -113,10 +113,9 @@ export function ListTask({ route }: any) {
     navigation.navigate("newitemtask", { selectedItemId: taskId });
   };
 
-  const handleDeleteTask = async (taskId: string) => {
+  const handleDeleteTask = async (taskId: string, task?: ITask) => {
     try {
-      await deleteTask(taskId);
-      Toast.show("Tarefa excluída!", { type: "success" });
+      await deleteTask(taskId, task);
     } catch (error) {
       console.error("Erro ao excluir a tarefa: ", error);
       Toast.show("Erro ao excluir a tarefa", { type: "error" });
@@ -274,7 +273,7 @@ export function ListTask({ route }: any) {
                   <View>
                     <ItemTask
                       task={item}
-                      handleDelete={() => handleDeleteTask(item.id)}
+                      handleDelete={() => handleDeleteTask(item.id, item)}
                       handleUpdate={() => handleEditTask(item.id)}
                       isSelected={selectedTasks.includes(item.id)}
                       onSelect={() => handleSelectTask(item.id)}

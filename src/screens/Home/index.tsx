@@ -36,6 +36,7 @@ import ExpensePersonImage from "../../assets/illustrations/expense.png";
 import RevenuePersonImage from "../../assets/illustrations/revenue.png";
 import { database } from "../../libs/firebase";
 import { AppOpenAdComponent } from "../../components/AppOpenAd";
+import firebase from '@react-native-firebase/app';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -87,6 +88,7 @@ export function Home() {
   );
   const [isLoadingSharedData, setIsLoadingSharedData] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [removedItems, setRemovedItems] = useState<Set<string>>(new Set());
 
   // Adicionando estados para o resumo
   const [paidBills, setPaidBills] = useState(0);
@@ -187,20 +189,48 @@ export function Home() {
     setActiveButton(buttonName);
   };
 
-  function handleDeleteRevenue(documentId: string) {
-    database
-      .collection("Revenue")
-      .doc(documentId)
-      .delete()
-      .then(() => {
-        Toast.show("Nota excluída!", { type: "success" });
-      })
-      .catch((error) => {
-        console.error("Erro ao excluir a nota: ", error);
-      });
-  }
-
-  const handleDeleteItem = (documentId: string, type: "input" | "output") => {
+  const handleDeleteItem = async (documentId: string, type: "input" | "output", item?: any) => {
+    console.log('handleDeleteItem chamado:', { documentId, type, itemUid: item?.uid, meuUid: uid, removedItems: Array.from(removedItems) });
+    // Se o item for compartilhado com você (não é seu), remova seu UID do array shareWith no Firestore
+    if (item && ("uid" in item) && item.uid !== uid) {
+      const collectionName = type === "input" ? "Revenue" : "Expense";
+      try {
+        await database
+          .collection(collectionName)
+          .doc(documentId)
+          .update({
+            shareWith: firebase.firestore.FieldValue.arrayRemove(uid),
+          });
+        
+        // Remover localmente para sumir da tela imediatamente
+        if (type === "input") {
+          setRevenueSharedWithMe((prev: any[]) => {
+            const newList = prev.filter((n: any) => n.id !== documentId);
+            console.log('Item removido de revenueShareWithMe:', documentId, 'Nova lista tem', newList.length, 'itens');
+            return newList;
+          });
+        } else {
+          setExpensesSharedWithme((prev: any[]) => {
+            const newList = prev.filter((n: any) => n.id !== documentId);
+            console.log('Item removido de expensesSharedWithMe:', documentId, 'Nova lista tem', newList.length, 'itens');
+            return newList;
+          });
+        }
+        
+        // Adicionar ao conjunto de itens removidos para garantir que não apareça na lista
+        setRemovedItems(prev => {
+          const newSet = new Set([...prev, documentId]);
+          console.log('Item adicionado ao conjunto de removidos:', documentId, 'Total de itens removidos:', newSet.size);
+          return newSet;
+        });
+        Toast.show("Item removido da sua lista!", { type: "success" });
+      } catch (error) {
+        Toast.show("Erro ao remover compartilhamento", { type: "danger" });
+        console.error("Erro ao remover compartilhamento:", error);
+      }
+      return;
+    }
+    // Se for seu, delete do banco normalmente
     if (type === "input") {
       database
         .collection("Revenue")
@@ -212,8 +242,6 @@ export function Home() {
         .catch((error) => {
           console.error("Erro ao excluir a nota: ", error);
         });
-      // setRevenueSharedByMe((prev) => prev.filter((n) => n.id !== documentId));
-      // setExpenseSharedByMe((prev) => prev.filter((n) => n.id !== documentId));
     } else {
       database
         .collection("Expense")
@@ -225,9 +253,6 @@ export function Home() {
         .catch((error) => {
           console.error("Erro ao excluir a nota: ", error);
         });
-
-      // setRevenueSharedByMe((prev) => prev.filter((n) => n.id !== documentId));
-      // setExpenseSharedByMe((prev) => prev.filter((n) => n.id !== documentId));
     }
   };
 
@@ -413,19 +438,46 @@ export function Home() {
     }
   }
 
-  // LOGS DE DEPURAÇÃO
-  console.log('Receitas próprias:', revenueData);
-  console.log('Receitas compartilhadas por mim:', revenueShareByMe);
-  console.log('Receitas compartilhadas comigo:', revenueShareWithMe);
-  console.log('Despesas próprias:', expenseData);
-  console.log('Despesas compartilhadas por mim:', expenseSharedByMe);
-  console.log('Despesas compartilhadas comigo:', expensesSharedWithMe);
+  // Função utilitária para remover duplicatas por id
+  function deduplicateById(arr: any[]) {
+    const map = new Map();
+    arr.forEach(item => map.set(item.id, item));
+    return Array.from(map.values());
+  }
 
-  // Unificar listas para renderização
-  const allRevenues = [...revenueData, ...revenueShareWithMe];
-  const allExpenses = [...expenseData, ...expensesSharedWithMe];
-  console.log('Receitas finais renderizadas:', allRevenues);
-  console.log('Despesas finais renderizadas:', allExpenses);
+  // Unificar listas para renderização, sem duplicatas e com filtro de compartilhamento
+  const allRevenues = deduplicateById([...revenueData, ...revenueShareWithMe])
+    .filter(item => {
+      // Se o item foi removido, não aparece
+      if (removedItems.has(item.id)) {
+        console.log(`Item ${item.id} (${item.name}) foi removido, não aparecerá na lista`);
+        return false;
+      }
+      // Se for meu, sempre aparece
+      if (item.uid === uid) return true;
+      // Se não for meu, só aparece se ainda estou em shareWith
+      const isSharedWithMe = Array.isArray(item.shareWith) && item.shareWith.includes(uid);
+      console.log(`Item ${item.id} (${item.name}): uid=${item.uid}, meu uid=${uid}, shareWith=${JSON.stringify(item.shareWith)}, isSharedWithMe=${isSharedWithMe}`);
+      return isSharedWithMe;
+    });
+  
+  const allExpenses = deduplicateById([...expenseData, ...expensesSharedWithMe])
+    .filter(item => {
+      // Se o item foi removido, não aparece
+      if (removedItems.has(item.id)) {
+        console.log(`Item ${item.id} (${item.name}) foi removido, não aparecerá na lista`);
+        return false;
+      }
+      // Se for meu, sempre aparece
+      if (item.uid === uid) return true;
+      // Se não for meu, só aparece se ainda estou em shareWith
+      const isSharedWithMe = Array.isArray(item.shareWith) && item.shareWith.includes(uid);
+      console.log(`Item ${item.id} (${item.name}): uid=${item.uid}, meu uid=${uid}, shareWith=${JSON.stringify(item.shareWith)}, isSharedWithMe=${isSharedWithMe}`);
+      return isSharedWithMe;
+    });
+  
+  console.log('Receitas finais renderizadas:', allRevenues.length);
+  console.log('Despesas finais renderizadas:', allExpenses.length);
 
   if (authLoading || isLoadingSharedData) {
     return <Loading />;
@@ -524,7 +576,7 @@ export function Home() {
                       onPress={() => handleRevenueEdit(item.id, activeButton)}
                     >
                       <Items
-                        onDelete={() => handleDeleteItem(item.id, item.type as "input" | "output")}
+                        onDelete={() => handleDeleteItem(item.id, item.type as "input" | "output", item)}
                         onEdit={() => handleRevenueEdit(item.id, activeButton)}
                         type="PRIMARY"
                         status={item.status}
@@ -576,7 +628,7 @@ export function Home() {
                       onPress={() => handleExpenseEdit(item.id, activeButton)}
                     >
                       <Items
-                        onDelete={() => handleDeleteItem(item.id, item.type as "input" | "output")}
+                        onDelete={() => handleDeleteItem(item.id, item.type as "input" | "output", item)}
                         onEdit={() => handleExpenseEdit(item.id, activeButton)}
                         type="SECONDARY"
                         status={item.status}

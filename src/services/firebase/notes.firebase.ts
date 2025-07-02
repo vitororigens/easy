@@ -1,6 +1,7 @@
-import { collection, addDoc, doc, updateDoc, getDoc, getDocs, query, where, deleteDoc } from '@react-native-firebase/firestore';
+import { collection, addDoc, doc, updateDoc, getDoc, getDocs, query, where, deleteDoc, FieldValue } from '@react-native-firebase/firestore';
 import { database } from '../../libs/firebase';
 import { Timestamp } from "@react-native-firebase/firestore";
+import firestore from '@react-native-firebase/firestore';
 
 type TShareInfo = {
   acceptedAt: Timestamp | null;
@@ -10,6 +11,7 @@ type TShareInfo = {
 
 export interface INote {
   id: string;
+  title?: string;
   name: string;
   description: string;
   type: string;
@@ -121,7 +123,16 @@ export const listNotesSharedByMe = async (uid: string): Promise<INote[]> => {
   return notes;
 };
 
-export const deleteNote = async (documentId: string) => {
-  const noteRef = doc(database, "Notes", documentId);
-  await deleteDoc(noteRef);
+export const deleteNote = async (documentId: string, note?: INote, currentUid?: string) => {
+  if (note && currentUid && note.uid !== currentUid) {
+    // Se o item for compartilhado com você (não é seu), remova seu UID do array shareWith no Firestore
+    const noteRef = doc(database, "Notes", documentId);
+    await updateDoc(noteRef, {
+      shareWith: firestore.FieldValue.arrayRemove(currentUid),
+    });
+  } else {
+    // Se for seu, delete do banco normalmente
+    const noteRef = doc(database, "Notes", documentId);
+    await deleteDoc(noteRef);
+  }
 };

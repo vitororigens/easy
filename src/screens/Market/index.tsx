@@ -136,28 +136,13 @@ export function Market({ route }: any) {
 
   const handleDeleteMarket = async (marketId: string) => {
     try {
-      // Encontrar o mercado que está sendo excluído
-      const marketToDelete = markets?.find(market => market.id === marketId);
-      
-      if (!marketToDelete) {
-        Toast.show("Item não encontrado", { type: "error" });
-        return;
-      }
-
-      // Verificar se o usuário é o criador do item OU se é o proprietário
-      const isCreator = marketToDelete.uid === user?.user?.uid;
-      const canDelete = isCreator || marketToDelete.isOwner;
-
-      if (!canDelete) {
-        Toast.show("Você não pode excluir itens compartilhados por outros usuários", { type: "warning" });
-        return;
-      }
-
+      console.log('Tentando excluir mercado:', marketId);
       await deleteMarket(marketId);
       // Remove o item da lista de selecionados quando ele é excluído
       setSelectedMarkets(prev => prev.filter(id => id !== marketId));
-      Toast.show("Item excluído!", { type: "success" });
+      console.log('Mercado excluído com sucesso:', marketId);
     } catch (error) {
+      console.error('Erro ao excluir mercado:', error);
       Toast.show("Erro ao excluir o item", { type: "error" });
     }
   };
