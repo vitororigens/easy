@@ -92,7 +92,6 @@ export const Container = styled.View`
   border-radius: 10px;
   padding: 8px;
   margin-bottom: 16px;
-  max-height: 250px;
 `;
 export const ContainerHistory = styled.View`
   width: 100%;

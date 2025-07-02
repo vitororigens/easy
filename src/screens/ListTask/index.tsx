@@ -296,15 +296,7 @@ export function ListTask({ route }: any) {
                 }
               />
             </Container>
-            {completedTasks.length > 0 && (
-              <ContentTitle type="PRIMARY" onPress={() => setIsCompletedListVisible(!isCompletedListVisible)}>
-                <HeaderContainer >
-                  <SectionIcon type="PRIMARY" name="checkbox-marked-circle-outline" />
-                  <Title type="PRIMARY">Tarefas concluídas</Title>
-                </HeaderContainer>
-                <Icon type="PRIMARY" name={isCompletedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
-              </ContentTitle>
-            )}
+         
             {isCompletedListVisible && completedTasks.length > 0 && (
               <Container>
                 <FlatList

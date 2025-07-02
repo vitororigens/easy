@@ -89,11 +89,11 @@ export const SectionIcon = styled(MaterialCommunityIcons).attrs<Props>(({ theme,
 
 export const Container = styled.View`
   width: 100%;
+  flex: 1;
   background-color: ${({ theme }) => theme.COLORS.WHITE};
   border-radius: 10px;
   padding: 8px;
   margin-bottom: 16px;
-  max-height: 400px;
 `;
 
 export const EmptyContainer = styled.View`
