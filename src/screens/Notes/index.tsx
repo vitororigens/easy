@@ -27,6 +27,7 @@ import {
   listNotesSharedWithMe,
   listNotesSharedByMe,
 } from "../../services/firebase/notes.firebase";
+import { Timestamp } from "@react-native-firebase/firestore";
 
 export function Notes({ route }: any) {
   const reload = route?.params?.reload;
@@ -94,8 +95,17 @@ export function Notes({ route }: any) {
 
   // Combinar todas as notas em uma única lista
   const allNotes = useMemo(() => {
-    const myNotesWithFlag = myNotes.map(note => ({ ...note, isShared: false }));
-    const sharedNotesWithFlag = [...sharedNotesWithMe, ...sharedNotesByMe].map(note => ({ ...note, isShared: true }));
+    const ensureTimestamp = (date: any) => {
+      if (!date) return Timestamp.now();
+      if (date instanceof Timestamp) return date;
+      if (date instanceof Date) return Timestamp.fromDate(date);
+      if (typeof date === 'object' && 'seconds' in date && 'nanoseconds' in date) {
+        return new Timestamp(date.seconds, date.nanoseconds);
+      }
+      return Timestamp.now();
+    };
+    const myNotesWithFlag = myNotes.map(note => ({ ...note, isShared: false, title: note.title || "", createdAt: ensureTimestamp(note.createdAt) }));
+    const sharedNotesWithFlag = [...sharedNotesWithMe, ...sharedNotesByMe].map(note => ({ ...note, isShared: true, title: note.title || "", createdAt: ensureTimestamp(note.createdAt) }));
     return [...myNotesWithFlag, ...sharedNotesWithFlag];
   }, [myNotes, sharedNotesWithMe, sharedNotesByMe]);
 
@@ -120,8 +130,8 @@ export function Notes({ route }: any) {
               const isSharedByMe = sharedNotesByMe.some(note => note.id === item.id);
               return (
                 <ItemNotes
-                  onDelete={() => handleDeleteNote(item.id, item)}
-                  onUpdate={() => handleEditItem(item.id, !item.isShared)}
+                  handleDelete={() => handleDeleteNote(item.id, item)}
+                  handleUpdate={() => handleEditItem(item.id, !item.isShared)}
                   note={item}
                   isSharedByMe={isSharedByMe}
                 />
