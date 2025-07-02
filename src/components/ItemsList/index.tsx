@@ -1,144 +1,91 @@
-import { Feather } from '@expo/vector-icons';
-import { useTheme } from "styled-components/native";
-import { Container, Content, ContentItems, Divider, Icon, SubTitle, Title } from "./styles";
+import React, { useState, useRef } from "react";
+import { TouchableOpacity, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import {
+  Container,
+  Content,
+  Title,
+  Description,
+  Actions,
+  ActionButton,
+  PopoverContainer,
+  PopoverItem,
+  PopoverItemText,
+  PopoverDivider,
+} from "./styles";
+import Popover from "react-native-popover-view";
 
-type ItemsProps = {
-    category?: string;
-    date: string;
-    valueTransaction?: string;
-    repeat?: boolean;
-    status?: boolean;
-    alert?: boolean;
-    type?: string;
-    showItemPiggyBank?: boolean;
-    showItemTask?: boolean;
-    showItemTaskRevenue?: boolean;
-    handlewStatus?: () => void;
+interface ItemsListProps {
+  title: string;
+  description?: string;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onPress?: () => void;
 }
 
-export function ItemsList({ handlewStatus, category, date, valueTransaction, repeat, alert, status, type, showItemPiggyBank, showItemTaskRevenue, showItemTask }: ItemsProps) {
-    const transactionType = repeat ? 'Despesa fixa' : 'Despesa variável';
-    const { COLORS } = useTheme();
-    const textStatus = status ? 'Pago' : 'Pendente';
-    const typeMode = type === 'input' ? transactionType : textStatus;
-    const dateToday = formatDate(new Date());
+export function ItemsList({
+  title,
+  description,
+  onEdit,
+  onDelete,
+  onPress,
+}: ItemsListProps) {
+  const [isPopoverVisible, setIsPopoverVisible] = useState(false);
+  const popoverRef = useRef(null);
 
-    function formatDate(date: Date): string {
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-    }
+  const handleEdit = () => {
+    setIsPopoverVisible(false);
+    onEdit && onEdit();
+  };
 
-    return (
-        <>
-            <Container>
-             
-                {showItemTask && date <= dateToday && !status && (
-                    <>
-                        <Icon onPress={() => handlewStatus} type='SECONDARY'>
-                            <Feather name="circle" size={24} color="white" />
-                        </Icon>
-                        <Content>
-                            <ContentItems>
-                                <Title type='SECONDARY'>
-                                    {category}
-                                </Title>
-                                <Title type='SECONDARY'>
-                                    {valueTransaction}
-                                </Title>
-                            </ContentItems>
-                            <Divider />
-                            <ContentItems>
-                                <SubTitle>
-                                    {date}
-                                </SubTitle>
-                                <SubTitle>
-                                    Atrasado
-                                </SubTitle>
-                            </ContentItems>
-                        </Content>
-                    </>
+  const handleDelete = () => {
+    setIsPopoverVisible(false);
+    onDelete && onDelete();
+  };
+
+  return (
+    <Container>
+      <Content>
+        <TouchableOpacity onPress={onPress} style={{ flex: 1 }}>
+          <Title>{title}</Title>
+          {description && <Description>{description}</Description>}
+        </TouchableOpacity>
+        
+        <Actions>
+          <View>
+            <Popover
+              ref={popoverRef}
+              isVisible={isPopoverVisible}
+              onRequestClose={() => setIsPopoverVisible(false)}
+              popoverStyle={{ borderRadius: 8 }}
+              from={
+                <ActionButton onPress={() => setIsPopoverVisible(true)}>
+                  <MaterialIcons name="more-vert" size={24} color="#a7a9ac" />
+                </ActionButton>
+              }
+            >
+              <PopoverContainer>
+                {onEdit && (
+                  <PopoverItem onPress={handleEdit}>
+                    <MaterialIcons name="edit" size={20} color="#a7a9ac" />
+                    <PopoverItemText>Editar</PopoverItemText>
+                  </PopoverItem>
                 )}
-                {showItemTask && date >= dateToday && !status && (
-                    <>
-                        <Icon onPress={() => handlewStatus} type='TERTIARY'>
-                            <Feather name="circle" size={24} color="white" />
-                        </Icon>
-                        <Content>
-                            <ContentItems>
-                                <Title type='TERTIARY'>
-                                    {category}
-                                </Title>
-                                <Title type='TERTIARY'>
-                                    {valueTransaction}
-                                </Title>
-                            </ContentItems>
-                            <Divider />
-                            <ContentItems>
-                                <SubTitle>
-                                    {date}
-                                </SubTitle>
-                                <SubTitle>
-                                {typeMode}
-                                </SubTitle>
-                            </ContentItems>
-                        </Content>
-                    </>
+                
+                {onDelete && (
+                  <>
+                    {onEdit && <PopoverDivider />}
+                    <PopoverItem onPress={handleDelete}>
+                      <MaterialIcons name="delete-outline" size={20} color="#b91c1c" />
+                      <PopoverItemText>Excluir</PopoverItemText>
+                    </PopoverItem>
+                  </>
                 )}
-                {showItemTask && status && (
-                    <>
-                        <Icon onPress={() => handlewStatus} type='PRIMARY'>
-                            <Feather name="check-circle" size={24} color="white" />
-                        </Icon>
-                        <Content>
-                            <ContentItems>
-                                <Title type='PRIMARY'>
-                                    {category}
-                                </Title>
-                                <Title type='PRIMARY'>
-                                    {valueTransaction}
-                                </Title>
-                            </ContentItems>
-                            <Divider />
-                            <ContentItems>
-                                <SubTitle>
-                                    {date}
-                                </SubTitle>
-                                <SubTitle>
-                                    {typeMode}
-                                </SubTitle>
-                            </ContentItems>
-                        </Content>
-                    </>
-                )}
-                   {showItemTaskRevenue && (
-                    <>
-                        <Icon onPress={() => handlewStatus} type='PRIMARY'>
-                            <Feather name="check-circle" size={24} color="white" />
-                        </Icon>
-                        <Content>
-                            <ContentItems>
-                                <Title type='PRIMARY'>
-                                    {category}
-                                </Title>
-                                <Title type='PRIMARY'>
-                                    {valueTransaction}
-                                </Title>
-                            </ContentItems>
-                            <Divider />
-                            <ContentItems>
-                                <SubTitle>
-                                    {date}
-                                </SubTitle>
-                                <SubTitle>
-                                    {transactionType}
-                                </SubTitle>
-                            </ContentItems>
-                        </Content>
-                    </>
-                )}
-            </Container>
-        </>
-    );
+              </PopoverContainer>
+            </Popover>
+          </View>
+        </Actions>
+      </Content>
+    </Container>
+  );
 }

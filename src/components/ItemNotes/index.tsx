@@ -1,112 +1,115 @@
-import React, { useState } from "react";
-import { View } from "react-native";
-import Popover from "react-native-popover-view";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-
-import { INote } from "../../services/firebase/notes.firebase";
+import React, { useState, useRef } from "react";
+import { TouchableOpacity, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { INote } from "../../interfaces/INote";
 import {
   Container,
+  Content,
   Title,
-  SubTitle,
-  DateNote,
-  Icon,
-  Button,
-  ContainerMenu,
+  Description,
+  Actions,
+  ActionButton,
   ShareBadge,
   ShareIcon,
+  ShareText,
+  PopoverContainer,
+  PopoverItem,
+  PopoverItemText,
+  PopoverDivider,
+  MainContent,
+  Row,
 } from "./styles";
+import { useUserAuth } from "../../hooks/useUserAuth";
+import Popover from "react-native-popover-view";
 
-// Estendendo a interface INote para incluir propriedades do Firebase
-interface ExtendedNote extends INote {
-  isShared?: boolean;
-  sharedWith?: string[];
+interface ItemNotesProps {
+  note: INote;
+  handleDelete: () => void;
+  handleUpdate: () => void;
+  isSharedByMe?: boolean;
 }
 
-type ItemNotesProps = {
-  note: ExtendedNote;
-  onDelete: (id: string) => void;
-  onUpdate: (note: ExtendedNote) => void;
-  isSharedByMe?: boolean;
-};
+export function ItemNotes({
+  note,
+  handleDelete,
+  handleUpdate,
+  isSharedByMe = false,
+}: ItemNotesProps) {
+  const { user } = useUserAuth();
+  const [isPopoverVisible, setIsPopoverVisible] = useState(false);
+  const popoverRef = useRef(null);
 
-export function ItemNotes({ note, onDelete, onUpdate, isSharedByMe }: ItemNotesProps) {
-  const [showPopover, setShowPopover] = useState(false);
+  // Verificar se é uma nota compartilhada
+  const isShared = note.isShared || (note.sharedWith && note.sharedWith.length > 0) || isSharedByMe;
 
-  const formattedDate = (() => {
-    try {
-      let date: Date;
-      
-      if (note.createdAt instanceof Date) {
-        date = note.createdAt;
-      } else if (note.createdAt && typeof note.createdAt === 'object') {
-        // Verifica se é um objeto Timestamp do Firestore
-        if ('seconds' in note.createdAt && 'nanoseconds' in note.createdAt) {
-          date = new Date(
-            (note.createdAt as any).seconds * 1000 + 
-            (note.createdAt as any).nanoseconds / 1000000
-          );
-        } else {
-          date = new Date(note.createdAt as any);
-        }
-      } else {
-        date = new Date(note.createdAt as any);
-      }
-      
-      if (isNaN(date.getTime())) {
-        return "Data inválida";
-      }
+  const handleEdit = () => {
+    setIsPopoverVisible(false);
+    handleUpdate();
+  };
 
-      return format(date, "dd/MM/yyyy 'às' HH:mm", {
-        locale: ptBR,
-      });
-    } catch (error) {
-      console.error("Erro ao formatar data:", error);
-      return "Data indisponível";
-    }
-  })();
+  const handleDeleteItem = () => {
+    setIsPopoverVisible(false);
+    handleDelete();
+  };
+
+  const handleShare = () => {
+    setIsPopoverVisible(false);
+    // Implementar funcionalidade de compartilhamento se necessário
+  };
 
   return (
-    <Container isShared={note.isShared} onPress={() => onUpdate(note)}>
-      <View style={{ flex: 1 }}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Title numberOfLines={1}>{note.name}</Title>
-          {note.isShared && (
-            <ShareBadge isSharedByMe={isSharedByMe}>
-              <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
-            </ShareBadge>
+    <Container>
+      <Content>
+        <MainContent>
+          <Row>
+            <Title>{note.title || note.name}</Title>
+            {isShared && (
+              <ShareBadge>
+                <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
+              </ShareBadge>
+            )}
+          </Row>
+          <Description>{note.description}</Description>
+          {isShared && (
+            <ShareText>
+              {isSharedByMe ? "Compartilhado por você" : "Compartilhado com você"}
+            </ShareText>
           )}
-        </View>
-        <SubTitle numberOfLines={2}>{note.description}</SubTitle>
-        <DateNote>{formattedDate}</DateNote>
-      </View>
-
-      <Popover
-        isVisible={showPopover}
-        onRequestClose={() => setShowPopover(false)}
-        from={
-          <Button onPress={() => setShowPopover(true)}>
-            <Icon name="dots-three-vertical" />
-          </Button>
-        }
-      >
-        <ContainerMenu>
-          <Button onPress={() => {
-            setShowPopover(false);
-            onUpdate(note);
-          }}>
-            <Icon name="edit" />
-            <SubTitle style={{ marginLeft: 8 }}>Editar</SubTitle>
-          </Button>
-          <Button onPress={() => {
-            setShowPopover(false);
-            onDelete(note.id);
-          }}>
-            <Icon name="trash" />
-            <SubTitle style={{ marginLeft: 8 }}>Excluir</SubTitle>
-          </Button>
-        </ContainerMenu>
-      </Popover>
+        </MainContent>
+        <Actions>
+          <ActionButton onPress={() => setIsPopoverVisible(true)}>
+            <MaterialIcons name="more-vert" size={24} color="#7201b5" />
+          </ActionButton>
+        </Actions>
+        <Popover
+          ref={popoverRef}
+          isVisible={isPopoverVisible}
+          onRequestClose={() => setIsPopoverVisible(false)}
+          popoverStyle={{ borderRadius: 8 }}
+          from={null}
+        >
+          <PopoverContainer>
+            <PopoverItem onPress={handleEdit}>
+              <MaterialIcons name="edit" size={20} color="#a7a9ac" />
+              <PopoverItemText>Editar</PopoverItemText>
+            </PopoverItem>
+            {isShared && (
+              <>
+                <PopoverDivider />
+                <PopoverItem onPress={handleShare}>
+                  <MaterialIcons name="share" size={20} color="#a7a9ac" />
+                  <PopoverItemText>Compartilhar</PopoverItemText>
+                </PopoverItem>
+              </>
+            )}
+            <PopoverDivider />
+            <PopoverItem onPress={handleDeleteItem}>
+              <MaterialIcons name="delete-outline" size={20} color="#b91c1c" />
+              <PopoverItemText>Excluir</PopoverItemText>
+            </PopoverItem>
+          </PopoverContainer>
+        </Popover>
+      </Content>
     </Container>
   );
 }

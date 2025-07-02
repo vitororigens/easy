@@ -1,11 +1,12 @@
 import React, { useState, useRef } from "react";
 import { View } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { formatCurrency } from "../../utils/mask";
 import {
   Container,
   Content,
-  ContentInfo,
+  MainContent,
+  Row,
   Title,
   Description,
   Value,
@@ -13,6 +14,9 @@ import {
   Status,
   Actions,
   ActionButton,
+  ShareBadge,
+  ShareIcon,
+  ShareText,
   PopoverContainer,
   PopoverItem,
   PopoverItemText,
@@ -33,6 +37,8 @@ interface ItemsProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onToggleStatus?: () => void;
+  isShared?: boolean;
+  isSharedByMe?: boolean;
 }
 
 export function Items({
@@ -46,6 +52,8 @@ export function Items({
   onEdit,
   onDelete,
   onToggleStatus,
+  isShared = false,
+  isSharedByMe = false,
 }: ItemsProps) {
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
   const popoverRef = useRef(null);
@@ -140,12 +148,24 @@ export function Items({
   };
 
   return (
-    <Container>
-      <Content status={type === "SECONDARY" ? expenseStatus : undefined}>
-        <ContentInfo>
-          <Title type={type} status={type === "SECONDARY" ? expenseStatus : undefined}>{category}</Title>
-          {description && <Description>{description}</Description>}
+    <Container type={type}>
+      <Content>
+        <MainContent>
+          <Row>
+            <Title type={type} status={type === "SECONDARY" ? expenseStatus : undefined}>{category}</Title>
+            {isShared && (
+              <ShareBadge>
+                <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
+              </ShareBadge>
+            )}
+          </Row>
+          <Description>{description}</Description>
           <DateText>{formattedDate}</DateText>
+          {isShared && (
+            <ShareText>
+              {isSharedByMe ? "Compartilhado por você" : "Compartilhado com você"}
+            </ShareText>
+          )}
           {type === "SECONDARY" && (
             <Status status={expenseStatus}>
               {expenseStatus === "PAID" && "Pago"}
@@ -154,11 +174,9 @@ export function Items({
               {repeat && " • Recorrente"}
             </Status>
           )}
-        </ContentInfo>
-
+        </MainContent>
         <Actions>
           <Value color={formattedValue.color}>{formattedValue.formatted}</Value>
-          
           <View>
             <Popover
               ref={popoverRef}
@@ -167,7 +185,7 @@ export function Items({
               popoverStyle={{ borderRadius: 8 }}
               from={
                 <ActionButton onPress={() => setIsPopoverVisible(true)}>
-                  <MaterialIcons name="more-vert" size={24} color="#a7a9ac" />
+                  <MaterialIcons name="more-vert" size={24} color="#7201b5" />
                 </ActionButton>
               }
             >

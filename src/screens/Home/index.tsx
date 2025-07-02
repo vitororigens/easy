@@ -413,7 +413,19 @@ export function Home() {
     }
   }
 
+  // LOGS DE DEPURAÇÃO
+  console.log('Receitas próprias:', revenueData);
+  console.log('Receitas compartilhadas por mim:', revenueShareByMe);
+  console.log('Receitas compartilhadas comigo:', revenueShareWithMe);
+  console.log('Despesas próprias:', expenseData);
+  console.log('Despesas compartilhadas por mim:', expenseSharedByMe);
+  console.log('Despesas compartilhadas comigo:', expensesSharedWithMe);
 
+  // Unificar listas para renderização
+  const allRevenues = [...revenueData, ...revenueShareWithMe];
+  const allExpenses = [...expenseData, ...expensesSharedWithMe];
+  console.log('Receitas finais renderizadas:', allRevenues);
+  console.log('Despesas finais renderizadas:', allExpenses);
 
   if (authLoading || isLoadingSharedData) {
     return <Loading />;
@@ -443,13 +455,6 @@ export function Home() {
       </DefaultContainer>
     );
   }
-
-  const filteredRevenue = revenueData.filter(
-    (item: ExpenseData) => item.uid === uid && item.month === selectedMonth
-  );
-  const filteredExpense = expenseData.filter(
-    (item: ExpenseData) => item.uid === uid && item.month === selectedMonth
-  );
 
   return (
     <DefaultContainer
@@ -513,7 +518,7 @@ export function Home() {
             <Container>
               {isRevenueListVisible && (
                 <FlatList
-                  data={filteredRevenue}
+                  data={allRevenues}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       onPress={() => handleRevenueEdit(item.id, activeButton)}
@@ -531,6 +536,8 @@ export function Home() {
                             ? formatCurrency(item.valueTransaction ?? "0")
                             : formatCurrency("0")
                         }
+                        isShared={Array.isArray(item.shareWith) && item.shareWith.length > 0}
+                        isSharedByMe={("uid" in item ? item.uid : undefined) === uid && Array.isArray(item.shareWith) && item.shareWith.length > 0}
                       />
                     </TouchableOpacity>
                   )}
@@ -563,7 +570,7 @@ export function Home() {
             <Container>
               {isExpenseListVisible && (
                 <FlatList
-                  data={filteredExpense}
+                  data={allExpenses}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       onPress={() => handleExpenseEdit(item.id, activeButton)}
@@ -582,6 +589,8 @@ export function Home() {
                             ? formatCurrency(item.valueTransaction ?? "0")
                             : formatCurrency("0")
                         }
+                        isShared={Array.isArray(item.shareWith) && item.shareWith.length > 0}
+                        isSharedByMe={("uid" in item ? item.uid : undefined) === uid && Array.isArray(item.shareWith) && item.shareWith.length > 0}
                       />
                     </TouchableOpacity>
                   )}

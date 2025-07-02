@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ITask } from "../../interfaces/ITask";
@@ -14,8 +14,15 @@ import {
   ShareBadge,
   ShareIcon,
   ShareText,
+  PopoverContainer,
+  PopoverItem,
+  PopoverItemText,
+  PopoverDivider,
+  MainContent,
+  Row,
 } from "./styles";
 import { useUserAuth } from "../../hooks/useUserAuth";
+import Popover from "react-native-popover-view";
 
 interface ItemTaskProps {
   task: ITask;
@@ -33,12 +40,34 @@ export function ItemTask({
   onSelect,
 }: ItemTaskProps) {
   const { user } = useUserAuth();
+  const [isPopoverVisible, setIsPopoverVisible] = useState(false);
+  const popoverRef = useRef(null);
   
   console.log("ItemTask recebeu a tarefa:", task);
 
   // Verificar se é uma tarefa compartilhada
   const isShared = task.shareWith && task.shareWith.length > 0;
   const isSharedByMe = isShared && task.uid === user?.uid;
+
+  const handleEdit = () => {
+    setIsPopoverVisible(false);
+    handleUpdate();
+  };
+
+  const handleDeleteItem = () => {
+    setIsPopoverVisible(false);
+    handleDelete();
+  };
+
+  const handleToggleStatus = () => {
+    setIsPopoverVisible(false);
+    onSelect(); // Usar o onSelect para marcar como concluída
+  };
+
+  const handleShare = () => {
+    setIsPopoverVisible(false);
+    // Implementar funcionalidade de compartilhamento se necessário
+  };
 
   return (
     <Container>
@@ -50,30 +79,66 @@ export function ItemTask({
             )}
           </Checkbox>
         </CheckboxContainer>
-        <TouchableOpacity onPress={handleUpdate} style={{ flex: 1 }}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Title status={task.status}>{task.name}</Title>
+        <MainContent>
+          <Row>
+            <Title>{task.name}</Title>
             {isShared && (
-              <ShareBadge isSharedByMe={isSharedByMe}>
+              <ShareBadge>
                 <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
               </ShareBadge>
             )}
-          </View>
-          <Description status={task.status}>{task.description}</Description>
+          </Row>
+          <Description>{task.description}</Description>
           {isShared && (
             <ShareText>
               {isSharedByMe ? "Compartilhado por você" : "Compartilhado com você"}
             </ShareText>
           )}
-        </TouchableOpacity>
+        </MainContent>
         <Actions>
-          <ActionButton onPress={handleUpdate}>
-            <MaterialIcons name="edit" size={24} color="#6B7280" />
-          </ActionButton>
-          <ActionButton onPress={handleDelete}>
-            <MaterialIcons name="delete" size={24} color="#EF4444" />
+          <ActionButton onPress={() => setIsPopoverVisible(true)}>
+            <MaterialIcons name="more-vert" size={24} color="#7201b5" />
           </ActionButton>
         </Actions>
+        <Popover
+          ref={popoverRef}
+          isVisible={isPopoverVisible}
+          onRequestClose={() => setIsPopoverVisible(false)}
+          popoverStyle={{ borderRadius: 8 }}
+          from={null}
+        >
+          <PopoverContainer>
+            <PopoverItem onPress={handleToggleStatus}>
+              <MaterialIcons 
+                name={task.status ? "check-circle-outline" : "radio-button-unchecked"} 
+                size={20} 
+                color={task.status ? "#16a34a" : "#a7a9ac"} 
+              />
+              <PopoverItemText>
+                {task.status ? "Marcar como não concluída" : "Marcar como concluída"}
+              </PopoverItemText>
+            </PopoverItem>
+            <PopoverDivider />
+            <PopoverItem onPress={handleEdit}>
+              <MaterialIcons name="edit" size={20} color="#a7a9ac" />
+              <PopoverItemText>Editar</PopoverItemText>
+            </PopoverItem>
+            {isShared && (
+              <>
+                <PopoverDivider />
+                <PopoverItem onPress={handleShare}>
+                  <MaterialIcons name="share" size={20} color="#a7a9ac" />
+                  <PopoverItemText>Compartilhar</PopoverItemText>
+                </PopoverItem>
+              </>
+            )}
+            <PopoverDivider />
+            <PopoverItem onPress={handleDeleteItem}>
+              <MaterialIcons name="delete-outline" size={20} color="#b91c1c" />
+              <PopoverItemText>Excluir</PopoverItemText>
+            </PopoverItem>
+          </PopoverContainer>
+        </Popover>
       </Content>
     </Container>
   );

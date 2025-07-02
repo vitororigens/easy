@@ -1,76 +1,78 @@
 import { TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
-import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-type ContainerProps = {
-  isShared?: boolean;
-};
-
-type ShareBadgeProps = {
-  isSharedByMe?: boolean;
-};
-
-export const Container = styled(TouchableOpacity)<ContainerProps>`
-  width: 100%;
-  min-height: 80px;
-  background-color: ${({ theme, isShared }) =>
-    isShared ? theme.COLORS.PURPLE_50 : theme.COLORS.TEAL_50};
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 8px;
-  flex-direction: row;
-  justify-content: space-between;
-  elevation: 2;
+export const Container = styled.View`
+  background-color: ${({ theme }) => theme.COLORS.TEAL_50};
+  border-radius: 16px;
+  margin-bottom: 14px;
   shadow-color: #000;
   shadow-offset: 0px 2px;
-  shadow-opacity: 0.15;
-  shadow-radius: 2.84px;
+  shadow-opacity: 0.06;
+  shadow-radius: 6px;
+  elevation: 2;
+`;
+
+export const Content = styled.View`
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 16px 18px 14px 18px;
+`;
+
+export const MainContent = styled.View`
+  flex: 1;
+`;
+
+export const Row = styled.View`
+  flex-direction: row;
+  align-items: center;
 `;
 
 export const Title = styled.Text`
-  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
+  font-size: 16px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme }) => theme.COLORS.PURPLE_800};
 `;
 
-export const SubTitle = styled.Text`
-  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
-  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-  color: ${({ theme }) => theme.COLORS.GRAY_600};
+export const ShareBadge = styled.View`
+  background-color: ${({ theme }) => theme.COLORS.PURPLE_600};
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 7px;
+  align-items: center;
+  justify-content: center;
 `;
-
-export const DateNote = styled.Text`
-  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
-  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-  color: ${({ theme }) => theme.COLORS.GRAY_400};
-  margin-top: 4px;
-`;
-
-export const Icon = styled(Entypo).attrs(({ theme }) => ({
-  size: 20,
-  color: theme.COLORS.PURPLE_800,
-}))``;
 
 export const ShareIcon = styled(MaterialCommunityIcons).attrs(({ theme }) => ({
-  size: 16,
+  size: 15,
   color: theme.COLORS.WHITE,
 }))``;
 
-export const ShareBadge = styled.View<ShareBadgeProps>`
-  background-color: ${({ theme, isSharedByMe }) =>
-    isSharedByMe ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_600};
-  padding: 4px;
-  border-radius: 12px;
-  margin-left: 8px;
+export const Description = styled.Text`
+  font-size: 14px;
+  color: ${({ theme }) => theme.COLORS.GRAY_600};
+  margin-top: 2px;
 `;
 
-export const Button = styled(TouchableOpacity)`
+export const ShareText = styled.Text`
+  font-size: 12px;
+  color: ${({ theme }) => theme.COLORS.GRAY_400};
+  margin-top: 2px;
+`;
+
+export const Actions = styled.View`
   flex-direction: row;
-  align-items: center;
-  padding: 8px;
+  margin-left: 10px;
 `;
 
-export const ContainerMenu = styled.View`
+export const ActionButton = styled(TouchableOpacity)`
+  padding: 8px;
+  border-radius: 20px;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const PopoverContainer = styled.View`
   background-color: ${({ theme }) => theme.COLORS.WHITE};
   border-radius: 8px;
   padding: 8px;
@@ -79,4 +81,23 @@ export const ContainerMenu = styled.View`
   shadow-offset: 0px 2px;
   shadow-opacity: 0.25;
   shadow-radius: 3.84px;
+`;
+
+export const PopoverItem = styled(TouchableOpacity)`
+  flex-direction: row;
+  align-items: center;
+  padding: 8px;
+`;
+
+export const PopoverItemText = styled.Text`
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  color: ${({ theme }) => theme.COLORS.GRAY_600};
+  margin-left: 8px;
+`;
+
+export const PopoverDivider = styled.View`
+  height: 1px;
+  background-color: ${({ theme }) => theme.COLORS.GRAY_200};
+  margin: 4px 0;
 `;

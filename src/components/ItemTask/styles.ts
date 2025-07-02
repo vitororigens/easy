@@ -14,64 +14,94 @@ type ShareBadgeProps = {
 };
 
 export const Container = styled.View`
-  background-color: ${({ theme }) => theme.COLORS.WHITE};
-  border-radius: 8px;
-  margin-bottom: 8px;
-  elevation: 2;
+  background-color: ${({ theme }) => theme.COLORS.TEAL_50};
+  border-radius: 16px;
+  margin-bottom: 14px;
   shadow-color: #000;
   shadow-offset: 0px 2px;
-  shadow-opacity: 0.15;
-  shadow-radius: 2.84px;
+  shadow-opacity: 0.06;
+  shadow-radius: 6px;
+  elevation: 2;
 `;
 
 export const Content = styled.View`
   flex-direction: row;
-  align-items: center;
-  padding: 12px;
+  align-items: flex-start;
+  padding: 16px 18px 14px 18px;
 `;
 
 export const CheckboxContainer = styled(TouchableOpacity)`
   margin-right: 12px;
-`;
-
-export const Checkbox = styled.View<{ checked: boolean }>`
-  width: 24px;
-  height: 24px;
-  border-radius: 12px;
-  border-width: 2px;
-  border-color: ${({ theme, checked }) => 
-    checked ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_400};
-  background-color: ${({ theme, checked }) => 
-    checked ? theme.COLORS.TEAL_600 : "transparent"};
+  width: 26px;
+  height: 26px;
   align-items: center;
   justify-content: center;
 `;
 
-export const Title = styled.Text<{ status: boolean }>`
-  font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
-  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  color: ${({ theme, status }) => 
-    status ? theme.COLORS.GRAY_400 : theme.COLORS.GRAY_600};
-  text-decoration-line: ${({ status }) => status ? "line-through" : "none"};
-  margin-bottom: 4px;
+export const Checkbox = styled.View<{ checked: boolean }>`
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  border-width: 2px;
+  border-color: ${({ theme, checked }) => 
+    checked ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_400};
+  background-color: ${({ theme, checked }) => 
+    checked ? theme.COLORS.TEAL_600 : theme.COLORS.TEAL_50};
+  align-items: center;
+  justify-content: center;
 `;
 
-export const Description = styled.Text<{ status: boolean }>`
-  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
-  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-  color: ${({ theme, status }) => 
-    status ? theme.COLORS.GRAY_400 : theme.COLORS.GRAY_600};
-  text-decoration-line: ${({ status }) => status ? "line-through" : "none"};
+export const MainContent = styled.View`
+  flex: 1;
+`;
+
+export const Row = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const Title = styled.Text`
+  font-size: 16px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
+  color: ${({ theme }) => theme.COLORS.PURPLE_800};
+`;
+
+export const ShareBadge = styled.View`
+  background-color: ${({ theme }) => theme.COLORS.PURPLE_600};
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 7px;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const ShareIcon = styled(MaterialCommunityIcons).attrs(({ theme }) => ({
+  size: 15,
+  color: theme.COLORS.WHITE,
+}))``;
+
+export const Description = styled.Text`
+  font-size: 14px;
+  color: ${({ theme }) => theme.COLORS.GRAY_600};
+  margin-top: 2px;
+`;
+
+export const ShareText = styled.Text`
+  font-size: 12px;
+  color: ${({ theme }) => theme.COLORS.GRAY_400};
+  margin-top: 2px;
 `;
 
 export const Actions = styled.View`
   flex-direction: row;
-  margin-left: 8px;
+  margin-left: 10px;
 `;
 
 export const ActionButton = styled(TouchableOpacity)`
   padding: 8px;
-  margin-left: 4px;
+  border-radius: 20px;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const Button = styled(TouchableOpacity)`
@@ -113,22 +143,32 @@ export const IconCheck = styled(MaterialCommunityIcons).attrs<ListItemProps>(({t
     margin-right: 5px;
 `;
 
-export const ShareIcon = styled(MaterialCommunityIcons).attrs(({ theme }) => ({
-  size: 16,
-  color: theme.COLORS.WHITE,
-}))``;
+export const PopoverContainer = styled.View`
+  background-color: ${({ theme }) => theme.COLORS.WHITE};
+  border-radius: 8px;
+  padding: 8px;
+  elevation: 4;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+`;
 
-export const ShareBadge = styled.View<ShareBadgeProps>`
-  background-color: ${({ theme, isSharedByMe }) =>
-    isSharedByMe ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_600};
-  padding: 4px;
-  border-radius: 12px;
+export const PopoverItem = styled(TouchableOpacity)`
+  flex-direction: row;
+  align-items: center;
+  padding: 8px;
+`;
+
+export const PopoverItemText = styled.Text`
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  color: ${({ theme }) => theme.COLORS.GRAY_600};
   margin-left: 8px;
 `;
 
-export const ShareText = styled.Text`
-  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
-  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
-  color: ${({ theme }) => theme.COLORS.GRAY_400};
-  margin-left: 4px;
+export const PopoverDivider = styled.View`
+  height: 1px;
+  background-color: ${({ theme }) => theme.COLORS.GRAY_200};
+  margin: 4px 0;
 `;
