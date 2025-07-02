@@ -77,8 +77,6 @@ export function ListTask({ route }: any) {
   const { selectedMonth } = useMonth();
   const navigation = useNavigation();
   const [activeButton, setActiveButton] = useState("tarefas");
-  const [isListVisible, setIsListVisible] = useState(true);
-  const [isSharedListVisible, setIsSharedListVisible] = useState(false);
   const [isCompletedListVisible, setIsCompletedListVisible] = useState(false);
   const [modalActive, setModalActive] = useState(false);
   const { COLORS } = useTheme();
@@ -90,33 +88,13 @@ export function ListTask({ route }: any) {
     return month === selectedMonth;
   });
 
-  // Filtrar tarefas para cada seção
-  const personalTasks = tasks?.filter(task => 
-    // Tarefas pessoais (não compartilhadas) + tarefas que você compartilhou
-    (!task.shareWith || task.shareWith.length === 0 || task.uid === uid) && !task.status
-  ) || [];
-  
-  // Tarefas que foram compartilhadas COM você (você está na lista shareWith)
-  const sharedWithMeTasks = tasks?.filter(task => {
-    // Verificar se a tarefa tem shareWith e o usuário está incluído
-    const isShared = task.shareWith && 
-                    task.shareWith.length > 0 && 
-                    task.shareWith.includes(uid as string);
-    
-    // Verificar se o usuário tem uma entrada em shareInfo com acceptedAt não nulo
-    const isAccepted = task.shareInfo && 
-                      task.shareInfo.some(info => 
-                        info.uid === uid && info.acceptedAt !== null);
-    
-    // A tarefa deve ser compartilhada, aceita e não estar concluída
-    return isShared && isAccepted && !task.status;
-  }) || [];
+  // Combinar todas as tarefas em uma única lista (exceto concluídas)
+  const allTasks = tasks?.filter(task => !task.status) || [];
   
   const completedTasks = tasks?.filter(task => task.status) || [];
 
   console.log("Tarefas no ListTask:", tasks);
-  console.log("Minhas tarefas (pessoais + que compartilhei):", personalTasks);
-  console.log("Tarefas compartilhadas comigo:", sharedWithMeTasks);
+  console.log("Todas as tarefas ativas:", allTasks);
   console.log("Tarefas concluídas:", completedTasks);
   
   // Log detalhado da primeira tarefa concluída para debug
@@ -282,84 +260,43 @@ export function ListTask({ route }: any) {
 
         {activeButton === "tarefas" && (
           <Content>
-            <ContentTitle onPress={() => setIsListVisible(!isListVisible)}>
+            <ContentTitle>
               <HeaderContainer>
                 <SectionIcon name="checkbox-marked-circle-outline" />
-                <Title>Minhas tarefas</Title>
+                <Title>Lista de Tarefas</Title>
               </HeaderContainer>
-              <Icon name={isListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
             </ContentTitle>
-            {isListVisible && (
-              <Container>
-                <FlatList
-                  showsVerticalScrollIndicator={false}
-                  data={personalTasks}
-                  renderItem={({ item, index }) => (
-                    <View>
-                      <ItemTask
-                        task={item}
-                        handleDelete={() => handleDeleteTask(item.id)}
-                        handleUpdate={() => handleEditTask(item.id)}
-                        isSelected={selectedTasks.includes(item.id)}
-                        onSelect={() => handleSelectTask(item.id)}
-                      />
-                      {index % 5 === 0 && index !== 0 && (
-                        <NativeAdComponent style={{ marginVertical: 10 }} />
-                      )}
-                    </View>
-                  )}
-                  keyExtractor={(item) => item.id}
-                  contentContainerStyle={{ paddingBottom: 20 }}
-                  ListEmptyComponent={
-                    <EmptyContainer>
-                      <LoadData
-                        imageSrc={PersonImage}
-                        title="Comece agora!"
-                        subtitle="Adicione uma tarefa clicando em +"
-                      />
-                    </EmptyContainer>
-                  }
-                />
-              </Container>
-            )}
-
-            <ContentTitle type="PRIMARY" onPress={() => setIsSharedListVisible(!isSharedListVisible)}>
-              <HeaderContainer >
-                <SectionIcon type="PRIMARY" name="share-variant" />
-                <Title type="PRIMARY">Tarefas compartilhadas</Title>
-              </HeaderContainer>
-              <Icon type="PRIMARY" name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
-            </ContentTitle>
-            {isSharedListVisible && (
-              <Container>
-                <FlatList
-                  showsVerticalScrollIndicator={false}
-                  data={sharedWithMeTasks}
-                  renderItem={({ item, index }) => (
-                    <View>
-                      <ItemTask
-                        task={item}
-                        handleDelete={() => handleDeleteTask(item.id)}
-                        handleUpdate={() => handleEditTask(item.id)}
-                        isSelected={selectedTasks.includes(item.id)}
-                        onSelect={() => handleSelectTask(item.id)}
-                      />
-                      {index % 5 === 0 && index !== 0 && (
-                        <NativeAdComponent style={{ marginVertical: 10 }} />
-                      )}
-                    </View>
-                  )}
-                  keyExtractor={(item) => item.id}
-                  contentContainerStyle={{ paddingBottom: 20 }}
-                  ListEmptyComponent={
-                    <EmptyContainer>
-                      <SubTitle>Nenhuma tarefa compartilhada com você</SubTitle>
-                    </EmptyContainer>
-                  }
-                />
-              </Container>
-            )}
-
+            <Container>
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                data={allTasks}
+                renderItem={({ item, index }) => (
+                  <View>
+                    <ItemTask
+                      task={item}
+                      handleDelete={() => handleDeleteTask(item.id)}
+                      handleUpdate={() => handleEditTask(item.id)}
+                      isSelected={selectedTasks.includes(item.id)}
+                      onSelect={() => handleSelectTask(item.id)}
+                    />
+                    {index % 5 === 0 && index !== 0 && (
+                      <NativeAdComponent style={{ marginVertical: 10 }} />
+                    )}
+                  </View>
+                )}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={{ paddingBottom: 20 }}
+                ListEmptyComponent={
+                  <EmptyContainer>
+                    <LoadData
+                      imageSrc={PersonImage}
+                      title="Comece agora!"
+                      subtitle="Adicione uma tarefa clicando em +"
+                    />
+                  </EmptyContainer>
+                }
+              />
+            </Container>
             {completedTasks.length > 0 && (
               <ContentTitle type="PRIMARY" onPress={() => setIsCompletedListVisible(!isCompletedListVisible)}>
                 <HeaderContainer >

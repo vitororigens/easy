@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { FlatList, Modal, Platform, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { DefaultContainer } from "../../components/DefaultContainer";
@@ -36,8 +36,6 @@ export function Notes({ route }: any) {
   const [sharedNotesWithMe, setSharedNotesWithMe] = useState<INote[]>([]);
   console.log("compartilhadas", sharedNotesByMe, sharedNotesWithMe)
   const [isLoading, setIsLoading] = useState(true);
-  const [isMyListVisible, setIsMyListVisible] = useState(true);
-  const [isSharedListVisible, setIsSharedListVisible] = useState(false);
 
   const user = useUserAuth();
   const uid = user.user?.uid;
@@ -93,6 +91,13 @@ export function Notes({ route }: any) {
     }, [reload])
   );
 
+  // Combinar todas as notas em uma única lista
+  const allNotes = useMemo(() => {
+    const myNotesWithFlag = myNotes.map(note => ({ ...note, isShared: false }));
+    const sharedNotesWithFlag = [...sharedNotesWithMe, ...sharedNotesByMe].map(note => ({ ...note, isShared: true }));
+    return [...myNotesWithFlag, ...sharedNotesWithFlag];
+  }, [myNotes, sharedNotesWithMe, sharedNotesByMe]);
+
   if (isLoading || uid === undefined) {
     return <Loading />;
   }
@@ -100,83 +105,40 @@ export function Notes({ route }: any) {
   return (
     <DefaultContainer newNotes monthButton title="Bloco de Notas" backButton>
       <Content>
-        <ContentTitle onPress={() => setIsMyListVisible(!isMyListVisible)}>
+        <ContentTitle>
           <HeaderContainer>
             <SectionIcon name="notebook-outline" />
-            <Title>Minhas notas</Title>
+            <Title>Bloco de Notas</Title>
           </HeaderContainer>
-          <Icon name={isMyListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
         </ContentTitle>
-        {isMyListVisible && (
-          <Container>
-            <FlatList
-              showsVerticalScrollIndicator={false}
-              data={myNotes}
-              renderItem={({ item }) => (
+        <Container>
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={allNotes}
+            renderItem={({ item }) => {
+              const isSharedByMe = sharedNotesByMe.some(note => note.id === item.id);
+              return (
                 <ItemNotes
-                  onDelete={() => handleDeleteNote(item.id)} 
-                  onUpdate={() => handleEditItem(item.id, true)}
+                  onDelete={() => handleDeleteNote(item.id)}
+                  onUpdate={() => handleEditItem(item.id, !item.isShared)}
                   note={item}
+                  isSharedByMe={isSharedByMe}
                 />
-              )}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={{ paddingBottom: 16 }}
-              ListEmptyComponent={
-                <EmptyContainer>
-                  <LoadData
-                    imageSrc={PersonImage}
-                    title="Comece agora!"
-                    subtitle="Adicione uma nota clicando em +"
-                  />
-                </EmptyContainer>
-              }
-            />
-          </Container>
-        )}
-
-        <ContentTitle
-          isMysharedNotes
-          onPress={() => setIsSharedListVisible(!isSharedListVisible)}
-        >
-          <HeaderContainer>
-            <SectionIcon name="share-variant" isMysharedNotes />
-            <Title>Notas compartilhadas</Title>
-          </HeaderContainer>
-          <Icon name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
-        </ContentTitle>
-
-        {isSharedListVisible && (
-          <Container>
-            <FlatList
-              showsVerticalScrollIndicator={false}
-              data={[...sharedNotesWithMe, ...sharedNotesByMe]}
-              renderItem={({ item }) => {
-                const isSharedByMe = sharedNotesByMe.some(note => note.id === item.id);
-                const noteWithShared = {
-                  ...item,
-                  isShared: true
-                };
-                return (
-                  <ItemNotes
-                    onDelete={() => handleDeleteNote(item.id)}
-                    onUpdate={() => handleEditItem(item.id, false)}
-                    note={noteWithShared}
-                    isSharedByMe={isSharedByMe}
-                  />
-                );
-              }}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={{ paddingBottom: 16 }}
-              ListEmptyComponent={
-                <EmptyContainer>
-                  <SubTitle>
-                    Você não possui notas compartilhadas
-                  </SubTitle>
-                </EmptyContainer>
-              }
-            />
-          </Container>
-        )}
+              );
+            }}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ paddingBottom: 16 }}
+            ListEmptyComponent={
+              <EmptyContainer>
+                <LoadData
+                  imageSrc={PersonImage}
+                  title="Comece agora!"
+                  subtitle="Adicione uma nota clicando em +"
+                />
+              </EmptyContainer>
+            }
+          />
+        </Container>
       </Content>
     </DefaultContainer>
   );

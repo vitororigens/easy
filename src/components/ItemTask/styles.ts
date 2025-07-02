@@ -9,6 +9,10 @@ type ListItemProps = {
     type?: ListItemStyleProps;
 }
 
+type ShareBadgeProps = {
+  isSharedByMe?: boolean;
+};
+
 export const Container = styled.View`
   background-color: ${({ theme }) => theme.COLORS.WHITE};
   border-radius: 8px;
@@ -107,4 +111,24 @@ export const IconCheck = styled(MaterialCommunityIcons).attrs<ListItemProps>(({t
     size: theme.FONT_SIZE.XL
 }))`
     margin-right: 5px;
+`;
+
+export const ShareIcon = styled(MaterialCommunityIcons).attrs(({ theme }) => ({
+  size: 16,
+  color: theme.COLORS.WHITE,
+}))``;
+
+export const ShareBadge = styled.View<ShareBadgeProps>`
+  background-color: ${({ theme, isSharedByMe }) =>
+    isSharedByMe ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_600};
+  padding: 4px;
+  border-radius: 12px;
+  margin-left: 8px;
+`;
+
+export const ShareText = styled.Text`
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  color: ${({ theme }) => theme.COLORS.GRAY_400};
+  margin-left: 4px;
 `;

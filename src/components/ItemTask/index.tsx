@@ -1,4 +1,5 @@
-import { TouchableOpacity } from "react-native";
+import React from "react";
+import { TouchableOpacity, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ITask } from "../../interfaces/ITask";
 import {
@@ -10,7 +11,11 @@ import {
   ActionButton,
   Checkbox,
   CheckboxContainer,
+  ShareBadge,
+  ShareIcon,
+  ShareText,
 } from "./styles";
+import { useUserAuth } from "../../hooks/useUserAuth";
 
 interface ItemTaskProps {
   task: ITask;
@@ -27,7 +32,13 @@ export function ItemTask({
   isSelected,
   onSelect,
 }: ItemTaskProps) {
+  const { user } = useUserAuth();
+  
   console.log("ItemTask recebeu a tarefa:", task);
+
+  // Verificar se é uma tarefa compartilhada
+  const isShared = task.shareWith && task.shareWith.length > 0;
+  const isSharedByMe = isShared && task.uid === user?.uid;
 
   return (
     <Container>
@@ -40,8 +51,20 @@ export function ItemTask({
           </Checkbox>
         </CheckboxContainer>
         <TouchableOpacity onPress={handleUpdate} style={{ flex: 1 }}>
-          <Title status={task.status}>{task.name}</Title>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Title status={task.status}>{task.name}</Title>
+            {isShared && (
+              <ShareBadge isSharedByMe={isSharedByMe}>
+                <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
+              </ShareBadge>
+            )}
+          </View>
           <Description status={task.status}>{task.description}</Description>
+          {isShared && (
+            <ShareText>
+              {isSharedByMe ? "Compartilhado por você" : "Compartilhado com você"}
+            </ShareText>
+          )}
         </TouchableOpacity>
         <Actions>
           <ActionButton onPress={handleUpdate}>

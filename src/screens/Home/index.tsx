@@ -76,10 +76,7 @@ export function Home() {
   const [confirmExpenseVisible, setConfirmExpenseVisible] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isSharedListVisible, setIsSharedListVisible] = useState(false);
-  const [isSharedRevenueListVisible, setSharedRevenueListVisible] =
-    useState(false);
-  const [isSharedExpenseListVisible, setSharedExpenseListVisible] = useState(false);
+
   const [isRevenueListVisible, setRevenueListVisible] = useState(true);
   const [isExpenseListVisible, setExpenseListVisible] = useState(true);
   const [revenueShareByMe, setRevenueSharedByMe] = useState<IRevenue[]>([]);
@@ -416,15 +413,7 @@ export function Home() {
     }
   }
 
-  const handleSharedRevenueVisibility = () => {
-    setSharedRevenueListVisible(!isSharedRevenueListVisible);
-    setSharedExpenseListVisible(false);
-  };
 
-  const handleSharedExpenseVisibility = () => {
-    setSharedExpenseListVisible(!isSharedExpenseListVisible);
-    setSharedRevenueListVisible(false);
-  };
 
   if (authLoading || isLoadingSharedData) {
     return <Loading />;
@@ -558,56 +547,8 @@ export function Home() {
                 />
               )}
             </Container>
-
-            <ContentTitle
-              onPress={handleSharedRevenueVisibility}
-            >
-              <Title>Despesas e receitas compartilhadas</Title>
-              <DividerContent />
-              <Icon
-                name={isSharedRevenueListVisible ? "arrow-drop-up" : "arrow-drop-down"}
-              />
-            </ContentTitle>
-
-            {isSharedRevenueListVisible && (
-              <Container>
-                <FlatList
-                  data={revenueShareByMe.concat(revenueShareWithMe)}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      onPress={() => handleExpenseEdit(item.id, activeButton)}
-                    >
-                      <Items
-                        onDelete={() => handleDeleteItem(item.id, item.type)}
-                        onEdit={() => handleExpenseEdit(item.id, activeButton)}
-                        status={item.status}
-                        type={item.type === "input" ? "PRIMARY" : "SECONDARY"}
-                        category={item.name}
-                        date={item.date}
-                        repeat={item.repeat}
-                        valueTransaction={
-                          item.valueTransaction
-                            ? formatCurrency(item.valueTransaction ?? "0")
-                            : formatCurrency("0")
-                        }
-                      />
-                    </TouchableOpacity>
-                  )}
-                  keyExtractor={(item) => item.id}
-                  contentContainerStyle={{ paddingBottom: 10 }}
-                  ListEmptyComponent={
-                    <EmptyContainer>
-                      <TextEmpty>
-                        Você não possui receitas compartilhadas
-                      </TextEmpty>
-                    </EmptyContainer>
-                  }
-                />
-              </Container>
-            )}
           </>
         )}
-
         {activeButton === "despesas" && (
           <>
             <ContentTitle
@@ -619,7 +560,6 @@ export function Home() {
                 name={isExpenseListVisible ? "arrow-drop-up" : "arrow-drop-down"}
               />
             </ContentTitle>
-
             <Container>
               {isExpenseListVisible && (
                 <FlatList
@@ -659,53 +599,6 @@ export function Home() {
                 />
               )}
             </Container>
-
-            <ContentTitle
-              onPress={handleSharedExpenseVisibility}
-            >
-              <Title>Despesas e receitas compartilhadas</Title>
-              <DividerContent />
-              <Icon
-                name={isSharedExpenseListVisible ? "arrow-drop-up" : "arrow-drop-down"}
-              />
-            </ContentTitle>
-
-            {isSharedExpenseListVisible && (
-              <Container>
-                <FlatList
-                  data={expenseSharedByMe.concat(expensesSharedWithMe)}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      onPress={() => handleExpenseEdit(item.id, activeButton)}
-                    >
-                      <Items
-                        onDelete={() => handleDeleteItem(item.id, item.type as "input" | "output")}
-                        onEdit={() => handleExpenseEdit(item.id, activeButton)}
-                        status={item.status}
-                        type={item.type === "input" ? "PRIMARY" : "SECONDARY"}
-                        category={item.name}
-                        date={item.date}
-                        repeat={item.repeat}
-                        valueTransaction={
-                          item.valueTransaction
-                            ? formatCurrency(item.valueTransaction ?? "0")
-                            : formatCurrency("0")
-                        }
-                      />
-                    </TouchableOpacity>
-                  )}
-                  keyExtractor={(item) => item.id}
-                  contentContainerStyle={{ paddingBottom: 10 }}
-                  ListEmptyComponent={
-                    <EmptyContainer>
-                      <TextEmpty>
-                        Você não possui despesas compartilhadas
-                      </TextEmpty>
-                    </EmptyContainer>
-                  }
-                />
-              </Container>
-            )}
           </>
         )}
       </Content>

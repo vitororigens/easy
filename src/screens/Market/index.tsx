@@ -81,8 +81,6 @@ export function Market({ route }: any) {
   const { markets, loading, deleteMarket, toggleMarketCompletion } = useMarket();
 
   const [activeButton, setActiveButton] = useState<ActiveButtonType>("mercado");
-  const [isListVisible, setIsListVisible] = useState(true);
-  const [isSharedListVisible, setIsSharedListVisible] = useState(false);
   const [isSummaryVisible, setIsSummaryVisible] = useState(true);
   const [selectedMarkets, setSelectedMarkets] = useState<string[]>([]);
   const [modalActive, setModalActive] = useState(false);
@@ -99,24 +97,14 @@ export function Market({ route }: any) {
     return filtered;
   }, [marketplaceData, user.user?.uid]);
 
-  const personalMarkets = useMemo(() => {
-    const filtered = markets?.filter(market => market.isOwner) || [];
-    return filtered;
-  }, [markets]);
-
-  const sharedMarkets = useMemo(() => {
-    const filtered = markets?.filter(market => {
-      const isShared = market.isShared && !market.isOwner;
-      return isShared;
-    }) || [];
-    
-    return filtered;
+  // Combinar todos os mercados em uma única lista
+  const allMarkets = useMemo(() => {
+    return markets || [];
   }, [markets]);
 
   // Adicionar informações úteis sobre os mercados
   const marketStats = useMemo(() => {
     // Garantir que todos os preços sejam números válidos
-    const allMarkets = [...personalMarkets, ...sharedMarkets];
     const totalValue = allMarkets.reduce((acc, curr) => {
       // Converter o preço para número
       const price = typeof curr.price === 'number' ? curr.price : 0;
@@ -131,7 +119,7 @@ export function Market({ route }: any) {
     };
     
     return stats;
-  }, [personalMarkets, sharedMarkets]);
+  }, [allMarkets]);
 
   const handleButtonClick = (buttonName: ActiveButtonType) => {
     setActiveButton(buttonName);
@@ -139,23 +127,6 @@ export function Market({ route }: any) {
 
   const handleToggleSummary = () => {
     setIsSummaryVisible(!isSummaryVisible);
-  };
-
-  const handleToggleMyItems = () => {
-    setIsListVisible(!isListVisible);
-    // Se estiver abrindo meus itens, fecha itens compartilhados
-    if (!isListVisible) {
-      setIsSharedListVisible(false);
-    }
-  };
-
-  const handleToggleSharedItems = () => {
-    setIsSharedListVisible(!isSharedListVisible);
-    // Se estiver abrindo itens compartilhados, fecha resumo e meus itens
-    if (!isSharedListVisible) {
-      setIsSummaryVisible(false);
-      setIsListVisible(false);
-    }
   };
 
   const handleEditMarket = (marketId: string) => {
@@ -351,83 +322,43 @@ export function Market({ route }: any) {
           </Container>
           )}
 
-          <ContentTitle type="PRIMARY" onPress={() => handleToggleMyItems()}>
+          <ContentTitle type="PRIMARY">
             <HeaderContainer>
               <SectionIcon type="PRIMARY" name="cart-variant" />
-              <Title type="PRIMARY">Meus itens</Title>
+              <Title type="PRIMARY">Lista de Compras</Title>
             </HeaderContainer>
-            <Icon type="PRIMARY" name={isListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
           </ContentTitle>
-          {isListVisible && (
-            <Container>
-              <FlatList
-                showsVerticalScrollIndicator={false}
-                data={personalMarkets}
-                renderItem={({ item, index }) => (
-                  <View>
-                    <ItemMarket
-                      market={item}
-                      handleDelete={() => handleDeleteMarket(item.id)}
-                      handleUpdate={() => handleEditMarket(item.id)}
-                      isSelected={selectedMarkets.includes(item.id)}
-                      onSelect={() => handleSelectMarket(item.id)}
-                    />
-                    {index % 5 === 0 && index !== 0 && (
-                      <NativeAdComponent style={{ marginVertical: 10 }} />
-                    )}
-                  </View>
-                )}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingBottom: 20 }}
-                ListEmptyComponent={
-                  <EmptyContainer>
-                    <LoadData
-                      imageSrc={PersonImage}
-                      title="Comece agora!"
-                      subtitle="Adicione um item clicando em +"
-                    />
-                  </EmptyContainer>
-                }
-              />
-            </Container>
-          )}
-
-          <ContentTitle type="PRIMARY" onPress={() => handleToggleSharedItems()}>
-            <HeaderContainer>
-              <SectionIcon type="PRIMARY" name="share-variant" />
-              <Title type="PRIMARY">Itens compartilhados</Title>
-            </HeaderContainer>
-            <Icon type="PRIMARY" name={isSharedListVisible ? "arrow-drop-up" : "arrow-drop-down"} />
-          </ContentTitle>
-          {isSharedListVisible && (
-            <Container>
-              <FlatList
-                showsVerticalScrollIndicator={false}
-                data={sharedMarkets}
-                renderItem={({ item, index }) => (
-                  <View>
-                    <ItemMarket
-                      market={item}
-                      handleDelete={() => handleDeleteMarket(item.id)}
-                      handleUpdate={() => handleEditMarket(item.id)}
-                      isSelected={selectedMarkets.includes(item.id)}
-                      onSelect={() => handleSelectMarket(item.id)}
-                    />
-                    {index % 5 === 0 && index !== 0 && (
-                      <NativeAdComponent style={{ marginVertical: 10 }} />
-                    )}
-                  </View>
-                )}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingBottom: 70 }}
-                ListEmptyComponent={
-                  <EmptyContainer>
-                    <SubTitle>Nenhum item compartilhado</SubTitle>
-                  </EmptyContainer>
-                }
-              />
-            </Container>
-          )}
+          <Container>
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={allMarkets}
+              renderItem={({ item, index }) => (
+                <View>
+                  <ItemMarket
+                    market={item}
+                    handleDelete={() => handleDeleteMarket(item.id)}
+                    handleUpdate={() => handleEditMarket(item.id)}
+                    isSelected={selectedMarkets.includes(item.id)}
+                    onSelect={() => handleSelectMarket(item.id)}
+                  />
+                  {index % 5 === 0 && index !== 0 && (
+                    <NativeAdComponent style={{ marginVertical: 10 }} />
+                  )}
+                </View>
+              )}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={{ paddingBottom: 20 }}
+              ListEmptyComponent={
+                <EmptyContainer>
+                  <LoadData
+                    imageSrc={PersonImage}
+                    title="Comece agora!"
+                    subtitle="Adicione um item clicando em +"
+                  />
+                </EmptyContainer>
+              }
+            />
+          </Container>
         </Content>
       )}
 

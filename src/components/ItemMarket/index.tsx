@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { IMarket } from "../../interfaces/IMarket";
 import {
@@ -11,6 +11,9 @@ import {
   ActionButton,
   Checkbox,
   CheckboxContainer,
+  ShareBadge,
+  ShareIcon,
+  ShareText,
 } from "./styles";
 import { formatPrice } from "../../utils/price";
 import { useUserAuth } from "../../hooks/useUserAuth";
@@ -37,6 +40,10 @@ export function ItemMarket({
   const isCreator = market.uid === user?.uid;
   const canDelete = isCreator || market.isOwner;
 
+  // Verificar se é um item compartilhado
+  const isShared = market.isShared;
+  const isSharedByMe = isShared && isCreator;
+
   return (
     <Container>
       <Content>
@@ -48,10 +55,22 @@ export function ItemMarket({
           </Checkbox>
         </CheckboxContainer>
         <TouchableOpacity onPress={handleUpdate} style={{ flex: 1 }}>
-          <Title status={isSelected}>{market.name}</Title>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Title status={isSelected}>{market.name}</Title>
+            {isShared && (
+              <ShareBadge isSharedByMe={isSharedByMe}>
+                <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
+              </ShareBadge>
+            )}
+          </View>
           <Description status={!!market.status}>
             {market.quantity} {market.measurement} - {formatPrice(market.price || 0)}
           </Description>
+          {isShared && (
+            <ShareText>
+              {isSharedByMe ? "Compartilhado por você" : "Compartilhado com você"}
+            </ShareText>
+          )}
         </TouchableOpacity>
         <Actions>
           <ActionButton onPress={handleUpdate}>
