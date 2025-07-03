@@ -41,6 +41,7 @@ interface ItemsProps {
   onToggleStatus?: () => void;
   isShared?: boolean;
   isSharedByMe?: boolean;
+  uid?: string;
 }
 
 export function Items({
@@ -56,6 +57,7 @@ export function Items({
   onToggleStatus,
   isShared = false,
   isSharedByMe = false,
+  uid,
 }: ItemsProps) {
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
   const [sharedByUserName, setSharedByUserName] = useState<string>("");
@@ -152,11 +154,15 @@ export function Items({
 
   useEffect(() => {
     const fetchSharedByUserName = async () => {
+      console.log("Items useEffect - isShared:", isShared, "isSharedByMe:", isSharedByMe, "uid:", uid);
       if (isShared && !isSharedByMe && uid) {
         try {
+          console.log("Buscando nome do usuário para uid:", uid);
           const userData = await findUserById(uid);
+          console.log("Dados do usuário encontrados:", userData);
           if (userData) {
             setSharedByUserName(userData.userName);
+            console.log("Nome do usuário definido:", userData.userName);
           }
         } catch (error) {
           console.error("Erro ao buscar nome do usuário que compartilhou:", error);
@@ -166,6 +172,12 @@ export function Items({
 
     fetchSharedByUserName();
   }, [isShared, isSharedByMe, uid]);
+
+  useEffect(() => {
+    if (isShared) {
+      console.log("Render - sharedByUserName:", sharedByUserName, "isSharedByMe:", isSharedByMe);
+    }
+  }, [isShared, sharedByUserName, isSharedByMe]);
 
   return (
     <Container type={type}>

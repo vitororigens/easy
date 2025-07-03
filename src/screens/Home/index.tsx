@@ -590,6 +590,7 @@ export function Home() {
                         }
                         isShared={Array.isArray(item.shareWith) && item.shareWith.length > 0}
                         isSharedByMe={("uid" in item ? item.uid : undefined) === uid && Array.isArray(item.shareWith) && item.shareWith.length > 0}
+                        uid={("uid" in item ? item.uid : undefined)}
                       />
                     </TouchableOpacity>
                   )}
@@ -643,6 +644,7 @@ export function Home() {
                         }
                         isShared={Array.isArray(item.shareWith) && item.shareWith.length > 0}
                         isSharedByMe={("uid" in item ? item.uid : undefined) === uid && Array.isArray(item.shareWith) && item.shareWith.length > 0}
+                        uid={("uid" in item ? item.uid : undefined)}
                       />
                     </TouchableOpacity>
                   )}
