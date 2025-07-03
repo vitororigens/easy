@@ -558,7 +558,7 @@ export function Home() {
 
         {activeButton === "receitas" && (
           <>
-            <ContentTitle
+            {/* <ContentTitle
               onPress={() => setRevenueListVisible(!isRevenueListVisible)}
             >
               <Title>Receitas</Title>
@@ -566,7 +566,7 @@ export function Home() {
               <Icon
                 name={isRevenueListVisible ? "arrow-drop-up" : "arrow-drop-down"}
               />
-            </ContentTitle>
+            </ContentTitle> */}
             <Container>
               {isRevenueListVisible && (
                 <FlatList
@@ -610,7 +610,7 @@ export function Home() {
         )}
         {activeButton === "despesas" && (
           <>
-            <ContentTitle
+            {/* <ContentTitle
               onPress={() => setExpenseListVisible(!isExpenseListVisible)}
             >
               <Title>Despesas</Title>
@@ -618,7 +618,7 @@ export function Home() {
               <Icon
                 name={isExpenseListVisible ? "arrow-drop-up" : "arrow-drop-down"}
               />
-            </ContentTitle>
+            </ContentTitle> */}
             <Container>
               {isExpenseListVisible && (
                 <FlatList

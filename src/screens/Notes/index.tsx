@@ -116,12 +116,12 @@ export function Notes({ route }: any) {
   return (
     <DefaultContainer newNotes monthButton title="Bloco de Notas" backButton>
       <Content>
-        <ContentTitle>
+        {/* <ContentTitle>
           <HeaderContainer>
             <SectionIcon name="notebook-outline" />
             <Title>Bloco de Notas</Title>
           </HeaderContainer>
-        </ContentTitle>
+        </ContentTitle> */}
         <Container>
           <FlatList
             showsVerticalScrollIndicator={false}

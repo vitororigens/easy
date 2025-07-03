@@ -72,7 +72,7 @@ export function ItemNotes({
           <Description>{note.description}</Description>
           {isShared && (
             <ShareText>
-              {isSharedByMe ? "Compartilhado por você" : "Compartilhado com você"}
+              {isSharedByMe ? "Compartilhado por você" : "${nameShared} Compartilhado com você"}
             </ShareText>
           )}
         </MainContent>

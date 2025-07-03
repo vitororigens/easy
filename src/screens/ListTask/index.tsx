@@ -259,12 +259,12 @@ export function ListTask({ route }: any) {
 
         {activeButton === "tarefas" && (
           <Content>
-            <ContentTitle>
+            {/* <ContentTitle>
               <HeaderContainer>
                 <SectionIcon name="checkbox-marked-circle-outline" />
                 <Title>Lista de Tarefas</Title>
               </HeaderContainer>
-            </ContentTitle>
+            </ContentTitle> */}
             <Container>
               <FlatList
                 showsVerticalScrollIndicator={false}
@@ -331,12 +331,12 @@ export function ListTask({ route }: any) {
 
         {activeButton === "historico" && (
           <Content>
-            <ContentTitle>
+            {/* <ContentTitle>
               <HeaderContainer>
                 <SectionIcon name="history" />
                 <Title>Histórico de tarefas</Title>
               </HeaderContainer>
-            </ContentTitle>
+            </ContentTitle> */}
             <Container>
               <FlatList
                 showsVerticalScrollIndicator={false}

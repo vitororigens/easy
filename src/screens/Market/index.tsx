@@ -274,13 +274,13 @@ export function Market({ route }: any) {
 
       {activeButton === "mercado" && (
         <Content>
-          <ContentTitle type="PRIMARY" onPress={handleToggleSummary}>
+          {/* <ContentTitle type="PRIMARY" onPress={handleToggleSummary}>
             <HeaderContainer>
               <SectionIcon type="PRIMARY" name="chart-bar" />
               <Title type="PRIMARY">Resumo</Title>
             </HeaderContainer>
             <Icon name={isSummaryVisible ? "arrow-drop-up" : "arrow-drop-down"} type="PRIMARY" />
-          </ContentTitle>
+          </ContentTitle> */}
           {isSummaryVisible && (
           <Container>
             <StatsContainer>
@@ -307,12 +307,12 @@ export function Market({ route }: any) {
           </Container>
           )}
 
-          <ContentTitle type="PRIMARY">
+          {/* <ContentTitle type="PRIMARY">
             <HeaderContainer>
               <SectionIcon type="PRIMARY" name="cart-variant" />
               <Title type="PRIMARY">Lista de Compras</Title>
             </HeaderContainer>
-          </ContentTitle>
+          </ContentTitle> */}
           <Container>
             <FlatList
               showsVerticalScrollIndicator={false}
