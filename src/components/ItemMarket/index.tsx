@@ -26,6 +26,7 @@ import {
 import { formatPrice } from "../../utils/price";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import Popover from "react-native-popover-view";
+import { findUserById } from "../../services/firebase/users.firestore";
 
 interface ItemMarketProps {
   market: IMarket;
@@ -44,6 +45,7 @@ export function ItemMarket({
 }: ItemMarketProps) {
   const { user } = useUserAuth();
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
+  const [sharedByUserName, setSharedByUserName] = useState<string>("");
   const popoverRef = useRef(null);
   
   // Verificar se o usuário pode excluir este item
@@ -70,6 +72,23 @@ export function ItemMarket({
     // Implementar funcionalidade de compartilhamento se necessário
   };
 
+  useEffect(() => {
+    const fetchSharedByUserName = async () => {
+      if (isShared && !isSharedByMe && market.uid) {
+        try {
+          const userData = await findUserById(market.uid);
+          if (userData) {
+            setSharedByUserName(userData.userName);
+          }
+        } catch (error) {
+          console.error("Erro ao buscar nome do usuário que compartilhou:", error);
+        }
+      }
+    };
+
+    fetchSharedByUserName();
+  }, [isShared, isSharedByMe, market.uid]);
+
   return (
     <Container>
       <Content>
@@ -95,7 +114,12 @@ export function ItemMarket({
           </Description>
           {isShared && (
             <ShareText>
-              {isSharedByMe ? "Compartilhado por você" : "Compartilhado com você"}
+              {isSharedByMe 
+                ? "Compartilhado por você" 
+                : sharedByUserName 
+                  ? `Compartilhado por ${sharedByUserName}` 
+                  : "Compartilhado com você"
+              }
             </ShareText>
           )}
         </MainContent>

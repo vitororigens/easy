@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ITask } from "../../interfaces/ITask";
@@ -23,6 +23,7 @@ import {
 } from "./styles";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import Popover from "react-native-popover-view";
+import { findUserById } from "../../services/firebase/users.firestore";
 
 interface ItemTaskProps {
   task: ITask;
@@ -41,6 +42,7 @@ export function ItemTask({
 }: ItemTaskProps) {
   const { user } = useUserAuth();
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
+  const [sharedByUserName, setSharedByUserName] = useState<string>("");
   const popoverRef = useRef(null);
   
   console.log("ItemTask recebeu a tarefa:", task);
@@ -48,6 +50,23 @@ export function ItemTask({
   // Verificar se é uma tarefa compartilhada
   const isShared = task.shareWith && task.shareWith.length > 0;
   const isSharedByMe = isShared && task.uid === user?.uid;
+
+  useEffect(() => {
+    const fetchSharedByUserName = async () => {
+      if (isShared && !isSharedByMe && task.uid) {
+        try {
+          const userData = await findUserById(task.uid);
+          if (userData) {
+            setSharedByUserName(userData.userName);
+          }
+        } catch (error) {
+          console.error("Erro ao buscar nome do usuário que compartilhou:", error);
+        }
+      }
+    };
+
+    fetchSharedByUserName();
+  }, [isShared, isSharedByMe, task.uid]);
 
   const handleEdit = () => {
     setIsPopoverVisible(false);
@@ -91,7 +110,12 @@ export function ItemTask({
           <Description>{task.description}</Description>
           {isShared && (
             <ShareText>
-              {isSharedByMe ? "Compartilhado por você" : "Compartilhado com você"}
+              {isSharedByMe 
+                ? "Compartilhado por você" 
+                : sharedByUserName 
+                  ? `Compartilhado por ${sharedByUserName}` 
+                  : "Compartilhado com você"
+              }
             </ShareText>
           )}
         </MainContent>

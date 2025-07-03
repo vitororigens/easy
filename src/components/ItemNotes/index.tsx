@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { INote } from "../../interfaces/INote";
@@ -21,6 +21,7 @@ import {
 } from "./styles";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import Popover from "react-native-popover-view";
+import { findUserById } from "../../services/firebase/users.firestore";
 
 interface ItemNotesProps {
   note: INote;
@@ -37,10 +38,29 @@ export function ItemNotes({
 }: ItemNotesProps) {
   const { user } = useUserAuth();
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
+  const [sharedByUserName, setSharedByUserName] = useState<string>("");
   const popoverRef = useRef(null);
 
   // Verificar se é uma nota compartilhada
   const isShared = note.isShared || (note.sharedWith && note.sharedWith.length > 0) || isSharedByMe;
+
+  // Buscar o nome do usuário que compartilhou
+  useEffect(() => {
+    const fetchSharedByUserName = async () => {
+      if (isShared && !isSharedByMe && note.uid) {
+        try {
+          const userData = await findUserById(note.uid);
+          if (userData) {
+            setSharedByUserName(userData.userName);
+          }
+        } catch (error) {
+          console.error("Erro ao buscar nome do usuário que compartilhou:", error);
+        }
+      }
+    };
+
+    fetchSharedByUserName();
+  }, [isShared, isSharedByMe, note.uid]);
 
   const handleEdit = () => {
     setIsPopoverVisible(false);
@@ -72,7 +92,12 @@ export function ItemNotes({
           <Description>{note.description}</Description>
           {isShared && (
             <ShareText>
-              {isSharedByMe ? "Compartilhado por você" : "${nameShared} Compartilhado com você"}
+              {isSharedByMe 
+                ? "Compartilhado por você" 
+                : sharedByUserName 
+                  ? `Compartilhado por ${sharedByUserName}` 
+                  : "Compartilhado com você"
+              }
             </ShareText>
           )}
         </MainContent>

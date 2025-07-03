@@ -1,7 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { View } from "react-native";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { formatCurrency } from "../../utils/mask";
+import { findUserById } from "../../services/firebase/users.firestore";
 import {
   Container,
   Content,
@@ -25,6 +26,7 @@ import {
 import { format, isBefore, parseISO, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Popover from "react-native-popover-view";
+
 
 interface ItemsProps {
   type?: "PRIMARY" | "SECONDARY" | "TERTIARY";
@@ -56,6 +58,7 @@ export function Items({
   isSharedByMe = false,
 }: ItemsProps) {
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
+  const [sharedByUserName, setSharedByUserName] = useState<string>("");
   const popoverRef = useRef(null);
 
   const getExpenseStatus = () => {
@@ -147,6 +150,23 @@ export function Items({
     onToggleStatus && onToggleStatus();
   };
 
+  useEffect(() => {
+    const fetchSharedByUserName = async () => {
+      if (isShared && !isSharedByMe && uid) {
+        try {
+          const userData = await findUserById(uid);
+          if (userData) {
+            setSharedByUserName(userData.userName);
+          }
+        } catch (error) {
+          console.error("Erro ao buscar nome do usuário que compartilhou:", error);
+        }
+      }
+    };
+
+    fetchSharedByUserName();
+  }, [isShared, isSharedByMe, uid]);
+
   return (
     <Container type={type}>
       <Content>
@@ -163,7 +183,12 @@ export function Items({
           <DateText>{formattedDate}</DateText>
           {isShared && (
             <ShareText>
-              {isSharedByMe ? "Compartilhado por você" : "Compartilhado com você"}
+               {isSharedByMe 
+                ? "Compartilhado por você" 
+                : sharedByUserName 
+                  ? `Compartilhado por ${sharedByUserName}` 
+                  : "Compartilhado com você"
+              }
             </ShareText>
           )}
           {type === "SECONDARY" && (
