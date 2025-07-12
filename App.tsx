@@ -21,7 +21,6 @@ import {
 import mobileAds from "react-native-google-mobile-ads";
 import * as Updates from 'expo-updates';
 
-import Constants from "expo-constants";
 import { useEffect } from "react";
 
 OneSignal.Debug.setLogLevel(LogLevel.Verbose);
