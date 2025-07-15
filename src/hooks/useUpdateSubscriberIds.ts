@@ -35,13 +35,13 @@ export function useUpdateSubscriberIds() {
                 }
 
                 const data = userSnap.data();
-                const subscriptionIds = data?.subscribers || [];
+                const subscriptionIds = data?.['subscribers'] || [];
                 const isAllSubscriptionIds = subscriptionIds.includes(subscriptionId);
                 const updatedSubscriptionIds = isAllSubscriptionIds
                     ? subscriptionIds
                     : [...subscriptionIds, subscriptionId];
 
-                const playerIds = data?.playerIds || [];
+                const playerIds = data?.['playerIds'] || [];
                 const isAllPlayerIds = playerIds.includes(playerId);
                 const updatedPlayerIds = isAllPlayerIds
                     ? playerIds

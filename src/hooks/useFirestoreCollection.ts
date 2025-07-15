@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import firestore from "@react-native-firebase/firestore";
+import { getFirestore } from "@react-native-firebase/firestore";
 import { useUserAuth } from "./useUserAuth";
 import { useMonth } from "../context/MonthProvider";
 import { Alert, Linking } from "react-native";
@@ -36,7 +36,7 @@ const useFirestoreCollection = (collectionName: string) => {
   const [error, setError] = useState<string | null>(null);
   const { user } = useUserAuth();
   const { selectedMonth } = useMonth();
-
+  const db = getFirestore();
   const handleIndexError = (error: any, type: 'own' | 'shared') => {
     console.error(`Erro ao observar documentos ${type} de ${collectionName}:`, error);
     
@@ -69,21 +69,21 @@ const useFirestoreCollection = (collectionName: string) => {
     
     if (!user?.uid) {
       setLoading(false);
-      return;
+      return () => {};
     }
 
     try {
       console.log(`Iniciando listener para coleção: ${collectionName}`);
       
       // Query for user's own documents
-      const ownQuery = firestore()
+      const ownQuery = db
         .collection(collectionName)
         .where('month', '==', selectedMonth)
         .where('uid', '==', user.uid)
         .orderBy('createdAt', 'desc');
 
       // Query for shared documents
-      const sharedQuery = firestore()
+      const sharedQuery = db
         .collection(collectionName)
         .where('month', '==', selectedMonth)
         .where('shareWith', 'array-contains', user.uid)
@@ -91,12 +91,12 @@ const useFirestoreCollection = (collectionName: string) => {
       
       // Subscribe to both queries
       const unsubscribe1 = ownQuery.onSnapshot(
-        (snapshot) => {
+        (snapshot: any) => {
           if (!isMounted || !snapshot) return;
           
           console.log(`Snapshot recebido para ${collectionName} (próprios). Total de documentos: ${snapshot.size}`);
           
-          const ownData = snapshot.docs.map(doc => ({
+          const ownData = snapshot.docs.map((doc: any) => ({
             id: doc.id,
             ...doc.data()
           })) as ExpenseData[];
@@ -106,16 +106,16 @@ const useFirestoreCollection = (collectionName: string) => {
             return [...ownData, ...sharedDocs];
           });
         },
-        (error) => handleIndexError(error, 'own')
+        (error: any) => handleIndexError(error, 'own')
       );
 
       const unsubscribe2 = sharedQuery.onSnapshot(
-        (snapshot) => {
+        (snapshot: any) => {
           if (!isMounted || !snapshot) return;
 
           console.log(`Snapshot recebido para ${collectionName} (compartilhados). Total de documentos: ${snapshot.size}`);
 
-          const sharedData = snapshot.docs.map(doc => ({
+          const sharedData = snapshot.docs.map((doc: any) => ({
             id: doc.id,
             ...doc.data()
           })) as ExpenseData[];
@@ -125,7 +125,7 @@ const useFirestoreCollection = (collectionName: string) => {
             return [...ownDocs, ...sharedData];
           });
         },
-        (error) => handleIndexError(error, 'shared')
+        (error: any) => handleIndexError(error, 'shared')
       );
 
       setLoading(false);
@@ -137,10 +137,11 @@ const useFirestoreCollection = (collectionName: string) => {
         unsubscribe2();
       };
     } catch (err) {
-      if (!isMounted) return;
+      if (!isMounted) return () => {};
       console.error(`Erro ao configurar listener para ${collectionName}:`, err);
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
       setLoading(false);
+      return () => {};
     }
   }, [collectionName, user?.uid, selectedMonth]);
 

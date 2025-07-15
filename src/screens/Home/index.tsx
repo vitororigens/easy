@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, TouchableOpacity, View, Text, ScrollView } from "react-native";
+import { FlatList, TouchableOpacity, View, Text} from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { Items } from "../../components/Items";
@@ -16,8 +16,6 @@ import {
   NavBar,
   SubTitle,
   Title,
-  ContentTitle,
-  DividerContent,
   Icon,
   Container,
   Content,
@@ -25,8 +23,6 @@ import {
   StatItem,
   StatValue,
   StatLabel,
-  EmptyContainer,
-  TextEmpty,
 } from "./styles";
 
 import { useNavigation } from "@react-navigation/native";
@@ -264,7 +260,7 @@ export function Home() {
       .get()
       .then((doc) => {
         if (doc.exists()) {
-          const currentStatus = doc.data()?.status || false;
+          const currentStatus = doc.data()?.['status'] || false;
           
           // Atualizar o status para o oposto do atual
           database
@@ -493,7 +489,6 @@ export function Home() {
         monthButton
         title="Erro"
         type="SECONDARY"
-        subtitle="Ocorreu um erro ao carregar os dados"
       >
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ color: 'red', marginBottom: 20 }}>{error}</Text>
@@ -513,7 +508,6 @@ export function Home() {
       monthButton
       title={activeButton === "receitas" ? "Receitas" : "Despesas"}
       type="SECONDARY"
-      subtitle={formattedTotalValue}
       addActionFn={() => handleCreateItem("", activeButton)}
     >
       <AppOpenAdComponent />

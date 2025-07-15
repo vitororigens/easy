@@ -1,7 +1,7 @@
 import { collection, onSnapshot, query, where } from "@react-native-firebase/firestore";
 import { useEffect, useState } from "react";
 import { useUserAuth } from "./useUserAuth";
-import { database } from "../libs/firebase";
+import { getFirestore } from "@react-native-firebase/firestore";
 
 export interface MarketplaceData {
   id: string;
@@ -21,7 +21,7 @@ const useMarketplaceCollections = (
 ): MarketplaceData[] => {
   const [data, setData] = useState<MarketplaceData[]>([]);
   const user = useUserAuth();
-
+  const db = getFirestore();
   useEffect(() => {
     if (!user.user?.uid) {
       console.log("Usuário não autenticado no hook useMarketplaceCollections");
@@ -34,7 +34,7 @@ const useMarketplaceCollections = (
     // Usar Marketplace como coleção padrão e filtrar por uid
     const actualCollectionName = "Marketplace";
     const q = query(
-      collection(database, actualCollectionName),
+      collection(db, actualCollectionName),
       where("uid", "==", user.user?.uid)
     );
 
@@ -42,7 +42,7 @@ const useMarketplaceCollections = (
       console.log("Snapshot do Marketplace recebido");
       const collectionData: MarketplaceData[] = [];
 
-      querySnapshot.forEach((doc) => {
+      querySnapshot.forEach((doc: any) => {
         const docData = doc.data();
         console.log("Documento encontrado:", doc.id, docData.uid);
         collectionData.push({
@@ -53,7 +53,7 @@ const useMarketplaceCollections = (
 
       console.log("Total de documentos encontrados:", collectionData.length);
       setData(collectionData);
-    }, (error) => {
+    }, (error: any) => {
       console.error("Erro ao observar Marketplace:", error);
     });
 

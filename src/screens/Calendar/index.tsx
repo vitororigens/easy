@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, TouchableOpacity, View, Image } from "react-native";
+import { FlatList, Image } from "react-native";
 import { Calendar as RNCalendar } from "react-native-calendars";
 import { useTheme } from "styled-components/native";
 import { DefaultContainer } from "../../components/DefaultContainer";
@@ -12,21 +12,16 @@ import {
 
 import { format } from "date-fns";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
 import {
   Container,
   Content,
   ContentTitle,
   DividerContent,
-  Icon,
   SubTitle,
   Title,
-  HeaderContainer,
-  SectionIcon,
   EmptyContainer,
 } from "./styles";
-import { ICalendarEvent, listEvents, listSharedEvents, deleteCalendarEvent } from "../../services/firebase/calendar.firebase";
-import { ICalendar } from "../../interfaces/ICalendar";
+import { listEvents, listSharedEvents, deleteCalendarEvent, ICalendarEvent } from "../../services/firebase/calendar.firebase";
 import { Toast } from "react-native-toast-notifications";
 
 export function CalendarScreen() {
@@ -89,9 +84,6 @@ export function CalendarScreen() {
     });
   }
 
-  function handleShareEvent(event: ICalendarEvent) {
-    // Implement share functionality
-  }
 
   function handleNewEvent() {
     navigation.navigate("newevent", {
@@ -115,29 +107,15 @@ export function CalendarScreen() {
 
   // Add dots for days with events
   events.forEach((event) => {
-    if (markedDates[event.date]) {
-      markedDates[event.date].dots = [
-        { color: COLORS.PURPLE_800 }
-      ];
-    } else {
-      markedDates[event.date] = {
-        dots: [{ color: COLORS.PURPLE_800 }]
-      };
-    }
+    markedDates[event.date] = markedDates[event.date] || {};
+    markedDates[event.date]!.dots = [{ color: COLORS.PURPLE_800 }];
   });
 
   // Add dots for days with shared events
   sharedEvents.forEach((event) => {
-    if (markedDates[event.date]) {
-      if (!markedDates[event.date].dots) {
-        markedDates[event.date].dots = [];
-      }
-      markedDates[event.date].dots?.push({ color: COLORS.TEAL_600 });
-    } else {
-      markedDates[event.date] = {
-        dots: [{ color: COLORS.TEAL_600 }]
-      };
-    }
+    markedDates[event.date] = markedDates[event.date] || {};
+    markedDates[event.date]!.dots = markedDates[event.date]!.dots || [];
+    markedDates[event.date]!.dots!.push({ color: COLORS.TEAL_600 });
   });
 
   // Combinar todos os eventos em uma única lista

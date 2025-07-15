@@ -26,7 +26,6 @@ export function Charts() {
   const [revenueData, setRevenueData] = useState<ExpenseData[] | never[]>([]);
   const [expenseData, setExpenseData] = useState<ExpenseData[] | never[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSharedListVisible, setIsSharedListVisible] = useState(false);
   const { COLORS } = useTheme();
   const revenue = useFirestoreCollection("Revenue");
   const expense = useFirestoreCollection("Expense");
@@ -49,7 +48,7 @@ export function Charts() {
   ];
 
   const getMonthName = (month: number): string => {
-    return monthNames[month - 1];
+    return monthNames[month - 1] ?? "";
   };
 
   const getTotalByMonth = (data: ExpenseData[], month: number): number => {
@@ -79,8 +78,8 @@ export function Charts() {
           data: totalByMonth,
           color:
             activeButton === "receitas"
-              ? (opacity = 1) => COLORS.TEAL_600
-              : (opacity = 1) => COLORS.PURPLE_600,
+              ? () => COLORS.TEAL_600
+              : () => COLORS.PURPLE_600,
           strokeWidth: 2,
         },
       ],
@@ -124,8 +123,8 @@ export function Charts() {
     backgroundGradientToOpacity: 0.5,
     color:
       activeButton === "receitas"
-        ? (opacity = 1) => COLORS.TEAL_600
-        : (opacity = 1) => COLORS.PURPLE_600,
+        ? () => COLORS.TEAL_600
+        : () => COLORS.PURPLE_600,
     strokeWidth: 2,
     barPercentage: 0.5,
     useShadowColorFromDataset: false,

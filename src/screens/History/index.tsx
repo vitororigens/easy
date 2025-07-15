@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { FlatList, Text } from 'react-native';
 import styled from 'styled-components/native';
 import { useUserAuth } from '../../hooks/useUserAuth';
@@ -49,20 +48,12 @@ const DateText = styled(TaskText)`
   color: ${({ theme }) => theme.COLORS.GRAY_400};
 `;
 
-interface Task {
-  id: string;
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export default function History() {
   const { user } = useUserAuth();
   const uid = user?.uid;
 
   // Carregar tarefas do Firestore
   const { data, loading } = useFirestoreCollection('Tasks');
-  const [searchTerm, setSearchTerm] = useState('');
 
   const completedTasks = data
     .filter((item: any) => item.uid === uid && item.status)

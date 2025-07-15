@@ -11,8 +11,9 @@ import {
   TaskDate,
   GroupName,
 } from './styles';
+import { useRoute, useNavigation } from '@react-navigation/native';
 
-interface HistoryTaskModalProps {
+type HistoryTaskModalParams = {
   onClose: () => void;
   groupName: string;
   finishedDate: string;
@@ -22,15 +23,12 @@ interface HistoryTaskModalProps {
     name: string;
     createdAt: string;
   }>;
-}
+};
 
-export function HistoryTaskModal({ 
-  onClose, 
-  groupName,
-  finishedDate,
-  finishedTime,
-  tasks 
-}: HistoryTaskModalProps) {
+export function HistoryTaskModal() {
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { onClose, groupName, finishedDate, finishedTime, tasks } = route.params as HistoryTaskModalParams;
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
     return {

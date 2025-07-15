@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { database } from "../libs/firebase";
+import { getFirestore } from "@react-native-firebase/firestore";
 
 export interface FinanceData {
   uid: string;
@@ -9,11 +9,11 @@ export interface FinanceData {
 
 export function useFinanceData(uid: string): FinanceData | null {
   const [financeData, setFinanceData] = useState<FinanceData | null>(null);
-
+  const db = getFirestore();
   useEffect(() => {
     const fetchFinanceData = async () => {
       try {
-        const financeDoc = await database.collection("Tasks").doc(uid).get();
+        const financeDoc = await db.collection("Tasks").doc(uid).get();
         if (financeDoc.exists()) {
           const data = financeDoc.data();
           if (data) {

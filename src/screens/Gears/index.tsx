@@ -1,4 +1,4 @@
-import { Entypo, FontAwesome, FontAwesome5, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { Entypo, FontAwesome, Ionicons } from "@expo/vector-icons";
 import { getAuth, signOut, deleteUser } from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
@@ -25,7 +25,7 @@ import {
   DangerIcon,
   WarningIcon,
 } from "./styles";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
 
 // Interface para os itens de menu
 interface MenuItemProps {
@@ -140,13 +140,13 @@ export function Gears() {
     }
   }
 
-  function handlePiggyBank() {
-    navigation.navigate("piggybank");
-  }
+  // function handlePiggyBank() {
+  //   navigation.navigate("piggybank");
+  // }
 
-  function handleGraphics() {
-    navigation.navigate("graphics");
-  }
+  // function handleGraphics() {
+  //   navigation.navigate("graphics");
+  // }
 
   function handlePefil() {
     navigation.navigate("perfil");
