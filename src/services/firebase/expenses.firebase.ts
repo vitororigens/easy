@@ -1,11 +1,12 @@
-import { database } from "../../libs/firebase";
-import { Timestamp, collection, addDoc, doc, updateDoc, getDoc, getDocs, query, where, deleteDoc } from "@react-native-firebase/firestore";
+import { Timestamp, collection, addDoc, doc, updateDoc, getDoc, getDocs, query, where, deleteDoc, getFirestore, FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 
 type TShareInfo = {
   acceptedAt: Timestamp | null;
   uid: string;
   userName: string;
 };
+
+const database = getFirestore();
 
 export interface IExpense {
   id?: string;
@@ -41,7 +42,7 @@ export const findExpenseById = async (id: string) => {
 export const listExpenses = async (uid: string) => {
   const q = query(collection(database, "Expenses"), where("uid", "==", uid));
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) => ({
+  return querySnapshot.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
     id: doc.id,
     ...doc.data(),
   } as IExpense));
@@ -54,14 +55,14 @@ export const listExpensesSharedWithMe = async (uid: string) => {
   );
   const querySnapshot = await getDocs(q);
 
-  const expenses = querySnapshot.docs.map((doc) => ({
+  const expenses = querySnapshot.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
     id: doc.id,
     ...doc.data(),
   } as IExpense));
 
-  return expenses.filter((n) =>
+  return expenses.filter((n: IExpense) =>
     n.shareInfo.some(
-      ({ uid: shareUid, acceptedAt }) => shareUid === uid && acceptedAt !== null
+      ({ uid: shareUid, acceptedAt }: { uid: string, acceptedAt: Timestamp | null }) => shareUid === uid && acceptedAt !== null
     )
   );
 };

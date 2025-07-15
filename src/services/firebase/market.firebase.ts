@@ -1,12 +1,13 @@
-import { collection, addDoc, doc, getDoc, getDocs, query, where, writeBatch, deleteDoc, updateDoc } from '@react-native-firebase/firestore';
-import { database } from '../../libs/firebase';
-import { Timestamp } from "@react-native-firebase/firestore";
+import { collection, addDoc, doc, getDoc, getDocs, query, where, writeBatch, deleteDoc, updateDoc, getFirestore } from '@react-native-firebase/firestore';
+import { Timestamp, FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 
 type TShareInfo = {
   acceptedAt: Timestamp | null;
   uid: string;
   userName: string;
 };
+
+const database = getFirestore();
 
 export interface IMarket {
   id: string;
@@ -58,7 +59,7 @@ export const listMarkets = async (uid: string) => {
   const q = query(collection(database, "Markets"), where("uid", "==", uid));
   const querySnapshot = await getDocs(q);
   
-  const markets = querySnapshot.docs.map((doc) => ({
+  const markets = querySnapshot.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
     id: doc.id,
     ...doc.data(),
     isOwner: true
@@ -78,13 +79,13 @@ export const listMarketsSharedWithMe = async (uid: string) => {
   );
   const querySnapshot = await getDocs(q);
 
-    const markets = querySnapshot.docs.map((doc) => {
+    const markets = querySnapshot.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
       const data = doc.data();
       console.log("Documento encontrado:", {
         id: doc.id,
-        shareWith: data.shareWith,
-        shareInfo: data.shareInfo,
-        uid: data.uid
+        shareWith: data['shareWith'],
+        shareInfo: data['shareInfo'],
+        uid: data['uid']
       });
       return {
     id: doc.id,
@@ -96,7 +97,7 @@ export const listMarketsSharedWithMe = async (uid: string) => {
     console.log("Mercados encontrados:", markets);
 
     // Filtrar apenas os mercados onde o usuário está em shareWith
-    const filteredMarkets = markets.filter((market) => {
+    const filteredMarkets = markets.filter((market: IMarket) => {
       const shareInfo = market.shareInfo?.find(info => info.uid === uid);
       console.log("Verificando mercado:", {
         id: market.id,
@@ -129,9 +130,9 @@ export const listMarketsSharedByMe = async (uid: string): Promise<IMarket[]> => 
   const querySnapshot = await getDocs(q);
 
   const markets = querySnapshot.docs
-    .map((doc) => ({ id: doc.id, ...doc.data() } as IMarket))
+    .map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() } as IMarket))
     .filter(
-      (doc) => Array.isArray(doc.shareWith) && doc.shareWith.length > 0
+      (doc: IMarket) => Array.isArray(doc.shareWith) && doc.shareWith.length > 0
     ) as IMarket[];
 
   return markets;

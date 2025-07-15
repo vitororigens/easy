@@ -239,8 +239,8 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
       await updateNote({
         id: selectedItemId,
         name,
-        author,
-        type,
+        author: author ?? "",
+        type: type ?? "",
         description,
         shareInfo: sharedUsers.map((user) => ({
           uid: user.uid,
@@ -327,9 +327,8 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
     <>
       <DefaultContainer
         backButton
-        hasHeader={false}
         title="Adicionar nova nota"
-        closeModalFn={closeBottomSheet}
+        {...(closeBottomSheet ? { closeModalFn: closeBottomSheet } : {})}
       >
         <Content>
           <ScrollView
@@ -412,10 +411,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
 
             {isCreator && (
               <FormProvider {...form}>
-                <ShareWithUsers
-                  control={control as any}
-                  name="sharedUsers"
-                />
+                 <ShareWithUsers />
               </FormProvider>
             )}
 

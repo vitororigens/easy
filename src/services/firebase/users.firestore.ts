@@ -1,5 +1,7 @@
-import { collection, addDoc, doc, getDoc, getDocs, query, where, updateDoc, deleteDoc, setDoc } from '@react-native-firebase/firestore';
-import { database } from '../../libs/firebase';
+import { collection, addDoc, doc, getDoc, getDocs, query, where, updateDoc, deleteDoc, setDoc, getFirestore } from '@react-native-firebase/firestore';
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+
+const database = getFirestore();
 
 export interface IUser {
   uid: string;
@@ -53,7 +55,7 @@ const ensureFavoritesProperty = async (userId: string): Promise<string[]> => {
     console.log("ensureFavoritesProperty: Dados encontrados:", userData);
     
     // Se a propriedade favorites não existe, inicializa com array vazio
-    if (!Array.isArray(userData.favorites)) {
+    if (!Array.isArray(userData['favorites'])) {
       console.log("ensureFavoritesProperty: Propriedade favorites não existe, inicializando...");
       await updateDoc(userRef, {
         favorites: [],
@@ -62,8 +64,8 @@ const ensureFavoritesProperty = async (userId: string): Promise<string[]> => {
       return [];
     }
     
-    console.log("ensureFavoritesProperty: Favoritos encontrados:", userData.favorites);
-    return userData.favorites;
+    console.log("ensureFavoritesProperty: Favoritos encontrados:", userData['favorites']);
+    return userData['favorites'];
   } catch (error) {
     console.error("ensureFavoritesProperty: Erro:", error);
     return [];
@@ -103,11 +105,11 @@ export const findUserByUsername = async (username: string, me: string) => {
     const querySnapshot = await getDocs(q);
     
     return querySnapshot.docs
-      .map((docSnapshot) => ({
+      .map((docSnapshot: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
         uid: docSnapshot.id,
         ...docSnapshot.data(),
       }))
-      .filter(user => user.uid !== me) as IUser[];
+      .filter((user: IUser) => user.uid !== me) as IUser[];
   } catch (error) {
     console.error("Error in findUserByUsername:", error);
     return [];
@@ -154,7 +156,7 @@ export const removeFromFavorites = async (userId: string, favoriteUserId: string
     
     const userRef = doc(database, "User", userId);
     await updateDoc(userRef, {
-      favorites: favorites.filter(id => id !== favoriteUserId),
+      favorites: favorites.filter((id: string) => id !== favoriteUserId),
       updatedAt: new Date()
     });
     console.log("removeFromFavorites: Favorito removido com sucesso");
@@ -195,7 +197,7 @@ export const getFavorites = async (userId: string): Promise<IUser[]> => {
       })
     );
     
-    const validUsers = favoritesUsers.filter((user): user is IUser => user !== null);
+    const validUsers = favoritesUsers.filter((user: IUser | null): user is IUser => user !== null);
     console.log("getFavorites: Usuários válidos encontrados:", validUsers.length);
     return validUsers;
   } catch (error) {

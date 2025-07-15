@@ -8,9 +8,12 @@ import {
   getDocs, 
   query, 
   where, 
-  deleteDoc 
+  deleteDoc,
+  getFirestore
 } from "@react-native-firebase/firestore";
-import { database } from "../../libs/firebase";
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+
+const database = getFirestore();
 
 export interface ICalendarEvent {
   id: string;
@@ -65,7 +68,7 @@ export async function listEvents(userId: string) {
     const q = query(colRef, where('userId', '==', userId));
     const querySnapshot = await getDocs(q);
 
-    return querySnapshot.docs.map((docSnap) => ({
+    return querySnapshot.docs.map((docSnap: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
       id: docSnap.id,
       ...docSnap.data(),
     })) as ICalendarEvent[];
@@ -81,7 +84,7 @@ export async function listSharedEvents(userId: string) {
     const q = query(colRef, where('sharedWith', 'array-contains', userId));
     const querySnapshot = await getDocs(q);
 
-    return querySnapshot.docs.map((docSnap) => ({
+    return querySnapshot.docs.map((docSnap: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
       id: docSnap.id,
       ...docSnap.data(),
     })) as ICalendarEvent[];
@@ -125,13 +128,13 @@ export async function deleteCalendarEvent(eventId: string, userId: string) {
     }
 
     // Se o usuário é o criador, excluir completamente
-    if (eventData.userId === userId) {
+    if (eventData['userId'] === userId) {
       await deleteDoc(docRef);
       console.log("Evento excluído completamente:", eventId);
     } else {
       // Se não é o criador, apenas remover do compartilhamento
-      if (eventData.sharedWith && Array.isArray(eventData.sharedWith)) {
-        const updatedSharedWith = eventData.sharedWith.filter((uid: string) => uid !== userId);
+        if (eventData['sharedWith'] && Array.isArray(eventData['sharedWith'])) {
+        const updatedSharedWith = eventData['sharedWith'].filter((uid: string) => uid !== userId);
         await updateDoc(docRef, { sharedWith: updatedSharedWith });
         console.log("Usuário removido do compartilhamento:", eventId);
       }

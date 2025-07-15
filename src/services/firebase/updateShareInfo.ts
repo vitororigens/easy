@@ -1,5 +1,6 @@
-import { database } from "../../libs/firebase";
-import { doc, getDoc, updateDoc, Timestamp } from "@react-native-firebase/firestore";
+import { doc, getDoc, updateDoc, Timestamp, getFirestore } from "@react-native-firebase/firestore";
+
+const database = getFirestore();
 
 export const updateNotes = async (sourceId: string, receiverId: string) => {
   console.log("Atualizando nota:", { sourceId, receiverId });
@@ -12,12 +13,12 @@ export const updateNotes = async (sourceId: string, receiverId: string) => {
       const data = docSnap.data() as { shareInfo?: any[] };
       console.log("Dados atuais da nota:", data);
       
-      if (!data.shareInfo) {
+      if (!data['shareInfo']) {
         console.log("Nota não tem shareInfo");
         return;
       }
 
-      const updatedShareinfo = data.shareInfo.map((item: any) => {
+      const updatedShareinfo = data['shareInfo'].map((item: any) => {
         if (item.uid === receiverId) {
           console.log("Atualizando acceptedAt para usuário:", item.uid);
           return {
@@ -48,7 +49,7 @@ export const updateExpenses = async (sourceId: string, receiverId: string) => {
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
     const data = docSnap.data();
-    const updatedShareinfo = data?.shareInfo.map((item: any) => {
+    const updatedShareinfo = data?.['shareInfo'].map((item: any) => {
       if (item.uid === receiverId) {
         item.acceptedAt = new Date();
       }
@@ -68,7 +69,7 @@ export const updateMarkets = async (sourceId: string, receiverId: string) => {
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
     const data = docSnap.data();
-    const updatedShareinfo = data?.shareInfo.map((item: any) => {
+    const updatedShareinfo = data?.['shareInfo'].map((item: any) => {
       if (item.uid === receiverId) {
         item.acceptedAt = new Date();
       }

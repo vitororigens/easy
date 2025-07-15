@@ -1,13 +1,8 @@
-import { collection, addDoc, doc, updateDoc, getDoc, getDocs, query, where, deleteDoc, FieldValue } from '@react-native-firebase/firestore';
-import { database } from '../../libs/firebase';
+import { collection, addDoc, doc, updateDoc, getDoc, getDocs, query, where, deleteDoc, getFirestore, FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Timestamp } from "@react-native-firebase/firestore";
 import firestore from '@react-native-firebase/firestore';
 
-type TShareInfo = {
-  acceptedAt: Timestamp | null;
-  uid: string;
-  userName: string;
-};
+const database = getFirestore();
 
 export interface INote {
   id: string;
@@ -62,7 +57,7 @@ export const listNotes = async (uid: string) => {
   const q = query(collection(database, "Notes"), where("uid", "==", uid));
   const querySnapshot = await getDocs(q);
 
-  return (querySnapshot.docs.map((doc) => ({
+  return (querySnapshot.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
     id: doc.id,
     ...doc.data(),
   })) ?? []) as INote[];
@@ -79,7 +74,7 @@ export const listNotesSharedWithMe = async (uid: string) => {
     );
     const querySnapshot = await getDocs(q);
 
-    const notes = querySnapshot.docs.map((doc) => ({
+    const notes = querySnapshot.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data(),
     })) as INote[];
@@ -88,7 +83,7 @@ export const listNotesSharedWithMe = async (uid: string) => {
     console.log("Notas encontradas:", notes);
 
     // Filtrar apenas as notas onde o usuário tem acceptedAt não nulo
-    const filteredNotes = notes.filter((note) => {
+    const filteredNotes = notes.filter((note: INote) => {
       const shareInfo = note.shareInfo?.find(info => info.uid === uid);
       console.log("Nota:", note.id, "ShareInfo:", shareInfo);
       return shareInfo && shareInfo.acceptedAt !== null;
@@ -115,9 +110,9 @@ export const listNotesSharedByMe = async (uid: string): Promise<INote[]> => {
   const querySnapshot = await getDocs(q);
 
   const notes = querySnapshot.docs
-    .map((doc) => ({ id: doc.id, ...doc.data() } as INote))
+    .map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() } as INote))
     .filter(
-      (doc) => Array.isArray(doc.shareWith) && doc.shareWith.length > 0
+      (doc: INote) => Array.isArray(doc.shareWith) && doc.shareWith.length > 0
     ) as INote[];
 
   return notes;

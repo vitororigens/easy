@@ -46,7 +46,7 @@ export function Perfil() {
   const [image, setImage] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
 
-  const { setValue, reset } = useForm<FormSchemaType>({
+  const { setValue } = useForm<FormSchemaType>({
     defaultValues: {
       image: undefined,
     },
@@ -61,9 +61,9 @@ export function Perfil() {
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             const data = docSnap.data();
-            if (data?.image) {
-              setImage(data.image);
-              setValue("image", data.image);
+            if (data?.['image']) {
+              setImage(data['image']);
+              setValue("image", data['image']);
             }
           }
 
@@ -110,11 +110,12 @@ export function Perfil() {
         quality: 1,
       });
 
-      if (!result.canceled) {
+      if (!result.canceled && result.assets && result.assets[0]?.uri) {
         const uri = result.assets[0].uri;
-        setImage(uri);
-        setValue("image", uri);
-        await handleSaveItem({ image: uri });
+        const uploadedUrl = await uploadImage(uri);
+        setImage(uploadedUrl);
+        setValue("image", uploadedUrl);
+        await handleSaveItem({ image: uploadedUrl });
       }
     } catch (error) {
       console.error("Error picking image: ", error);

@@ -1,38 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, Modal, TouchableOpacity, View } from "react-native";
-import { Toast } from "react-native-toast-notifications";
-import { Container } from "../../components/Container";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { ItemsAccounts } from "../../components/ItemsAccounts";
-import { LoadData } from "../../components/LoadData";
-import { Loading } from "../../components/Loading";
-import { useMonth } from "../../context/MonthProvider";
-import useFirestoreCollection from "../../hooks/useFirestoreCollection";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { ButtonClose, Content, Title } from "./styles";
-import { database } from "../../libs/firebase";
-import { NewLaunch } from "../NewLaunch";
-
-type Props = {
-  closeBottomSheet?: () => void;
-  onCloseModal?: () => void;
-  showButtonEdit?: boolean;
-  showButtonSave?: boolean;
-  showButtonRemove?: boolean;
-};
+import React, { useEffect, useState } from 'react';
+import { FlatList, Modal, TouchableOpacity, View } from 'react-native';
+import { Toast } from 'react-native-toast-notifications';
+import { Container } from '../../components/Container';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { ItemsAccounts } from '../../components/ItemsAccounts';
+import { LoadData } from '../../components/LoadData';
+import { Loading } from '../../components/Loading';
+import { useMonth } from '../../context/MonthProvider';
+import useFirestoreCollection from '../../hooks/useFirestoreCollection';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { Content, FooterSpacer, ModalCloseButton, ModalCloseTitle } from './styles';
+import { database } from '../../libs/firebase';
+import { NewLaunch } from '../NewLaunch';
 
 export function ListaDeContas() {
   const { selectedMonth } = useMonth();
   const user = useUserAuth();
   const uid = user.user?.uid;
-  const [status, setStatus] = useState(false);
-  const revenue = useFirestoreCollection("Revenue");
-  const expense = useFirestoreCollection("Expense");
+  const expense = useFirestoreCollection('Expense');
   const [confirmExpenseVisible, setConfirmExpenseVisible] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState("");
-  const [selectedItems, setSelectedItems] = useState<{
-    [key: string]: boolean;
-  }>({});
+  const [selectedItemId, setSelectedItemId] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
 
   function handleExpenseConfirmation(documentId: string) {
@@ -41,7 +28,7 @@ export function ListaDeContas() {
   }
 
   function handleStatus(itemId: string) {
-    const docRef = database.collection("Expense").doc(itemId);
+    const docRef = database.collection('Expense').doc(itemId);
     const selected = expense.data.find((item) => item.id === itemId);
 
     docRef
@@ -50,13 +37,9 @@ export function ListaDeContas() {
       })
       .then(() => {})
       .catch(() => {
-        Toast.show("Erro ao atualizar despesa", { type: "error" });
+        Toast.show('Erro ao atualizar despesa', { type: 'error' });
       });
   }
-
-  const selectedTrueItems = Object.entries(selectedItems)
-    .filter(([key, value]) => value)
-    .map(([key]) => key);
 
   // console.log(expense.filter((item) => item.uid === uid));
   useEffect(() => {
@@ -73,7 +56,7 @@ export function ListaDeContas() {
 
   return (
     <View>
-      <DefaultContainer monthButton addButton listButtom>
+      <DefaultContainer monthButton>
         <Container
           type="SECONDARY"
           title="Lista de contas a pagar"
@@ -85,7 +68,7 @@ export function ListaDeContas() {
                 (item) =>
                   item.uid === uid &&
                   ((item.repeat === true && item.month === selectedMonth) ||
-                    (item.repeat === false && item.month === selectedMonth))
+                    (item.repeat === false && item.month === selectedMonth)),
               )}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -112,7 +95,7 @@ export function ListaDeContas() {
                   subtitle="Você ainda não possui lançamentos de saídas! Comece lançando uma nova saída."
                 />
               }
-              ListFooterComponent={<View style={{ height: 90 }} />}
+              ListFooterComponent={<FooterSpacer />}
             />
           </Content>
         </Container>
@@ -122,15 +105,12 @@ export function ListaDeContas() {
         visible={confirmExpenseVisible}
         onRequestClose={() => setConfirmExpenseVisible(false)}
       >
-        <DefaultContainer hasHeader={false}>
-          <ButtonClose
-            onPress={() => setConfirmExpenseVisible(false)}
-            style={{ alignSelf: "flex-end", marginBottom: 32 }}
-          >
-            <Title style={{ color: "white" }}>Fechar</Title>
-          </ButtonClose>
-          <Container type="SECONDARY" title={"Editar Saída"}>
-            <NewLaunch />
+        <DefaultContainer>
+          <ModalCloseButton onPress={() => setConfirmExpenseVisible(false)}>
+            <ModalCloseTitle>Fechar</ModalCloseTitle>
+          </ModalCloseButton>
+          <Container type="SECONDARY" title={'Editar Saída'}>
+            <NewLaunch selectedItemId={selectedItemId} />
           </Container>
         </DefaultContainer>
       </Modal>

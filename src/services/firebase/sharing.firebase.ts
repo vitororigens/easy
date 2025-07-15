@@ -1,7 +1,7 @@
-import { collection, addDoc, doc, getDoc, getDocs, query, where, orderBy, updateDoc, deleteDoc } from '@react-native-firebase/firestore';
-import { database } from '../../libs/firebase';
-import { Optional } from "../../@types/optional";
-import { Timestamp } from "@react-native-firebase/firestore";
+import { collection, addDoc, doc, getDoc, getDocs, query, where, orderBy, updateDoc, deleteDoc, getFirestore } from '@react-native-firebase/firestore';
+import { Timestamp, FirebaseFirestoreTypes} from "@react-native-firebase/firestore";
+
+const database = getFirestore();
 
 export type TSharingStatus = "accepted" | "pending" | "rejected";
 
@@ -64,7 +64,7 @@ export const getSharing = async ({ uid, profile, status }: IGetSharing) => {
   q = query(q, orderBy("createdAt", "desc"));
   const querySnapshot = await getDocs(q);
 
-  return (querySnapshot.docs.map((docSnapshot) => ({
+  return (querySnapshot.docs.map((docSnapshot: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
     id: docSnapshot.id,
     ...docSnapshot.data(),
   })) ?? []) as ISharing[];

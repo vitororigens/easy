@@ -203,7 +203,7 @@ export const useRateLimit = (action: string, config?: RateLimitConfig) => {
 
 // Decorator para adicionar rate limiting a métodos
 export const withRateLimit = (action: string, config?: RateLimitConfig) => {
-  return function (target: any, propertyName: string, descriptor: PropertyDescriptor) {
+  return function ( propertyName: string, descriptor: PropertyDescriptor) {
     const method = descriptor.value;
     const limiter = config ? new RateLimiter(config) : rateLimiters[action as keyof typeof rateLimiters];
 

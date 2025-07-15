@@ -1,6 +1,7 @@
-import { collection, addDoc, doc, getDoc, getDocs, query, where, orderBy, updateDoc, deleteDoc, Timestamp } from '@react-native-firebase/firestore';
-import { database } from '../../libs/firebase';
+import { collection, addDoc, doc, getDoc, getDocs, query, where, orderBy, updateDoc, deleteDoc, Timestamp, FirebaseFirestoreTypes, getFirestore } from '@react-native-firebase/firestore';
 import { updateExpenses, updateMarkets, updateNotes, updateEvents } from "./updateShareInfo";
+
+const database = getFirestore();
 
 export type TNotificationType =
   | "sharing_invite"
@@ -75,18 +76,18 @@ export const getNotifications = async ({ uid, profile }: IGetNotifications) => {
   const querySnapshot = await getDocs(q);
 
   const notifications = querySnapshot.docs
-    .map((docSnapshot) => {
+    .map((docSnapshot: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
       const data = docSnapshot.data();
-      if (!data.createdAt) {
-        data.createdAt = Timestamp.now();
+      if (!data['createdAt']) {
+        data['createdAt'] = Timestamp.now();
       }
       return {
         id: docSnapshot.id,
         ...data
       } as INotification;
     })
-    .filter(notification => notification.createdAt)
-    .sort((a, b) => {
+    .filter((notification: INotification) => notification.createdAt)
+    .sort((a: INotification, b: INotification) => {
       try {
         if (!a.createdAt || !b.createdAt) return 0;
         return b.createdAt.toMillis() - a.createdAt.toMillis();

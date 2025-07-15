@@ -3,11 +3,6 @@ import styled from "styled-components/native";
 
 export type subTitleTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
-type Props = {
-    type: subTitleTypeStyleProps;
-}
-
-
 export const Content = styled.View`
     flex: 1;
     background-color: ${({ theme }) => theme.COLORS.WHITE};
@@ -63,4 +58,17 @@ export const Button = styled(TouchableOpacity)`
     border-bottom-color: ${({ theme }) => theme.COLORS.PURPLE_800};
     align-items: center;
     justify-content: center;
+`;
+
+export const FooterSpacer = styled.View`
+  height: 90px;
+`;
+
+export const ModalCloseButton = styled(TouchableOpacity)`
+  align-self: flex-end;
+  margin-bottom: 32px;
+`;
+
+export const ModalCloseTitle = styled(Title)`
+  color: ${({ theme }) => theme.COLORS.WHITE};
 `;

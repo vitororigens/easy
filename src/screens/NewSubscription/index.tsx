@@ -41,7 +41,6 @@ export function NewSubscription() {
   const {
     control,
     handleSubmit,
-    reset,
     setValue,
     formState: { errors },
   } = useForm<FormData>({
@@ -133,7 +132,7 @@ export function NewSubscription() {
                   onChangeText={onChange}
                   value={value}
                   placeholder="Ex: Netflix"
-                  errorMessage={errors.name?.message}
+                  errorMessage={errors.name?.message ?? ""}
                 />
               )}
             />
@@ -152,7 +151,7 @@ export function NewSubscription() {
                   value={value}
                   placeholder="R$ 0,00"
                   keyboardType="numeric"
-                  errorMessage={errors.value?.message}
+                  errorMessage={errors.value?.message ?? ""}
                 />
               )}
             />
@@ -175,7 +174,7 @@ export function NewSubscription() {
                   value={value}
                   placeholder="Dia (1-31)"
                   keyboardType="numeric"
-                  errorMessage={errors.dueDay?.message}
+                  errorMessage={errors.dueDay?.message ?? ""}
                 />
               )}
             />

@@ -1,5 +1,7 @@
-import { collection, addDoc, getDocs, query, where, deleteDoc, doc, updateDoc } from '@react-native-firebase/firestore';
-import { db } from './config';
+import { collection, addDoc, getDocs, query, where, deleteDoc, doc, updateDoc, getFirestore } from '@react-native-firebase/firestore';
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+
+const database = getFirestore();
 
 export interface Subscription {
   id?: string;
@@ -21,7 +23,7 @@ export const createSubscription = async (subscription: Omit<Subscription, 'id' |
       updatedAt: new Date(),
     };
 
-    const docRef = await addDoc(collection(db, 'subscriptions'), subscriptionData);
+    const docRef = await addDoc(collection(database, 'subscriptions'), subscriptionData);
     return { id: docRef.id, ...subscriptionData };
   } catch (error) {
     console.error('Erro ao criar assinatura:', error);
@@ -31,9 +33,9 @@ export const createSubscription = async (subscription: Omit<Subscription, 'id' |
 
 export const getSubscriptions = async (userId: string) => {
   try {
-    const q = query(collection(db, 'subscriptions'), where('userId', '==', userId));
+    const q = query(collection(database, 'subscriptions'), where('userId', '==', userId));
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
+    return querySnapshot.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data()
     })) as Subscription[];
@@ -45,7 +47,7 @@ export const getSubscriptions = async (userId: string) => {
 
 export const deleteSubscription = async (subscriptionId: string) => {
   try {
-    await deleteDoc(doc(db, 'subscriptions', subscriptionId));
+    await deleteDoc(doc(database, 'subscriptions', subscriptionId));
   } catch (error) {
     console.error('Erro ao deletar assinatura:', error);
     throw error;
@@ -54,7 +56,7 @@ export const deleteSubscription = async (subscriptionId: string) => {
 
 export const updateSubscription = async (subscriptionId: string, data: Partial<Subscription>) => {
   try {
-    const subscriptionRef = doc(db, 'subscriptions', subscriptionId);
+    const subscriptionRef = doc(database, 'subscriptions', subscriptionId);
     await updateDoc(subscriptionRef, {
       ...data,
       updatedAt: new Date(),

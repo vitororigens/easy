@@ -1,5 +1,4 @@
 import { OneSignal } from "react-native-onesignal";
-import Constants from "expo-constants";
 import axios from "axios";
 
 const ONESIGNAL_APP_ID = "04b5e397-b327-469b-a9f2-9ac8a22a039f";

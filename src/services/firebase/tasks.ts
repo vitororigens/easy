@@ -1,14 +1,14 @@
-import { collection, addDoc, doc, getDoc, getDocs, query, where, updateDoc, deleteDoc } from '@react-native-firebase/firestore';
-import { database } from '../../libs/firebase';
+import { collection, addDoc, doc, getDoc, getDocs, query, where, updateDoc, deleteDoc, getFirestore } from '@react-native-firebase/firestore';
 import { Optional } from "../../@types/optional";
-import { Timestamp } from "@react-native-firebase/firestore";
-import { NewTask } from "../../screens/NewTask/index";
+import { Timestamp, FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 
 type TShareInfo = {
   acceptedAt: Timestamp | null;
   uid: string;
   userName: string;
 };
+
+const database = getFirestore();
 
 export interface ITask {
   id: string;
@@ -45,7 +45,7 @@ export const listTasks = async (uid: string) => {
   const q = query(collection(database, "Tasks"), where("uid", "==", uid));
   const querySnapshot = await getDocs(q);
 
-  return (querySnapshot.docs.map((docSnapshot) => ({
+  return (querySnapshot.docs.map((docSnapshot: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
     id: docSnapshot.id,
     ...docSnapshot.data(),
   })) ?? []) as ITask[];
@@ -79,7 +79,7 @@ export const listNotes = async (uid: string) => {
   const q = query(collection(database, "Notes"), where("uid", "==", uid));
   const querySnapshot = await getDocs(q);
 
-  return (querySnapshot.docs.map((docSnapshot) => ({
+  return (querySnapshot.docs.map((docSnapshot: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
     id: docSnapshot.id,
     ...docSnapshot.data(),
   })) ?? []) as ITask[];
@@ -92,14 +92,14 @@ export const listTaskSharedWithMe = async (uid: string) => {
   );
   const querySnapshot = await getDocs(q);
 
-  const tasks = (querySnapshot.docs.map((docSnapshot) => ({
+  const tasks = (querySnapshot.docs.map((docSnapshot: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
     id: docSnapshot.id,
     ...docSnapshot.data(),
   })) ?? []) as ITask[];
 
-  const findTasks = tasks.filter((task) =>
+  const findTasks = tasks.filter((task: ITask) =>
     task.shareInfo.some(
-      (shareInfo) => shareInfo.uid === uid && shareInfo.acceptedAt !== null
+      (shareInfo: TShareInfo) => shareInfo.uid === uid && shareInfo.acceptedAt !== null
     )
   );
 
@@ -114,7 +114,7 @@ export const listNotesSharedByMe = async (uid: string) => {
   );
   const querySnapshot = await getDocs(q);
 
-  return (querySnapshot.docs.map((docSnapshot) => ({
+  return (querySnapshot.docs.map((docSnapshot: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
     id: docSnapshot.id,
     ...docSnapshot.data(),
   })) ?? []) as ITask[];
@@ -128,7 +128,7 @@ export const listTasksSharedByMe = async (uid: string): Promise<ITask[]> => {
   );
   const querySnapshot = await getDocs(q);
 
-  return (querySnapshot.docs.map((docSnapshot) => ({
+  return (querySnapshot.docs.map((docSnapshot: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
     id: docSnapshot.id,
     ...docSnapshot.data(),
   })) ?? []) as ITask[];

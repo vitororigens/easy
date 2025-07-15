@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from "react";
-import { FlatList, Modal, Platform, View } from "react-native";
+import { FlatList } from "react-native";
 import { Toast } from "react-native-toast-notifications";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { ItemNotes } from "../../components/ItemNotes";
@@ -8,13 +8,6 @@ import { useUserAuth } from "../../hooks/useUserAuth";
 import {
   Container,
   Content,
-  ContentTitle,
-  DividerContent,
-  Icon,
-  SubTitle,
-  Title,
-  HeaderContainer,
-  SectionIcon,
   EmptyContainer,
 } from "./styles";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -128,11 +121,13 @@ export function Notes({ route }: any) {
             data={allNotes}
             renderItem={({ item }) => {
               const isSharedByMe = sharedNotesByMe.some(note => note.id === item.id);
+              // Converter createdAt para Date ao passar para ItemNotes
+              const itemWithDate = { ...item, createdAt: item.createdAt instanceof Timestamp ? item.createdAt.toDate() : item.createdAt };
               return (
                 <ItemNotes
-                  handleDelete={() => handleDeleteNote(item.id, item)}
+                  handleDelete={() => handleDeleteNote(item.id, item as any)}
                   handleUpdate={() => handleEditItem(item.id, !item.isShared)}
-                  note={item}
+                  note={itemWithDate as any}
                   isSharedByMe={isSharedByMe}
                 />
               );

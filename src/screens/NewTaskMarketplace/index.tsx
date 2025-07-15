@@ -27,7 +27,7 @@ export function NewTaskMarketplace({ closeBottomSheet }: Props) {
 
   return (
     <>
-      <DefaultContainer hasHeader={false}>
+      <DefaultContainer>
         <ButtonClose
           onPress={closeBottomSheet}
           style={{ alignSelf: "flex-end", marginBottom: 32 }}

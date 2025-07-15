@@ -1,4 +1,4 @@
-import { TextInput } from "react-native";
+import { TextInput, ScrollView, KeyboardAvoidingView } from "react-native";
 import styled from "styled-components/native";
 
 export const Container = styled.View`
@@ -48,4 +48,12 @@ export const TextError = styled.Text`
     font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
     
     margin-bottom: 5px;
+`;
+
+export const ScrollContent = styled(ScrollView).attrs({
+  contentContainerStyle: { flexGrow: 1 }
+})``;
+
+export const KeyboardAvoiding = styled(KeyboardAvoidingView)`
+  flex: 1;
 `;

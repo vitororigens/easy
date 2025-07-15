@@ -1,7 +1,5 @@
 import React from "react";
 import { ActivityIndicator, FlatList } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { useUserAuth } from "../../hooks/useUserAuth";
 import { DefaultContainer } from "../../components/DefaultContainer";
 import { useSubscriptionsCollection } from "../../hooks/useSubscriptionsCollection";
 import { format } from "date-fns";
@@ -20,7 +18,6 @@ import {
 } from "./styles";
 
 export function SubscriptionHistory() {
-  const navigation = useNavigation();
   const { subscriptions, loading, error } = useSubscriptionsCollection();
 
   const canceledSubscriptions = subscriptions.filter(sub => !sub.status);

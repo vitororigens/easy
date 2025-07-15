@@ -1,6 +1,5 @@
 import { Optional } from "../../@types/optional";
-import { database } from "../../libs/firebase";
-import { Timestamp, collection, doc, getDoc, getDocs, query, where, runTransaction, updateDoc, deleteDoc } from "@react-native-firebase/firestore";
+import { Timestamp, collection, doc, getDoc, getDocs, query, where, runTransaction, updateDoc, getFirestore, FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 import { IMarket } from "./market.firebase";
 import { IExpense } from "./expenses.firebase";
 
@@ -9,6 +8,8 @@ type TShareInfo = {
   uid: string;
   userName: string;
 };
+
+const database = getFirestore();
 
 export interface IMarketHistory {
   id: string;
@@ -102,21 +103,21 @@ export const listMarketHistories = async (uid: string) => {
     
     const querySnapshot = await getDocs(q);
     
-    const histories = querySnapshot.docs.map((doc) => {
+    const histories = querySnapshot.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
       const data = doc.data();
       console.log('Documento encontrado:', doc.id, data);
       return {
         id: doc.id,
         ...data,
-        markets: data.markets || [],
+        markets: data['markets'] || [],
       } as IMarketHistory;
     });
 
     console.log('Total de históricos encontrados:', histories.length);
     
     // Filtra novamente para garantir que só retorne do usuário correto
-    const filteredHistories = histories.filter(history => {
-      const isOwner = history.uid === uid;
+    const filteredHistories = histories.filter((history: IMarketHistory) => {
+      const isOwner = history.uid === uid;  
       if (!isOwner) {
         console.log('Histórico ignorado - UID diferente:', history.id, history.uid);
       }
@@ -143,13 +144,13 @@ export const listMarketHistoriesSharedWithMe = async (uid: string) => {
     
     const querySnapshot = await getDocs(q);
     
-    const marketHistories = querySnapshot.docs.map((doc) => {
+    const marketHistories = querySnapshot.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
       const data = doc.data();
       console.log('Documento compartilhado encontrado:', doc.id, data);
       return {
         id: doc.id,
         ...data,
-        markets: data.markets || [],
+        markets: data['markets'] || [],
       } as IMarketHistory;
     });
 
@@ -158,10 +159,10 @@ export const listMarketHistoriesSharedWithMe = async (uid: string) => {
     // Filtra para garantir que:
     // 1. O histórico NÃO é do próprio usuário
     // 2. O usuário está na lista de compartilhamento E aceitou
-    const filteredHistories = marketHistories.filter((history) => {
+    const filteredHistories = marketHistories.filter((history: IMarketHistory) => {
       const isNotOwner = history.uid !== uid;
       const hasAccepted = history.shareInfo?.some(
-        (info) => info.uid === uid && info.acceptedAt !== null
+        (info: TShareInfo) => info.uid === uid && info.acceptedAt !== null
       );
 
       if (!isNotOwner) {
