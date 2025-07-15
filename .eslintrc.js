@@ -2,7 +2,7 @@ module.exports = {
   root: true,
   extends: [
     'expo',
-    '@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
   parser: '@typescript-eslint/parser',
   plugins: [
@@ -78,7 +78,6 @@ module.exports = {
     'react-native/no-raw-text': 'off',
   },
   env: {
-    'react-native/react-native': true,
     es6: true,
     node: true,
   },
