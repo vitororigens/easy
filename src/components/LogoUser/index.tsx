@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Container, ContainerIcon, Icon, StyledImage, Title } from "./styles";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { database } from "../../libs/firebase";
-import { doc, onSnapshot } from "@react-native-firebase/firestore";
+import { doc, onSnapshot, getFirestore } from "@react-native-firebase/firestore"; 
 
 type LogoUserProps = {
   color: string;
@@ -12,22 +11,24 @@ export function LogoUser({ color }: LogoUserProps) {
   const user = useUserAuth();
   const uid = user.user?.uid;
   const [image, setImage] = useState<string | null>(null);
+  const db = getFirestore();
 
   useEffect(() => {
     if (uid) {
-      const docRef = doc(database, "Perfil", uid);
+      const docRef = doc(db, "Perfil", uid);
       
       const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
         console.log("Document snapshot received: ", docSnapshot.data());
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
-          setImage(data?.image ?? null);
+          setImage(data?.['image'] ?? null);
         }
       });
 
       // Cleanup the listener on component unmount
       return () => unsubscribe();
     }
+    return undefined;
   }, [uid]);
 
   function getInitials(name: string | undefined): string {

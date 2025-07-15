@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View } from "react-native";
-import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { formatCurrency } from "../../utils/mask";
 import { findUserById } from "../../services/firebase/users.firestore";
 import {

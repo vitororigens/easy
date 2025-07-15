@@ -1,6 +1,5 @@
 import { TouchableOpacity } from "react-native";
 import { Popover } from "react-native-popper";
-import { useTheme } from "styled-components/native";
 import { ContainerMenu } from "../Items/styles";
 import {
     Button,
@@ -31,24 +30,11 @@ export function ItemsAccounts({
   handleStatus,
   category,
   date,
-  status,
-  type,
   selected,
   income,
   handleExpenseConfirmation
 }: ItemsProps) {
   const transactionType = income ? "Despesa fixa" : "Despesa variável";
-  const { COLORS } = useTheme();
-  const textStatus = status ? "Pago" : "Pendente";
-  const typeMode = type === "input" ? transactionType : textStatus;
-  const dateToday = formatDate(new Date());
-
-  function formatDate(date: Date): string {
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
 
   return (
     <Container>

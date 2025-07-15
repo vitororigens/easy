@@ -42,7 +42,7 @@ export function EditshareModal({
       const querySnapshot = await getDocs(q);
       
       if (!querySnapshot.empty) {
-        const results = querySnapshot.docs.map((doc) => ({
+        const results = querySnapshot.docs.map((doc: any) => ({
           uid: doc.id,
           ...doc.data(),
         }));

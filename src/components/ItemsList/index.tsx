@@ -3,7 +3,6 @@ import { TouchableOpacity, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import {
   Container,
-  Content,
   Title,
   Description,
   Actions,
@@ -45,7 +44,6 @@ export function ItemsList({
 
   return (
     <Container>
-      <Content>
         <TouchableOpacity onPress={onPress} style={{ flex: 1 }}>
           <Title>{title}</Title>
           {description && <Description>{description}</Description>}
@@ -85,7 +83,6 @@ export function ItemsList({
             </Popover>
           </View>
         </Actions>
-      </Content>
     </Container>
   );
 }

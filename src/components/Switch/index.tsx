@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { Container, CustomSwitch, Title } from './styles';
 
 type SwitchProps = {

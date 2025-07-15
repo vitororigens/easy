@@ -40,10 +40,6 @@ export function InputDate({ value, onChange, onBlur, placeholder = "Data" }: Inp
     }
   };
 
-  const handleInputFocus = () => {
-    setShowCalendar(true);
-  };
-
   const handleInputBlur = () => {
     if (onBlur) {
       onBlur();
@@ -54,7 +50,6 @@ export function InputDate({ value, onChange, onBlur, placeholder = "Data" }: Inp
     <View style={{ width: '100%' }}>
       <Input
         placeholder={placeholder}
-        type="TERTIARY"
         name="calendar"
         showIcon
        onFocus={() => setShowCalendar(true)}

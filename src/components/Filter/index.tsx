@@ -40,7 +40,6 @@ export function Filter() {
   return (
     <>
       <DefaultContainer
-        hasHeader={false}
         title="Filtrar"
         backButton
       >

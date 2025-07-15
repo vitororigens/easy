@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { TouchableOpacity, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { INote } from "../../interfaces/INote";
 import {
@@ -19,7 +18,6 @@ import {
   MainContent,
   Row,
 } from "./styles";
-import { useUserAuth } from "../../hooks/useUserAuth";
 import Popover from "react-native-popover-view";
 import { findUserById } from "../../services/firebase/users.firestore";
 
@@ -36,7 +34,6 @@ export function ItemNotes({
   handleUpdate,
   isSharedByMe = false,
 }: ItemNotesProps) {
-  const { user } = useUserAuth();
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
   const [sharedByUserName, setSharedByUserName] = useState<string>("");
   const popoverRef = useRef(null);

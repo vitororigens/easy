@@ -6,7 +6,6 @@ import {
   View,
   TouchableOpacity,
   Alert,
-  Text,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
@@ -32,7 +31,7 @@ import {
   CloseButtonText,
   TextCircle,
 } from "./styles";
-import { useFormContext, Control } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { getInitials } from "../../utils/getInitials";
 import { SubTitle } from "../DefaultContainer/style";
@@ -46,7 +45,6 @@ import {
   getFavorites,
 } from "../../services/firebase/users.firestore";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { Button } from "../Button";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { database } from "../../libs/firebase";
 import { doc, updateDoc, getDoc } from '@react-native-firebase/firestore';
@@ -88,12 +86,7 @@ type FormData = {
   [key: string]: any; // Permitir outras propriedades
 };
 
-interface IShareWithUsers {
-  control: Control<any>; // Usar any para ser mais flexível
-  name: string;
-}
-
-export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => {
+export const ShareWithUsers: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [users, setUsers] = useState<IUser[]>([]);
@@ -110,6 +103,7 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
   const searchUsers = useDebouncedCallback(async (username: string) => {
     if (!username || !uid) {
       setUsers([]);
+      setLoading(false);
       return;
     }
 
@@ -535,70 +529,75 @@ export const ShareWithUsers: React.FC<IShareWithUsers> = ({ control, name }) => 
                 )}
                 
                 <SectionTitle type="secondary">Todos os usuários</SectionTitle>
-                
-                <FlatList
-                  data={users}
-                  keyExtractor={(item) => item.uid}
-                  renderItem={({ item }) => {
-                    const isChecked = !!sharedUsers.find((u) => u.uid === item.uid);
-                    const isFavorite = favoriteUsers.some(u => u.uid === item.uid);
-                    return (
-                      <ButtonSelect
-                        onPress={() =>
-                          handleToggleSharedUser({
-                            ...item,
-                            acceptedAt: usersAlreadySharing.some(
-                              (u) => u.target === item.uid
-                            )
-                              ? Timestamp.now()
-                              : null,
-                          })
-                        }
-                        style={{
-                          borderLeftWidth: isFavorite ? 3 : 0,
-                          borderLeftColor: '#FFD700',
-                          backgroundColor: isChecked ? 'rgba(255, 215, 0, 0.05)' : undefined
-                        }}
-                      >
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Title type={isChecked ? "primary" : "secondary"}>
-                            {item.userName}
-                          </Title>
-                          {isFavorite && (
-                            <FavoriteIcon
-                              name="star"
-                              type="primary"
-                              style={{ marginLeft: 5 }}
+                {loading ? (
+                  <View style={{ alignItems: 'center', marginVertical: 16 }}>
+                    <Title type="secondary">Carregando...</Title>
+                  </View>
+                ) : (
+                  <FlatList
+                    data={users}
+                    keyExtractor={(item) => item.uid}
+                    renderItem={({ item }) => {
+                      const isChecked = !!sharedUsers.find((u) => u.uid === item.uid);
+                      const isFavorite = favoriteUsers.some(u => u.uid === item.uid);
+                      return (
+                        <ButtonSelect
+                          onPress={() =>
+                            handleToggleSharedUser({
+                              ...item,
+                              acceptedAt: usersAlreadySharing.some(
+                                (u) => u.target === item.uid
+                              )
+                                ? Timestamp.now()
+                                : null,
+                            })
+                          }
+                          style={{
+                            borderLeftWidth: isFavorite ? 3 : 0,
+                            borderLeftColor: '#FFD700',
+                            backgroundColor: isChecked ? 'rgba(255, 215, 0, 0.05)' : undefined
+                          }}
+                        >
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Title type={isChecked ? "primary" : "secondary"}>
+                              {item.userName}
+                            </Title>
+                            {isFavorite && (
+                              <FavoriteIcon
+                                name="star"
+                                type="primary"
+                                style={{ marginLeft: 5 }}
+                              />
+                            )}
+                          </View>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <FavoriteButton
+                              onPress={(e) => {
+                                e.stopPropagation();
+                                handleToggleFavorite(item);
+                              }}
+                            >
+                              <FavoriteIcon
+                                name={isFavorite ? "star" : "star-outline"}
+                                type={isFavorite ? "primary" : "secondary"}
+                              />
+                            </FavoriteButton>
+                            <IconCheck
+                              type={isChecked ? "primary" : "secondary"}
+                              name={
+                                isChecked
+                                  ? "checkbox-marked-circle-outline"
+                                  : "checkbox-blank-circle-outline"
+                              }
                             />
-                          )}
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <FavoriteButton
-                            onPress={(e) => {
-                              e.stopPropagation();
-                              handleToggleFavorite(item);
-                            }}
-                          >
-                            <FavoriteIcon
-                              name={isFavorite ? "star" : "star-outline"}
-                              type={isFavorite ? "primary" : "secondary"}
-                            />
-                          </FavoriteButton>
-                          <IconCheck
-                            type={isChecked ? "primary" : "secondary"}
-                            name={
-                              isChecked
-                                ? "checkbox-marked-circle-outline"
-                                : "checkbox-blank-circle-outline"
-                            }
-                          />
-                        </View>
-                      </ButtonSelect>
-                    );
-                  }}
-                  style={{ maxHeight: 300 }}
-                  scrollEnabled={false}
-                />
+                          </View>
+                        </ButtonSelect>
+                      );
+                    }}
+                    style={{ maxHeight: 300 }}
+                    scrollEnabled={false}
+                  />
+                )}
                 <CloseButton onPress={handleCloseModal}>
                   <CloseButtonText>Fechar</CloseButtonText>
                 </CloseButton>

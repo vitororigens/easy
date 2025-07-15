@@ -84,7 +84,7 @@ export function Select({
           
           <Picker
             ref={pickerRef}
-            selectedValue={selectedValue}
+            selectedValue={selectedValue ?? ''}
             onValueChange={handleValueChange}
             enabled={!disabled}
             mode="dropdown"
@@ -170,7 +170,7 @@ export function Select({
             
             <FlatList
               data={items}
-              keyExtractor={(item, index) => index.toString()}
+              keyExtractor={( index) => index.toString()}
               renderItem={({ item }) => {
                 const isSelected = selectedValue === item.value;
                 return (

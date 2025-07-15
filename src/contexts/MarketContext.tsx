@@ -51,7 +51,7 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
     const unsubscribeMyMarkets = onSnapshot(
       myMarketsQuery,
       (snapshot) => {
-        const myMarkets = snapshot.docs.map((doc) => ({
+        const myMarkets = snapshot.docs.map((doc: any) => ({
           id: doc.id,
           ...doc.data(),
           isOwner: true,
@@ -75,13 +75,13 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
       sharedMarketsQuery,
       (snapshot) => {
         const sharedMarkets = snapshot.docs
-          .map((doc) => ({
+          .map((doc: any) => ({
             id: doc.id,
             ...doc.data(),
             isShared: true,
             isOwner: false,
           }))
-          .filter((market) => market.id !== user.user?.uid) as IMarket[];
+          .filter((market: any) => market.id !== user.user?.uid) as IMarket[];
 
         setMarkets((prevMarkets) => {
           // Remove old shared markets
@@ -158,16 +158,16 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
         throw new Error("Dados do mercado não encontrados");
       }
       
-      console.log('Dados do mercado:', { uid: marketData.uid, shareWith: marketData.shareWith, meuUid: user.user?.uid });
+      console.log('Dados do mercado:', { uid: marketData['uid'], shareWith: marketData['shareWith'], meuUid: user.user?.uid });
       
       // Se o usuário é o proprietário, excluir completamente
-      if (marketData.uid === user.user?.uid) {
+      if (marketData['uid'] === user.user?.uid) {
         console.log('Usuário é proprietário, deletando documento');
         await deleteDoc(marketRef);
       } else {
         // Se não é o proprietário, apenas remover do compartilhamento
         console.log('Usuário não é proprietário, removendo do shareWith');
-        const updatedShareWith = marketData.shareWith?.filter(
+        const updatedShareWith = marketData['shareWith']?.filter(
           (uid: string) => uid !== user.user?.uid
         ) || [];
         await updateDoc(marketRef, { shareWith: updatedShareWith });
@@ -191,7 +191,7 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
       if (docSnap.exists()) {
         const marketData = docSnap.data();
         await updateDoc(marketRef, {
-          status: !marketData?.status,
+          status: !marketData?.['status'],
         });
       }
     } catch (error) {

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { INote } from '../interfaces/INote';
 import { INoteContext } from '../interfaces/INoteContext';
+import { Timestamp } from 'firebase/firestore';
 
 const NoteContext = createContext<INoteContext | undefined>(undefined);
 
@@ -12,7 +13,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const newNote: INote = {
       ...note,
       id: uuidv4(),
-      createdAt: new Date(),
+      createdAt: Timestamp.now(),
       isShared: false,
       sharedWith: []
     };

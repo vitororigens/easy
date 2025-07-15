@@ -1,5 +1,4 @@
-import React, { useState, useRef } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { useState, useRef, useEffect } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { IMarket } from "../../interfaces/IMarket";
 import {
@@ -51,7 +50,6 @@ export function ItemMarket({
   // Verificar se o usuário pode excluir este item
   // Pode excluir se for o criador (uid) OU se for o proprietário (isOwner)
   const isCreator = market.uid === user?.uid;
-  const canDelete = isCreator || market.isOwner;
 
   // Verificar se é um item compartilhado
   const isShared = market.isShared;

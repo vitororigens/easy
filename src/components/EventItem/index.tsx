@@ -61,12 +61,12 @@ export function EventItem({ event, onDelete, onUpdate, isSharedByMe }: EventItem
   })();
 
   return (
-    <Container isShared={event.isShared} onPress={() => onUpdate(event)}>
+    <Container isShared={!!event.isShared} onPress={() => onUpdate(event)}>
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Title numberOfLines={1}>{event.name}</Title>
           {event.isShared && (
-            <ShareBadge isSharedByMe={isSharedByMe}>
+            <ShareBadge isSharedByMe={!!isSharedByMe}>
               <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
             </ShareBadge>
           )}

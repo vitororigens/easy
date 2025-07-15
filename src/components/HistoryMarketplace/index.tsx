@@ -1,8 +1,6 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FlatList, View } from "react-native";
 import { Toast } from "react-native-toast-notifications";
-import useHistoryMarketplaceCollections from "../../hooks/useHistoryMarketplaceCollection";
-import { useUserAuth } from "../../hooks/useUserAuth";
 import { DefaultContainer } from "../DefaultContainer";
 import { Button, Content, Title, TotalValue } from "./styles";
 import { useEffect, useState } from "react";
@@ -15,7 +13,6 @@ import { formatPrice } from "../../utils/price";
 import { createManyMarkets } from "../../services/firebase/market.firebase";
 
 export function HistoryMarketplaceModal() {
-  const user = useUserAuth();
   const route = useRoute();
 
   const [marketHistory, setMarketHistory] = useState<IMarketHistory | null>(
@@ -25,12 +22,6 @@ export function HistoryMarketplaceModal() {
   const { selectedItemId } = route.params as { selectedItemId?: string };
 
   const navigation = useNavigation();
-
-  const historyData = useHistoryMarketplaceCollections("HistoryMarketplace");
-  const selectedListMarketplace = historyData.find(
-    (item) => item.id === selectedItemId
-  );
-  const items = selectedListMarketplace?.items;
 
   const handleSaveListAgain = async () => {
     if (!marketHistory?.markets || marketHistory.markets.length === 0) return;
@@ -66,7 +57,7 @@ export function HistoryMarketplaceModal() {
   }, [selectedItemId]);
   return (
     <>
-      <DefaultContainer hasHeader={false} title="Produtos" backButton>
+      <DefaultContainer title="Produtos" backButton>
         <Content>
           <FlatList
             data={marketHistory?.markets || []}

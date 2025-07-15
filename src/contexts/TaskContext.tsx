@@ -1,9 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { ITask } from "../interfaces/ITask";
 import { useUserAuth } from "../hooks/useUserAuth";
-import { Timestamp } from "@react-native-firebase/firestore";
-import { database } from "../libs/firebase";
-import firestore from "@react-native-firebase/firestore";
+import { Timestamp, getFirestore, arrayRemove } from "@react-native-firebase/firestore";
 import { Toast } from "react-native-toast-notifications";
 
 interface ITaskContext {
@@ -21,7 +19,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [loading, setLoading] = useState(false);
   const user = useUserAuth();
-
+  const db = getFirestore();
   // Carregar tarefas do Firebase
   useEffect(() => {
     if (!user.user?.uid) {
@@ -36,13 +34,13 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     let allTasks: ITask[] = [];
     
     // 1. Listener para tarefas criadas pelo usuário
-    const userTasksUnsubscribe = database
+    const userTasksUnsubscribe = db
       .collection("Tasks")
       .where("uid", "==", user.user?.uid)
       .onSnapshot((snapshot) => {
         console.log("Snapshot de tarefas do usuário recebido");
         const userTasks: ITask[] = [];
-        snapshot.forEach((doc) => {
+        snapshot.forEach((doc: any) => {
           userTasks.push({ id: doc.id, ...doc.data() } as ITask);
         });
         console.log("Tarefas do usuário carregadas:", userTasks.length);
@@ -51,19 +49,19 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         allTasks = [...userTasks, ...allTasks.filter(task => task.uid !== user.user?.uid)];
         setTasks(allTasks);
         setLoading(false);
-      }, (error) => {
+      }, (error: any) => {
         console.error("Erro ao carregar tarefas do usuário:", error);
         setLoading(false);
       });
     
     // 2. Listener para tarefas compartilhadas com o usuário
-    const sharedTasksUnsubscribe = database
+    const sharedTasksUnsubscribe = db
       .collection("Tasks")
       .where("shareWith", "array-contains", user.user?.uid)
       .onSnapshot((snapshot) => {
         console.log("Snapshot de tarefas compartilhadas recebido");
         const sharedTasksData: ITask[] = [];
-        snapshot.forEach((doc) => {
+        snapshot.forEach((doc: any) => {
           const taskData = doc.data() as ITask;
           const taskWithId = { ...taskData, id: doc.id } as ITask;
           
@@ -88,7 +86,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
           ...sharedTasksData
         ];
         setTasks(allTasks);
-      }, (error) => {
+      }, (error: any) => {
         console.error("Erro ao carregar tarefas compartilhadas:", error);
       });
 
@@ -104,7 +102,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     
     setLoading(true);
     try {
-      await database.collection("Tasks").add({
+      await db.collection("Tasks").add({
         ...task,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
@@ -119,7 +117,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const updateTask = useCallback(async (id: string, task: Partial<ITask>) => {
     setLoading(true);
     try {
-      await database.collection("Tasks").doc(id).update({
+      await db.collection("Tasks").doc(id).update({
         ...task,
         updatedAt: Timestamp.now(),
       });
@@ -135,16 +133,16 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     try {
       // Se o item for compartilhado com você (não é seu), remova seu UID do array shareWith no Firestore
       if (task && task.uid !== user.user?.uid) {
-        await database
+        await db
           .collection("Tasks")
           .doc(id)
           .update({
-            shareWith: firestore.FieldValue.arrayRemove(user.user?.uid),
+            shareWith: arrayRemove(user.user?.uid),
           });
         Toast.show("Item removido da sua lista!", { type: "success" });
       } else {
         // Se for seu, delete do banco normalmente
-        await database.collection("Tasks").doc(id).delete();
+          await db.collection("Tasks").doc(id).delete();
         Toast.show("Tarefa excluída!", { type: "success" });
       }
     } catch (error) {
@@ -158,12 +156,12 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const toggleTaskCompletion = useCallback(async (id: string) => {
     setLoading(true);
     try {
-      const taskRef = database.collection("Tasks").doc(id);
+      const taskRef = db.collection("Tasks").doc(id);
       const doc = await taskRef.get();
       if (doc.exists()) {
         const taskData = doc.data();
         await taskRef.update({
-          status: !taskData?.status,
+          status: !taskData?.['status'],
           updatedAt: Timestamp.now(),
         });
       }

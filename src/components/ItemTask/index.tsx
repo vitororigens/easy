@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { useState, useRef, useEffect } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ITask } from "../../interfaces/ITask";
 import {

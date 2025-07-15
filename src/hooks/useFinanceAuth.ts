@@ -19,8 +19,8 @@ export function useFinanceData(uid: string): FinanceData | null {
           if (data) {
             const financeData: FinanceData = {
               uid: uid,
-              revenue: parseFloat(data.revenue),
-              expense: parseFloat(data.expense),
+              revenue: parseFloat(data['revenue']),
+              expense: parseFloat(data['Exepnse']),
             };
             setFinanceData(financeData);
           } else {

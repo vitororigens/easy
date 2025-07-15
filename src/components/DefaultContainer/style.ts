@@ -15,7 +15,7 @@ export const Container = styled(SafeAreaView)<Props>`
 `;
 
 type ContentProps = {
-  customBg?: string;
+  customBg: string;
 };
 
 export const Content = styled.View<ContentProps>`

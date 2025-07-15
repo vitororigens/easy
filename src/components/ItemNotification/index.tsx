@@ -9,7 +9,7 @@ interface IItemNotificationProps {
   handleRefresh: () => void;
 }
 
-export function ItemNotification({ notification, handleRefresh }: IItemNotificationProps) {
+export function ItemNotification({ notification }: IItemNotificationProps) {
   const theme = useTheme();
 
   const getIconName = () => {
