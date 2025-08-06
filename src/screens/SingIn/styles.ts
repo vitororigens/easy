@@ -1,5 +1,5 @@
-import { TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
+import { TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
 
 export const Container = styled.View`
     flex: 1;
@@ -9,7 +9,7 @@ export const Container = styled.View`
 
 `;
 
-export const ButtonForgetPassword = styled(TouchableOpacity)``
+export const ButtonForgetPassword = styled(TouchableOpacity)``;
 
 export const Title = styled.Text`
     font-size: ${({theme}) => theme.FONT_SIZE.SM}px;
@@ -26,7 +26,6 @@ export const Span = styled.Text`
     color: ${({theme}) => theme.COLORS.PURPLE_600};
 `;
 
-
 export const Text = styled.Text`
     font-size: ${({theme}) => theme.FONT_SIZE.SM}px;
     font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
@@ -35,7 +34,6 @@ export const Text = styled.Text`
     margin-bottom: 40px;
     margin-top: 20px;
 `;
-
 
 export const Divider = styled.View`
     width: 100px;

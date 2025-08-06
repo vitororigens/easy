@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   FlatList,
   Modal,
@@ -6,26 +6,26 @@ import {
   TouchableOpacity,
   View,
   Alert,
-} from "react-native";
-import { Toast } from "react-native-toast-notifications";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { LoadData } from "../../components/LoadData";
-import { Loading } from "../../components/Loading";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { useMarket } from "../../contexts/MarketContext";
-import { IMarket } from "../../interfaces/IMarket";
-import { useNavigation } from "@react-navigation/native";
-import { format } from "date-fns";
-import { useTheme } from "styled-components/native";
-import PersonImage from "../../assets/illustrations/marketplace.png";
-import { FinishMarkets } from "../../components/FinishMarkets";
-import { ItemMarket } from "../../components/ItemMarket";
-import { useMonth } from "../../context/MonthProvider";
-import useMarketplaceCollections from "../../hooks/useHistoryMarketsCollection";
-import { Timestamp } from "@react-native-firebase/firestore";
-import { HistoryMarketModal } from "../../components/HistoryMarketModal";
-import { formatCurrency } from "../../utils/mask";
-import { NativeAdComponent } from "../../components/NativeAd";
+} from 'react-native';
+import { Toast } from 'react-native-toast-notifications';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { LoadData } from '../../components/LoadData';
+import { Loading } from '../../components/Loading';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { useMarket } from '../../contexts/MarketContext';
+import { IMarket } from '../../interfaces/IMarket';
+import { useNavigation } from '@react-navigation/native';
+import { format } from 'date-fns';
+import { useTheme } from 'styled-components/native';
+import PersonImage from '../../assets/illustrations/marketplace.png';
+import { FinishMarkets } from '../../components/FinishMarkets';
+import { ItemMarket } from '../../components/ItemMarket';
+import { useMonth } from '../../context/MonthProvider';
+import useMarketplaceCollections from '../../hooks/useHistoryMarketsCollection';
+import { Timestamp } from '@react-native-firebase/firestore';
+import { HistoryMarketModal } from '../../components/HistoryMarketModal';
+import { formatCurrency } from '../../utils/mask';
+import { NativeAdComponent } from '../../components/NativeAd';
 import { getFirestore, doc, getDoc, updateDoc } from '@react-native-firebase/firestore';
 
 import {
@@ -49,22 +49,22 @@ import {
   StatValue,
   StatLabel,
   ContainerHistory,
-} from "./styles";
+} from './styles';
 
-const modalBottom = Platform.OS === "ios" ? 90 : 70;
+const modalBottom = Platform.OS === 'ios' ? 90 : 70;
 
-type ActiveButtonType = "mercado" | "historico";
+type ActiveButtonType = 'mercado' | 'historico';
 
 interface HistoryItem {
   id: string;
   name: string;
   finishedDate: string;
   finishedTime: string;
-  markets: Array<{
+  markets: {
     id: string;
     name: string;
     createdAt: string;
-  }>;
+  }[];
 }
 
 interface ShareInfo {
@@ -80,20 +80,20 @@ export function Market({ route }: any) {
   const user = useUserAuth();
   const { markets, loading, deleteMarket, toggleMarketCompletion } = useMarket();
 
-  const [activeButton, setActiveButton] = useState<ActiveButtonType>("mercado");
+  const [activeButton, setActiveButton] = useState<ActiveButtonType>('mercado');
   const [isSummaryVisible, setIsSummaryVisible] = useState(true);
   const [selectedMarkets, setSelectedMarkets] = useState<string[]>([]);
   const [modalActive, setModalActive] = useState(false);
   const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryItem | null>(null);
 
-  const marketplaceData = useMarketplaceCollections("Marketplace");
+  const marketplaceData = useMarketplaceCollections('Marketplace');
 
   // Filtrar apenas os itens do usuário atual
   const filteredMarketplaceData = useMemo(() => {
     if (!marketplaceData || !user?.user?.uid) return [];
-    
+
     const filtered = marketplaceData.filter(item => item.uid === user.user?.uid);
-    
+
     return filtered;
   }, [marketplaceData, user.user?.uid]);
 
@@ -110,14 +110,14 @@ export function Market({ route }: any) {
       const price = typeof curr.price === 'number' ? curr.price : 0;
       return acc + price;
     }, 0);
-    
+
     const stats = {
       totalItems: allMarkets.length,
       completedItems: allMarkets.filter(m => m.status).length,
       pendingItems: allMarkets.filter(m => !m.status).length,
-      totalValue: totalValue
+      totalValue,
     };
-    
+
     return stats;
   }, [allMarkets]);
 
@@ -131,7 +131,7 @@ export function Market({ route }: any) {
 
   const handleEditMarket = (marketId: string) => {
     // @ts-ignore
-    navigation.navigate("market-item", { selectedItemId: marketId });
+    navigation.navigate('market-item', { selectedItemId: marketId });
   };
 
   const handleDeleteMarket = async (marketId: string) => {
@@ -143,7 +143,7 @@ export function Market({ route }: any) {
       console.log('Mercado excluído com sucesso:', marketId);
     } catch (error) {
       console.error('Erro ao excluir mercado:', error);
-      Toast.show("Erro ao excluir o item", { type: "error" });
+      Toast.show('Erro ao excluir o item', { type: 'error' });
     }
   };
 
@@ -151,7 +151,7 @@ export function Market({ route }: any) {
     try {
       await toggleMarketCompletion(marketId);
     } catch (error) {
-      Toast.show("Erro ao alternar status do item", { type: "error" });
+      Toast.show('Erro ao alternar status do item', { type: 'error' });
     }
   };
 
@@ -188,23 +188,23 @@ export function Market({ route }: any) {
             price: market.price || 0,
             quantity: market.quantity || 1,
             measurement: market.measurement || 'un',
-            category: market.category || 'outros'
+            category: market.category || 'outros',
           };
         }) || [];
 
       const now = new Date();
       const marketplaceData = {
         name: groupName,
-        uid: user.user?.uid || "",
-        finishedDate: format(now, "dd/MM/yyyy"),
-        finishedTime: format(now, "HH:mm:ss"),
+        uid: user.user?.uid || '',
+        finishedDate: format(now, 'dd/MM/yyyy'),
+        finishedTime: format(now, 'HH:mm:ss'),
         markets: selectedMarketsInfo,
         createdAt: Timestamp.now(),
-        totalValue: selectedMarketsInfo.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0)
+        totalValue: selectedMarketsInfo.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0),
       };
 
       // Primeiro, adiciona ao histórico
-      await getFirestore().collection("Marketplace").add(marketplaceData);
+      await getFirestore().collection('Marketplace').add(marketplaceData);
 
       // Depois, exclui os itens selecionados da lista original
       for (const marketId of selectedMarkets) {
@@ -216,34 +216,34 @@ export function Market({ route }: any) {
       }
 
       setSelectedMarkets([]);
-      Toast.show("Itens finalizados com sucesso!", { type: "success" });
+      Toast.show('Itens finalizados com sucesso!', { type: 'success' });
     } catch (error) {
-      Toast.show("Erro ao finalizar itens", { type: "error" });
+      Toast.show('Erro ao finalizar itens', { type: 'error' });
     }
   };
 
   const handleDeleteHistoryItem = async (itemId: string) => {
     Alert.alert(
-      "Excluir histórico",
-      "Tem certeza que deseja excluir este item do histórico?",
+      'Excluir histórico',
+      'Tem certeza que deseja excluir este item do histórico?',
       [
         {
-          text: "Cancelar",
-          style: "cancel"
+          text: 'Cancelar',
+          style: 'cancel',
         },
         {
-          text: "Excluir",
-          style: "destructive",
+          text: 'Excluir',
+          style: 'destructive',
           onPress: async () => {
             try {
-              await getFirestore().collection("Marketplace").doc(itemId).delete();
-              Toast.show("Item excluído do histórico!", { type: "success" });
+              await getFirestore().collection('Marketplace').doc(itemId).delete();
+              Toast.show('Item excluído do histórico!', { type: 'success' });
             } catch (error) {
-              Toast.show("Erro ao excluir item do histórico", { type: "error" });
+              Toast.show('Erro ao excluir item do histórico', { type: 'error' });
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     );
   };
 
@@ -256,15 +256,15 @@ export function Market({ route }: any) {
       <Header>
         <NavBar>
           <Button
-            onPress={() => handleButtonClick("mercado")}
-            active={activeButton === "mercado"}
+            onPress={() => handleButtonClick('mercado')}
+            active={activeButton === 'mercado'}
             style={{ borderTopLeftRadius: 40 }}
           >
             <Title>Mercado</Title>
           </Button>
           <Button
-            onPress={() => handleButtonClick("historico")}
-            active={activeButton === "historico"}
+            onPress={() => handleButtonClick('historico')}
+            active={activeButton === 'historico'}
             style={{ borderTopRightRadius: 40 }}
           >
             <Title>Histórico de compras</Title>
@@ -272,7 +272,7 @@ export function Market({ route }: any) {
         </NavBar>
       </Header>
 
-      {activeButton === "mercado" && (
+      {activeButton === 'mercado' && (
         <Content>
           {/* <ContentTitle type="PRIMARY" onPress={handleToggleSummary}>
             <HeaderContainer>
@@ -282,29 +282,29 @@ export function Market({ route }: any) {
             <Icon name={isSummaryVisible ? "arrow-drop-up" : "arrow-drop-down"} type="PRIMARY" />
           </ContentTitle> */}
           {isSummaryVisible && (
-          <Container>
-            <StatsContainer>
-              
-              <StatItem>
-                <StatValue>{marketStats.totalItems}</StatValue>
-                <StatLabel>Total de itens</StatLabel>
-              </StatItem>
-              {selectedMarkets.length > 0 && (
+            <Container>
+              <StatsContainer>
+
                 <StatItem>
-                  <StatValue>{selectedMarkets.length}</StatValue>
-                  <StatLabel>Itens selecionados</StatLabel>
+                  <StatValue>{marketStats.totalItems}</StatValue>
+                  <StatLabel>Total de itens</StatLabel>
                 </StatItem>
-              )}
-              <StatItem>
-                <StatValue>{marketStats.pendingItems}</StatValue>
-                <StatLabel>Itens pendentes</StatLabel>
-              </StatItem>
-              <StatItem>
-                <StatValue>{formatCurrency(marketStats.totalValue).formatted}</StatValue>
-                <StatLabel>Valor total</StatLabel>
-              </StatItem>
-            </StatsContainer>
-          </Container>
+                {selectedMarkets.length > 0 && (
+                  <StatItem>
+                    <StatValue>{selectedMarkets.length}</StatValue>
+                    <StatLabel>Itens selecionados</StatLabel>
+                  </StatItem>
+                )}
+                <StatItem>
+                  <StatValue>{marketStats.pendingItems}</StatValue>
+                  <StatLabel>Itens pendentes</StatLabel>
+                </StatItem>
+                <StatItem>
+                  <StatValue>{formatCurrency(marketStats.totalValue).formatted}</StatValue>
+                  <StatLabel>Valor total</StatLabel>
+                </StatItem>
+              </StatsContainer>
+            </Container>
           )}
 
           {/* <ContentTitle type="PRIMARY">
@@ -347,7 +347,7 @@ export function Market({ route }: any) {
         </Content>
       )}
 
-      {activeButton === "historico" && (
+      {activeButton === 'historico' && (
         <Content>
           <ContentTitle type="PRIMARY">
             <HeaderContainer>
@@ -371,7 +371,7 @@ export function Market({ route }: any) {
                   <DateText>
                     ✅ Total de itens: {item.markets?.length || 0}
                   </DateText>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     onPress={() => handleDeleteHistoryItem(item.id)}
                     style={{ position: 'absolute', right: 10, top: 10 }}
                   >

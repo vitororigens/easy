@@ -1,13 +1,13 @@
-import { Entypo } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import styled from "styled-components/native";
-import { TouchableOpacity } from "react-native";
+import { Entypo } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import styled from 'styled-components/native';
+import { TouchableOpacity } from 'react-native';
 
-export type ItemsTypeStyleProps = "PRIMARY" | "SECONDARY" | "TERTIARY";
+export type ItemsTypeStyleProps = 'PRIMARY' | 'SECONDARY' | 'TERTIARY';
 
 type Props = {
   type?: ItemsTypeStyleProps;
-  status?: "PENDING" | "PAID" | "OVERDUE" | undefined;
+  status?: 'PENDING' | 'PAID' | 'OVERDUE' | undefined;
   isShared?: boolean;
 };
 
@@ -70,14 +70,14 @@ export const Title = styled.Text<Props>`
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color:  ${({ theme, status }) => {
     switch (status) {
-      case "PAID":
-        return theme.COLORS.GREEN_700;
-      case "PENDING":
-        return theme.COLORS.YELLOW_700;
-      case "OVERDUE":
-        return theme.COLORS.RED_700;
-      default:
-        return theme.COLORS.GRAY_400;
+    case 'PAID':
+      return theme.COLORS.GREEN_700;
+    case 'PENDING':
+      return theme.COLORS.YELLOW_700;
+    case 'OVERDUE':
+      return theme.COLORS.RED_700;
+    default:
+      return theme.COLORS.GRAY_400;
     }
   }};
 `;
@@ -107,14 +107,14 @@ export const Status = styled.Text<Props>`
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme, status }) => {
     switch (status) {
-      case "PAID":
-        return theme.COLORS.GREEN_700;
-      case "PENDING":
-        return theme.COLORS.YELLOW_700;
-      case "OVERDUE":
-        return theme.COLORS.RED_700;
-      default:
-        return theme.COLORS.GRAY_600;
+    case 'PAID':
+      return theme.COLORS.GREEN_700;
+    case 'PENDING':
+      return theme.COLORS.YELLOW_700;
+    case 'OVERDUE':
+      return theme.COLORS.RED_700;
+    default:
+      return theme.COLORS.GRAY_600;
     }
   }};
   margin-top: 4px;
@@ -134,11 +134,11 @@ export const Icon = styled.View<Props>`
   width: 13%;
   height: 45px;
   background-color: ${({ theme, type }) =>
-    type === "PRIMARY"
+    type === 'PRIMARY'
       ? theme.COLORS.GREEN_700
-      : type === "SECONDARY"
-      ? theme.COLORS.RED_700
-      : theme.COLORS.YELLOW_700};
+      : type === 'SECONDARY'
+        ? theme.COLORS.RED_700
+        : theme.COLORS.YELLOW_700};
   align-items: center;
   justify-content: center;
   border-radius: 10px;
@@ -164,11 +164,11 @@ export const ContentItems = styled.View`
 
 export const IconMenu = styled(Entypo).attrs<Props>(({ theme, type }) => ({
   color:
-    type === "PRIMARY"
+    type === 'PRIMARY'
       ? theme.COLORS.GREEN_700
-      : type === "SECONDARY"
-      ? theme.COLORS.RED_700
-      : theme.COLORS.YELLOW_700,
+      : type === 'SECONDARY'
+        ? theme.COLORS.RED_700
+        : theme.COLORS.YELLOW_700,
   size: theme.FONT_SIZE.XL,
 }))``;
 

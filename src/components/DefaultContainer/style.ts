@@ -1,17 +1,16 @@
-import { Ionicons } from "@expo/vector-icons";
-import { TouchableOpacity, Dimensions } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import styled from "styled-components/native";
+import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import styled from 'styled-components/native';
 
 type Props = {
-  type?: "PRIMARY" | "SECONDARY";
+  type?: 'PRIMARY' | 'SECONDARY';
 };
-const windowHeight = Dimensions.get("window").height;
 
 export const Container = styled(SafeAreaView)<Props>`
   flex: 1;
   background-color: ${({ theme, type }) =>
-    type === "PRIMARY" ? theme.COLORS.PURPLE_800 : theme.COLORS.TEAL_600};
+    type === 'PRIMARY' ? theme.COLORS.PURPLE_800 : theme.COLORS.TEAL_600};
 `;
 
 type ContentProps = {
@@ -21,20 +20,20 @@ type ContentProps = {
 export const Content = styled.View<ContentProps>`
   flex: 1;
   background-color: ${({ theme, customBg }) =>
-    !!customBg ? customBg : theme.COLORS.WHITE};
+    customBg ? customBg : theme.COLORS.WHITE};
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
 `;
 
 export const Header = styled.View<Props>`
   width: 100%;
-  height: ${({ theme, type }) => (type === "PRIMARY" ? "80px" : "120px")};
+  height: ${({ type }) => (type === 'PRIMARY' ? '80px' : '120px')};
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   position: relative;
   background-color: ${({ theme, type }) =>
-    type === "PRIMARY" ? theme.COLORS.PURPLE_800 : theme.COLORS.TEAL_600};
+    type === 'PRIMARY' ? theme.COLORS.PURPLE_800 : theme.COLORS.TEAL_600};
   padding: 0 10px;
 `;
 

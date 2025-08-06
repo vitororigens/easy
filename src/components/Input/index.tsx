@@ -1,17 +1,21 @@
-import React, { useState } from "react";
-import { TextInputProps } from "react-native";
-import { Button, Container, Icon, IconInput, InputContainer, ErrorText, InputWrapper } from "./style";
+import React, { useState } from 'react';
+import { TextInputProps } from 'react-native';
+import { Button, Container, Icon, IconInput, InputContainer, ErrorText, InputWrapper } from './style';
 
 type InputProps = TextInputProps & {
   placeholder: string;
   onChangeText?: (text: string) => void;
+  onFocus?: () => void;
+  editable?: boolean;
   required?: boolean;
   passwordType?: boolean;
   showSearch?: boolean;
+  showPlus?: boolean;
+  onPress?: () => void;
   showIcon?: boolean;
-  name: string;
+  name?: string;
   value: string;
-  errorMessage?: string;
+  error?: string;
 };
 
 export function Input({
@@ -22,7 +26,9 @@ export function Input({
   passwordType = false,
   showIcon = false,
   name,
-  errorMessage,
+  editable = true,
+  onFocus,
+  error,
 }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -32,27 +38,29 @@ export function Input({
 
   return (
     <Container>
-      <InputWrapper error={!!errorMessage}>
+      <InputWrapper error={!!error}>
         {showIcon && <IconInput name={name} />}
 
         <InputContainer
           placeholder={placeholder}
           onChangeText={onChangeText}
+          onFocus={onFocus}
           secureTextEntry={!showPassword && passwordType}
           value={value}
+          editable={editable}
         />
         {passwordType && (
           <Button onPress={togglePasswordVisibility}>
-            <Icon name={showPassword ? "eye" : "eye-closed"} />
+            <Icon name={showPassword ? 'eye' : 'eye-closed'} />
           </Button>
         )}
         {showSearch && (
           <Button onPress={togglePasswordVisibility}>
-            <Icon name="search" />
+            <Icon name='search' />
           </Button>
         )}
       </InputWrapper>
-      {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
+      {error && <ErrorText>{error}</ErrorText>}
     </Container>
   );
 }

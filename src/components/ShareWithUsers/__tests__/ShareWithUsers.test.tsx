@@ -3,7 +3,7 @@ import { render, fireEvent, waitFor, screen } from '@testing-library/react-nativ
 import { FormProvider, useForm } from 'react-hook-form';
 import { ShareWithUsers } from '../index';
 import { findUserByUsername, addToFavorites, removeFromFavorites, getFavorites } from '../../../services/firebase/users.firestore';
-import { createSharing, getSharing } from '../../../services/firebase/sharing.firebase';
+import { getSharing } from '../../../services/firebase/sharing.firebase';
 import { sendPushNotification } from '../../../services/one-signal';
 import { useUserAuth } from '../../../hooks/useUserAuth';
 
@@ -17,7 +17,6 @@ const mockFindUserByUsername = findUserByUsername as jest.MockedFunction<typeof 
 const mockAddToFavorites = addToFavorites as jest.MockedFunction<typeof addToFavorites>;
 const mockRemoveFromFavorites = removeFromFavorites as jest.MockedFunction<typeof removeFromFavorites>;
 const mockGetFavorites = getFavorites as jest.MockedFunction<typeof getFavorites>;
-const mockCreateSharing = createSharing as jest.MockedFunction<typeof createSharing>;
 const mockGetSharing = getSharing as jest.MockedFunction<typeof getSharing>;
 const mockSendPushNotification = sendPushNotification as jest.MockedFunction<typeof sendPushNotification>;
 const mockUseUserAuth = useUserAuth as jest.MockedFunction<typeof useUserAuth>;
@@ -35,11 +34,26 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 describe('ShareWithUsers', () => {
   const mockUser = {
-    user: {
+    user: ({
       uid: 'test-uid',
       email: 'test@example.com',
       displayName: 'Test User',
-    },
+      emailVerified: true,
+      isAnonymous: false,
+      metadata: {},
+      multiFactor: {},
+      providerData: [],
+      refreshToken: '',
+      tenantId: null,
+      phoneNumber: null,
+      photoURL: null,
+      providerId: '',
+      delete: jest.fn(),
+      getIdToken: jest.fn(),
+      getIdTokenResult: jest.fn(),
+      reload: jest.fn(),
+      toJSON: jest.fn(),
+    } as unknown) as import('@react-native-firebase/auth').FirebaseAuthTypes.User,
     loading: false,
   };
 
@@ -48,24 +62,19 @@ describe('ShareWithUsers', () => {
       uid: 'user1',
       userName: 'John Doe',
       email: 'john@example.com',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
       uid: 'user2',
       userName: 'Jane Smith',
       email: 'jane@example.com',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
   ];
 
-  const mockSharings = [
-    {
-      id: 'sharing1',
-      invitedBy: 'test-uid',
-      target: 'user1',
-      status: 'accepted' as const,
-      createdAt: { seconds: 1234567890, nanoseconds: 0 },
-      updatedAt: { seconds: 1234567890, nanoseconds: 0 },
-    },
-  ];
+  // Removido mockSharings pois não é usado
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -79,8 +88,8 @@ describe('ShareWithUsers', () => {
     it('deve renderizar o componente corretamente', () => {
       const { getByText } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       expect(getByText('Compartilhar com usuários')).toBeTruthy();
@@ -89,8 +98,8 @@ describe('ShareWithUsers', () => {
     it('deve mostrar o botão de adicionar usuários', () => {
       const { getByTestId } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       expect(getByTestId('add-users-button')).toBeTruthy();
@@ -103,8 +112,8 @@ describe('ShareWithUsers', () => {
 
       const { getByPlaceholderText } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const searchInput = getByPlaceholderText('Buscar usuários');
@@ -120,8 +129,8 @@ describe('ShareWithUsers', () => {
 
       const { getByPlaceholderText, getByTestId } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const searchInput = getByPlaceholderText('Buscar usuários');
@@ -133,8 +142,8 @@ describe('ShareWithUsers', () => {
     it('deve limpar a lista de usuários quando o campo estiver vazio', async () => {
       const { getByPlaceholderText } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const searchInput = getByPlaceholderText('Buscar usuários');
@@ -153,8 +162,8 @@ describe('ShareWithUsers', () => {
 
       const { getByPlaceholderText, getByText } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const searchInput = getByPlaceholderText('Buscar usuários');
@@ -180,8 +189,8 @@ describe('ShareWithUsers', () => {
 
       const { getByPlaceholderText, getByText } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const searchInput = getByPlaceholderText('Buscar usuários');
@@ -207,8 +216,8 @@ describe('ShareWithUsers', () => {
 
       const { getByTestId } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const addButton = getByTestId('add-users-button');
@@ -225,8 +234,8 @@ describe('ShareWithUsers', () => {
 
       const { getByPlaceholderText, getByTestId } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const searchInput = getByPlaceholderText('Buscar usuários');
@@ -248,8 +257,8 @@ describe('ShareWithUsers', () => {
 
       const { getByPlaceholderText, getByTestId } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const searchInput = getByPlaceholderText('Buscar usuários');
@@ -274,8 +283,8 @@ describe('ShareWithUsers', () => {
 
       const { getByTestId, getByText } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const addButton = getByTestId('add-users-button');
@@ -297,8 +306,8 @@ describe('ShareWithUsers', () => {
 
       const { getByPlaceholderText, getByText, getByTestId } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const searchInput = getByPlaceholderText('Buscar usuários');
@@ -320,30 +329,33 @@ describe('ShareWithUsers', () => {
 
   describe('Tratamento de erros', () => {
     it('deve mostrar erro quando a busca falhar', async () => {
+      const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
       mockFindUserByUsername.mockRejectedValue(new Error('Erro na busca'));
 
       const { getByPlaceholderText } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const searchInput = getByPlaceholderText('Buscar usuários');
       fireEvent.changeText(searchInput, 'john');
 
       await waitFor(() => {
-        expect(console.error).toHaveBeenCalledWith('Error fetching users:', expect.any(Error));
+        expect(spy).toHaveBeenCalledWith('Error fetching users:', expect.any(Error));
       });
+      spy.mockRestore();
     });
 
     it('deve mostrar erro quando adicionar aos favoritos falhar', async () => {
+      const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
       mockFindUserByUsername.mockResolvedValue(mockUsers);
       mockAddToFavorites.mockRejectedValue(new Error('Erro ao adicionar favorito'));
 
       const { getByPlaceholderText, getByTestId } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const searchInput = getByPlaceholderText('Buscar usuários');
@@ -355,8 +367,9 @@ describe('ShareWithUsers', () => {
       });
 
       await waitFor(() => {
-        expect(console.error).toHaveBeenCalledWith('Error toggling favorite:', expect.any(Error));
+        expect(spy).toHaveBeenCalledWith('Error toggling favorite:', expect.any(Error));
       });
+      spy.mockRestore();
     });
   });
 
@@ -366,8 +379,8 @@ describe('ShareWithUsers', () => {
 
       const { getByPlaceholderText, getByTestId } = render(
         <TestWrapper>
-          <ShareWithUsers control={{} as any} name="sharedUsers" />
-        </TestWrapper>
+          <ShareWithUsers />
+        </TestWrapper>,
       );
 
       const searchInput = getByPlaceholderText('Buscar usuários');
@@ -395,7 +408,7 @@ describe('ShareWithUsers', () => {
 
         return (
           <FormProvider {...methods}>
-            <ShareWithUsers control={methods.control} name="sharedUsers" />
+            <ShareWithUsers />
           </FormProvider>
         );
       };
@@ -416,4 +429,4 @@ describe('ShareWithUsers', () => {
       });
     });
   });
-}); 
+});

@@ -1,4 +1,4 @@
-import { Timestamp, collection, addDoc, getFirestore} from "@react-native-firebase/firestore";
+import { Timestamp, collection, addDoc, getFirestore} from '@react-native-firebase/firestore';
 
 const database = getFirestore();
 
@@ -22,7 +22,7 @@ export interface IExpense {
   shareInfo: TShareInfo[];
 }
 
-export const createRevenue = async (note: Omit<IExpense, "id">) => {
-  const docRef = await addDoc(collection(database, "Revenue"), note);
+export const createRevenue = async (note: Omit<IExpense, 'id'>) => {
+  const docRef = await addDoc(collection(database, 'Revenue'), note);
   return docRef;
 };

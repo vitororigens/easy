@@ -1,6 +1,6 @@
-import styled from "styled-components/native";
+import styled from 'styled-components/native';
 
-export type ItemsTypeStyleProps = "primary" | "secondary" | "tertiary";
+export type ItemsTypeStyleProps = 'primary' | 'secondary' | 'tertiary';
 
 type Props = {
   type?: ItemsTypeStyleProps;
@@ -19,11 +19,11 @@ export const Icon = styled.View<Props>`
   width: 13%;
   height: 45px;
   background-color: ${({ theme, type }) =>
-    type === "primary"
+    type === 'primary'
       ? theme.COLORS.GREEN_700
-      : type === "secondary"
-      ? theme.COLORS.RED_700
-      : theme.COLORS.YELLOW_700};
+      : type === 'secondary'
+        ? theme.COLORS.RED_700
+        : theme.COLORS.YELLOW_700};
   align-items: center;
   justify-content: center;
   border-radius: 10px;
@@ -45,11 +45,11 @@ export const Title = styled.Text<Props>`
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   color: ${({ theme, type }) =>
-    type === "primary"
+    type === 'primary'
       ? theme.COLORS.GREEN_700
-      : type === "secondary"
-      ? theme.COLORS.RED_700
-      : theme.COLORS.YELLOW_700};
+      : type === 'secondary'
+        ? theme.COLORS.RED_700
+        : theme.COLORS.YELLOW_700};
 `;
 
 export const SubTitle = styled.Text`

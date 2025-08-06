@@ -8,10 +8,10 @@ type SwitchProps = {
 };
 
 export function Switch({ title, onValueChange, value, disabled }: SwitchProps) {
-  
+
   return (
     <Container>
-      <CustomSwitch 
+      <CustomSwitch
         onValueChange={onValueChange}
         value={value}
         disabled={disabled}

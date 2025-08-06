@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 type MonthContextType = {
   selectedMonth: number | null;
@@ -10,7 +10,7 @@ const MonthContext = createContext<MonthContextType | undefined>(undefined);
 export const useMonth = () => {
   const context = useContext(MonthContext);
   if (!context) {
-    throw new Error("useMonth must be used within a MonthProvider");
+    throw new Error('useMonth must be used within a MonthProvider');
   }
   return context;
 };

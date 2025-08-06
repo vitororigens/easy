@@ -1,7 +1,7 @@
-import { TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
+import { TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
 
-export type subTitleTypeStyleProps = "PRIMARY" | "SECONDARY";
+export type subTitleTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
 type Props = {
   type: subTitleTypeStyleProps;
@@ -84,7 +84,7 @@ export const SubTitle = styled.Text<Props>`
   font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme, type }) =>
-    type === "PRIMARY" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
+    type === 'PRIMARY' ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
 `;
 
 export const Items = styled.View`

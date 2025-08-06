@@ -1,5 +1,5 @@
 import { Modal, FlatList } from 'react-native';
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from '@expo/vector-icons';
 import {
   Container,
   Content,
@@ -18,11 +18,11 @@ type HistoryTaskModalParams = {
   groupName: string;
   finishedDate: string;
   finishedTime: string;
-  tasks: Array<{
+  tasks: {
     id: string;
     name: string;
     createdAt: string;
-  }>;
+  }[];
 };
 
 export function HistoryTaskModal() {
@@ -33,7 +33,7 @@ export function HistoryTaskModal() {
     const date = new Date(dateString);
     return {
       date: date.toLocaleDateString(),
-      time: date.toLocaleTimeString()
+      time: date.toLocaleTimeString(),
     };
   };
 

@@ -1,6 +1,6 @@
-import styled from "styled-components/native";
-import { Entypo} from "@expo/vector-icons";
-import {  Image } from "react-native";
+import styled from 'styled-components/native';
+import { Entypo} from '@expo/vector-icons';
+import {  Image } from 'react-native';
 
 export const Container = styled.View`
     width: 40px;
@@ -19,8 +19,8 @@ export const Title = styled.Text`
 `;
 
 export const Icon = styled(Entypo).attrs(({theme}) => ({
-    color: theme.COLORS.WHITE,
-    size: 12,
+  color: theme.COLORS.WHITE,
+  size: 12,
 }))``;
 
 export const ContainerIcon = styled.View`
@@ -37,7 +37,6 @@ export const ContainerIcon = styled.View`
     justify-content: center;
 
 `;
-
 
 export const StyledImage = styled(Image)`
   width: 40px;

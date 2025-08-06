@@ -7,4 +7,4 @@ export interface INoteContext {
   deleteNote: (id: string) => void;
   shareNote: (id: string, email: string) => void;
   unshareNote: (id: string, email: string) => void;
-} 
+}

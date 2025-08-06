@@ -1,6 +1,6 @@
 import React from 'react';
-import { TouchableOpacityProps } from "react-native";
-import { Container, Title } from "./style";
+import { TouchableOpacityProps } from 'react-native';
+import { Container, Title } from './style';
 
 type ButtonProps = TouchableOpacityProps & {
     title: string | React.ReactNode;
@@ -8,9 +8,9 @@ type ButtonProps = TouchableOpacityProps & {
 }
 
 export function Button({ title, isLoading, ...rest }: ButtonProps) {
-    return (
-        <Container {...rest} disabled={isLoading}>
-            {typeof title === 'string' ? <Title>{title}</Title> : title}
-        </Container>
-    );
+  return (
+    <Container {...rest} disabled={isLoading}>
+      {typeof title === 'string' ? <Title>{title}</Title> : title}
+    </Container>
+  );
 }

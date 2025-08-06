@@ -124,7 +124,7 @@ class AnalyticsService {
       await analytics().logEvent('performance_operation', {
         operation_name: operation,
         duration_ms: duration,
-        success: success,
+        success,
         timestamp: new Date().toISOString(),
       });
       console.log('Performance logged:', operation, duration);
@@ -211,7 +211,7 @@ export const measurePerformance = (operationName: string) => {
  */
 export const withScreenTracking = <P extends object>(
   Component: React.ComponentType<P>,
-  screenName: string
+  screenName: string,
 ) => {
   const WrappedComponent = (props: P) => {
     const { trackScreen } = useAnalytics();
@@ -328,4 +328,4 @@ export const AnalyticsParameters = {
 } as const;
 
 // Exporta a instância por padrão
-export default analyticsService; 
+export default analyticsService;

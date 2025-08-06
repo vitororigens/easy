@@ -1,10 +1,10 @@
-import { OneSignal } from "react-native-onesignal";
-import axios from "axios";
+import { OneSignal } from 'react-native-onesignal';
+import axios from 'axios';
 
-const ONESIGNAL_APP_ID = "04b5e397-b327-469b-a9f2-9ac8a22a039f";
+const ONESIGNAL_APP_ID = '04b5e397-b327-469b-a9f2-9ac8a22a039f';
 const REST_API_KEY =
-  "os_v2_app_as26hf5te5djxkpstlekekqdt4oahagr6xyejcez2hdgol5ykcixw7hqbz2qvittluo6sr5ihlq2kdzxbd5bal3uo2cx36jzpllwxxy";
-const ONE_SIGNAL_BASE_URL = "https://api.onesignal.com";
+  'os_v2_app_as26hf5te5djxkpstlekekqdt4oahagr6xyejcez2hdgol5ykcixw7hqbz2qvittluo6sr5ihlq2kdzxbd5bal3uo2cx36jzpllwxxy';
+const ONE_SIGNAL_BASE_URL = 'https://api.onesignal.com';
 
 interface ISendPushNotification {
   title: string;
@@ -18,18 +18,18 @@ export const sendPushNotification = async ({
   uid,
 }: ISendPushNotification) => {
   const headers = {
-    "Content-Type": "application/json; charset=utf-8",
+    'Content-Type': 'application/json; charset=utf-8',
     Authorization: `Basic ${REST_API_KEY}`,
   };
 
-  console.log("valor uid", uid);
+  console.log('valor uid', uid);
   const payload = {
     app_id: ONESIGNAL_APP_ID,
     filters: [
       {
-        field: "tag",
-        key: "id",
-        relation: "=",
+        field: 'tag',
+        key: 'id',
+        relation: '=',
         value: uid,
       },
     ],
@@ -42,12 +42,12 @@ export const sendPushNotification = async ({
     const response = await axios.post(
       `${ONE_SIGNAL_BASE_URL}/notifications`,
       payload,
-      { headers }
+      { headers },
     );
-    console.log("Notification sent successfully:", response.data);
+    console.log('Notification sent successfully:', response.data);
     return response.data;
   } catch (error) {
-    console.error("Error sending notification:", error);
+    console.error('Error sending notification:', error);
     throw error;
   }
 };

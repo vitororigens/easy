@@ -1,10 +1,10 @@
-import React from "react";
-import { ActivityIndicator, FlatList } from "react-native";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { useSubscriptionsCollection } from "../../hooks/useSubscriptionsCollection";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { Subscription } from "../../services/firebase/subscription.firebase";
+import React from 'react';
+import { ActivityIndicator, FlatList } from 'react-native';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { useSubscriptionsCollection } from '../../hooks/useSubscriptionsCollection';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { Subscription } from '../../services/firebase/subscription.firebase';
 
 import {
   Container,
@@ -15,7 +15,7 @@ import {
   ItemDate,
   EmptyContainer,
   EmptyText,
-} from "./styles";
+} from './styles';
 
 export function SubscriptionHistory() {
   const { subscriptions, loading, error } = useSubscriptionsCollection();
@@ -67,7 +67,7 @@ export function SubscriptionHistory() {
               <ItemTitle>{item.name}</ItemTitle>
               <ItemValue>R$ {typeof item.value === 'number' ? item.value.toFixed(2) : '0.00'}</ItemValue>
               <ItemDate>
-                Cancelada em {format(new Date(item.updatedAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                Cancelada em {format(new Date(item.updatedAt), 'dd \'de\' MMMM \'de\' yyyy', { locale: ptBR })}
               </ItemDate>
             </ItemContainer>
           )}
@@ -75,4 +75,4 @@ export function SubscriptionHistory() {
       </Container>
     </DefaultContainer>
   );
-} 
+}

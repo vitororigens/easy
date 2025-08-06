@@ -1,48 +1,48 @@
-import { useEffect, useState } from "react";
-import { getAuth, createUserWithEmailAndPassword, signOut } from "@react-native-firebase/auth";
-import { ActivityIndicator } from "react-native";
-import { Toast } from "react-native-toast-notifications";
-import { useTheme } from "styled-components/native";
-import { Container, Span, TextError, Title } from "./styles";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
-import { database } from "../../libs/firebase";
+import { useEffect, useState } from 'react';
+import { getAuth, createUserWithEmailAndPassword, signOut } from '@react-native-firebase/auth';
+import { ActivityIndicator } from 'react-native';
+import { Toast } from 'react-native-toast-notifications';
+import { useTheme } from 'styled-components/native';
+import { Container, Span, TextError, Title } from './styles';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Button } from '../../components/Button';
+import { Input } from '../../components/Input';
+import { database } from '../../libs/firebase';
 
 const formSchema = z
   .object({
     name: z
       .string()
-      .min(1, "O nome é obrigatório.")
+      .min(1, 'O nome é obrigatório.')
       .refine(
         (value) => {
-          return value.trim().split(" ").length >= 2;
+          return value.trim().split(' ').length >= 2;
         },
         {
-          message: "O nome completo deve conter pelo menos um sobrenome.",
-        }
+          message: 'O nome completo deve conter pelo menos um sobrenome.',
+        },
       ),
-    userName: z.string().min(1, "Nome de usuario é obrigatorio"),
+    userName: z.string().min(1, 'Nome de usuario é obrigatorio'),
     email: z
       .string()
-      .min(1, "O email é obrigatório.")
-      .email("Formato de email inválido"),
+      .min(1, 'O email é obrigatório.')
+      .email('Formato de email inválido'),
     password: z
       .string()
-      .min(1, { message: "A senha é obrigatória." })
-      .min(6, { message: "A senha deve conter pelo menos 6 caracteres." }),
-    confirmPassword: z.string().min(1, "Confirme sua senha."),
+      .min(1, { message: 'A senha é obrigatória.' })
+      .min(6, { message: 'A senha deve conter pelo menos 6 caracteres.' }),
+    confirmPassword: z.string().min(1, 'Confirme sua senha.'),
   })
   .refine(
     (values) => {
       return values.password === values.confirmPassword;
     },
     {
-      message: "As senhas não coincidem",
-      path: ["confirmPassword"],
-    }
+      message: 'As senhas não coincidem',
+      path: ['confirmPassword'],
+    },
   );
 
 type FormSchemaType = z.infer<typeof formSchema>;
@@ -60,21 +60,21 @@ export function SingUp() {
   } = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      userName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
+      name: '',
+      userName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
     },
   });
 
   const checkUsernameExists = async (username: string) => {
-    const userRef = database.collection("User");
-    const snapshot = await userRef.where("userName", "==", username).get();
+    const userRef = database.collection('User');
+    const snapshot = await userRef.where('userName', '==', username).get();
     return !snapshot.empty;
   };
 
-  const userName = watch("userName");
+  const userName = watch('userName');
 
   useEffect(() => {
     const checkUsername = async () => {
@@ -92,12 +92,12 @@ export function SingUp() {
   function handleLogout() {
     const auth = getAuth();
     signOut(auth)
-      .then(() => console.log("User signed out"));
+      .then(() => console.log('User signed out'));
   }
 
   function handleRegister({ name, email, password, userName }: FormSchemaType) {
     if (usernameExists) {
-      Toast.show("Nome de usuário já existe.", { type: "danger" });
+      Toast.show('Nome de usuário já existe.', { type: 'danger' });
       return;
     }
 
@@ -110,22 +110,22 @@ export function SingUp() {
             displayName: name.trim(),
           })
           .then(() => {
-            database.collection("User").doc(uid).set({
+            database.collection('User').doc(uid).set({
               userName: userName.trim(),
               uid,
             });
-            Toast.show("Conta cadastrada com sucesso!", { type: "success" });
+            Toast.show('Conta cadastrada com sucesso!', { type: 'success' });
           });
       })
       .catch((error) => {
-        if (error.code === "auth/email-already-in-use") {
-          Toast.show("O email já está em uso por outra conta.", {
-            type: "danger",
+        if (error.code === 'auth/email-already-in-use') {
+          Toast.show('O email já está em uso por outra conta.', {
+            type: 'danger',
           });
         } else {
-          console.error("Erro ao criar conta:", error);
-          Toast.show("Não foi possível cadastrar sua conta, verifique.", {
-            type: "danger",
+          console.error('Erro ao criar conta:', error);
+          Toast.show('Não foi possível cadastrar sua conta, verifique.', {
+            type: 'danger',
           });
         }
       })
@@ -266,7 +266,7 @@ export function SingUp() {
       )}
 
       <Button
-        title={isSubmitting ? <ActivityIndicator /> : "Cadastrar"}
+        title={isSubmitting ? <ActivityIndicator /> : 'Cadastrar'}
         onPress={handleSubmit(handleRegister)}
         disabled={isSubmitting || usernameExists}
       />

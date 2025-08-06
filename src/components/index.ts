@@ -44,4 +44,8 @@ export { FinishMarkets } from './FinishMarkets';
 export { FinishTasks } from './FinishTasks';
 export { Logo } from './Logo';
 export { LogoUser } from './LogoUser';
-export { Notification } from './Notification'; 
+export { Notification } from './Notification';
+
+// Componentes de IA
+export { AIInsights } from './AIInsights';
+export { NaturalInput } from './NaturalInput';

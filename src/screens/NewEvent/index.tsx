@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Switch } from 'react-native';
+import { Alert, Switch, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { DefaultContainer } from '../../components/DefaultContainer';
 import { Input } from '../../components/Input';
@@ -8,37 +8,42 @@ import { useUserAuth } from '../../hooks/useUserAuth';
 import useSendNotifications from '../../hooks/useSendNotifications';
 import { ICalendarEvent, createEvent, findEventById, updateEvent } from '../../services/firebase/calendar.firebase';
 import { Timestamp } from '@react-native-firebase/firestore';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { FormProvider, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { ShareWithUsers } from '../../components/ShareWithUsers';
 import { createSharing, getSharing, ESharingStatus } from '../../services/firebase/sharing.firebase';
 import { createNotification } from '../../services/firebase/notifications.firebase';
 import { z } from 'zod';
 import {
-  Content,
-  DateTimeContainer,
-  DateTimeLabel,
-  DateTimeValue,
-  DateTimePickerButton,
   NotificationContainer,
   NotificationLabel,
 } from './styles';
 import { getFirestore, doc, getDoc } from '@react-native-firebase/firestore';
+import { InputDate, InputTime } from '@/components';
+import { dataMask } from '../../utils/mask';
 
 const formSchema = z.object({
-  name: z.string().min(1, "Nome do evento é obrigatório"),
-  formattedDate: z.string().min(1, "Data é obrigatória"),
+  name: z.string().min(1, 'Nome do evento é obrigatório'),
+  formattedDate: z.string().min(1, 'Data é obrigatória'),
   description: z.string().optional(),
   sharedUsers: z.array(
     z.object({
       uid: z.string(),
       userName: z.string(),
       acceptedAt: z.union([z.null(), z.instanceof(Timestamp)]),
-    })
+    }),
   ),
+  time: z.string().default(''),
 });
 
 type FormSchemaType = z.infer<typeof formSchema>;
+
+// Extrair o objeto de estilo do styled-component para usar no contentContainerStyle
+const scrollContentStyle = {
+  flexGrow: 1,
+  padding: 16,
+  borderTopLeftRadius: 40,
+  borderTopRightRadius: 40,
+};
 
 export function NewEvent() {
   const navigation = useNavigation();
@@ -54,13 +59,8 @@ export function NewEvent() {
       sharedUsers: [],
     },
   });
+  const { control, handleSubmit, setValue } = form;
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [date, setDate] = useState(new Date());
-  const [time, setTime] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [subscriberIds, setSubscriberIds] = useState<string[]>([]);
@@ -69,46 +69,51 @@ export function NewEvent() {
     if (selectedItemId) {
       loadEvent();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItemId]);
 
   useEffect(() => {
     const loadSubscriberIds = async () => {
       if (!user.user?.uid) {
+        // eslint-disable-next-line no-console
         console.log('Usuário não está autenticado');
         return;
       }
-      
       try {
         const db = getFirestore();
-        const userRef = doc(db, "User", user.user.uid);
+        const userRef = doc(db, 'User', user.user.uid);
         const userSnap = await getDoc(userRef);
-        
         if (userSnap.exists()) {
           const userData = userSnap.data();
+          // eslint-disable-next-line no-console
           console.log('Dados do usuário:', userData);
-          
-          if (userData?.subscribers && userData.subscribers.length > 0) {
-            console.log('Subscribers encontrados:', userData.subscribers);
-            setSubscriberIds(userData.subscribers);
+          if (userData?.['subscribers'] && userData['subscribers'].length > 0) {
+            // eslint-disable-next-line no-console
+            console.log('Subscribers encontrados:', userData['subscribers']);
+            setSubscriberIds(userData['subscribers']);
           } else if (subscriptionId) {
+            // eslint-disable-next-line no-console
             console.log('Usando subscriptionId direto:', subscriptionId);
             setSubscriberIds([subscriptionId]);
           } else {
+            // eslint-disable-next-line no-console
             console.log('Nenhum subscriber encontrado');
             setSubscriberIds([]);
           }
         } else {
+          // eslint-disable-next-line no-console
           console.log('Documento do usuário não existe');
           if (subscriptionId) {
+            // eslint-disable-next-line no-console
             console.log('Usando subscriptionId direto:', subscriptionId);
             setSubscriberIds([subscriptionId]);
           }
         }
       } catch (error) {
-        console.error("Erro ao carregar subscriberIds:", error);
+        // eslint-disable-next-line no-console
+        console.error('Erro ao carregar subscriberIds:', error);
       }
     };
-
     loadSubscriberIds();
   }, [user.user?.uid, subscriptionId]);
 
@@ -116,56 +121,40 @@ export function NewEvent() {
     if (!selectedItemId) return;
     try {
       const event = await findEventById(selectedItemId);
-      console.log("Evento encontrado:", event);
+      // eslint-disable-next-line no-console
+      console.log('Evento encontrado:', event);
       if (event) {
-        setTitle(event.title);
-        setDescription(event.description);
-        setDate(new Date(event.date));
-        setTime(new Date(`2000-01-01T${event.time}`));
-        form.setValue('name', event.title);
-        form.setValue('description', event.description);
-        form.setValue('formattedDate', new Date(event.date).toLocaleDateString('pt-BR'));
-        form.setValue('sharedUsers', event.sharedWith?.map((uid) => ({ uid, userName: uid, acceptedAt: null })) || []);
+        setValue('name', event.title);
+        setValue('description', event.description);
+        setValue('formattedDate', new Date(event.date).toLocaleDateString('pt-BR'));
+        setValue('sharedUsers', event.sharedWith?.map((uid) => ({ uid, userName: uid, acceptedAt: null })) || []);
+        setValue('time', event.time ? String(event.time) : '');
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Erro ao carregar evento:', error);
       Alert.alert('Erro', 'Não foi possível carregar o evento');
     }
   };
 
-  const formatDate = (date: Date) => {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  const formatTime = (time: Date) => {
-    const hours = String(time.getHours()).padStart(2, '0');
-    const minutes = String(time.getMinutes()).padStart(2, '0');
-    return `${hours}:${minutes}`;
-  };
-
-  const handleSave = async () => {
+  const onSubmit = async (formData: FormSchemaType & { time?: string }) => {
     if (!user.user?.uid) return;
-    if (!title.trim()) {
+    if (!formData.name.trim()) {
       Alert.alert('Erro', 'Por favor, preencha o título do evento');
       return;
     }
-
     try {
       setIsLoading(true);
-      const formData = form.getValues();
       const sharedUsers = formData.sharedUsers || [];
-
+      const dateObj = formData.formattedDate
+        ? (() => { const [d, m, y] = formData.formattedDate.split('/'); return new Date(`${y}-${m}-${d}`); })() : new Date();
       const eventData: Partial<ICalendarEvent> = {
-        title: title.trim(),
-        description: description.trim(),
-        date: date.toISOString().split('T')[0],
-        time: time.toTimeString().split(' ')[0].slice(0, 5),
-        sharedWith: sharedUsers.map((user: any) => user.uid),
+        title: formData.name.trim(),
+        description: formData.description?.trim() || '',
+        date: dateObj.toISOString().split('T')[0] ?? '',
+        time: String(formData.time ?? ''),
+        sharedWith: sharedUsers.map((user: { uid: string }) => user.uid),
       };
-
       let createdEvent;
       if (selectedItemId) {
         await updateEvent(selectedItemId, eventData);
@@ -175,70 +164,64 @@ export function NewEvent() {
           userId: user.user?.uid,
           createdAt: Timestamp.now(),
         } as ICalendarEvent);
-
         if (notificationsEnabled && subscriberIds.length > 0) {
           await sendNotification({
-            title: title,
-            message: "Você tem um novo evento agendado!",
+            title: formData.name,
+            message: 'Você tem um novo evento agendado!',
             subscriptionsIds: subscriberIds,
-            date: formatDate(date),
-            hour: formatTime(time),
+            date: formData.formattedDate,
+            hour: formData.time || '',
           });
         }
-
         // Handle sharing
         if (sharedUsers.length > 0) {
           const usersInvitedByMe = await getSharing({
-            profile: "invitedBy",
+            profile: 'invitedBy',
             uid: user.user.uid,
           });
-
           for (const sharedUser of sharedUsers) {
             const alreadySharing = usersInvitedByMe.some(
-              (u) => u.target === sharedUser.uid && u.status === ESharingStatus.ACCEPTED
+              (u) => u.target === sharedUser.uid && u.status === ESharingStatus.ACCEPTED,
             );
-
             const possibleSharingRequestExists = usersInvitedByMe.some(
-              (u) => u.target === sharedUser.uid
+              (u) => u.target === sharedUser.uid,
             );
-
             const message = alreadySharing
               ? `${user.user?.displayName} compartilhou um evento com você`
               : `${user.user?.displayName} convidou você para compartilhar um evento`;
-
             await Promise.allSettled([
               createNotification({
                 sender: user.user.uid,
                 receiver: sharedUser.uid,
-                status: alreadySharing ? "sharing_accepted" : "pending",
-                type: "sharing_invite",
+                status: alreadySharing ? 'sharing_accepted' : 'pending',
+                type: 'sharing_invite',
                 source: {
-                  type: "event",
+                  type: 'event',
                   id: createdEvent.id,
                 },
-                title: "Compartilhamento de evento",
+                title: 'Compartilhamento de evento',
                 description: message,
                 createdAt: Timestamp.now(),
               }),
               ...(!alreadySharing && !possibleSharingRequestExists
                 ? [
-                    createSharing({
-                      invitedBy: user.user.uid,
-                      status: ESharingStatus.PENDING,
-                      target: sharedUser.uid,
-                      createdAt: Timestamp.now(),
-                      updatedAt: Timestamp.now(),
-                    }),
-                  ]
+                  createSharing({
+                    invitedBy: user.user.uid,
+                    status: ESharingStatus.PENDING,
+                    target: sharedUser.uid,
+                    createdAt: Timestamp.now(),
+                    updatedAt: Timestamp.now(),
+                  }),
+                ]
                 : []),
             ]);
           }
         }
       }
-
       Alert.alert('Sucesso', 'Evento salvo com sucesso!');
       navigation.goBack();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Erro ao salvar evento:', error);
       Alert.alert('Erro', 'Não foi possível salvar o evento');
     } finally {
@@ -246,78 +229,66 @@ export function NewEvent() {
     }
   };
 
-  const onDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setDate(selectedDate);
-      form.setValue('formattedDate', selectedDate.toLocaleDateString('pt-BR'));
-    }
-  };
-
-  const onTimeChange = (event: any, selectedTime?: Date) => {
-    setShowTimePicker(false);
-    if (selectedTime) {
-      setTime(selectedTime);
-    }
-  };
-
   return (
-    <DefaultContainer title={selectedItemId ? 'Editar Evento' : 'Novo Evento'} backButton addButton>
-      <Content>
-        <Input
-          name='title'
-          value={title}
-          onChangeText={(text) => {
-            setTitle(text);
-            form.setValue('name', text);
-          }}
-          placeholder="Digite o título do evento"
-        />
-
-        <Input
-          name="Descrição"
-          value={description}
-          onChangeText={(text) => {
-            setDescription(text);
-            form.setValue('description', text);
-          }}
-          placeholder="Digite a descrição do evento"
-          multiline
-          numberOfLines={4}
-        />
-
-        <DateTimeContainer>
-          <DateTimeLabel>Data</DateTimeLabel>
-          <DateTimePickerButton onPress={() => setShowDatePicker(true)}>
-            <DateTimeValue>{formatDate(date)}</DateTimeValue>
-          </DateTimePickerButton>
-          {showDatePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={onDateChange}
+    <DefaultContainer title={selectedItemId ? 'Editar Evento' : 'Novo Evento'} backButton>
+      <ScrollView
+        contentContainerStyle={scrollContentStyle}
+        keyboardShouldPersistTaps='handled'
+        showsVerticalScrollIndicator={false}
+      >
+        <Controller
+          control={control}
+          name='name'
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              name='title'
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              placeholder='Digite o título do evento'
             />
           )}
-        </DateTimeContainer>
-
-        <DateTimeContainer>
-          <DateTimeLabel>Hora</DateTimeLabel>
-          <DateTimePickerButton onPress={() => setShowTimePicker(true)}>
-            <DateTimeValue>
-              {formatTime(time)}
-            </DateTimeValue>
-          </DateTimePickerButton>
-          {showTimePicker && (
-            <DateTimePicker
-              value={time}
-              mode="time"
-              display="default"
-              onChange={onTimeChange}
+        />
+        <Controller
+          control={control}
+          name='description'
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              name='Descrição'
+              value={value ?? ''}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              placeholder='Digite a descrição do evento'
+              multiline
+              numberOfLines={4}
             />
           )}
-        </DateTimeContainer>
-
+        />
+        <Controller
+          control={control}
+          name='formattedDate'
+          render={({ field: { onChange, onBlur, value } }) => (
+            <InputDate
+              placeholder='Data'
+              name='calendar'
+              onBlur={onBlur}
+              onChange={onChange}
+              value={dataMask(value)}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name='time'
+          render={({ field: { onChange, onBlur, value } }) => (
+            <InputTime
+              name='time'
+              value={typeof value === 'string' ? value : ''}
+              onChange={onChange}
+              onBlur={onBlur}
+            />
+          )}
+        />
         <NotificationContainer>
           <NotificationLabel>Enviar notificação</NotificationLabel>
           <Switch
@@ -325,19 +296,18 @@ export function NewEvent() {
             onValueChange={setNotificationsEnabled}
           />
         </NotificationContainer>
-
         {isCreator && (
           <FormProvider {...form}>
-            <ShareWithUsers control={form.control} name="sharedUsers" />
+            {/* @ts-expect-error: ShareWithUsers espera props extras */}
+            <ShareWithUsers control={form.control} name='sharedUsers' />
           </FormProvider>
         )}
-
         <Button
           title={selectedItemId ? 'Salvar' : 'Criar'}
-          onPress={handleSave}
+          onPress={handleSubmit(onSubmit)}
           isLoading={isLoading}
         />
-      </Content>
+      </ScrollView>
     </DefaultContainer>
   );
 }

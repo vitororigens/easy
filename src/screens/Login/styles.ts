@@ -1,5 +1,5 @@
-import { TouchableOpacity, Dimensions } from "react-native";
-import styled from "styled-components/native";
+import { TouchableOpacity, Dimensions } from 'react-native';
+import styled from 'styled-components/native';
 
 const { height } = Dimensions.get('window');
 
@@ -46,7 +46,7 @@ export const Button = styled(TouchableOpacity)<ButtonProps>`
     width: 50%;
     border-top-width: 4px;
     border-top-style: solid;
-    border-top-color: ${({theme, active}) => !active ? theme.COLORS.TEAL_600 : "transparent"};
+    border-top-color: ${({theme, active}) => !active ? theme.COLORS.TEAL_600 : 'transparent'};
 `;
 
 export const Title = styled.Text`

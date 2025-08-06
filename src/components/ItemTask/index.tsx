@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import { ITask } from "../../interfaces/ITask";
+import { useState, useRef, useEffect } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
+import { ITask } from '../../interfaces/ITask';
 import {
   Container,
   Content,
@@ -19,10 +19,10 @@ import {
   PopoverDivider,
   MainContent,
   Row,
-} from "./styles";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import Popover from "react-native-popover-view";
-import { findUserById } from "../../services/firebase/users.firestore";
+} from './styles';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import Popover from 'react-native-popover-view';
+import { findUserById } from '../../services/firebase/users.firestore';
 
 interface ItemTaskProps {
   task: ITask;
@@ -41,10 +41,10 @@ export function ItemTask({
 }: ItemTaskProps) {
   const { user } = useUserAuth();
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
-  const [sharedByUserName, setSharedByUserName] = useState<string>("");
+  const [sharedByUserName, setSharedByUserName] = useState<string>('');
   const popoverRef = useRef(null);
-  
-  console.log("ItemTask recebeu a tarefa:", task);
+
+  console.log('ItemTask recebeu a tarefa:', task);
 
   // Verificar se é uma tarefa compartilhada
   const isShared = task.shareWith && task.shareWith.length > 0;
@@ -59,7 +59,7 @@ export function ItemTask({
             setSharedByUserName(userData.userName);
           }
         } catch (error) {
-          console.error("Erro ao buscar nome do usuário que compartilhou:", error);
+          console.error('Erro ao buscar nome do usuário que compartilhou:', error);
         }
       }
     };
@@ -102,18 +102,18 @@ export function ItemTask({
             <Title>{task.name}</Title>
             {isShared && (
               <ShareBadge>
-                <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
+                <ShareIcon name={isSharedByMe ? 'share' : 'share-variant'} />
               </ShareBadge>
             )}
           </Row>
           <Description>{task.description}</Description>
           {isShared && (
             <ShareText>
-              {isSharedByMe 
-                ? "Compartilhado por você" 
-                : sharedByUserName 
-                  ? `Compartilhado por ${sharedByUserName}` 
-                  : "Compartilhado com você"
+              {isSharedByMe
+                ? 'Compartilhado por você'
+                : sharedByUserName
+                  ? `Compartilhado por ${sharedByUserName}`
+                  : 'Compartilhado com você'
               }
             </ShareText>
           )}
@@ -132,13 +132,13 @@ export function ItemTask({
         >
           <PopoverContainer>
             <PopoverItem onPress={handleToggleStatus}>
-              <MaterialIcons 
-                name={task.status ? "check-circle-outline" : "radio-button-unchecked"} 
-                size={20} 
-                color={task.status ? "#16a34a" : "#a7a9ac"} 
+              <MaterialIcons
+                name={task.status ? 'check-circle-outline' : 'radio-button-unchecked'}
+                size={20}
+                color={task.status ? '#16a34a' : '#a7a9ac'}
               />
               <PopoverItemText>
-                {task.status ? "Marcar como não concluída" : "Marcar como concluída"}
+                {task.status ? 'Marcar como não concluída' : 'Marcar como concluída'}
               </PopoverItemText>
             </PopoverItem>
             <PopoverDivider />

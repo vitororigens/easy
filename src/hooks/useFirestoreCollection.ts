@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import { getFirestore } from "@react-native-firebase/firestore";
-import { useUserAuth } from "./useUserAuth";
-import { useMonth } from "../context/MonthProvider";
-import { Alert, Linking } from "react-native";
+import { useState, useEffect } from 'react';
+import { getFirestore } from '@react-native-firebase/firestore';
+import { useUserAuth } from './useUserAuth';
+import { useMonth } from '../context/MonthProvider';
+import { Alert, Linking } from 'react-native';
 
 export interface ExpenseData {
   id: string;
@@ -39,10 +39,10 @@ const useFirestoreCollection = (collectionName: string) => {
   const db = getFirestore();
   const handleIndexError = (error: any, type: 'own' | 'shared') => {
     console.error(`Erro ao observar documentos ${type} de ${collectionName}:`, error);
-    
+
     if (error.code === 'firestore/failed-precondition' && error.message.includes('index')) {
       const indexUrl = error.message.match(/https:\/\/console\.firebase\.google\.com[^\s]*/)?.[0];
-      
+
       if (indexUrl) {
         Alert.alert(
           'Índice necessário',
@@ -50,23 +50,23 @@ const useFirestoreCollection = (collectionName: string) => {
           [
             {
               text: 'Criar índice',
-              onPress: () => Linking.openURL(indexUrl)
+              onPress: () => Linking.openURL(indexUrl),
             },
             {
               text: 'Cancelar',
-              style: 'cancel'
-            }
-          ]
+              style: 'cancel',
+            },
+          ],
         );
       }
     }
-    
+
     setError(error.message);
   };
 
   useEffect(() => {
     let isMounted = true;
-    
+
     if (!user?.uid) {
       setLoading(false);
       return () => {};
@@ -74,7 +74,7 @@ const useFirestoreCollection = (collectionName: string) => {
 
     try {
       console.log(`Iniciando listener para coleção: ${collectionName}`);
-      
+
       // Query for user's own documents
       const ownQuery = db
         .collection(collectionName)
@@ -88,25 +88,25 @@ const useFirestoreCollection = (collectionName: string) => {
         .where('month', '==', selectedMonth)
         .where('shareWith', 'array-contains', user.uid)
         .orderBy('createdAt', 'desc');
-      
+
       // Subscribe to both queries
       const unsubscribe1 = ownQuery.onSnapshot(
         (snapshot: any) => {
           if (!isMounted || !snapshot) return;
-          
+
           console.log(`Snapshot recebido para ${collectionName} (próprios). Total de documentos: ${snapshot.size}`);
-          
+
           const ownData = snapshot.docs.map((doc: any) => ({
             id: doc.id,
-            ...doc.data()
+            ...doc.data(),
           })) as ExpenseData[];
-          
+
           setData(prev => {
             const sharedDocs = prev.filter(doc => doc.shareWith?.includes(user.uid));
             return [...ownData, ...sharedDocs];
           });
         },
-        (error: any) => handleIndexError(error, 'own')
+        (error: any) => handleIndexError(error, 'own'),
       );
 
       const unsubscribe2 = sharedQuery.onSnapshot(
@@ -117,7 +117,7 @@ const useFirestoreCollection = (collectionName: string) => {
 
           const sharedData = snapshot.docs.map((doc: any) => ({
             id: doc.id,
-            ...doc.data()
+            ...doc.data(),
           })) as ExpenseData[];
 
           setData(prev => {
@@ -125,7 +125,7 @@ const useFirestoreCollection = (collectionName: string) => {
             return [...ownDocs, ...sharedData];
           });
         },
-        (error: any) => handleIndexError(error, 'shared')
+        (error: any) => handleIndexError(error, 'shared'),
       );
 
       setLoading(false);

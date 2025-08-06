@@ -1,13 +1,13 @@
-import { View } from "react-native";
+import { View } from 'react-native';
 import {
   Button,
   CartInfoContainer,
   Container,
   Separator,
   Title,
-} from "./styles";
-import { IMarket } from "../../services/firebase/market.firebase";
-import { formatPrice } from "../../utils/price";
+} from './styles';
+import { IMarket } from '../../services/firebase/market.firebase';
+import { formatPrice } from '../../utils/price';
 
 type ICartProps = {
   selectedItems: IMarket[];
@@ -17,11 +17,11 @@ type ICartProps = {
 export function Cart({ selectedItems, buttonSave }: ICartProps) {
   const totalItems = selectedItems.reduce(
     (total, item) => total + (item.quantity ?? 0),
-    0
+    0,
   );
   const totalValue = selectedItems.reduce(
     (total, item) => total + (item.price ?? 0) * (item.quantity ?? 0),
-    0
+    0,
   );
 
   return (
@@ -35,8 +35,8 @@ export function Cart({ selectedItems, buttonSave }: ICartProps) {
           <Button onPress={buttonSave}>
             <Title
               style={{
-                width: "100%",
-                textAlign: "center",
+                width: '100%',
+                textAlign: 'center',
                 fontSize: 14,
               }}
             >

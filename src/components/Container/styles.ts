@@ -1,5 +1,5 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import styled from "styled-components/native";
+import styled from 'styled-components/native';
 
 export type ContainerTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
@@ -13,13 +13,12 @@ export const Content  =  styled.View`
     border-radius: 50px 50px  0px 0px;
 `;
 
-
 export const Header = styled.View<Props>`
     width: 100%;
     height: 100px;
     border-radius: 50px 50px 0 0;
-    background-color: ${({theme, type}) => type === 'PRIMARY' 
-    ? theme.COLORS.TEAL_600 
+    background-color: ${({theme, type}) => type === 'PRIMARY'
+    ? theme.COLORS.TEAL_600
     : theme.COLORS.PURPLE_800};
     align-items: center;
     justify-content: center;
@@ -38,10 +37,9 @@ export const SubTitle = styled.Text`
     color: ${({theme}) => theme.COLORS.GRAY_400};
 `;
 
-
 export const Icon = styled(FontAwesome5).attrs(({theme}) => ({
-    color: theme.COLORS.WHITE,
-    size: theme.FONT_SIZE.XL
+  color: theme.COLORS.WHITE,
+  size: theme.FONT_SIZE.XL,
 }))`
 margin-right: 10px;
 `;

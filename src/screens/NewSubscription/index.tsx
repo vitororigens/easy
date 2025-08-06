@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { useForm, Controller } from "react-hook-form";
-import { Toast } from "react-native-toast-notifications";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Input } from "../../components/Input";
-import { Button } from "../../components/Button";
-import { createSubscription, updateSubscription } from "../../services/firebase/subscription.firebase";
-import { Subscription } from "../../services/firebase/subscription.firebase";
-import firestore from "@react-native-firebase/firestore";
+import React, { useEffect, useState } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useForm, Controller } from 'react-hook-form';
+import { Toast } from 'react-native-toast-notifications';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { Input } from '../../components/Input';
+import { Button } from '../../components/Button';
+import { createSubscription, updateSubscription } from '../../services/firebase/subscription.firebase';
+import { Subscription } from '../../services/firebase/subscription.firebase';
+import firestore from '@react-native-firebase/firestore';
 
 import {
   Container,
@@ -19,8 +19,8 @@ import {
   SelectContainer,
   SelectButton,
   SelectText,
-} from "./styles";
-import { currencyMask } from "../../utils/mask";
+} from './styles';
+import { currencyMask } from '../../utils/mask';
 
 type FormData = {
   name: string;
@@ -45,8 +45,8 @@ export function NewSubscription() {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      status: true
-    }
+      status: true,
+    },
   });
 
   useEffect(() => {
@@ -58,30 +58,30 @@ export function NewSubscription() {
   async function fetchSubscription() {
     try {
       const doc = await firestore()
-        .collection("subscriptions")
+        .collection('subscriptions')
         .doc(selectedItemId)
         .get();
 
       if (doc.exists()) {
         const subscription = doc.data() as Subscription;
 
-        setValue("name", subscription.name);
-        setValue("value", subscription.value.toString());
-        setValue("dueDay", subscription.dueDay.toString());
-        setValue("status", subscription.status);
+        setValue('name', subscription.name);
+        setValue('value', subscription.value.toString());
+        setValue('dueDay', subscription.dueDay.toString());
+        setValue('status', subscription.status);
         setStatus(subscription.status);
 
         if (subscription.description) {
-          setValue("description", subscription.description);
+          setValue('description', subscription.description);
           setShowDescription(true);
         }
       } else {
-        console.error("Assinatura não encontrada");
-        Toast.show("Assinatura não encontrada", { type: "error" });
+        console.error('Assinatura não encontrada');
+        Toast.show('Assinatura não encontrada', { type: 'error' });
       }
     } catch (error) {
-      console.error("Erro ao buscar assinatura:", error);
-      Toast.show("Erro ao carregar assinatura", { type: "error" });
+      console.error('Erro ao buscar assinatura:', error);
+      Toast.show('Erro ao carregar assinatura', { type: 'error' });
     }
   }
 
@@ -101,16 +101,16 @@ export function NewSubscription() {
 
       if (selectedItemId) {
         await updateSubscription(selectedItemId, subscriptionData);
-        Toast.show("Assinatura atualizada!", { type: "success" });
+        Toast.show('Assinatura atualizada!', { type: 'success' });
       } else {
         await createSubscription(subscriptionData);
-        Toast.show("Assinatura criada!", { type: "success" });
+        Toast.show('Assinatura criada!', { type: 'success' });
       }
 
       navigation.goBack();
     } catch (error) {
-      console.error("Erro ao salvar assinatura:", error);
-      Toast.show("Erro ao salvar assinatura", { type: "error" });
+      console.error('Erro ao salvar assinatura:', error);
+      Toast.show('Erro ao salvar assinatura', { type: 'error' });
     }
   }
 
@@ -125,14 +125,14 @@ export function NewSubscription() {
             <Controller
               control={control}
               name="name"
-              rules={{ required: "Nome é obrigatório" }}
+              rules={{ required: 'Nome é obrigatório' }}
               render={({ field: { onChange, value } }) => (
                 <Input
                   name="tag"
                   onChangeText={onChange}
                   value={value}
                   placeholder="Ex: Netflix"
-                  errorMessage={errors.name?.message ?? ""}
+                  errorMessage={errors.name?.message ?? ''}
                 />
               )}
             />
@@ -143,7 +143,7 @@ export function NewSubscription() {
             <Controller
               control={control}
               name="value"
-              rules={{ required: "Valor é obrigatório" }}
+              rules={{ required: 'Valor é obrigatório' }}
               render={({ field: { onChange, value } }) => (
                 <Input
                   name="dollar"
@@ -151,7 +151,7 @@ export function NewSubscription() {
                   value={value}
                   placeholder="R$ 0,00"
                   keyboardType="numeric"
-                  errorMessage={errors.value?.message ?? ""}
+                  errorMessage={errors.value?.message ?? ''}
                 />
               )}
             />
@@ -162,10 +162,10 @@ export function NewSubscription() {
             <Controller
               control={control}
               name="dueDay"
-              rules={{ 
-                required: "Dia do vencimento é obrigatório",
-                min: { value: 1, message: "Dia deve ser entre 1 e 31" },
-                max: { value: 31, message: "Dia deve ser entre 1 e 31" }
+              rules={{
+                required: 'Dia do vencimento é obrigatório',
+                min: { value: 1, message: 'Dia deve ser entre 1 e 31' },
+                max: { value: 31, message: 'Dia deve ser entre 1 e 31' },
               }}
               render={({ field: { onChange, value } }) => (
                 <Input
@@ -174,7 +174,7 @@ export function NewSubscription() {
                   value={value}
                   placeholder="Dia (1-31)"
                   keyboardType="numeric"
-                  errorMessage={errors.dueDay?.message ?? ""}
+                  errorMessage={errors.dueDay?.message ?? ''}
                 />
               )}
             />
@@ -207,7 +207,7 @@ export function NewSubscription() {
                 active={status}
                 onPress={() => {
                   setStatus(true);
-                  setValue("status", true);
+                  setValue('status', true);
                 }}
               >
                 <SelectText active={status}>Ativa</SelectText>
@@ -216,7 +216,7 @@ export function NewSubscription() {
                 active={!status}
                 onPress={() => {
                   setStatus(false);
-                  setValue("status", false);
+                  setValue('status', false);
                 }}
               >
                 <SelectText active={!status}>Cancelada</SelectText>
@@ -225,7 +225,7 @@ export function NewSubscription() {
           </InputContainer>
 
           <Button
-            title={selectedItemId ? "Atualizar" : "Criar"}
+            title={selectedItemId ? 'Atualizar' : 'Criar'}
             onPress={handleSubmit(onSubmit)}
           />
         </Form>

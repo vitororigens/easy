@@ -1,14 +1,14 @@
-import { Entypo, FontAwesome, Ionicons } from "@expo/vector-icons";
-import { getAuth, signOut, deleteUser } from "@react-native-firebase/auth";
-import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
-import { ScrollView, View, Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useTheme } from "styled-components/native";
-import { CustomModal } from "../../components/CustomModal";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Loading } from "../../components/Loading";
-import { useUserAuth } from "../../hooks/useUserAuth";
+import { Entypo, FontAwesome, Ionicons } from '@expo/vector-icons';
+import { getAuth, signOut, deleteUser } from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
+import { ScrollView, View, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from 'styled-components/native';
+import { CustomModal } from '../../components/CustomModal';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { Loading } from '../../components/Loading';
+import { useUserAuth } from '../../hooks/useUserAuth';
 import {
   ButtonIcon,
   Content,
@@ -24,8 +24,7 @@ import {
   ArrowIcon,
   DangerIcon,
   WarningIcon,
-} from "./styles";
-
+} from './styles';
 
 // Interface para os itens de menu
 interface MenuItemProps {
@@ -46,23 +45,23 @@ const MenuItem: React.FC<MenuItemProps> = ({
   onPress,
   accessibilityLabel,
   accessibilityHint,
-  iconType = 'default'
+  iconType = 'default',
 }) => {
   const { COLORS } = useTheme();
-  
+
   const renderIcon = () => {
     switch (iconType) {
-      case 'warning':
-        return <WarningIcon>{icon}</WarningIcon>;
-      case 'danger':
-        return <DangerIcon>{icon}</DangerIcon>;
-      default:
-        return <Icon>{icon}</Icon>;
+    case 'warning':
+      return <WarningIcon>{icon}</WarningIcon>;
+    case 'danger':
+      return <DangerIcon>{icon}</DangerIcon>;
+    default:
+      return <Icon>{icon}</Icon>;
     }
   };
 
   return (
-    <ButtonIcon 
+    <ButtonIcon
       onPress={onPress}
       activeOpacity={0.7}
       accessibilityLabel={accessibilityLabel}
@@ -103,17 +102,17 @@ export function Gears() {
   async function handleLogout() {
     try {
       await signOut(auth);
-      await AsyncStorage.removeItem("user");
-      console.log("User signed out");
+      await AsyncStorage.removeItem('user');
+      console.log('User signed out');
       setTimeout(() => {
         navigation.reset({
           index: 0,
-          routes: [{ name: "login" }],
+          routes: [{ name: 'login' }],
         });
       }, 1000);
     } catch (error) {
-      console.error("Error signing out: ", error);
-      Alert.alert("Erro", "Não foi possível fazer logout. Tente novamente.");
+      console.error('Error signing out: ', error);
+      Alert.alert('Erro', 'Não foi possível fazer logout. Tente novamente.');
     }
   }
 
@@ -125,18 +124,18 @@ export function Gears() {
     try {
       if (auth.currentUser) {
         await deleteUser(auth.currentUser);
-        await AsyncStorage.removeItem("user");
-        console.log("User deleted account");
+        await AsyncStorage.removeItem('user');
+        console.log('User deleted account');
         setTimeout(() => {
           navigation.reset({
             index: 0,
-            routes: [{ name: "login" }],
+            routes: [{ name: 'login' }],
           });
         }, 1000);
       }
     } catch (error) {
-      console.error("Error delete account: ", error);
-      Alert.alert("Erro", "Não foi possível deletar a conta. Tente novamente.");
+      console.error('Error delete account: ', error);
+      Alert.alert('Erro', 'Não foi possível deletar a conta. Tente novamente.');
     }
   }
 
@@ -149,28 +148,28 @@ export function Gears() {
   // }
 
   function handlePefil() {
-    navigation.navigate("perfil");
+    navigation.navigate('perfil');
   }
 
   function handleNotifications() {
-    navigation.navigate("notifications");
+    navigation.navigate('notifications');
   }
 
   function handleShared() {
-    navigation.navigate("shared");
+    navigation.navigate('shared');
   }
 
   function handleSubscriptions() {
-    navigation.navigate("subscriptions");
+    navigation.navigate('subscriptions');
   }
 
   function handleNotes() {
-    navigation.navigate("notes");
+    navigation.navigate('notes');
   }
 
   return (
     <DefaultContainer title="Configurações">
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}
         style={{ flex: 1 }}
@@ -190,7 +189,7 @@ export function Gears() {
                     accessibilityLabel="Ir para Assinaturas"
                     accessibilityHint="Navega para a tela de gerenciamento de assinaturas"
                   />
-                  
+
                   <MenuItem
                     title="Notas"
                     subtitle="Suas anotações e lembretes"
@@ -214,7 +213,7 @@ export function Gears() {
                     accessibilityLabel="Ir para Compartilhamentos"
                     accessibilityHint="Navega para a tela de compartilhamentos"
                   />
-                  
+
                   <MenuItem
                     title="Notificações"
                     subtitle="Configure alertas e lembretes"
@@ -223,7 +222,7 @@ export function Gears() {
                     accessibilityLabel="Ir para Notificações"
                     accessibilityHint="Navega para a tela de configurações de notificações"
                   />
-                  
+
                   <MenuItem
                     title="Perfil"
                     subtitle="Edite suas informações pessoais"
@@ -248,7 +247,7 @@ export function Gears() {
                     accessibilityHint="Confirma o logout da conta atual"
                     iconType="warning"
                   />
-                  
+
                   <MenuItem
                     title="Deletar Conta"
                     subtitle="Excluir conta permanentemente"
@@ -266,7 +265,7 @@ export function Gears() {
           )}
         </Content>
       </ScrollView>
-      
+
       <CustomModal
         animationType="slide"
         transparent={true}
@@ -281,7 +280,7 @@ export function Gears() {
         title="Deseja realmente sair da conta?"
         visible={confirmLogoutVisible}
       />
-      
+
       <CustomModal
         animationType="slide"
         transparent={true}

@@ -37,7 +37,7 @@ export const getSubscriptions = async (userId: string) => {
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     })) as Subscription[];
   } catch (error) {
     console.error('Erro ao buscar assinaturas:', error);
@@ -65,4 +65,4 @@ export const updateSubscription = async (subscriptionId: string, data: Partial<S
     console.error('Erro ao atualizar assinatura:', error);
     throw error;
   }
-}; 
+};

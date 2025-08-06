@@ -1,8 +1,8 @@
-import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
+import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
 
-export type ItemsTypeStyleProps = "PRIMARY" | "SECONDARY" | "TERTIARY";
+export type ItemsTypeStyleProps = 'PRIMARY' | 'SECONDARY' | 'TERTIARY';
 
 type Props = {
   type?: ItemsTypeStyleProps;
@@ -43,9 +43,9 @@ export const Title = styled.Text<Props>`
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   color: ${({ theme, type }) =>
-    type === "SECONDARY" ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_600};
+    type === 'SECONDARY' ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_600};
   text-decoration-line: ${({ type }) =>
-    type === "SECONDARY" ? "line-through" : "none"};
+    type === 'SECONDARY' ? 'line-through' : 'none'};
 `;
 
 export const SubTitle = styled.Text`
@@ -79,10 +79,10 @@ export const Icon = styled(MaterialCommunityIcons).attrs(({ theme }) => ({
 
 export const IconMenu = styled(Entypo).attrs<Props>(({ theme, type }) => ({
   color:
-    type === "PRIMARY"
+    type === 'PRIMARY'
       ? theme.COLORS.TEAL_600
-      : type === "SECONDARY"
-      ? theme.COLORS.RED_700
-      : theme.COLORS.YELLOW_700,
+      : type === 'SECONDARY'
+        ? theme.COLORS.RED_700
+        : theme.COLORS.YELLOW_700,
   size: theme.FONT_SIZE.XL,
 }))``;

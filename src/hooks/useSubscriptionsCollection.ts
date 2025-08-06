@@ -29,4 +29,4 @@ export const useSubscriptionsCollection = () => {
   }, [user?.uid]);
 
   return { subscriptions, loading, error };
-}; 
+};

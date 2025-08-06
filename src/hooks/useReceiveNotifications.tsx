@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
-import { 
-  getFirestore, 
-  collection, 
-  query, 
-  orderBy, 
+import { useState, useEffect } from 'react';
+import {
+  getFirestore,
+  collection,
+  query,
+  orderBy,
   onSnapshot,
   updateDoc,
   deleteDoc,
-  doc
+  doc,
 } from '@react-native-firebase/firestore';
-import { useUserAuth } from "./useUserAuth";
+import { useUserAuth } from './useUserAuth';
 
 interface Notification {
   id: string;
@@ -29,8 +29,8 @@ export function useReceiveNotifications() {
     if (!user?.uid) return;
 
     const db = getFirestore();
-    const notificationsRef = collection(db, "User", user.uid, "Notifications");
-    const notificationsQuery = query(notificationsRef, orderBy("createdAt", "desc"));
+    const notificationsRef = collection(db, 'User', user.uid, 'Notifications');
+    const notificationsQuery = query(notificationsRef, orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(notificationsQuery, snapshot => {
       const notificationsList: Notification[] = [];
@@ -57,10 +57,10 @@ export function useReceiveNotifications() {
 
     try {
       const db = getFirestore();
-      const notificationRef = doc(db, "User", user.uid, "Notifications", notificationId);
+      const notificationRef = doc(db, 'User', user.uid, 'Notifications', notificationId);
       await updateDoc(notificationRef, { read: true });
     } catch (error) {
-      console.error("Erro ao marcar notificação como lida:", error);
+      console.error('Erro ao marcar notificação como lida:', error);
     }
   };
 
@@ -69,10 +69,10 @@ export function useReceiveNotifications() {
 
     try {
       const db = getFirestore();
-      const notificationRef = doc(db, "User", user.uid, "Notifications", notificationId);
+      const notificationRef = doc(db, 'User', user.uid, 'Notifications', notificationId);
       await deleteDoc(notificationRef);
     } catch (error) {
-      console.error("Erro ao deletar notificação:", error);
+      console.error('Erro ao deletar notificação:', error);
     }
   };
 

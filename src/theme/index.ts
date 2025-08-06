@@ -11,7 +11,7 @@ export default {
     PURPLE_50: '#f1eafd',
     PURPLE_600: '#7201b5',
     PURPLE_800: '#492276',
-    
+
     GRAY_200: '#e5e7eb',
     GRAY_300: '#f1f2f2',
     GRAY_400: '#a7a9ac',
@@ -29,6 +29,6 @@ export default {
     GG: 18,
     XL: 26,
 
-  }
-}
+  },
+};
 

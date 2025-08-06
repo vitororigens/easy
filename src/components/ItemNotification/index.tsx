@@ -14,29 +14,29 @@ export function ItemNotification({ notification }: IItemNotificationProps) {
 
   const getIconName = () => {
     switch (notification.type) {
-      case 'sharing_invite':
-        return 'share';
-      case 'due_account':
-        return 'warning';
-      case 'overdue_account':
-        return 'error';
-      default:
-        return 'notifications';
+    case 'sharing_invite':
+      return 'share';
+    case 'due_account':
+      return 'warning';
+    case 'overdue_account':
+      return 'error';
+    default:
+      return 'notifications';
     }
   };
 
   const getStatusColor = () => {
     switch (notification.status) {
-      case 'pending':
-        return theme.COLORS.PURPLE_600;
-      case 'read':
-        return theme.COLORS.GRAY_400;
-      case 'sharing_accepted':
-        return theme.COLORS.GREEN_700;
-      case 'sharing_rejected':
-        return theme.COLORS.RED_700;
-      default:
-        return theme.COLORS.PURPLE_600;
+    case 'pending':
+      return theme.COLORS.PURPLE_600;
+    case 'read':
+      return theme.COLORS.GRAY_400;
+    case 'sharing_accepted':
+      return theme.COLORS.GREEN_700;
+    case 'sharing_rejected':
+      return theme.COLORS.RED_700;
+    default:
+      return theme.COLORS.PURPLE_600;
     }
   };
 

@@ -1,4 +1,4 @@
-import styled from "styled-components/native";
+import styled from 'styled-components/native';
 
 export const Container = styled.View`
   flex: 1;
@@ -59,4 +59,11 @@ export const NotificationContainer = styled.View`
 export const NotificationLabel = styled.Text`
   font-size: 16px;
   color: ${({ theme }) => theme.COLORS.PURPLE_800};
-`; 
+`;
+
+export const ScrollContent = styled.View`
+  flex-grow: 1;
+  padding: 16px;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+`;

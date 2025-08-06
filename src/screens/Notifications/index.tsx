@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { ItemNotification } from "../../components/ItemNotification";
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { ItemNotification } from '../../components/ItemNotification';
 import {
   getNotifications,
   INotification,
-} from "../../services/firebase/notifications.firebase";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { FlatList, RefreshControl, View, Text } from "react-native";
-import { Loading } from "../../components/Loading";
-import theme from "../../theme";
+} from '../../services/firebase/notifications.firebase';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { FlatList, RefreshControl, View, Text } from 'react-native';
+import { Loading } from '../../components/Loading';
+import theme from '../../theme';
 
 export function Notifications() {
   const [notifications, setNotifications] = useState<INotification[]>([]);
@@ -19,17 +19,17 @@ export function Notifications() {
 
   const handleGetNotifications = useCallback(async () => {
     if (!user?.uid) return;
-    
+
     try {
       setIsLoading(true);
       const n = await getNotifications({
-        profile: "receiver",
+        profile: 'receiver',
         uid: user.uid,
       });
 
       setNotifications(n);
     } catch (error) {
-      console.error("Error fetching notifications:", error);
+      console.error('Error fetching notifications:', error);
     } finally {
       setIsLoading(false);
     }

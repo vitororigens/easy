@@ -1,5 +1,5 @@
-import { Icon, Title, Container, Button } from "./styles";
-import { TouchableOpacity, View } from "react-native";
+import { Icon, Title, Container, Button } from './styles';
+import { TouchableOpacity, View } from 'react-native';
 
 type ListItemProps = {
   title: string;
@@ -13,7 +13,7 @@ export function ListItem({ title, onDelete, onEdit, isChecked, onToggle }: ListI
   return (
     <Container>
       <Button onPress={onToggle}>
-        <Icon type={isChecked ? 'PRIMARY' : 'SECONDARY'} name={isChecked ? "checkbox-marked-circle-outline" : "checkbox-blank-circle-outline"} />
+        <Icon type={isChecked ? 'PRIMARY' : 'SECONDARY'} name={isChecked ? 'checkbox-marked-circle-outline' : 'checkbox-blank-circle-outline'} />
         <Title type={isChecked ? 'PRIMARY' : 'SECONDARY'}>{title}</Title>
       </Button>
       <View style={{ flexDirection: 'row' }}>

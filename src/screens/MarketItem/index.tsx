@@ -1,15 +1,15 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { useEffect, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
-import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
-import { Toast } from "react-native-toast-notifications";
-import { z } from "zod";
-import { LoadingIndicator } from "../../components/Loading/style";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { currencyMask, currencyUnMask, formatCurrency } from "../../utils/mask";
-import { findMarketById } from "../../services/firebase/market.firebase";
+import { MaterialIcons } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { Alert, ScrollView, TouchableOpacity, View } from 'react-native';
+import { Toast } from 'react-native-toast-notifications';
+import { z } from 'zod';
+import { LoadingIndicator } from '../../components/Loading/style';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { currencyMask, currencyUnMask, formatCurrency } from '../../utils/mask';
+import { findMarketById } from '../../services/firebase/market.firebase';
 import {
   Button,
   ButtonPlus,
@@ -20,20 +20,20 @@ import {
   Span,
   SubTitle,
   Title,
-} from "./styles";
-import { getInitials } from "../../utils/getInitials";
-import { Timestamp } from "@react-native-firebase/firestore";
+} from './styles';
+import { getInitials } from '../../utils/getInitials';
+import { Timestamp } from '@react-native-firebase/firestore';
 import {
   createSharing,
   ESharingStatus,
   getSharing,
-} from "../../services/firebase/sharing.firebase";
-import { createNotification } from "../../services/firebase/notifications.firebase";
-import { sendPushNotification } from "../../services/one-signal";
-import { ShareWithUsers } from "../../components/ShareWithUsers";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { useMarket } from "../../contexts/MarketContext";
-import { Select } from "../../components/Select";
+} from '../../services/firebase/sharing.firebase';
+import { createNotification } from '../../services/firebase/notifications.firebase';
+import { sendPushNotification } from '../../services/one-signal';
+import { ShareWithUsers } from '../../components/ShareWithUsers';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { useMarket } from '../../contexts/MarketContext';
+import { Select } from '../../components/Select';
 
 type IMarketItemProps = {
   closeBottomSheet?: () => void;
@@ -45,19 +45,19 @@ type IMarketItemProps = {
 };
 
 const formSchema = z.object({
-  name: z.string().min(1, "Nome da Tarefa é obrigatório"),
+  name: z.string().min(1, 'Nome da Tarefa é obrigatório'),
   quantity: z.string().optional(),
   price: z.string().optional(),
   category: z.string().optional(),
   measurement: z.string().optional(),
   observation: z.string().optional(),
-  formattedDate: z.string().min(1, "Data é obrigatória"),
+  formattedDate: z.string().min(1, 'Data é obrigatória'),
   sharedUsers: z.array(
     z.object({
       uid: z.string(),
       userName: z.string(),
       acceptedAt: z.union([z.null(), z.instanceof(Timestamp)]),
-    })
+    }),
   ),
 });
 
@@ -71,7 +71,7 @@ export const MarketItem = ({
   showButtonRemove,
   selectedItemId,
 }: IMarketItemProps) => {
-  console.log("MarketItem props:", {
+  console.log('MarketItem props:', {
     closeBottomSheet,
     onCloseModal,
     showButtonEdit,
@@ -94,19 +94,19 @@ export const MarketItem = ({
     selectedItemId?: string;
     isCreator: boolean;
   };
-  console.log("isCreator:", isCreator);
-  console.log("selectedItemId from route:", routeSelectedItemId);
+  console.log('isCreator:', isCreator);
+  console.log('selectedItemId from route:', routeSelectedItemId);
 
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      quantity: "1",
-      price: "",
-      category: "outros",
-      measurement: "un",
-      observation: "",
-      formattedDate: new Date().toLocaleDateString("pt-BR"),
+      name: '',
+      quantity: '1',
+      price: '',
+      category: 'outros',
+      measurement: 'un',
+      observation: '',
+      formattedDate: new Date().toLocaleDateString('pt-BR'),
       sharedUsers: [],
     },
   });
@@ -115,8 +115,8 @@ export const MarketItem = ({
 
   function formatQuantity(quantity: string) {
     const formattedQuantity = quantity
-      .replace(/\D/g, "")
-      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+      .replace(/\D/g, '')
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
     return formattedQuantity;
   }
 
@@ -134,7 +134,7 @@ export const MarketItem = ({
       setLoading(true);
 
       const usersInvitedByMe = await getSharing({
-        profile: "invitedBy",
+        profile: 'invitedBy',
         uid: uid as string,
       });
 
@@ -151,7 +151,7 @@ export const MarketItem = ({
           uid: user.uid,
           userName: user.userName,
           acceptedAt: usersInvitedByMe.some(
-            (u) => u.target === user.uid && u.status === ESharingStatus.ACCEPTED
+            (u) => u.target === user.uid && u.status === ESharingStatus.ACCEPTED,
           )
             ? Timestamp.now()
             : null,
@@ -159,17 +159,17 @@ export const MarketItem = ({
       });
 
       if (!marketId) {
-        throw new Error("Failed to create market");
+        throw new Error('Failed to create market');
       }
 
       if (sharedUsers.length > 0) {
         for (const user of sharedUsers) {
           const alreadySharing = usersInvitedByMe.some(
-            (u) => u.target === user.uid && u.status === "accepted"
+            (u) => u.target === user.uid && u.status === 'accepted',
           );
 
           const possibleSharingRequestExists = usersInvitedByMe.some(
-            (u) => u.target === user.uid
+            (u) => u.target === user.uid,
           );
 
           const message = alreadySharing
@@ -180,13 +180,13 @@ export const MarketItem = ({
             createNotification({
               sender: uid as string,
               receiver: user.uid,
-              status: alreadySharing ? "sharing_accepted" : "pending",
-              type: "sharing_invite",
+              status: alreadySharing ? 'sharing_accepted' : 'pending',
+              type: 'sharing_invite',
               source: {
-                type: "market",
+                type: 'market',
                 id: marketId,
               },
-              title: "Compartilhamento de mercado",
+              title: 'Compartilhamento de mercado',
               description: message,
               createdAt: Timestamp.now(),
             }),
@@ -202,7 +202,7 @@ export const MarketItem = ({
               ]
               : []),
             sendPushNotification({
-              title: "Compartilhamento de mercado",
+              title: 'Compartilhamento de mercado',
               message,
               uid: user.uid,
             }),
@@ -210,17 +210,17 @@ export const MarketItem = ({
         }
       }
 
-      Toast.show("Item adicionado!", { type: "success" });
+      Toast.show('Item adicionado!', { type: 'success' });
       reset();
-      navigation.navigate("tabroutes", {
-        screen: "Market",
+      navigation.navigate('tabroutes', {
+        screen: 'Market',
         params: { reload: true },
       });
       onCloseModal && onCloseModal();
       closeBottomSheet && closeBottomSheet();
     } catch (error) {
-      console.error("Erro ao adicionar o item: ", error);
-      Toast.show("Erro ao adicionar o item", { type: "error" });
+      console.error('Erro ao adicionar o item: ', error);
+      Toast.show('Erro ao adicionar o item', { type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -236,7 +236,7 @@ export const MarketItem = ({
     quantity,
   }: FormSchemaType) => {
     if (!routeSelectedItemId) {
-      console.error("Nenhum documento selecionado para edição!");
+      console.error('Nenhum documento selecionado para edição!');
       return;
     }
     try {
@@ -256,16 +256,16 @@ export const MarketItem = ({
         shareWith: sharedUsers.map((user) => user.uid),
       });
 
-      Toast.show("Item atualizado!", { type: "success" });
-      navigation.navigate("tabroutes", {
-        screen: "Market",
+      Toast.show('Item atualizado!', { type: 'success' });
+      navigation.navigate('tabroutes', {
+        screen: 'Market',
         params: { reload: true },
       });
       onCloseModal && onCloseModal();
       closeBottomSheet && closeBottomSheet();
     } catch (error) {
-      console.error("Erro ao atualizar o documento:", error);
-      Toast.show("Erro ao atualizar o item", { type: "error" });
+      console.error('Erro ao atualizar o documento:', error);
+      Toast.show('Erro ao atualizar o item', { type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -273,23 +273,23 @@ export const MarketItem = ({
 
   const handleDeleteMarket = async () => {
     if (!routeSelectedItemId) {
-      console.error("Nenhum documento selecionado para exclusão!");
+      console.error('Nenhum documento selecionado para exclusão!');
       return;
     }
 
     try {
       setLoading(true);
       await deleteMarket(routeSelectedItemId);
-      Toast.show("Item Excluído!", { type: "success" });
-      navigation.navigate("tabroutes", {
-        screen: "Market",
+      Toast.show('Item Excluído!', { type: 'success' });
+      navigation.navigate('tabroutes', {
+        screen: 'Market',
         params: { reload: true },
       });
       onCloseModal && onCloseModal();
       closeBottomSheet && closeBottomSheet();
     } catch (error) {
-      console.error("Erro ao excluir o documento de item:", error);
-      Toast.show("Erro ao excluir o item", { type: "error" });
+      console.error('Erro ao excluir o documento de item:', error);
+      Toast.show('Erro ao excluir o item', { type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -297,8 +297,8 @@ export const MarketItem = ({
 
   const onInvalid = () => {
     Alert.alert(
-      "Atenção!",
-      "Por favor, preencha todos os campos obrigatórios antes de salvar."
+      'Atenção!',
+      'Por favor, preencha todos os campos obrigatórios antes de salvar.',
     );
   };
 
@@ -308,45 +308,45 @@ export const MarketItem = ({
 
   useEffect(() => {
     if (routeSelectedItemId) {
-      console.log("selectedItemId from route:", routeSelectedItemId);
+      console.log('selectedItemId from route:', routeSelectedItemId);
       const findNote = async () => {
         try {
-          console.log("Buscando item com ID:", routeSelectedItemId);
+          console.log('Buscando item com ID:', routeSelectedItemId);
           const market = await findMarketById(routeSelectedItemId);
-          console.log("Item encontrado:", market);
+          console.log('Item encontrado:', market);
 
           if (market) {
-            console.log("Preenchendo formulário com dados:", {
+            console.log('Preenchendo formulário com dados:', {
               name: market.name,
               category: market.category,
               measurement: market.measurement,
               price: market.price,
               quantity: market.quantity,
               observation: market.observation,
-              shareInfo: market.shareInfo
+              shareInfo: market.shareInfo,
             });
-            setValue("name", market.name);
-            setValue("category", market.category);
-            setValue("measurement", market.measurement);
+            setValue('name', market.name);
+            setValue('category', market.category);
+            setValue('measurement', market.measurement);
             setValue(
-              "price",
-              market.price ? currencyMask(market.price.toString()) : ""
+              'price',
+              market.price ? currencyMask(market.price.toString()) : '',
             );
-            setValue("quantity", String(market.quantity ?? ""));
-            setValue("observation", market.observation);
+            setValue('quantity', String(market.quantity ?? ''));
+            setValue('observation', market.observation);
             setValue(
-              "sharedUsers",
+              'sharedUsers',
               market.shareInfo.map((si) => ({
                 uid: si.uid,
                 userName: si.userName,
                 acceptedAt: si.acceptedAt,
-              })) ?? []
+              })) ?? [],
             );
             setIsEditing(true);
           }
         } catch (error) {
-          console.error("Erro ao obter o documento:", error);
-          Toast.show("Erro ao carregar o item", { type: "error" });
+          console.error('Erro ao obter o documento:', error);
+          Toast.show('Erro ao carregar o item', { type: 'error' });
         }
       };
       findNote();
@@ -355,7 +355,7 @@ export const MarketItem = ({
 
   useEffect(() => {
     if (error) {
-      Toast.show(error, { type: "error" });
+      Toast.show(error, { type: 'error' });
     }
   }, [error]);
 
@@ -419,15 +419,15 @@ export const MarketItem = ({
             <TouchableOpacity
               onPress={handleShowAdvanced}
               style={{
-                width: "100%",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
+                width: '100%',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              <Title>{showAdvanced ? "Mostrar menos" : "Mostrar mais"}</Title>
+              <Title>{showAdvanced ? 'Mostrar menos' : 'Mostrar mais'}</Title>
               <MaterialIcons
-                name={showAdvanced ? "arrow-drop-up" : "arrow-drop-down"}
+                name={showAdvanced ? 'arrow-drop-up' : 'arrow-drop-down'}
                 size={24}
                 color="black"
               />
@@ -446,25 +446,25 @@ export const MarketItem = ({
                     onValueChange={onChange}
                     value={value}
                     items={[
-                      { label: "Açougue", value: "acougue" },
-                      { label: "Bebidas", value: "bebidas" },
-                      { label: "Biscoitos", value: "biscoitos" },
-                      { label: "Congelados", value: "congelados" },
-                      { label: "Condimentos e temperos", value: "condimentos" },
-                      { label: "Doces e snacks", value: "doces_snacks" },
-                      { label: "Enlatados", value: "enlatados" },
-                      { label: "Higiene pessoal", value: "higiene" },
-                      { label: "Hortifruti", value: "hortifruti" },
-                      { label: "Laticínios", value: "laticinios" },
-                      { label: "Limpeza", value: "limpeza" },
-                      { label: "Massas e grãos", value: "massas_graos" },
-                      { label: "Matinais (café, cereal...)", value: "matinais" },
-                      { label: "Mercearia", value: "mercearia" },
-                      { label: "Outros", value: "outros" },
-                      { label: "Padaria", value: "padaria" },
-                      { label: "Pet shop", value: "petshop" },
-                      { label: "Produtos naturais", value: "naturais" },
-                      { label: "Utilidades domésticas", value: "utilidades" },
+                      { label: 'Açougue', value: 'acougue' },
+                      { label: 'Bebidas', value: 'bebidas' },
+                      { label: 'Biscoitos', value: 'biscoitos' },
+                      { label: 'Congelados', value: 'congelados' },
+                      { label: 'Condimentos e temperos', value: 'condimentos' },
+                      { label: 'Doces e snacks', value: 'doces_snacks' },
+                      { label: 'Enlatados', value: 'enlatados' },
+                      { label: 'Higiene pessoal', value: 'higiene' },
+                      { label: 'Hortifruti', value: 'hortifruti' },
+                      { label: 'Laticínios', value: 'laticinios' },
+                      { label: 'Limpeza', value: 'limpeza' },
+                      { label: 'Massas e grãos', value: 'massas_graos' },
+                      { label: 'Matinais (café, cereal...)', value: 'matinais' },
+                      { label: 'Mercearia', value: 'mercearia' },
+                      { label: 'Outros', value: 'outros' },
+                      { label: 'Padaria', value: 'padaria' },
+                      { label: 'Pet shop', value: 'petshop' },
+                      { label: 'Produtos naturais', value: 'naturais' },
+                      { label: 'Utilidades domésticas', value: 'utilidades' },
                     ]}
                   />
                 )}
@@ -479,10 +479,10 @@ export const MarketItem = ({
                     onValueChange={onChange}
                     value={value}
                     items={[
-                      { label: "Unidade", value: "un" },
-                      { label: "Quilograma", value: "kg" },
-                      { label: "Litro", value: "l" },
-                      { label: "Metro", value: "m" },
+                      { label: 'Unidade', value: 'un' },
+                      { label: 'Quilograma', value: 'kg' },
+                      { label: 'Litro', value: 'l' },
+                      { label: 'Metro', value: 'm' },
                     ]}
                   />
                 )}
@@ -501,8 +501,8 @@ export const MarketItem = ({
 
           <FormProvider {...form}>
             <ShareWithUsers
-            control={control}
-            name="sharedUsers"
+              control={control}
+              name="sharedUsers"
             />
           </FormProvider>
 
@@ -515,7 +515,7 @@ export const MarketItem = ({
                   : handleSubmit(handleCreateMarket, onInvalid)
               }
             >
-              <Title>{loading ? <LoadingIndicator /> : "Salvar"}</Title>
+              <Title>{loading ? <LoadingIndicator /> : 'Salvar'}</Title>
             </Button>
 
             {showButtonRemove && (

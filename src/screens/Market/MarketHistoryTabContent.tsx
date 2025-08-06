@@ -1,18 +1,18 @@
-import React, { Dispatch, SetStateAction, useState, useEffect } from "react";
-import { FlatList, RefreshControl, TouchableOpacity, View } from "react-native";
-import { LoadData } from "../../components/LoadData";
+import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
+import { FlatList, RefreshControl, TouchableOpacity, View } from 'react-native';
+import { LoadData } from '../../components/LoadData';
 import {
   deleteMarketHistory,
   IMarketHistory,
   listMarketHistories,
   listMarketHistoriesSharedWithMe,
-} from "../../services/firebase/market-history.firebase";
-import { Toast } from "react-native-toast-notifications";
-import { useNavigation } from "@react-navigation/native";
-import { MarketHistoryItem } from "./MarketHistoryItem";
-import PersonImage from "../../assets/illustrations/marketplace.png";
-import { Container, ContentTitle, DividerContent, Icon, Title } from "./styles";
-import { useUserAuth } from "../../hooks/useUserAuth";
+} from '../../services/firebase/market-history.firebase';
+import { Toast } from 'react-native-toast-notifications';
+import { useNavigation } from '@react-navigation/native';
+import { MarketHistoryItem } from './MarketHistoryItem';
+import PersonImage from '../../assets/illustrations/marketplace.png';
+import { Container, ContentTitle, DividerContent, Icon, Title } from './styles';
+import { useUserAuth } from '../../hooks/useUserAuth';
 
 interface IMarketHistoryTabContentProps {
   marketHistories: IMarketHistory[];
@@ -41,7 +41,7 @@ export const MarketHistoryTabContent = ({
   // Limpar dados quando o usuário mudar
   useEffect(() => {
     if (!loggedUser.user?.uid) {
-      console.log("Limpando dados do histórico - usuário deslogado");
+      console.log('Limpando dados do histórico - usuário deslogado');
       setMarketHistories([]);
       setSharedMarketHistories([]);
     }
@@ -50,7 +50,7 @@ export const MarketHistoryTabContent = ({
   // Carregar dados quando o componente for montado
   useEffect(() => {
     if (loggedUser.user?.uid) {
-      console.log("Carregando dados iniciais para o usuário:", loggedUser.user?.uid);
+      console.log('Carregando dados iniciais para o usuário:', loggedUser.user?.uid);
       fetchMyMarketHistory();
       fetchSharedMarketHistory();
     }
@@ -65,14 +65,14 @@ export const MarketHistoryTabContent = ({
 
       setMarketHistories((p) => p.filter((p) => p.id !== marketHistory.id));
 
-      Toast.show("Histórico de compras excluído", { type: "success" });
+      Toast.show('Histórico de compras excluído', { type: 'success' });
     } catch (error) {
-      console.error("Erro ao excluir a lista: ", error);
+      console.error('Erro ao excluir a lista: ', error);
     }
   };
 
   const handleDeleteSharedMarketHistory = async (
-    marketHistory: IMarketHistory
+    marketHistory: IMarketHistory,
   ) => {
     try {
       await deleteMarketHistory({
@@ -81,33 +81,33 @@ export const MarketHistoryTabContent = ({
       });
 
       setSharedMarketHistories((p) =>
-        p.filter((p) => p.id !== marketHistory.id)
+        p.filter((p) => p.id !== marketHistory.id),
       );
 
-      Toast.show("Histórico de compras excluído", { type: "success" });
+      Toast.show('Histórico de compras excluído', { type: 'success' });
     } catch (error) {
-      console.error("Erro ao excluir a lista: ", error);
+      console.error('Erro ao excluir a lista: ', error);
     }
   };
 
   const handleNavigateToMarketHistoryDetails = (id: string) => {
-    navigation.navigate("market-history-item", { selectedItemId: id });
+    navigation.navigate('market-history-item', { selectedItemId: id });
   };
 
   const fetchMyMarketHistory = async () => {
     if (!loggedUser.user?.uid) {
-      console.log("Usuário não autenticado ao buscar histórico");
+      console.log('Usuário não autenticado ao buscar histórico');
       return;
     }
     try {
-      console.log("Buscando histórico para o usuário:", loggedUser.user?.uid);
+      console.log('Buscando histórico para o usuário:', loggedUser.user?.uid);
       setIsRefreshingMarketHistory(true);
       const response = await listMarketHistories(loggedUser.user!.uid);
-      console.log("Histórico recebido:", response);
+      console.log('Histórico recebido:', response);
       setMarketHistories(response);
     } catch (error) {
-      console.error("Erro ao buscar o histórico de compras: ", error);
-      Toast.show("Erro ao carregar o histórico", { type: "error" });
+      console.error('Erro ao buscar o histórico de compras: ', error);
+      Toast.show('Erro ao carregar o histórico', { type: 'error' });
     } finally {
       setIsRefreshingMarketHistory(false);
     }
@@ -115,18 +115,18 @@ export const MarketHistoryTabContent = ({
 
   const fetchSharedMarketHistory = async () => {
     if (!loggedUser.user?.uid) {
-      console.log("Usuário não autenticado ao buscar histórico compartilhado");
+      console.log('Usuário não autenticado ao buscar histórico compartilhado');
       return;
     }
     try {
-      console.log("Buscando histórico compartilhado para o usuário:", loggedUser.user?.uid);
+      console.log('Buscando histórico compartilhado para o usuário:', loggedUser.user?.uid);
       setIsRefreshingSMarketHistory(true);
       const response = await listMarketHistoriesSharedWithMe(loggedUser.user!.uid);
-      console.log("Histórico compartilhado recebido:", response);
+      console.log('Histórico compartilhado recebido:', response);
       setSharedMarketHistories(response);
     } catch (error) {
-      console.error("Erro ao buscar o histórico compartilhado: ", error);
-      Toast.show("Erro ao carregar o histórico compartilhado", { type: "error" });
+      console.error('Erro ao buscar o histórico compartilhado: ', error);
+      Toast.show('Erro ao carregar o histórico compartilhado', { type: 'error' });
     } finally {
       setIsRefreshingSMarketHistory(false);
     }
@@ -149,7 +149,7 @@ export const MarketHistoryTabContent = ({
         <Title>Meu histórico de compras</Title>
         <DividerContent />
         <Icon
-          name={isMarketHistoryVisible ? "arrow-drop-up" : "arrow-drop-down"}
+          name={isMarketHistoryVisible ? 'arrow-drop-up' : 'arrow-drop-down'}
         />
       </ContentTitle>
       {isMarketHistoryVisible && (
@@ -197,7 +197,7 @@ export const MarketHistoryTabContent = ({
         <DividerContent />
         <Icon
           name={
-            isSharedMarketHistoryVisible ? "arrow-drop-up" : "arrow-drop-down"
+            isSharedMarketHistoryVisible ? 'arrow-drop-up' : 'arrow-drop-down'
           }
         />
       </ContentTitle>

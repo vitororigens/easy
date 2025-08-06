@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, TouchableOpacity, View, Text } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { FlatList, TouchableOpacity } from 'react-native';
 import { Toast } from 'react-native-toast-notifications';
 import { DefaultContainer } from '../../components/DefaultContainer';
 import { Items } from '../../components/Items';
 import { LoadData } from '../../components/LoadData';
-import { Loading } from '../../components/Loading';
+import { AIInsights } from '../../components/AIInsights';
+import { NaturalInput } from '../../components/NaturalInput';
 import { useMonth } from '../../context/MonthProvider';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { useTotalValue } from '../../hooks/useTotalValue';
 import { useUserAuth } from '../../hooks/useUserAuth';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { Timestamp } from '@react-native-firebase/firestore';
+import { processAndSaveNaturalInput } from '../../services/firebase/ai-transactions.firebase';
 import {
   Button,
   NavBar,
@@ -23,16 +25,20 @@ import {
   StatItem,
   StatValue,
   StatLabel,
+  EmptyContainer,
+  CenteredView,
+  RedText,
+  FlatListContentReceita,
+  FlatListContentDespesa,
 } from './styles';
 
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../@types/navigation';
-import ExpensePersonImage from '../../assets/illustrations/expense.png';
-import RevenuePersonImage from '../../assets/illustrations/revenue.png';
 import { database } from '../../libs/firebase';
 import { AppOpenAdComponent } from '../../components/AppOpenAd';
 import firebase from '@react-native-firebase/app';
+import { SkeletonItem } from '../../components/SkeletonItem';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -56,6 +62,7 @@ export interface IRevenue {
   shareWith: string[];
   shareInfo: TShareInfo[];
   valueTransaction: string;
+  uid?: string;
 }
 
 export function Home() {
@@ -83,7 +90,68 @@ export function Home() {
   const [pendingBills, setPendingBills] = useState(0);
   const [totalValue, setTotalValue] = useState(0);
 
+  // Estados para funcionalidades de IA
+  const [showAIInsights, setShowAIInsights] = useState(true);
+  const [showNaturalInput, setShowNaturalInput] = useState(false);
+
   const navigation = useNavigation<NavigationProp>();
+
+  // Corrigir: memorizar as funções para evitar loop
+  const getRevenuesSharedWithMe = useCallback(async () => {
+    if (!uid) return [];
+    try {
+      const data = await database
+        .collection('Revenue')
+        .where('shareWith', 'array-contains', uid)
+        .get();
+
+      const revenues = (data.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) ?? []) as IRevenue[];
+
+      const filteredRevenues = revenues.filter((n) =>
+        n.shareInfo.some(
+          ({ uid: shareUid, acceptedAt }) => shareUid === uid && acceptedAt !== null,
+        ),
+      );
+
+      setRevenueSharedWithMe(filteredRevenues);
+      return filteredRevenues;
+    } catch {
+      Toast.show('Erro ao buscar receitas compartilhadas comigo', { type: 'danger' });
+      setError('Erro ao buscar receitas compartilhadas comigo');
+      return [];
+    }
+  }, [uid]);
+
+  const getExpenseSharedWithMe = useCallback(async () => {
+    if (!uid) return [];
+    try {
+      const data = await database
+        .collection('Expense')
+        .where('shareWith', 'array-contains', uid)
+        .get();
+
+      const expenses = (data.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) ?? []) as IRevenue[];
+
+      const filteredExpenses = expenses.filter((n) =>
+        n.shareInfo.some(
+          ({ uid: shareUid, acceptedAt }) => shareUid === uid && acceptedAt !== null,
+        ),
+      );
+
+      setExpensesSharedWithme(filteredExpenses);
+      return filteredExpenses;
+    } catch {
+      Toast.show('Erro ao buscar despesas compartilhadas comigo', { type: 'danger' });
+      setError('Erro ao buscar despesas compartilhadas comigo');
+      return [];
+    }
+  }, [uid]);
 
   useEffect(() => {
     if (!authLoading && uid) {
@@ -91,9 +159,9 @@ export function Home() {
       setError(null);
       Promise.all([
         getRevenuesSharedWithMe(),
-        getExpenseSharedWithMe()
+        getExpenseSharedWithMe(),
       ]).catch(() => {
-        setError("Erro ao carregar dados compartilhados");
+        Toast.show('Erro ao carregar dados compartilhados', { type: 'danger' });
       }).finally(() => {
         setIsLoadingSharedData(false);
       });
@@ -119,8 +187,8 @@ export function Home() {
         setPaidBills(paid);
         setPendingBills(pending);
         setTotalValue(tolalRevenueMunth - totalExpenseMunth);
-      } catch (err) {
-        console.error('Erro ao calcular resumo:', err);
+      } catch {
+        Toast.show('Erro ao calcular resumo', { type: 'danger' });
         setError('Erro ao calcular resumo');
       }
     }
@@ -136,24 +204,24 @@ export function Home() {
   });
 
   function handleRevenueEdit(documentId: string, initialActiveButton: string) {
-    // Mapear o botão ativo para o tipo de coleção
     const collectionType = initialActiveButton === 'receitas' ? 'Revenue' : 'Expense';
-
-    navigation.navigate('newlaunch' as any, {
+    // @ts-expect-error: Navegação para rota customizada
+    navigation.navigate('newlaunch', {
       selectedItemId: documentId,
       initialActiveButton,
       collectionType,
+      isCreator: true,
     });
   }
 
   function handleExpenseEdit(documentId: string, initialActiveButton: string) {
-    // Mapear o botão ativo para o tipo de coleção
     const collectionType = initialActiveButton === 'receitas' ? 'Revenue' : 'Expense';
-
-    navigation.navigate('newlaunch' as any, {
+    // @ts-expect-error: Navegação para rota customizada
+    navigation.navigate('newlaunch', {
       selectedItemId: documentId,
       initialActiveButton,
       collectionType,
+      isCreator: true,
     });
   }
 
@@ -161,9 +229,13 @@ export function Home() {
     setActiveButton(buttonName);
   };
 
-  const handleDeleteItem = async (documentId: string, type: 'input' | 'output', item?: any) => {
+  const handleDeleteItem = async (
+    documentId: string,
+    type: 'input' | 'output',
+    item?: IRevenue,
+  ) => {
     // Se o item for compartilhado com você (não é seu), remova seu UID do array shareWith no Firestore
-    if (item && ('uid' in item) && item.uid !== uid) {
+    if (item && item.uid !== uid) {
       const collectionName = type === 'input' ? 'Revenue' : 'Expense';
       try {
         await database
@@ -175,26 +247,16 @@ export function Home() {
 
         // Remover localmente para sumir da tela imediatamente
         if (type === 'input') {
-          setRevenueSharedWithMe((prev: any[]) => {
-            const newList = prev.filter((n: any) => n.id !== documentId);
-            return newList;
-          });
+          setRevenueSharedWithMe((prev) => prev.filter((n) => n.id !== documentId));
         } else {
-          setExpensesSharedWithme((prev: any[]) => {
-            const newList = prev.filter((n: any) => n.id !== documentId);
-            return newList;
-          });
+          setExpensesSharedWithme((prev) => prev.filter((n) => n.id !== documentId));
         }
 
         // Adicionar ao conjunto de itens removidos para garantir que não apareça na lista
-        setRemovedItems(prev => {
-          const newSet = new Set([...prev, documentId]);
-          return newSet;
-        });
+        setRemovedItems(prev => new Set([...prev, documentId]));
         Toast.show('Item removido da sua lista!', { type: 'success' });
-      } catch (error) {
+      } catch {
         Toast.show('Erro ao remover compartilhamento', { type: 'danger' });
-        console.error('Erro ao remover compartilhamento:', error);
       }
       return;
     }
@@ -208,7 +270,7 @@ export function Home() {
           Toast.show('Nota excluída!', { type: 'success' });
         })
         .catch((error) => {
-          console.error('Erro ao excluir a nota: ', error);
+          Toast.show(`Erro ao excluir a nota: ${error}`, { type: 'danger' });
         });
     } else {
       database
@@ -219,7 +281,7 @@ export function Home() {
           Toast.show('Nota excluída!', { type: 'success' });
         })
         .catch((error) => {
-          console.error('Erro ao excluir a nota: ', error);
+          Toast.show(`Erro ao excluir a nota: ${error}`, { type: 'danger' });
         });
     }
   };
@@ -249,135 +311,218 @@ export function Home() {
                 { type: 'success' },
               );
             })
-            .catch((error) => {
-              console.error('Erro ao atualizar o status: ', error);
-              Toast.show('Erro ao atualizar o status', { type: 'error' });
+            .catch(() => {
+              Toast.show('Erro ao atualizar o status', { type: 'danger' });
             });
         } else {
           Toast.show('Despesa não encontrada', { type: 'error' });
         }
       })
-      .catch((error) => {
-        console.error('Erro ao buscar a despesa: ', error);
+      .catch(() => {
         Toast.show('Erro ao buscar a despesa', { type: 'error' });
       });
   };
 
-  async function getRevenuesSharedWithMe() {
-    if (!uid) return [];
-    try {
-      const data = await database
-        .collection('Revenue')
-        .where('shareWith', 'array-contains', uid)
-        .get();
-
-      const revenues = (data.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) ?? []) as IRevenue[];
-
-      const filteredRevenues = revenues.filter((n) =>
-        n.shareInfo.some(
-          ({ uid: shareUid, acceptedAt }) => shareUid === uid && acceptedAt !== null,
-        ),
-      );
-
-      setRevenueSharedWithMe(filteredRevenues);
-      return filteredRevenues;
-    } catch (err) {
-      console.error('Erro ao buscar receitas compartilhadas comigo:', err);
-      setError('Erro ao buscar receitas compartilhadas comigo');
-      return [];
-    }
-  }
-
-  async function getExpenseSharedWithMe() {
-    if (!uid) return [];
-    try {
-      const data = await database
-        .collection('Expense')
-        .where('shareWith', 'array-contains', uid)
-        .get();
-
-      const expenses = (data.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) ?? []) as IRevenue[];
-
-      const filteredExpenses = expenses.filter((n) =>
-        n.shareInfo.some(
-          ({ uid: shareUid, acceptedAt }) => shareUid === uid && acceptedAt !== null,
-        ),
-      );
-
-      setExpensesSharedWithme(filteredExpenses);
-      return filteredExpenses;
-    } catch (err) {
-      console.error('Erro ao buscar despesas compartilhadas comigo:', err);
-      setError('Erro ao buscar despesas compartilhadas comigo');
-      return [];
-    }
-  }
-
   function handleCreateItem(documentId: string, initialActiveButton: string) {
-    // Mapear o botão ativo para o tipo de coleção
     const collectionType = initialActiveButton === 'receitas' ? 'Revenue' : 'Expense';
-
-    // Se documentId estiver vazio, não passar selectedItemId
-    const params: any = {
+    const params: {
+      selectedItemId?: string;
+      initialActiveButton: string;
+      collectionType: string;
+      isCreator: boolean;
+    } = {
       initialActiveButton: initialActiveButton || 'receitas',
       collectionType,
       isCreator: true,
     };
-
-    // Só adicionar selectedItemId se não estiver vazio
     if (documentId && documentId.trim() !== '') {
       params.selectedItemId = documentId;
     }
-
     try {
-      navigation.navigate('newlaunch' as any, params);
-    } catch (error) {
-      console.error('Erro ao navegar para newtask:', error);
+      // @ts-expect-error: Navegação para rota customizada
+      navigation.navigate('newlaunch', params);
+    } catch {
+      Toast.show('Erro ao navegar para newtask', { type: 'danger' });
     }
   }
 
+  // Função para lidar com transações processadas pela IA
+  const handleAITransactionParsed = async (transaction: {
+    type: 'input' | 'output';
+    amount: number;
+    category: string;
+    description: string;
+    date: string;
+  }) => {
+    if (!uid) {
+      Toast.show('Usuário não autenticado', {
+        type: 'danger',
+        placement: 'top',
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      // Salvar a transação no Firebase
+      const result = await processAndSaveNaturalInput(
+        `${transaction.type === 'output' ? 'gastei' : 'recebi'} ${transaction.amount} ${transaction.description}`,
+        uid
+      );
+
+      if (result.success) {
+        Toast.show(`Transação ${transaction.type === 'input' ? 'de receita' : 'de despesa'} salva com sucesso!`, {
+          type: 'success',
+          placement: 'top',
+          duration: 3000,
+        });
+        
+        // Fechar o input natural após processar
+        setShowNaturalInput(false);
+      } else {
+        Toast.show(`Erro: ${result.error}`, {
+          type: 'danger',
+          placement: 'top',
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving AI transaction:', error);
+      Toast.show('Erro ao salvar transação', {
+        type: 'danger',
+        placement: 'top',
+        duration: 3000,
+      });
+    }
+  };
+
   // Função utilitária para remover duplicatas por id
-  function deduplicateById(arr: unknown[]) {
-    const map = new Map();
-    arr.forEach((item: any) => map.set(item.id, item));
+  function deduplicateById(arr: IRevenue[]): IRevenue[] {
+    const map = new Map<string, IRevenue>();
+    arr.forEach((item) => map.set(item.id, item));
     return Array.from(map.values());
   }
 
-  // Unificar listas para renderização, sem duplicatas e com filtro de compartilhamento
-  const allRevenues = deduplicateById([...revenueData, ...revenueShareWithMe])
-    .filter(item => {
-      // Se o item foi removido, não aparece
-      if (removedItems.has(item.id)) {
-        return false;
-      }
-      // Se for meu, sempre aparece
-      if (item.uid === uid) return true;
-      // Se não for meu, só aparece se ainda estou em shareWith
-      const isSharedWithMe = Array.isArray(item.shareWith) && item.shareWith.includes(uid);
-      return isSharedWithMe;
-    });
+  function hasCreatedAt(item: unknown): item is IRevenue {
+    return !!item && typeof (item as IRevenue).createdAt !== 'undefined';
+  }
 
-  const allExpenses = deduplicateById([...expenseData, ...expensesSharedWithMe])
-    .filter(item => {
-      // Se o item foi removido, não aparece
-      if (removedItems.has(item.id)) {
-        return false;
+  // Obter o ano atual
+  const currentYear = new Date().getFullYear();
+
+  // Função para verificar se o item é do ano corrente
+  const isCurrentYear = (item: IRevenue) => {
+    // Primeiro tenta verificar o campo date (data do evento)
+    if (item.date) {
+      try {
+        // Converte a data do formato DD/MM/YYYY para Date
+        const dateParts = item.date.split('/');
+        if (dateParts.length === 3) {
+          const year = parseInt(dateParts[2] || '0', 10);
+          return year === currentYear;
+        }
+      } catch {
+        // Erro ao processar data do evento
       }
-      // Se for meu, sempre aparece
-      if (item.uid === uid) return true;
-      // Se não for meu, só aparece se ainda estou em shareWith
-      const isSharedWithMe = Array.isArray(item.shareWith) && item.shareWith.includes(uid);
-      return isSharedWithMe;
-    });
+    }
+
+    // Se não conseguir verificar a data do evento, tenta o createdAt
+    if (item.createdAt) {
+      try {
+        let itemDate: Date;
+
+        // Verifica se é um Timestamp do Firestore
+        if (typeof item.createdAt.toDate === 'function') {
+          itemDate = item.createdAt.toDate();
+        }
+        // Verifica se é uma string de data
+        else if (typeof item.createdAt === 'string') {
+          itemDate = new Date(item.createdAt);
+        }
+        // Se não conseguir determinar, assume que é do ano atual
+        else {
+          return true;
+        }
+
+        const itemYear = itemDate.getFullYear();
+        return itemYear === currentYear;
+      } catch {
+        // Se não conseguir converter a data, assume que é do ano atual
+        return true;
+      }
+    }
+
+    // Se não tem nenhuma data válida, assume que é do ano atual para não perder dados
+    return true;
+  };
+
+  // Unificar listas para renderização, sem duplicatas e com filtro de compartilhamento e ano corrente
+  const allRevenues = deduplicateById(
+    [...revenueData, ...revenueShareWithMe].filter(hasCreatedAt),
+  ).filter(item => {
+    if (removedItems.has(item.id)) {
+      return false;
+    }
+    if (!isCurrentYear(item)) {
+      return false;
+    }
+    if ((item.uid ?? '') === (uid ?? '')) {
+      return true;
+    }
+    const isSharedWithMe = Array.isArray(item.shareWith) && item.shareWith.includes(uid ?? '');
+    return isSharedWithMe;
+  });
+
+  const allExpenses = deduplicateById(
+    [...expenseData, ...expensesSharedWithMe].filter(hasCreatedAt),
+  ).filter(item => {
+    if (removedItems.has(item.id)) {
+      return false;
+    }
+    if (!isCurrentYear(item)) {
+      return false;
+    }
+    if ((item.uid ?? '') === (uid ?? '')) {
+      return true;
+    }
+    const isSharedWithMe = Array.isArray(item.shareWith) && item.shareWith.includes(uid ?? '');
+    return isSharedWithMe;
+  });
+
+  const skeletonArray = Array.from({ length: 6 });
 
   if (authLoading || isLoadingSharedData) {
-    return <Loading />;
+    return (
+      <DefaultContainer
+        monthButton
+        title={activeButton === 'receitas' ? 'Receitas' : 'Despesas'}
+        type="SECONDARY"
+      >
+        <NavBar>
+          <Button
+            onPress={() => handleButtonClick('receitas')}
+            active={activeButton === 'receitas'}
+          >
+            <Title active={activeButton === 'receitas'}>Receitas</Title>
+            <SubTitle type="PRIMARY">--</SubTitle>
+          </Button>
+          <Button
+            onPress={() => handleButtonClick('despesas')}
+            active={activeButton === 'despesas'}
+          >
+            <Title active={activeButton === 'despesas'}>Despesas</Title>
+            <SubTitle type="SECONDARY">--</SubTitle>
+          </Button>
+        </NavBar>
+        <Content>
+          <Container>
+            {skeletonArray.map((_, idx) => (
+              <SkeletonItem key={idx} />
+            ))}
+          </Container>
+        </Content>
+      </DefaultContainer>
+    );
   }
 
   if (!user) {
@@ -391,14 +536,14 @@ export function Home() {
         title="Erro"
         type="SECONDARY"
       >
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={{ color: 'red', marginBottom: 20 }}>{error}</Text>
+        <CenteredView>
+          <RedText>{error}</RedText>
           <Button onPress={() => {
             setError(null);
           }}>
             <Title>Tentar novamente</Title>
           </Button>
-        </View>
+        </CenteredView>
       </DefaultContainer>
     );
   }
@@ -429,38 +574,52 @@ export function Home() {
       </NavBar>
 
       <Content>
-        <StatsContainer>
-          <StatItem>
-            <TouchableOpacity onPress={() => navigation.navigate('graphics' as never)}>
-              <Icon name="pie-chart" size={24} color="#000" />
-              <StatLabel>Gráficos</StatLabel>
-            </TouchableOpacity>
-          </StatItem>
-          <StatItem>
-            <StatValue>{pendingBills}</StatValue>
-            <StatLabel>Contas pendentes</StatLabel>
-          </StatItem>
-          <StatItem>
-            <StatValue>{paidBills}</StatValue>
-            <StatLabel>Contas pagas</StatLabel>
-          </StatItem>
-          <StatItem>
-            <StatValue>{formatCurrency(totalValue)}</StatValue>
-            <StatLabel>Valor total</StatLabel>
-          </StatItem>
-        </StatsContainer>
+          <StatsContainer>
+            <StatItem>
+              <TouchableOpacity onPress={() => navigation.navigate('graphics' as never)}>
+                <Icon name="pie-chart" size={24} color="#000" />
+                <StatLabel>Gráficos</StatLabel>
+              </TouchableOpacity>
+            </StatItem>
+            <StatItem>
+              <TouchableOpacity onPress={() => setShowAIInsights(!showAIInsights)}>
+                <Icon name="lightbulb" size={24} color={showAIInsights ? '#3498db' : '#000'} />
+                <StatLabel>IA Insights</StatLabel>
+              </TouchableOpacity>
+            </StatItem>
+            <StatItem>
+              <TouchableOpacity onPress={() => setShowNaturalInput(!showNaturalInput)}>
+                <Icon name="edit" size={24} color={showNaturalInput ? '#3498db' : '#000'} />
+                <StatLabel>Entrada IA</StatLabel>
+              </TouchableOpacity>
+            </StatItem>
+            <StatItem>
+              <StatValue>{pendingBills}</StatValue>
+              <StatLabel>Contas pendentes</StatLabel>
+            </StatItem>
+            <StatItem>
+              <StatValue>{paidBills}</StatValue>
+              <StatLabel>Contas pagas</StatLabel>
+            </StatItem>
+            <StatItem>
+              <StatValue>{formatCurrency(totalValue)}</StatValue>
+              <StatLabel>Valor total</StatLabel>
+            </StatItem>
+          </StatsContainer>
+
+          {/* Componentes de IA */}
+          <AIInsights 
+            transactions={[...allRevenues, ...allExpenses]} 
+            visible={showAIInsights} 
+          />
+          
+          <NaturalInput 
+            onTransactionParsed={handleAITransactionParsed}
+            visible={showNaturalInput}
+          />
 
         {activeButton === 'receitas' && (
           <>
-            {/* <ContentTitle
-              onPress={() => setRevenueListVisible(!isRevenueListVisible)}
-            >
-              <Title>Receitas</Title>
-              <DividerContent />
-              <Icon
-                name={isRevenueListVisible ? "arrow-drop-up" : "arrow-drop-down"}
-              />
-            </ContentTitle> */}
             <Container>
               {isRevenueListVisible && (
                 <FlatList
@@ -470,7 +629,7 @@ export function Home() {
                       onPress={() => handleRevenueEdit(item.id, activeButton)}
                     >
                       <Items
-                        onDelete={() => handleDeleteItem(item.id, item.type as 'input' | 'output', item)}
+                        onDelete={() => handleDeleteItem(item.id, item.type as 'input' | 'output', item as IRevenue)}
                         onEdit={() => handleRevenueEdit(item.id, activeButton)}
                         type="PRIMARY"
                         status={item.status}
@@ -483,21 +642,26 @@ export function Home() {
                             : formatCurrency('0')
                         }
                         isShared={Array.isArray(item.shareWith) && item.shareWith.length > 0}
-                        isSharedByMe={('uid' in item ? item.uid : undefined) === uid && Array.isArray(item.shareWith) && item.shareWith.length > 0}
-                        uid={('uid' in item ? item.uid : undefined)}
+                        isSharedByMe={((item.uid ?? '') === (uid ?? '')) && Array.isArray(item.shareWith) && item.shareWith.length > 0}
+                        uid={item.uid ?? ''}
                       />
                     </TouchableOpacity>
                   )}
+                  keyExtractor={(item) => item.id}
+                  initialNumToRender={10}
+                  maxToRenderPerBatch={10}
+                  windowSize={7}
+                  removeClippedSubviews={true}
+                  contentContainerStyle={FlatListContentReceita}
                   ListEmptyComponent={
-                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                    <EmptyContainer>
                       <LoadData
-                        imageSrc={RevenuePersonImage}
-                        title="Comece agora!"
-                        subtitle="Adicione uma receita clicando em +"
+                        imageSrc={require('../../assets/illustrations/revenue.png')}
+                        title="Nenhuma receita"
+                        subtitle="Toque no botão + para adicionar uma nova receita"
                       />
-                    </View>
+                    </EmptyContainer>
                   }
-                  contentContainerStyle={{ paddingBottom: 90 }}
                 />
               )}
             </Container>
@@ -505,15 +669,6 @@ export function Home() {
         )}
         {activeButton === 'despesas' && (
           <>
-            {/* <ContentTitle
-              onPress={() => setExpenseListVisible(!isExpenseListVisible)}
-            >
-              <Title>Despesas</Title>
-              <DividerContent />
-              <Icon
-                name={isExpenseListVisible ? "arrow-drop-up" : "arrow-drop-down"}
-              />
-            </ContentTitle> */}
             <Container>
               {isExpenseListVisible && (
                 <FlatList
@@ -523,7 +678,7 @@ export function Home() {
                       onPress={() => handleExpenseEdit(item.id, activeButton)}
                     >
                       <Items
-                        onDelete={() => handleDeleteItem(item.id, item.type as 'input' | 'output', item)}
+                        onDelete={() => handleDeleteItem(item.id, item.type as 'input' | 'output', item as IRevenue)}
                         onEdit={() => handleExpenseEdit(item.id, activeButton)}
                         type="SECONDARY"
                         status={item.status}
@@ -537,28 +692,32 @@ export function Home() {
                             : formatCurrency('0')
                         }
                         isShared={Array.isArray(item.shareWith) && item.shareWith.length > 0}
-                        isSharedByMe={('uid' in item ? item.uid : undefined) === uid && Array.isArray(item.shareWith) && item.shareWith.length > 0}
-                        uid={('uid' in item ? item.uid : undefined)}
+                        isSharedByMe={((item.uid ?? '') === (uid ?? '')) && Array.isArray(item.shareWith) && item.shareWith.length > 0}
+                        uid={item.uid ?? ''}
                       />
                     </TouchableOpacity>
                   )}
-                  ListEmptyComponent={
-                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                      <LoadData
-                        imageSrc={ExpensePersonImage}
-                        title="Comece agora!"
-                        subtitle="Adicione uma despesa clicando em +"
-                      />
-                    </View>
-                  }
                   keyExtractor={(item) => item.id}
-                  contentContainerStyle={{ paddingBottom: 10 }}
+                  initialNumToRender={10}
+                  maxToRenderPerBatch={10}
+                  windowSize={7}
+                  removeClippedSubviews={true}
+                  contentContainerStyle={FlatListContentDespesa}
+                  ListEmptyComponent={
+                    <EmptyContainer>
+                      <LoadData
+                        imageSrc={require('../../assets/illustrations/expense.png')}
+                        title="Nenhuma despesa"
+                        subtitle="Toque no botão + para adicionar uma nova despesa"
+                      />
+                    </EmptyContainer>
+                  }
                 />
               )}
             </Container>
           </>
         )}
-      </Content>
-    </DefaultContainer>
-  );
-}
+        </Content>
+      </DefaultContainer>
+    );
+  }

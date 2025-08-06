@@ -1,8 +1,8 @@
-import styled from "styled-components/native";
-import { Entypo } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
+import styled from 'styled-components/native';
+import { Entypo } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
 
-export type ItemsTypeStyleProps = "primary" | "secondary" | "tertiary";
+export type ItemsTypeStyleProps = 'primary' | 'secondary' | 'tertiary';
 
 type Props = {
   type?: ItemsTypeStyleProps;
@@ -21,11 +21,11 @@ export const Icon = styled.View<Props>`
   width: 13%;
   height: 45px;
   background-color: ${({ theme, type }) =>
-    type === "primary"
+    type === 'primary'
       ? theme.COLORS.GREEN_700
-      : type === "secondary"
-      ? theme.COLORS.RED_700
-      : theme.COLORS.YELLOW_700};
+      : type === 'secondary'
+        ? theme.COLORS.RED_700
+        : theme.COLORS.YELLOW_700};
   align-items: center;
   justify-content: center;
   border-radius: 10px;
@@ -47,11 +47,11 @@ export const Title = styled.Text<Props>`
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   color: ${({ theme, type }) =>
-    type === "primary"
+    type === 'primary'
       ? theme.COLORS.GREEN_700
-      : type === "secondary"
-      ? theme.COLORS.RED_700
-      : theme.COLORS.YELLOW_700};
+      : type === 'secondary'
+        ? theme.COLORS.RED_700
+        : theme.COLORS.YELLOW_700};
 `;
 
 export const SubTitle = styled.Text`
@@ -68,11 +68,11 @@ export const Divider = styled.View`
 
 export const IconMenu = styled(Entypo).attrs<Props>(({ theme, type }) => ({
   color:
-    type === "primary"
+    type === 'primary'
       ? theme.COLORS.GREEN_700
-      : type === "secondary"
-      ? theme.COLORS.RED_700
-      : theme.COLORS.YELLOW_700,
+      : type === 'secondary'
+        ? theme.COLORS.RED_700
+        : theme.COLORS.YELLOW_700,
   size: theme.FONT_SIZE.XL,
 }))``;
 

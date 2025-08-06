@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import { INote } from "../../interfaces/INote";
+import React, { useState, useRef, useEffect } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
+import { INote } from '../../interfaces/INote';
 import {
   Container,
   Content,
@@ -17,9 +17,9 @@ import {
   PopoverDivider,
   MainContent,
   Row,
-} from "./styles";
-import Popover from "react-native-popover-view";
-import { findUserById } from "../../services/firebase/users.firestore";
+} from './styles';
+import Popover from 'react-native-popover-view';
+import { findUserById } from '../../services/firebase/users.firestore';
 
 interface ItemNotesProps {
   note: INote;
@@ -35,7 +35,7 @@ export function ItemNotes({
   isSharedByMe = false,
 }: ItemNotesProps) {
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
-  const [sharedByUserName, setSharedByUserName] = useState<string>("");
+  const [sharedByUserName, setSharedByUserName] = useState<string>('');
   const popoverRef = useRef(null);
 
   // Verificar se é uma nota compartilhada
@@ -51,7 +51,7 @@ export function ItemNotes({
             setSharedByUserName(userData.userName);
           }
         } catch (error) {
-          console.error("Erro ao buscar nome do usuário que compartilhou:", error);
+          console.error('Erro ao buscar nome do usuário que compartilhou:', error);
         }
       }
     };
@@ -82,18 +82,18 @@ export function ItemNotes({
             <Title>{note.title || note.name}</Title>
             {isShared && (
               <ShareBadge>
-                <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
+                <ShareIcon name={isSharedByMe ? 'share' : 'share-variant'} />
               </ShareBadge>
             )}
           </Row>
           <Description>{note.description}</Description>
           {isShared && (
             <ShareText>
-              {isSharedByMe 
-                ? "Compartilhado por você" 
-                : sharedByUserName 
-                  ? `Compartilhado por ${sharedByUserName}` 
-                  : "Compartilhado com você"
+              {isSharedByMe
+                ? 'Compartilhado por você'
+                : sharedByUserName
+                  ? `Compartilhado por ${sharedByUserName}`
+                  : 'Compartilhado com você'
               }
             </ShareText>
           )}

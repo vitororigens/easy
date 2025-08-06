@@ -1,5 +1,5 @@
-import { TouchableOpacity, Image } from "react-native";
-import styled from "styled-components/native";
+import { TouchableOpacity, Image } from 'react-native';
+import styled from 'styled-components/native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -92,8 +92,8 @@ export const ContainerIcon = styled(TouchableOpacity)`
 `;
 
 export const Icon = styled(FontAwesome).attrs(({theme}) => ({
-    color: theme.COLORS.WHITE,
-    size: 16,
+  color: theme.COLORS.WHITE,
+  size: 16,
 }))``;
 
 export const Items = styled.View`
@@ -121,13 +121,13 @@ export const SubTitle = styled.Text<Props>`
     font-size: ${({ theme }) => theme.FONT_SIZE.GG}px;
     font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
     color: ${({ theme, type }) => type === 'PRIMARY'
-        ? theme.COLORS.TEAL_600
-        : theme.COLORS.PURPLE_800};
+    ? theme.COLORS.TEAL_600
+    : theme.COLORS.PURPLE_800};
 `;
 
 export const IconField = styled(MaterialIcons).attrs(({theme}) => ({
-    size: 24,
-    color: theme.COLORS.PURPLE_600
+  size: 24,
+  color: theme.COLORS.PURPLE_600,
 }))``;
 
 export const ButtonsContainer = styled.View`

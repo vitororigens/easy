@@ -1,5 +1,5 @@
-import styled from "styled-components/native";
-import { TouchableOpacity } from "react-native";
+import styled from 'styled-components/native';
+import { TouchableOpacity } from 'react-native';
 
 export const Container = styled.View`
   flex: 1;
@@ -177,4 +177,4 @@ export const MenuOptionText = styled.Text`
   font-size: 16px;
   color: #333;
   margin-left: 8px;
-`; 
+`;

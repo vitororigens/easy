@@ -4,7 +4,7 @@ import CalendarPicker from 'react-native-calendar-picker';
 import styled from 'styled-components/native';
 import { dataMask } from '../../utils/mask';
 import { Input } from '../Input';
-
+import { Container } from './style';
 
 interface InputDateProps {
   value: string;
@@ -21,7 +21,7 @@ const CalendarContainer = styled(View)`
   margin-bottom: 5px;  
 `;
 
-export function InputDate({ value, onChange, onBlur, placeholder = "Data" }: InputDateProps) {
+export function InputDate({ value, onChange, onBlur, placeholder = 'Data' }: InputDateProps) {
   const [showCalendar, setShowCalendar] = useState(false);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export function InputDate({ value, onChange, onBlur, placeholder = "Data" }: Inp
       const formattedDate = today.toLocaleDateString('pt-BR');
       onChange(formattedDate);
     }
-  }, []);
+  }, [value, onChange]);
 
   const handleDateChange = (date: Date) => {
     if (date) {
@@ -41,23 +41,24 @@ export function InputDate({ value, onChange, onBlur, placeholder = "Data" }: Inp
   };
 
   const handleInputBlur = () => {
+    setShowCalendar(false);
     if (onBlur) {
       onBlur();
     }
   };
 
   return (
-    <View style={{ width: '100%' }}>
+    <Container>
       <Input
         placeholder={placeholder}
         name="calendar"
         showIcon
-       onFocus={() => setShowCalendar(true)}
+        onPress={() => setShowCalendar(true)}
+        onFocus={() => setShowCalendar(true)}
         onBlur={handleInputBlur}
         onChangeText={onChange}
         value={dataMask(value)}
       />
-      
       {showCalendar && (
         <CalendarContainer>
           <CalendarPicker
@@ -86,6 +87,6 @@ export function InputDate({ value, onChange, onBlur, placeholder = "Data" }: Inp
           />
         </CalendarContainer>
       )}
-    </View>
+    </Container>
   );
 }

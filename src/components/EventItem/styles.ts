@@ -1,6 +1,6 @@
-import { TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
-import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import { TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
+import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 
 type ContainerProps = {
   isShared?: boolean;

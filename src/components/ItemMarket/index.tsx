@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import { IMarket } from "../../interfaces/IMarket";
+import { useState, useRef, useEffect } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
+import { IMarket } from '../../interfaces/IMarket';
 import {
   Container,
   Content,
@@ -21,11 +21,11 @@ import {
   Row,
   Unit,
   Price,
-} from "./styles";
-import { formatPrice } from "../../utils/price";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import Popover from "react-native-popover-view";
-import { findUserById } from "../../services/firebase/users.firestore";
+} from './styles';
+import { formatPrice } from '../../utils/price';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import Popover from 'react-native-popover-view';
+import { findUserById } from '../../services/firebase/users.firestore';
 
 interface ItemMarketProps {
   market: IMarket;
@@ -44,9 +44,9 @@ export function ItemMarket({
 }: ItemMarketProps) {
   const { user } = useUserAuth();
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
-  const [sharedByUserName, setSharedByUserName] = useState<string>("");
+  const [sharedByUserName, setSharedByUserName] = useState<string>('');
   const popoverRef = useRef(null);
-  
+
   // Verificar se o usuário pode excluir este item
   // Pode excluir se for o criador (uid) OU se for o proprietário (isOwner)
   const isCreator = market.uid === user?.uid;
@@ -79,7 +79,7 @@ export function ItemMarket({
             setSharedByUserName(userData.userName);
           }
         } catch (error) {
-          console.error("Erro ao buscar nome do usuário que compartilhou:", error);
+          console.error('Erro ao buscar nome do usuário que compartilhou:', error);
         }
       }
     };
@@ -102,7 +102,7 @@ export function ItemMarket({
             <Title>{market.name}</Title>
             {isShared && (
               <ShareBadge>
-                <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
+                <ShareIcon name={isSharedByMe ? 'share' : 'share-variant'} />
               </ShareBadge>
             )}
           </Row>
@@ -112,11 +112,11 @@ export function ItemMarket({
           </Description>
           {isShared && (
             <ShareText>
-              {isSharedByMe 
-                ? "Compartilhado por você" 
-                : sharedByUserName 
-                  ? `Compartilhado por ${sharedByUserName}` 
-                  : "Compartilhado com você"
+              {isSharedByMe
+                ? 'Compartilhado por você'
+                : sharedByUserName
+                  ? `Compartilhado por ${sharedByUserName}`
+                  : 'Compartilhado com você'
               }
             </ShareText>
           )}
@@ -157,4 +157,4 @@ export function ItemMarket({
       </Content>
     </Container>
   );
-} 
+}

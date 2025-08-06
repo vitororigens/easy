@@ -1,4 +1,4 @@
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons';
 import {
   Container,
   Content,
@@ -7,10 +7,10 @@ import {
   Separator,
   SubTitle,
   Title,
-} from "./styles";
-import { formatPrice } from "../../../utils/price";
-import { format } from "date-fns";
-import { IMarket } from "../../../interfaces/IMarket";
+} from './styles';
+import { formatPrice } from '../../../utils/price';
+import { format } from 'date-fns';
+import { IMarket } from '../../../interfaces/IMarket';
 
 interface IMarketHistoryItem {
   market: IMarket;
@@ -30,7 +30,7 @@ export const MarketHistoryItem = ({ market }: IMarketHistoryItem) => {
         </ContentItems>
         <Separator />
         <ContentItems>
-          <SubTitle>{format(market.createdAt.toDate(), "dd/mm/yyyy")}</SubTitle>
+          <SubTitle>{format(market.createdAt.toDate(), 'dd/mm/yyyy')}</SubTitle>
           <SubTitle>Pago</SubTitle>
         </ContentItems>
       </Content>

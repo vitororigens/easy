@@ -1,12 +1,11 @@
-import { TextInput, TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
+import { TextInput, TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
 
 export type subTitleTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
 type Props = {
     type: subTitleTypeStyleProps;
 }
-
 
 export const Content = styled.View`
     flex: 1;
@@ -43,13 +42,12 @@ export const Divider = styled.View`
     background-color: ${({ theme }) => theme.COLORS.TEAL_600};
 `;
 
-
 export const SubTitle = styled.Text<Props>`
     font-size: ${({ theme }) => theme.FONT_SIZE.XL}px;
     font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
     color: ${({ theme, type }) => type === 'PRIMARY'
-        ? theme.COLORS.TEAL_600
-        : theme.COLORS.PURPLE_800};
+    ? theme.COLORS.TEAL_600
+    : theme.COLORS.PURPLE_800};
 `;
 
 export const DividerTask = styled.View`
@@ -60,7 +58,7 @@ export const DividerTask = styled.View`
 `;
 
 export const Input = styled(TextInput).attrs(({ theme }) => ({
-    placeholderTextColor: theme.COLORS.GRAY_400
+  placeholderTextColor: theme.COLORS.GRAY_400,
 }))`
     flex: 1;
 
@@ -76,16 +74,14 @@ export const Input = styled(TextInput).attrs(({ theme }) => ({
     margin-bottom: 15px;
 `;
 
-
 export const TitleTask = styled.Text`
     font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
     font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
     color: ${({theme}) => theme.COLORS.GRAY_600};
 `;
 
-
 export const InputDescription = styled(TextInput).attrs(({ theme }) => ({
-    placeholderTextColor: theme.COLORS.GRAY_400,
+  placeholderTextColor: theme.COLORS.GRAY_400,
 }))`
     flex: 1;
     min-height: 90px;

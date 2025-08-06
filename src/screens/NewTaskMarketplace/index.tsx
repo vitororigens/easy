@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 //
 import {
   ButtonBar,
@@ -8,18 +8,18 @@ import {
   Header,
   NavBar,
   Title,
-} from "./styles";
+} from './styles';
 //
-import { Container } from "../../components/Container";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { NewItemTask } from "../NewItemTask";
+import { Container } from '../../components/Container';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { NewItemTask } from '../NewItemTask';
 
 type Props = {
   closeBottomSheet?: () => void;
 };
 
 export function NewTaskMarketplace({ closeBottomSheet }: Props) {
-  const [activeButton, setActiveButton] = useState("receitas");
+  const [activeButton, setActiveButton] = useState('receitas');
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
@@ -30,9 +30,9 @@ export function NewTaskMarketplace({ closeBottomSheet }: Props) {
       <DefaultContainer>
         <ButtonClose
           onPress={closeBottomSheet}
-          style={{ alignSelf: "flex-end", marginBottom: 32 }}
+          style={{ alignSelf: 'flex-end', marginBottom: 32 }}
         >
-          <Title style={{ color: "white" }}>Fechar</Title>
+          <Title style={{ color: 'white' }}>Fechar</Title>
         </ButtonClose>
         <Container type="SECONDARY" title="Adicionar Lançamento">
           <Content>
@@ -40,20 +40,20 @@ export function NewTaskMarketplace({ closeBottomSheet }: Props) {
               <Divider
                 style={{
                   alignSelf:
-                    activeButton === "receitas" ? "flex-start" : "flex-end",
+                    activeButton === 'receitas' ? 'flex-start' : 'flex-end',
                 }}
               />
               <NavBar>
-                <ButtonBar onPress={() => handleButtonClick("receitas")}>
+                <ButtonBar onPress={() => handleButtonClick('receitas')}>
                   <Title>Nova Tarefa</Title>
                 </ButtonBar>
-                <ButtonBar onPress={() => handleButtonClick("despesas")}>
+                <ButtonBar onPress={() => handleButtonClick('despesas')}>
                   <Title>Adicione item de compra</Title>
                 </ButtonBar>
               </NavBar>
             </Header>
-            {activeButton === "receitas" && <NewItemTask showButtonSave />}
-            {activeButton === "despesas" && <NewItemTask showButtonSave />}
+            {activeButton === 'receitas' && <NewItemTask showButtonSave />}
+            {activeButton === 'despesas' && <NewItemTask showButtonSave />}
           </Content>
         </Container>
       </DefaultContainer>

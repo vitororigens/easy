@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { Container, ContainerIcon, Icon, StyledImage, Title } from "./styles";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { doc, onSnapshot, getFirestore } from "@react-native-firebase/firestore"; 
+import { useEffect, useState } from 'react';
+import { Container, ContainerIcon, Icon, StyledImage, Title } from './styles';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { doc, onSnapshot, getFirestore } from '@react-native-firebase/firestore';
 
 type LogoUserProps = {
   color: string;
@@ -15,10 +15,10 @@ export function LogoUser({ color }: LogoUserProps) {
 
   useEffect(() => {
     if (uid) {
-      const docRef = doc(db, "Perfil", uid);
-      
+      const docRef = doc(db, 'Perfil', uid);
+
       const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
-        console.log("Document snapshot received: ", docSnapshot.data());
+        console.log('Document snapshot received: ', docSnapshot.data());
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
           setImage(data?.['image'] ?? null);
@@ -32,12 +32,12 @@ export function LogoUser({ color }: LogoUserProps) {
   }, [uid]);
 
   function getInitials(name: string | undefined): string {
-    if (!name) return "";
-    const nameArray = name.split(" ");
+    if (!name) return '';
+    const nameArray = name.split(' ');
     const initials = nameArray
       .slice(0, 2) // Pega apenas os dois primeiros nomes
       .map((word) => word.charAt(0).toUpperCase())
-      .join("");
+      .join('');
     return initials;
   }
 
@@ -46,7 +46,7 @@ export function LogoUser({ color }: LogoUserProps) {
       {image ? (
         <StyledImage source={{ uri: image }} />
       ) : (
-        <Title>{getInitials(user.user?.displayName ?? "")}</Title>
+        <Title>{getInitials(user.user?.displayName ?? '')}</Title>
       )}
       <ContainerIcon style={{ backgroundColor: color }}>
         <Icon name="menu" />

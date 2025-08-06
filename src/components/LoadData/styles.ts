@@ -1,7 +1,7 @@
-import { Image, Dimensions } from "react-native";
-import styled from "styled-components/native";
+import { Image, Dimensions } from 'react-native';
+import styled from 'styled-components/native';
 
-const windowHeight = Dimensions.get("window").height;
+const windowHeight = Dimensions.get('window').height;
 
 export const Container = styled.View`
   align-items: center;

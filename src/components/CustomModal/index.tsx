@@ -1,5 +1,5 @@
 import { Modal } from 'react-native';
-import { Container, ContainerButton, Title, TitleButton, Button, ModalContainer } from "./styles";
+import { Container, ContainerButton, Title, TitleButton, Button, ModalContainer } from './styles';
 
 type CustomModalProps = {
     title: string;
@@ -7,37 +7,36 @@ type CustomModalProps = {
     onClose: () => void;
     onConfirme: () => void;
     onCancel: () => void;
-    animationType: string; 
-    transparent: boolean; 
+    animationType: string;
+    transparent: boolean;
 }
 
-
 export function CustomModal({ title, visible, onClose, onConfirme, onCancel }: CustomModalProps) {
-    return (
-        <Modal transparent visible={visible} onRequestClose={onClose}>
-            <Container>
-             <ModalContainer>
-                    <Title>{title}</Title>
-                <ContainerButton>
-                    <Button type="PRIMARY" onPress={() => {
-                        onConfirme(); 
-                        onClose(); 
-                    }}>
-                        <TitleButton>
+  return (
+    <Modal transparent visible={visible} onRequestClose={onClose}>
+      <Container>
+        <ModalContainer>
+          <Title>{title}</Title>
+          <ContainerButton>
+            <Button type="PRIMARY" onPress={() => {
+              onConfirme();
+              onClose();
+            }}>
+              <TitleButton>
                             SIM
-                        </TitleButton>
-                    </Button>
-                    <Button type="SECONDARY" onPress={() => {
-                        onCancel();
-                        onClose(); 
-                    }}>
-                        <TitleButton>
+              </TitleButton>
+            </Button>
+            <Button type="SECONDARY" onPress={() => {
+              onCancel();
+              onClose();
+            }}>
+              <TitleButton>
                             Cancelar
-                        </TitleButton>
-                    </Button>
-                </ContainerButton>
-             </ModalContainer>
-            </Container>
-        </Modal>
-    )
+              </TitleButton>
+            </Button>
+          </ContainerButton>
+        </ModalContainer>
+      </Container>
+    </Modal>
+  );
 }

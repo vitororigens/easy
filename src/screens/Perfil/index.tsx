@@ -1,10 +1,10 @@
 import { getAuth, signOut, deleteUser } from '@react-native-firebase/auth';
-import { useState, useEffect } from "react";
-import { ScrollView, View } from "react-native";
-import { CustomModal } from "../../components/CustomModal";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Loading } from "../../components/Loading";
-import { useUserAuth } from "../../hooks/useUserAuth";
+import { useState, useEffect } from 'react';
+import { ScrollView, View } from 'react-native';
+import { CustomModal } from '../../components/CustomModal';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { Loading } from '../../components/Loading';
+import { useUserAuth } from '../../hooks/useUserAuth';
 import {
   ActionButton,
   ButtonText,
@@ -23,14 +23,14 @@ import {
   StyledImage,
   SubTitle,
   Title,
-} from "./styles";
-import { MaterialIcons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
+} from './styles';
+import { MaterialIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { database, storage } from "../../libs/firebase";
-import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from "@react-native-firebase/firestore";
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { database, storage } from '../../libs/firebase';
+import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from '@react-native-firebase/firestore';
 
 const formSchema = z.object({
   image: z.string().optional(),
@@ -57,27 +57,27 @@ export function Perfil() {
       const fetchUserData = async () => {
         try {
           // Buscar imagem do perfil
-          const docRef = doc(database, "Perfil", uid);
+          const docRef = doc(database, 'Perfil', uid);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             const data = docSnap.data();
             if (data?.['image']) {
               setImage(data['image']);
-              setValue("image", data['image']);
+              setValue('image', data['image']);
             }
           }
 
           // Buscar userName
-          const userRef = collection(database, "User");
-          const q = query(userRef, where("uid", "==", uid));
+          const userRef = collection(database, 'User');
+          const q = query(userRef, where('uid', '==', uid));
           const querySnapshot = await getDocs(q);
-          
+
           if (!querySnapshot.empty) {
             const userData = querySnapshot.docs[0].data();
             setUserName(userData.userName);
           }
         } catch (error) {
-          console.error("Error fetching user data: ", error);
+          console.error('Error fetching user data: ', error);
         }
       };
       fetchUserData();
@@ -87,8 +87,8 @@ export function Perfil() {
   function handleLogout() {
     const auth = getAuth();
     signOut(auth)
-      .then(() => console.log("User signed out"))
-      .catch((error) => console.error("Error signing out: ", error));
+      .then(() => console.log('User signed out'))
+      .catch((error) => console.error('Error signing out: ', error));
   }
 
   function handleDeleteUser() {
@@ -96,15 +96,15 @@ export function Perfil() {
     const currentUser = auth.currentUser;
     if (currentUser) {
       deleteUser(currentUser)
-        .then(() => console.log("User deleted"))
-        .catch((error) => console.error("Error deleting user: ", error));
+        .then(() => console.log('User deleted'))
+        .catch((error) => console.error('Error deleting user: ', error));
     }
   }
 
   const pickImage = async () => {
     try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
@@ -114,11 +114,11 @@ export function Perfil() {
         const uri = result.assets[0].uri;
         const uploadedUrl = await uploadImage(uri);
         setImage(uploadedUrl);
-        setValue("image", uploadedUrl);
+        setValue('image', uploadedUrl);
         await handleSaveItem({ image: uploadedUrl });
       }
     } catch (error) {
-      console.error("Error picking image: ", error);
+      console.error('Error picking image: ', error);
     }
   };
 
@@ -130,7 +130,7 @@ export function Perfil() {
       await imageRef.put(blob);
       return await imageRef.getDownloadURL();
     } catch (error) {
-      console.error("Error uploading image: ", error);
+      console.error('Error uploading image: ', error);
       throw error;
     }
   };
@@ -138,22 +138,22 @@ export function Perfil() {
   const handleSaveItem = async ({ image }: { image: string }) => {
     if (!uid) return;
     try {
-      const docRef = doc(database, "Perfil", uid);
+      const docRef = doc(database, 'Perfil', uid);
       await setDoc(docRef, { image }, { merge: true });
     } catch (error) {
-      console.error("Error saving image: ", error);
+      console.error('Error saving image: ', error);
     }
   };
 
   const deleteImage = async () => {
     if (!uid) return;
     try {
-      const docRef = doc(database, "Perfil", uid);
+      const docRef = doc(database, 'Perfil', uid);
       await updateDoc(docRef, { image: null });
       setImage(null);
-      setValue("image", undefined);
+      setValue('image', undefined);
     } catch (error) {
-      console.error("Error deleting image: ", error);
+      console.error('Error deleting image: ', error);
     }
   };
 
@@ -196,7 +196,7 @@ export function Perfil() {
                     <IconField name="person-outline" />
                     <ItemContent>
                       <Title>Nome de Usuário</Title>
-                      <SubTitle type="SECONDARY">{userName || "Não definido"}</SubTitle>
+                      <SubTitle type="SECONDARY">{userName || 'Não definido'}</SubTitle>
                     </ItemContent>
                   </Items>
 
@@ -215,9 +215,9 @@ export function Perfil() {
                       <SubTitle type="SECONDARY">
                         {user?.user?.uid
                           ? user.user.uid.length > 10
-                            ? user.user.uid.substring(0, 15) + "..."
+                            ? `${user.user.uid.substring(0, 15)}...`
                             : user.user.uid
-                          : ""}
+                          : ''}
                       </SubTitle>
                     </ItemContent>
                   </Items>

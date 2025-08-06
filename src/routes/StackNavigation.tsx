@@ -1,7 +1,7 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Login } from "../screens/Login";
-import { ForgetPassword } from "../screens/ForgetPassword";
-import { BottomTabsNavigation } from "./BottomTabsNavigation";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Login } from '../screens/Login';
+import { ForgetPassword } from '../screens/ForgetPassword';
+import { BottomTabsNavigation } from './BottomTabsNavigation';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 

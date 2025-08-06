@@ -1,5 +1,5 @@
-import styled from "styled-components/native";
-import { TouchableOpacity } from "react-native";
+import styled from 'styled-components/native';
+import { TouchableOpacity } from 'react-native';
 
 export const Container = styled.View`
   flex: 1;
@@ -57,4 +57,4 @@ export const MarketName = styled.Text`
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme }) => theme.COLORS.GRAY_600};
   margin-bottom: 4px;
-`; 
+`;

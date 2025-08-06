@@ -1,12 +1,11 @@
-import { TextInput, TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
+import { TextInput, TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
 
 export type subTitleTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
 type Props = {
     type: subTitleTypeStyleProps;
 }
-
 
 export const Content = styled.View`
     flex: 1;
@@ -36,7 +35,7 @@ export const ButtonClose = styled(TouchableOpacity)`
 `;
 
 export const Input = styled(TextInput).attrs(({ theme }) => ({
-    placeholderTextColor: theme.COLORS.GRAY_400
+  placeholderTextColor: theme.COLORS.GRAY_400,
 }))`
     flex: 1;
 
@@ -63,7 +62,6 @@ export const Button = styled(TouchableOpacity)`
     align-items: center;
     justify-content: center;
 `;
-
 
 export const Span = styled.Text`
     font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;

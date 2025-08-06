@@ -387,7 +387,7 @@ export function NewLaunch(props: NewLaunchProps) {
       if (data.repeat) {
         const repeatType = data.repeatType || 'finite';
         const repeatCount = data.repeatCount || 1;
-        let monthsToNotify = repeatType === 'finite' ? repeatCount : 12;
+        const monthsToNotify = repeatType === 'finite' ? repeatCount : 12;
 
         for (let i = 0; i < monthsToNotify; i++) {
           const nextMonth = monthNumber + i;
@@ -653,7 +653,7 @@ export function NewLaunch(props: NewLaunchProps) {
                       value={value ?? ''}
                       onChangeText={onChange}
                       onBlur={onBlur}
-                      errorMessage={errors.name?.message ?? ''}
+                      error={errors.name?.message ?? ''}
                     />
                   )}
                 />
@@ -716,8 +716,8 @@ export function NewLaunch(props: NewLaunchProps) {
                             value={value ?? ''}
                             placeholder="Tipo de repetição"
                             items={[
-                              { label: 'Quantidade definida', value: 'finite' },
-                              { label: 'Infinitamente', value: 'infinite' },
+                              { label: 'Parcelado', value: 'finite' },
+                              { label: 'Recorrente', value: 'infinite' },
                             ]}
                           />
                         </View>

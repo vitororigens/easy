@@ -7,4 +7,4 @@ export interface ICalendar {
   userId: string;
   isShared?: boolean;
   sharedWith?: string[];
-} 
+}

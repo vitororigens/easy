@@ -1,30 +1,30 @@
-import React, { useEffect, useState } from "react";
-import { ScrollView, TouchableOpacity, View, Alert } from "react-native";
-import { Toast } from "react-native-toast-notifications";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, FormProvider, useForm } from "react-hook-form";
-import { z } from "zod";
-import { LoadingIndicator } from "../../components/Loading/style";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { currencyMask, currencyUnMask } from "../../utils/mask";
-import { findTaskById } from "../../services/firebase/tasks";
-import { Button, Content, Input, Span, Title } from "./styles";
-import { getInitials } from "../../utils/getInitials";
-import { Timestamp } from "@react-native-firebase/firestore";
+import React, { useEffect, useState } from 'react';
+import { ScrollView, TouchableOpacity, View, Alert } from 'react-native';
+import { Toast } from 'react-native-toast-notifications';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { LoadingIndicator } from '../../components/Loading/style';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { currencyMask, currencyUnMask } from '../../utils/mask';
+import { findTaskById } from '../../services/firebase/tasks';
+import { Button, Content, Input, Span, Title } from './styles';
+import { getInitials } from '../../utils/getInitials';
+import { Timestamp } from '@react-native-firebase/firestore';
 import {
   createSharing,
   ESharingStatus,
   getSharing,
-} from "../../services/firebase/sharing.firebase";
-import { createNotification } from "../../services/firebase/notifications.firebase";
-import { sendPushNotification } from "../../services/one-signal";
-import { ShareWithUsers } from "../../components/ShareWithUsers";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { useTask } from "../../contexts/TaskContext";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { format } from "date-fns";
-import { createTask } from "../../services/firebase/tasks";
-import { database } from "../../libs/firebase";
+} from '../../services/firebase/sharing.firebase';
+import { createNotification } from '../../services/firebase/notifications.firebase';
+import { sendPushNotification } from '../../services/one-signal';
+import { ShareWithUsers } from '../../components/ShareWithUsers';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { useTask } from '../../contexts/TaskContext';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { format } from 'date-fns';
+import { createTask } from '../../services/firebase/tasks';
+import { database } from '../../libs/firebase';
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -38,14 +38,14 @@ type Props = {
 type FormSchemaType = z.infer<typeof formSchema>;
 
 const formSchema = z.object({
-  name: z.string().min(1, "Nome da Tarefa é obrigatória"),
-  formattedDate: z.string().min(1, "Data é obrigatória"),
+  name: z.string().min(1, 'Nome da Tarefa é obrigatória'),
+  formattedDate: z.string().min(1, 'Data é obrigatória'),
   sharedUsers: z.array(
     z.object({
       uid: z.string(),
       userName: z.string(),
       acceptedAt: z.union([z.null(), z.instanceof(Timestamp)]),
-    })
+    }),
   ),
 });
 // const formSchema = z.object({
@@ -70,50 +70,50 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
     selectedItemId?: string;
     isCreator: boolean;
   };
-  console.log("selectedItemId", selectedItemId);
+  console.log('selectedItemId', selectedItemId);
 
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      formattedDate: format(new Date(), "dd/MM/yyyy"),
+      name: '',
+      formattedDate: format(new Date(), 'dd/MM/yyyy'),
       sharedUsers: [],
     },
   });
 
-  const formattedDate = format(new Date(), "dd/MM/yyyy");
+  const formattedDate = format(new Date(), 'dd/MM/yyyy');
 
   // Hooks
   const { control, handleSubmit, reset, setValue, watch } = form;
 
   // Functions
 
-  const sharedUsers = watch("sharedUsers");
+  const sharedUsers = watch('sharedUsers');
 
   const handleCreatask = async ({ name, sharedUsers }: FormSchemaType) => {
     try {
       if (!uid) return;
       setLoading(true);
       const usersInvitedByMe = await getSharing({
-        profile: "invitedBy",
+        profile: 'invitedBy',
         uid: uid as string,
       });
 
       const createNewTask = await createTask({
-        name: name,
-        description: "",
+        name,
+        description: '',
         status: false,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
-        uid: uid,
-        type: "task",
+        uid,
+        type: 'task',
         shareWith: sharedUsers.map((user) => user.uid),
         shareInfo: sharedUsers.map((user) => ({
           uid: user.uid,
           userName: user.userName,
           finished: false,
           acceptedAt: usersInvitedByMe.some(
-            (u) => u.target === user.uid && u.status === ESharingStatus.ACCEPTED
+            (u) => u.target === user.uid && u.status === ESharingStatus.ACCEPTED,
           )
             ? Timestamp.now()
             : null,
@@ -123,11 +123,11 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
       if (sharedUsers.length > 0 || sharedUsers.length !== null) {
         for (const user of sharedUsers) {
           const alreadySharing = usersInvitedByMe.some(
-            (u) => u.target === user.uid && u.status === "accepted"
+            (u) => u.target === user.uid && u.status === 'accepted',
           );
 
           const possibleSharingRequestExists = usersInvitedByMe.some(
-            (u) => u.target === user.uid
+            (u) => u.target === user.uid,
           );
           const message = alreadySharing
             ? `${loggedUser.user?.displayName} adicionou uma nova tarefa`
@@ -137,13 +137,13 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
             createNotification({
               sender: uid as string,
               receiver: user.uid,
-              status: alreadySharing ? "sharing_accepted" : "pending",
-              type: "sharing_invite",
+              status: alreadySharing ? 'sharing_accepted' : 'pending',
+              type: 'sharing_invite',
               source: {
-                type: "task",
+                type: 'task',
                 id: createNewTask.id,
               },
-              title: "Compartilhamento de tarefa",
+              title: 'Compartilhamento de tarefa',
               createdAt: Timestamp.now(),
               description: message,
             }),
@@ -159,15 +159,15 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
               ]
               : []),
             sendPushNotification({
-              title: "Compartilhamento de task",
+              title: 'Compartilhamento de task',
               message,
               uid: user.uid,
             }),
           ]);
         }
         reset();
-        navigation.navigate("tabroutes", {
-          screen: "Tarefas",
+        navigation.navigate('tabroutes', {
+          screen: 'Tarefas',
           params: { reload: true },
         });
         setLoading(false);
@@ -175,7 +175,7 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.error("Erro ao adicionar o item: ", error);
+      console.error('Erro ao adicionar o item: ', error);
     } finally {
       setLoading(false);
     }
@@ -207,45 +207,45 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
 
   const handleDeleteExpense = () => {
     if (!selectedItemId) {
-      console.error("Nenhum documento selecionado para exclusão!");
+      console.error('Nenhum documento selecionado para exclusão!');
       return;
     }
     setLoading(true);
 
-    const expenseRef = database.collection("Task").doc(selectedItemId);
+    const expenseRef = database.collection('Task').doc(selectedItemId);
     expenseRef
       .delete()
       .then(() => {
         setLoading(false);
-        Toast.show("Item Excluido!", { type: "success" });
+        Toast.show('Item Excluido!', { type: 'success' });
         navigation.goBack();
         onCloseModal && onCloseModal();
       })
       .catch((error) => {
         setLoading(false);
-        console.error("Erro ao excluir o documento de item:", error);
+        console.error('Erro ao excluir o documento de item:', error);
       });
   };
 
   const handleEditExpense = ({ name }: FormSchemaType) => {
     setLoading(true);
     database
-      .collection("Task")
+      .collection('Task')
       .doc(selectedItemId)
       .set({
         name,
-        uid: uid,
+        uid,
       })
       .then(() => {
         setLoading(false);
-        Toast.show("Item adicionado!", { type: "success" });
+        Toast.show('Item adicionado!', { type: 'success' });
         onCloseModal && onCloseModal();
         navigation.goBack();
         !!closeBottomSheet && closeBottomSheet();
       })
       .catch((error) => {
         setLoading(false);
-        console.error("Erro ao adicionar o item: ", error);
+        console.error('Erro ao adicionar o item: ', error);
       });
   };
 
@@ -260,33 +260,33 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
     const loadTaskData = async () => {
       if (selectedItemId) {
         try {
-          console.log("Carregando dados da tarefa:", selectedItemId);
+          console.log('Carregando dados da tarefa:', selectedItemId);
           const task = await findTaskById(selectedItemId);
-          
+
           if (task) {
-            console.log("Dados da tarefa carregados:", task);
-            setValue("name", task.name);
-            
+            console.log('Dados da tarefa carregados:', task);
+            setValue('name', task.name);
+
             // Carregar usuários compartilhados se existirem
             if (task.shareInfo && Array.isArray(task.shareInfo)) {
               setValue(
-                "sharedUsers",
+                'sharedUsers',
                 task.shareInfo.map((si: any) => ({
                   uid: si.uid,
                   userName: si.userName,
                   acceptedAt: si.acceptedAt,
-                }))
+                })),
               );
             } else {
-              setValue("sharedUsers", []);
+              setValue('sharedUsers', []);
             }
-            
+
             setIsEditing(true);
           } else {
-            console.log("Tarefa não encontrada:", selectedItemId);
+            console.log('Tarefa não encontrada:', selectedItemId);
           }
         } catch (error) {
-          console.error("Erro ao carregar dados da tarefa:", error);
+          console.error('Erro ao carregar dados da tarefa:', error);
         }
       }
     };
@@ -302,45 +302,45 @@ export function NewItemTask({ closeBottomSheet, onCloseModal }: Props) {
         closeModalFn={closeBottomSheet}
         backButton
       >
-     <Content>
-            <Title>Nome da tarefa*</Title>
-            <Controller
-              control={control}
-              name="name"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input onBlur={onBlur} onChangeText={onChange} value={value} />
-              )}
-            />
+        <Content>
+          <Title>Nome da tarefa*</Title>
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input onBlur={onBlur} onChangeText={onChange} value={value} />
+            )}
+          />
 
-            <View style={{ marginBottom: 50, height: 200 }}>
+          <View style={{ marginBottom: 50, height: 200 }}>
+            <Button
+              style={{ marginBottom: 10 }}
+              onPress={
+                isEditing
+                  ? handleSubmit(handleEditExpense)
+                  : handleSubmit(handleCreatask)
+              }
+            >
+              <Title>{loading ? <LoadingIndicator /> : 'Salvar'}</Title>
+            </Button>
+            {!!selectedItemId && (
               <Button
                 style={{ marginBottom: 10 }}
-                onPress={
-                  isEditing
-                    ? handleSubmit(handleEditExpense)
-                    : handleSubmit(handleCreatask)
-                }
+                onPress={handleDeleteExpense}
               >
-                <Title>{loading ? <LoadingIndicator /> : "Salvar"}</Title>
+                <Title>Excluir</Title>
               </Button>
-              {!!selectedItemId && (
-                <Button
-                  style={{ marginBottom: 10 }}
-                  onPress={handleDeleteExpense}
-                >
-                  <Title>Excluir</Title>
-                </Button>
-              )}
-              {isCreator && (
-                <FormProvider {...form}>
-                  <ShareWithUsers 
+            )}
+            {isCreator && (
+              <FormProvider {...form}>
+                <ShareWithUsers
                   control={control}
                   name="sharedUsers"
-                  />
-                </FormProvider>
-              )}
-            </View>
-          </Content>
+                />
+              </FormProvider>
+            )}
+          </View>
+        </Content>
       </DefaultContainer>
     </View>
   );

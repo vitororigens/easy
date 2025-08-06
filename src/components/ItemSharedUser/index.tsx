@@ -27,7 +27,7 @@ export function ItemSharedUser({ sharing, onDeleteSharing, onStatusChange }: Ite
       try {
         const [targetData, senderData] = await Promise.all([
           findUserById(sharing.target),
-          findUserById(sharing.invitedBy)
+          findUserById(sharing.invitedBy),
         ]);
         setTargetUser(targetData);
         setSenderUser(senderData);
@@ -46,13 +46,13 @@ export function ItemSharedUser({ sharing, onDeleteSharing, onStatusChange }: Ite
   const handleAccept = async () => {
     try {
       await acceptSharing(sharing.id);
-      
+
       // Buscar todas as notas compartilhadas e atualizar o acceptedAt
       const notes = await findNoteById(sharing.id);
       if (notes) {
         await updateNotes(notes.id, user.user?.uid || '');
       }
-      
+
       setCurrentStatus('accepted');
       onStatusChange?.();
       Alert.alert('Sucesso', 'Compartilhamento aceito com sucesso!');
@@ -87,23 +87,23 @@ export function ItemSharedUser({ sharing, onDeleteSharing, onStatusChange }: Ite
 
   const getStatusText = () => {
     switch (currentStatus) {
-      case 'accepted':
-        return 'Aceito';
-      case 'rejected':
-        return 'Rejeitado';
-      case 'pending':
-        return 'Pendente';
-      default:
-        return '';
+    case 'accepted':
+      return 'Aceito';
+    case 'rejected':
+      return 'Rejeitado';
+    case 'pending':
+      return 'Pendente';
+    default:
+      return '';
     }
   };
 
   const formatDate = (timestamp: any) => {
     if (!timestamp) return 'Data não disponível';
-    
+
     try {
       let date: Date;
-      
+
       // Check if it's a Firestore Timestamp object
       if (timestamp.toDate && typeof timestamp.toDate === 'function') {
         date = timestamp.toDate();
@@ -127,16 +127,16 @@ export function ItemSharedUser({ sharing, onDeleteSharing, onStatusChange }: Ite
       else {
         return 'Data não disponível';
       }
-      
+
       // Validate if the date is valid
       if (isNaN(date.getTime())) {
         return 'Data não disponível';
       }
-      
+
       return date.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
-        year: '2-digit'
+        year: '2-digit',
       });
     } catch (error) {
       console.error('Error formatting date:', error);

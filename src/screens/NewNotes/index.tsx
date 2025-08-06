@@ -1,29 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { ScrollView, View, Alert, Text } from "react-native";
-import { Toast } from "react-native-toast-notifications";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, FormProvider, useForm } from "react-hook-form";
-import { z } from "zod";
-import { LoadingIndicator } from "../../components/Loading/style";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { findNoteById } from "../../services/firebase/notes.firebase";
-import { Button, Content, Input, InputContainer, Title } from "./styles";
-import { Timestamp } from "@react-native-firebase/firestore";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import React, { useEffect, useState } from 'react';
+import { ScrollView, View, Alert, Text } from 'react-native';
+import { Toast } from 'react-native-toast-notifications';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { LoadingIndicator } from '../../components/Loading/style';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { findNoteById } from '../../services/firebase/notes.firebase';
+import { Button, Content, Input, InputContainer, Title } from './styles';
+import { Timestamp } from '@react-native-firebase/firestore';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   createSharing,
   ESharingStatus,
   getSharing,
-} from "../../services/firebase/sharing.firebase";
-import { sendPushNotification } from "../../services/one-signal";
-import { createNotification } from "../../services/firebase/notifications.firebase";
-import { ShareWithUsers } from "../../components/ShareWithUsers";
+} from '../../services/firebase/sharing.firebase';
+import { sendPushNotification } from '../../services/one-signal';
+import { createNotification } from '../../services/firebase/notifications.firebase';
+import { ShareWithUsers } from '../../components/ShareWithUsers';
 import {
   createNote,
   deleteNote,
   updateNote,
-} from "../../services/firebase/notes.firebase";
-import { DefaultContainer } from "../../components/DefaultContainer";
+} from '../../services/firebase/notes.firebase';
+import { DefaultContainer } from '../../components/DefaultContainer';
 
 type Props = {
   closeBottomSheet?: () => void;
@@ -33,8 +33,8 @@ type Props = {
 type FormSchemaType = z.infer<typeof formSchema>;
 
 const formSchema = z.object({
-  name: z.string().min(1, "Nome da nota é obrigatório"),
-  description: z.string().min(1, "Descrição é obrigatória"),
+  name: z.string().min(1, 'Nome da nota é obrigatório'),
+  description: z.string().min(1, 'Descrição é obrigatória'),
   author: z.string().optional(),
   type: z.string().optional(),
   sharedUsers: z.array(
@@ -42,7 +42,7 @@ const formSchema = z.object({
       uid: z.string(),
       userName: z.string(),
       acceptedAt: z.union([z.null(), z.instanceof(Timestamp)]),
-    })
+    }),
   ).default([]),
 });
 
@@ -67,17 +67,17 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: "",
-      name: "",
+      description: '',
+      name: '',
       sharedUsers: [],
-      author: "",
-      type: "",
+      author: '',
+      type: '',
     },
   });
 
   const { control, handleSubmit, reset, setValue, watch, formState: { errors } } = form;
 
-  const sharedUsers = watch("sharedUsers");
+  const sharedUsers = watch('sharedUsers');
 
   const handleCreateNote = async ({
     name,
@@ -86,30 +86,30 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
   }: FormSchemaType) => {
     console.log('=== INÍCIO handleCreateNote ===');
     console.log('Valores do formulário:', { name, description, sharedUsers });
-    
+
     try {
       // Validação manual adicional
       if (!name || name.trim() === '') {
-        Alert.alert("Erro", "Nome da nota é obrigatório");
+        Alert.alert('Erro', 'Nome da nota é obrigatório');
         return;
       }
-      
+
       if (!description || description.trim() === '') {
-        Alert.alert("Erro", "Descrição é obrigatória");
+        Alert.alert('Erro', 'Descrição é obrigatória');
         return;
       }
-      
+
       if (!uid) return;
       setLoading(true);
       const usersInvitedByMe = await getSharing({
-        profile: "invitedBy",
+        profile: 'invitedBy',
         uid: uid as string,
       });
 
       const createdNote = await createNote({
         name,
         description,
-        type: "nota",
+        type: 'nota',
         author: String(currentUser),
         createdAt: new Date(),
         uid,
@@ -118,23 +118,23 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
           uid: user.uid,
           userName: user.userName,
           acceptedAt: usersInvitedByMe.some(
-            (u) => u.target === user.uid && u.status === ESharingStatus.ACCEPTED
+            (u) => u.target === user.uid && u.status === ESharingStatus.ACCEPTED,
           )
             ? Timestamp.now()
             : null,
         })),
       });
 
-      Toast.show("Nota adicionada!", { type: "success" });
+      Toast.show('Nota adicionada!', { type: 'success' });
 
       if (sharedUsers.length > 0 || sharedUsers.length !== null) {
         for (const user of sharedUsers) {
           const alreadySharing = usersInvitedByMe.some(
-            (u) => u.target === user.uid && u.status === "accepted"
+            (u) => u.target === user.uid && u.status === 'accepted',
           );
 
           const possibleSharingRequestExists = usersInvitedByMe.some(
-            (u) => u.target === user.uid
+            (u) => u.target === user.uid,
           );
 
           const message = alreadySharing
@@ -145,29 +145,29 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
             createNotification({
               sender: uid as string,
               receiver: user.uid,
-              status: alreadySharing ? "sharing_accepted" : "pending",
-              type: "sharing_invite",
+              status: alreadySharing ? 'sharing_accepted' : 'pending',
+              type: 'sharing_invite',
               source: {
-                type: "note",
+                type: 'note',
                 id: createdNote.id,
               },
-              title: "Compartilhamento de nota",
+              title: 'Compartilhamento de nota',
               description: message,
               createdAt: Timestamp.now(),
             }),
             ...(!alreadySharing && !possibleSharingRequestExists
               ? [
-                  createSharing({
-                    invitedBy: uid as string,
-                    status: ESharingStatus.PENDING,
-                    target: user.uid,
-                    createdAt: Timestamp.now(),
-                    updatedAt: Timestamp.now(),
-                  }),
-                ]
+                createSharing({
+                  invitedBy: uid as string,
+                  status: ESharingStatus.PENDING,
+                  target: user.uid,
+                  createdAt: Timestamp.now(),
+                  updatedAt: Timestamp.now(),
+                }),
+              ]
               : []),
             sendPushNotification({
-              title: "Compartilhamento de nota",
+              title: 'Compartilhamento de nota',
               message,
               uid: user.uid,
             }),
@@ -176,15 +176,15 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
       }
 
       reset();
-      navigation.navigate("tabroutes", {
-        screen: "Notas",
+      navigation.navigate('tabroutes', {
+        screen: 'Notas',
         params: { reload: true },
       });
       onCloseModal && onCloseModal();
       closeBottomSheet && closeBottomSheet();
     } catch (error) {
       setLoading(false);
-      console.error("Erro ao adicionar o item: ", error);
+      console.error('Erro ao adicionar o item: ', error);
     } finally {
       setLoading(false);
     }
@@ -192,22 +192,22 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
 
   const handleDeleteNote = async () => {
     if (!selectedItemId) {
-      console.error("Nenhum documento selecionado para exclusão!");
+      console.error('Nenhum documento selecionado para exclusão!');
       return;
     }
 
     try {
       setLoading(true);
       await deleteNote(selectedItemId);
-      Toast.show("Nota Excluída!", { type: "success" });
-      navigation.navigate("tabroutes", {
-        screen: "Notas",
+      Toast.show('Nota Excluída!', { type: 'success' });
+      navigation.navigate('tabroutes', {
+        screen: 'Notas',
         params: { reload: true },
       });
       onCloseModal && onCloseModal();
       closeBottomSheet && closeBottomSheet();
     } catch (error) {
-      console.error("Erro ao excluir o documento de item:", error);
+      console.error('Erro ao excluir o documento de item:', error);
     } finally {
       setLoading(false);
     }
@@ -220,27 +220,27 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
     type,
   }: FormSchemaType) => {
     if (!selectedItemId) {
-      console.error("Nenhum documento selecionado para edição!");
+      console.error('Nenhum documento selecionado para edição!');
       return;
     }
-    
+
     // Validação manual adicional
     if (!name || name.trim() === '') {
-      Alert.alert("Erro", "Nome da nota é obrigatório");
+      Alert.alert('Erro', 'Nome da nota é obrigatório');
       return;
     }
-    
+
     if (!description || description.trim() === '') {
-      Alert.alert("Erro", "Descrição é obrigatória");
+      Alert.alert('Erro', 'Descrição é obrigatória');
       return;
     }
-    
+
     try {
       await updateNote({
         id: selectedItemId,
         name,
-        author: author ?? "",
-        type: type ?? "",
+        author: author ?? '',
+        type: type ?? '',
         description,
         shareInfo: sharedUsers.map((user) => ({
           uid: user.uid,
@@ -249,14 +249,14 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
         })),
         shareWith: sharedUsers.map((user) => user.uid),
       });
-      navigation.navigate("tabroutes", {
-        screen: "Notas",
+      navigation.navigate('tabroutes', {
+        screen: 'Notas',
         params: { reload: true },
       });
       onCloseModal && onCloseModal();
       closeBottomSheet && closeBottomSheet();
     } catch (error) {
-      console.error("Erro ao atualizar o documento:", error);
+      console.error('Erro ao atualizar o documento:', error);
     } finally {
       setLoading(false);
     }
@@ -265,32 +265,32 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
   const onInvalid = (errors: any) => {
     console.log('Erros de validação:', errors);
     console.log('Valores atuais do formulário:', form.getValues());
-    
+
     const errorMessages = [];
-    
+
     if (errors.name) {
       errorMessages.push(`Nome: ${errors.name.message}`);
     }
-    
+
     if (errors.description) {
       errorMessages.push(`Descrição: ${errors.description.message}`);
     }
-    
+
     if (errors.author) {
       errorMessages.push(`Autor: ${errors.author.message}`);
     }
-    
+
     if (errors.type) {
       errorMessages.push(`Tipo: ${errors.type.message}`);
     }
-    
+
     if (errors.sharedUsers) {
       errorMessages.push(`Usuários compartilhados: ${errors.sharedUsers.message}`);
     }
-    
+
     Alert.alert(
-      "Atenção!",
-      `Por favor, corrija os seguintes campos:\n\n${errorMessages.join('\n')}`
+      'Atenção!',
+      `Por favor, corrija os seguintes campos:\n\n${errorMessages.join('\n')}`,
     );
   };
 
@@ -301,22 +301,22 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
           const note = await findNoteById(selectedItemId);
 
           if (note) {
-            setValue("name", note.name);
-            setValue("author", note.author);
-            setValue("type", note.type);
-            setValue("description", note.description);
+            setValue('name', note.name);
+            setValue('author', note.author);
+            setValue('type', note.type);
+            setValue('description', note.description);
             setValue(
-              "sharedUsers",
+              'sharedUsers',
               note.shareInfo.map((si) => ({
                 uid: si.uid,
                 userName: si.userName,
                 acceptedAt: si.acceptedAt,
-              })) ?? []
+              })) ?? [],
             );
             setIsEditing(true);
           }
         } catch (error) {
-          console.error("Erro ao obter o documento:", error);
+          console.error('Erro ao obter o documento:', error);
         }
       };
       findNote();
@@ -411,7 +411,7 @@ export function NewNotes({ closeBottomSheet, onCloseModal }: Props) {
 
             {isCreator && (
               <FormProvider {...form}>
-                 <ShareWithUsers />
+                <ShareWithUsers />
               </FormProvider>
             )}
 

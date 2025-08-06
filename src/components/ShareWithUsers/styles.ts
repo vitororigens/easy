@@ -1,22 +1,22 @@
-import { TouchableOpacity, Dimensions } from "react-native";
-import styled from "styled-components/native";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { TouchableOpacity, Dimensions } from 'react-native';
+import styled from 'styled-components/native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
 type ListItemProps = {
-  type?: "primary" | "secondary";
+  type?: 'primary' | 'secondary';
 };
 
 export const Title = styled.Text<ListItemProps>`
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   font-size: ${({ theme }) => theme.FONT_SIZE.GG}px;
   color: ${({ theme, type }) =>
-    type === "primary" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
+    type === 'primary' ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
   text-decoration-line: ${({ type }) =>
-    type === "primary" ? "line-through" : "none"};
+    type === 'primary' ? 'line-through' : 'none'};
 `;
 
 export const SectionTitle = styled(Title)`
@@ -101,9 +101,9 @@ export const ButtonSelect = styled(TouchableOpacity)`
 
 export const IconCheck = styled(MaterialCommunityIcons).attrs<ListItemProps>(
   ({ theme, type }) => ({
-    color: type === "primary" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800,
+    color: type === 'primary' ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800,
     size: theme.FONT_SIZE.XL,
-  })
+  }),
 )`
   margin-right: 5px;
 `;
@@ -113,9 +113,9 @@ export const FavoriteButton = styled(TouchableOpacity)`
   padding: 4px;
 `;
 
-export const FavoriteIcon = styled(MaterialCommunityIcons)<{ type: "primary" | "secondary" }>`
+export const FavoriteIcon = styled(MaterialCommunityIcons)<{ type: 'primary' | 'secondary' }>`
   color: ${({ theme, type }) =>
-    type === "primary" ? theme.COLORS.YELLOW_700 : theme.COLORS.GRAY_600};
+    type === 'primary' ? theme.COLORS.YELLOW_700 : theme.COLORS.GRAY_600};
   font-size: 24px;
 `;
 
@@ -170,4 +170,101 @@ export const CloseButtonText = styled.Text`
   color: ${({ theme }) => theme.COLORS.WHITE};
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   font-size: ${({ theme }) => theme.FONT_SIZE.GG}px;
+`;
+
+// Adicionado para centralizar estilos que estavam inline em index.tsx
+
+export const TitleCenter = styled(Title)`
+  text-align: center;
+  margin-bottom: 10px;
+`;
+
+export const ScrollHorizontal = styled.ScrollView`
+  padding-horizontal: 10px;
+`;
+
+export const InputShadow = styled.View`
+  margin-bottom: 15px;
+  elevation: 2;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+`;
+
+export const LoadingContainer = styled.View`
+  align-items: center;
+  margin-vertical: 16px;
+`;
+
+export const ButtonSelectChecked = styled(ButtonSelect)`
+  background-color: rgba(255, 215, 0, 0.05);
+`;
+
+export const ButtonSelectFavorite = styled(ButtonSelect)`
+  border-left-width: 3px;
+  border-left-color: #FFD700;
+`;
+
+export const ButtonSelectCheckedFavorite = styled(ButtonSelect)`
+  border-left-width: 3px;
+  border-left-color: #FFD700;
+  background-color: rgba(255, 215, 0, 0.05);
+`;
+
+export const CircleContainerSelected = styled(CircleContainer)`
+  border-width: 2px;
+  border-color: #00ff48;
+  background-color: rgba(0, 255, 38, 0.1);
+`;
+
+export const RemoveFavoriteButton = styled.TouchableOpacity`
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 2px;
+  elevation: 4;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+`;
+
+export const RemoveFavoriteIcon = styled(Remove)`
+  font-size: 12px;
+`;
+
+export const TextCircleName = styled(TextCircle)`
+  /* Usado para nome abaixo do círculo */
+`;
+
+export const FlatListContainer = styled.View`
+  max-height: 300px;
+`;
+
+export const FullWidthView = styled.View`
+  width: 100%;
+`;
+
+export const Flex1View = styled.View`
+  flex: 1;
+`;
+
+export const PaddingBottomScrollView = styled.ScrollView`
+  padding-bottom: 20px;
+`;
+
+export const AlignCenterView = styled.View`
+  align-items: center;
+`;
+
+export const RowAlignCenterView = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const MarginLeft5 = styled.View`
+  margin-left: 5px;
 `;

@@ -1,5 +1,5 @@
 import { Modal, FlatList } from 'react-native';
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from '@expo/vector-icons';
 import {
   Container,
   Content,
@@ -17,25 +17,25 @@ interface HistoryMarketModalProps {
   groupName: string;
   finishedDate: string;
   finishedTime: string;
-  markets: Array<{
+  markets: {
     id: string;
     name: string;
     createdAt: string;
-  }>;
+  }[];
 }
 
-export function HistoryMarketModal({ 
-  onClose, 
+export function HistoryMarketModal({
+  onClose,
   groupName,
   finishedDate,
   finishedTime,
-  markets 
+  markets,
 }: HistoryMarketModalProps) {
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
     return {
       date: date.toLocaleDateString(),
-      time: date.toLocaleTimeString()
+      time: date.toLocaleTimeString(),
     };
   };
 
@@ -78,4 +78,4 @@ export function HistoryMarketModal({
       </Container>
     </Modal>
   );
-} 
+}

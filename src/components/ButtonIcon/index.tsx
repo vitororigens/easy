@@ -1,4 +1,4 @@
-import { Button, Container, Icon } from "./styles";
+import { Button, Container, Icon } from './styles';
 
 type ButtonIconProps = {
     name: string;
@@ -6,15 +6,14 @@ type ButtonIconProps = {
     onPress?: () => void;
 }
 
-
 export function ButtonIcon({ name, color, onPress }: ButtonIconProps) {
-    return (
-        <Container style={{
-            backgroundColor: color
-        }}>
-           <Button onPress={onPress}>
-                <Icon name={name} />
-            </Button>
-        </Container>
-    )
+  return (
+    <Container style={{
+      backgroundColor: color,
+    }}>
+      <Button onPress={onPress}>
+        <Icon name={name} />
+      </Button>
+    </Container>
+  );
 }

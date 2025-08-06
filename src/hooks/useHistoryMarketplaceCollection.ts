@@ -1,7 +1,7 @@
-import { collection, onSnapshot, query } from "@react-native-firebase/firestore";
-import { useEffect, useState } from "react";
-import { MarketplaceData } from "./useMarketplaceCollections";
-import { getFirestore } from "@react-native-firebase/firestore";
+import { collection, onSnapshot, query } from '@react-native-firebase/firestore';
+import { useEffect, useState } from 'react';
+import { MarketplaceData } from './useMarketplaceCollections';
+import { getFirestore } from '@react-native-firebase/firestore';
 
 export interface HistoryMarketplaceData {
   id: string;
@@ -13,13 +13,13 @@ export interface HistoryMarketplaceData {
 }
 
 const useHistoryMarketplaceCollections = (
-  collectionName: string
+  collectionName: string,
 ): HistoryMarketplaceData[] => {
   const [data, setData] = useState<HistoryMarketplaceData[]>([]);
   const db = getFirestore();
   useEffect(() => {
     const q = query(collection(db, collectionName));
-    
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const collectionData: HistoryMarketplaceData[] = [];
       snapshot.forEach((doc: any) => {

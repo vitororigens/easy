@@ -1,5 +1,5 @@
-import { Timestamp } from "@react-native-firebase/firestore";
-import { ESharingStatus } from "../services/firebase/sharing.firebase";
+import { Timestamp } from '@react-native-firebase/firestore';
+import { ESharingStatus } from '../services/firebase/sharing.firebase';
 
 export interface ISharing {
   id?: string;
@@ -8,4 +8,4 @@ export interface ISharing {
   status: ESharingStatus;
   createdAt: Timestamp;
   updatedAt: Timestamp;
-} 
+}

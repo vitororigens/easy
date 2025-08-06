@@ -1,8 +1,8 @@
-import { TextInput, TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { TextInput, TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-export type subTitleTypeStyleProps = "PRIMARY" | "SECONDARY";
+export type subTitleTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
 type Props = {
   type: subTitleTypeStyleProps;

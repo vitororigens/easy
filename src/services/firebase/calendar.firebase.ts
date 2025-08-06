@@ -1,16 +1,16 @@
-import { 
-  Timestamp, 
-  collection, 
-  addDoc, 
-  doc, 
-  updateDoc, 
-  getDoc, 
-  getDocs, 
-  query, 
-  where, 
+import {
+  Timestamp,
+  collection,
+  addDoc,
+  doc,
+  updateDoc,
+  getDoc,
+  getDocs,
+  query,
+  where,
   deleteDoc,
-  getFirestore
-} from "@react-native-firebase/firestore";
+  getFirestore,
+} from '@react-native-firebase/firestore';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 
 const database = getFirestore();
@@ -27,7 +27,7 @@ export interface ICalendarEvent {
 
 const EVENTS_COLLECTION = 'events';
 
-export async function createEvent(event: Omit<ICalendarEvent, "id">) {
+export async function createEvent(event: Omit<ICalendarEvent, 'id'>) {
   try {
     const colRef = collection(database, EVENTS_COLLECTION);
     const docRef = await addDoc(colRef, {
@@ -36,7 +36,7 @@ export async function createEvent(event: Omit<ICalendarEvent, "id">) {
     });
     return { id: docRef.id, ...event };
   } catch (error) {
-    console.error("Error creating event:", error);
+    console.error('Error creating event:', error);
     throw error;
   }
 }
@@ -47,7 +47,7 @@ export async function updateEvent(id: string, event: Partial<ICalendarEvent>) {
     await updateDoc(docRef, event);
     return { id, ...event };
   } catch (error) {
-    console.error("Error updating event:", error);
+    console.error('Error updating event:', error);
     throw error;
   }
 }
@@ -57,7 +57,7 @@ export async function deleteEvent(id: string) {
     const docRef = doc(database, EVENTS_COLLECTION, id);
     await deleteDoc(docRef);
   } catch (error) {
-    console.error("Error deleting event:", error);
+    console.error('Error deleting event:', error);
     throw error;
   }
 }
@@ -73,7 +73,7 @@ export async function listEvents(userId: string) {
       ...docSnap.data(),
     })) as ICalendarEvent[];
   } catch (error) {
-    console.error("Error listing events:", error);
+    console.error('Error listing events:', error);
     throw error;
   }
 }
@@ -89,7 +89,7 @@ export async function listSharedEvents(userId: string) {
       ...docSnap.data(),
     })) as ICalendarEvent[];
   } catch (error) {
-    console.error("Error listing shared events:", error);
+    console.error('Error listing shared events:', error);
     throw error;
   }
 }
@@ -108,7 +108,7 @@ export async function findEventById(id: string) {
       ...docSnap.data(),
     } as ICalendarEvent;
   } catch (error) {
-    console.error("Error finding event:", error);
+    console.error('Error finding event:', error);
     throw error;
   }
 }
@@ -119,28 +119,28 @@ export async function deleteCalendarEvent(eventId: string, userId: string) {
     const docSnap = await getDoc(docRef);
 
     if (!docSnap.exists()) {
-      throw new Error("Evento não encontrado");
+      throw new Error('Evento não encontrado');
     }
 
     const eventData = docSnap.data();
     if (!eventData) {
-      throw new Error("Dados do evento não encontrados");
+      throw new Error('Dados do evento não encontrados');
     }
 
     // Se o usuário é o criador, excluir completamente
     if (eventData['userId'] === userId) {
       await deleteDoc(docRef);
-      console.log("Evento excluído completamente:", eventId);
+      console.log('Evento excluído completamente:', eventId);
     } else {
       // Se não é o criador, apenas remover do compartilhamento
-        if (eventData['sharedWith'] && Array.isArray(eventData['sharedWith'])) {
+      if (eventData['sharedWith'] && Array.isArray(eventData['sharedWith'])) {
         const updatedSharedWith = eventData['sharedWith'].filter((uid: string) => uid !== userId);
         await updateDoc(docRef, { sharedWith: updatedSharedWith });
-        console.log("Usuário removido do compartilhamento:", eventId);
+        console.log('Usuário removido do compartilhamento:', eventId);
       }
     }
   } catch (error) {
-    console.error("Erro ao deletar evento:", error);
+    console.error('Erro ao deletar evento:', error);
     throw error;
   }
 }

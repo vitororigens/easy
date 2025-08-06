@@ -1,18 +1,18 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { getAuth, sendPasswordResetEmail } from "@react-native-firebase/auth";
-import { useNavigation } from "@react-navigation/native";
-import { Controller, useForm } from "react-hook-form";
-import { Alert } from "react-native";
-import { Toast } from "react-native-toast-notifications";
-import { z } from "zod";
-import { Button } from "../../components/Button";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Input } from "../../components/Input";
-import { Logo } from "../../components/Logo";
-import { Container, LogoContainer, Title } from "./styles";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { getAuth, sendPasswordResetEmail } from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
+import { Controller, useForm } from 'react-hook-form';
+import { Alert } from 'react-native';
+import { Toast } from 'react-native-toast-notifications';
+import { z } from 'zod';
+import { Button } from '../../components/Button';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { Input } from '../../components/Input';
+import { Logo } from '../../components/Logo';
+import { Container, LogoContainer, Title } from './styles';
 
 const formSchema = z.object({
-  email: z.string().email("Formato inválido").min(1, "E-mail é obrigatório"),
+  email: z.string().email('Formato inválido').min(1, 'E-mail é obrigatório'),
 });
 
 type FormSchemaType = z.infer<typeof formSchema>;
@@ -25,32 +25,32 @@ export function ForgetPassword() {
   const { control, handleSubmit, reset } = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      email: '',
     },
   });
 
   // Functions
   function handleRegister() {
-    navigation.navigate("login");
+    navigation.navigate('login');
   }
 
   function handleForgetPassword({ email }: FormSchemaType) {
     const auth = getAuth();
     sendPasswordResetEmail(auth, email)
       .then(() => {
-        Toast.show("Um link foi enviado ao seu email", { type: "success" });
-        reset()
+        Toast.show('Um link foi enviado ao seu email', { type: 'success' });
+        reset();
         handleRegister();
       })
       .catch(() =>
-        Toast.show("Verifique se seu e-mail está correto.", { type: "danger" })
+        Toast.show('Verifique se seu e-mail está correto.', { type: 'danger' }),
       );
   }
 
   const onInvalid = () => {
     Alert.alert(
-      "Atenção!",
-      "Por favor, preencha o campo Email para que possa recuperar a senha"
+      'Atenção!',
+      'Por favor, preencha o campo Email para que possa recuperar a senha',
     );
   };
 
@@ -75,7 +75,7 @@ export function ForgetPassword() {
           )}
         />
 
-        <Button title={"Enviar"} onPress={handleSubmit(handleForgetPassword, onInvalid)} />
+        <Button title={'Enviar'} onPress={handleSubmit(handleForgetPassword, onInvalid)} />
       </Container>
       <LogoContainer>
         <Logo />

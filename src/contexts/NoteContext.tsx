@@ -15,14 +15,14 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: uuidv4(),
       createdAt: Timestamp.now(),
       isShared: false,
-      sharedWith: []
+      sharedWith: [],
     };
     setNotes(prev => [...prev, newNote]);
   };
 
   const updateNote = (id: string, updatedNote: Partial<INote>) => {
-    setNotes(prev => prev.map(note => 
-      note.id === id ? { ...note, ...updatedNote } : note
+    setNotes(prev => prev.map(note =>
+      note.id === id ? { ...note, ...updatedNote } : note,
     ));
   };
 
@@ -38,7 +38,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return {
             ...note,
             isShared: true,
-            sharedWith: [...sharedWith, email]
+            sharedWith: [...sharedWith, email],
           };
         }
       }
@@ -53,7 +53,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return {
           ...note,
           isShared: sharedWith.length > 0,
-          sharedWith
+          sharedWith,
         };
       }
       return note;
@@ -73,4 +73,4 @@ export const useNotes = () => {
     throw new Error('useNotes deve ser usado dentro de um NoteProvider');
   }
   return context;
-}; 
+};

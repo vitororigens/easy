@@ -1,11 +1,11 @@
-import { TouchableOpacity, Dimensions } from "react-native";
-import styled from "styled-components/native";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { TouchableOpacity, Dimensions } from 'react-native';
+import styled from 'styled-components/native';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-export type subTitleTypeStyleProps = "PRIMARY" | "SECONDARY";
+export type subTitleTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
 type Props = {
   type: subTitleTypeStyleProps;
@@ -73,7 +73,7 @@ export const ContentTitle = styled(TouchableOpacity)<contentTitle>`
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background-color: ${({ theme, isMysharedNotes }) => 
+  background-color: ${({ theme, isMysharedNotes }) =>
     isMysharedNotes ? theme.COLORS.PURPLE_50 : theme.COLORS.TEAL_50};
   border-radius: 10px;
   elevation: 2;
@@ -101,7 +101,7 @@ export const SectionIcon = styled(MaterialCommunityIcons).attrs(({ theme }) => (
   size: 24,
 }))<{ isMysharedNotes?: boolean }>`
   margin-right: 8px;
-  color: ${({ theme, isMysharedNotes }) => 
+  color: ${({ theme, isMysharedNotes }) =>
     isMysharedNotes ? theme.COLORS.PURPLE_600 : theme.COLORS.TEAL_600};
 `;
 

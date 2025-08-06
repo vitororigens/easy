@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 type ValuesType = {
   minValue: number | null;
@@ -22,7 +22,7 @@ export const useFilters = () => {
   const context = useContext(FiltersContext);
 
   if (!context) {
-    throw new Error("useFilters must be used within a FiltersContext");
+    throw new Error('useFilters must be used within a FiltersContext');
   }
   return context;
 };
@@ -36,13 +36,13 @@ export const FiltersProvider = ({ children }: FiltersProviderProps) => {
   const currentMonth = new Date().getMonth() + 1;
 
   // States
-  const [selectedTab, setSelectedTab] = useState("")
+  const [selectedTab, setSelectedTab] = useState('');
 
   const [selectedMonth, setSelectedMonth] = useState<number | null>(
-    currentMonth
+    currentMonth,
   );
 
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   const [values, setValues] = useState<ValuesType>({
     minValue: null,

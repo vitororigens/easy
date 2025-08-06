@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
-import { View } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import { formatCurrency } from "../../utils/mask";
-import { findUserById } from "../../services/firebase/users.firestore";
+import React, { useState, useRef, useEffect } from 'react';
+import { View } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { formatCurrency } from '../../utils/mask';
+import { findUserById } from '../../services/firebase/users.firestore';
 import {
   Container,
   Content,
@@ -22,14 +22,13 @@ import {
   PopoverItem,
   PopoverItemText,
   PopoverDivider,
-} from "./styles";
-import { format, isBefore, parseISO, startOfDay } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import Popover from "react-native-popover-view";
-
+} from './styles';
+import { format, isBefore, parseISO, startOfDay } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import Popover from 'react-native-popover-view';
 
 interface ItemsProps {
-  type?: "PRIMARY" | "SECONDARY" | "TERTIARY";
+  type?: 'PRIMARY' | 'SECONDARY' | 'TERTIARY';
   category: string;
   date: string;
   description?: string;
@@ -45,7 +44,7 @@ interface ItemsProps {
 }
 
 export function Items({
-  type = "PRIMARY",
+  type = 'PRIMARY',
   category,
   date,
   description,
@@ -60,15 +59,15 @@ export function Items({
   uid,
 }: ItemsProps) {
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
-  const [sharedByUserName, setSharedByUserName] = useState<string>("");
+  const [sharedByUserName, setSharedByUserName] = useState<string>('');
   const popoverRef = useRef(null);
 
   const getExpenseStatus = () => {
-    if (status === true) return "PAID";
-    
+    if (status === true) return 'PAID';
+
     try {
       let expenseDate;
-      
+
       // Verifica se a data está no formato DD/MM/YYYY
       if (date.includes('/')) {
         const [day, month, year] = date.split('/');
@@ -76,28 +75,28 @@ export function Items({
       } else {
         expenseDate = parseISO(date);
       }
-      
+
       // Verifica se a data é válida
       if (isNaN(expenseDate.getTime())) {
-        return "PENDING";
+        return 'PENDING';
       }
-      
+
       const today = startOfDay(new Date());
-      
+
       if (isBefore(expenseDate, today)) {
-        return "OVERDUE";
+        return 'OVERDUE';
       }
-      return "PENDING";
+      return 'PENDING';
     } catch (error) {
-      console.warn("Data inválida:", date);
-      return "PENDING";
+      console.warn('Data inválida:', date);
+      return 'PENDING';
     }
   };
 
   const expenseStatus = getExpenseStatus();
   const formattedValue = formatCurrency(valueTransaction, {
     showSymbol: true,
-    showNegative: type === "SECONDARY",
+    showNegative: type === 'SECONDARY',
     colorize: true,
   });
 
@@ -107,31 +106,31 @@ export function Items({
       if (date.includes('/')) {
         const [day, month, year] = date.split('/');
         const parsedDate = new Date(Number(year), Number(month) - 1, Number(day));
-        
+
         // Verifica se a data é válida
         if (isNaN(parsedDate.getTime())) {
-          return "Data inválida";
+          return 'Data inválida';
         }
-        
-        return format(parsedDate, "dd 'de' MMMM',' yyyy", {
+
+        return format(parsedDate, 'dd \'de\' MMMM\',\' yyyy', {
           locale: ptBR,
         });
       }
-      
+
       // Tenta parsear como ISO se não estiver no formato DD/MM/YYYY
       const parsedDate = parseISO(date);
-      
+
       // Verifica se a data é válida
       if (isNaN(parsedDate.getTime())) {
-        return "Data inválida";
+        return 'Data inválida';
       }
-      
-      return format(parsedDate, "dd 'de' MMMM',' yyyy", {
+
+      return format(parsedDate, 'dd \'de\' MMMM\',\' yyyy', {
         locale: ptBR,
       });
     } catch (error) {
-      console.warn("Erro ao formatar data:", date);
-      return "Data inválida";
+      console.warn('Erro ao formatar data:', date);
+      return 'Data inválida';
     }
   };
 
@@ -154,18 +153,18 @@ export function Items({
 
   useEffect(() => {
     const fetchSharedByUserName = async () => {
-      console.log("Items useEffect - isShared:", isShared, "isSharedByMe:", isSharedByMe, "uid:", uid);
+      console.log('Items useEffect - isShared:', isShared, 'isSharedByMe:', isSharedByMe, 'uid:', uid);
       if (isShared && !isSharedByMe && uid) {
         try {
-          console.log("Buscando nome do usuário para uid:", uid);
+          console.log('Buscando nome do usuário para uid:', uid);
           const userData = await findUserById(uid);
-          console.log("Dados do usuário encontrados:", userData);
+          console.log('Dados do usuário encontrados:', userData);
           if (userData) {
             setSharedByUserName(userData.userName);
-            console.log("Nome do usuário definido:", userData.userName);
+            console.log('Nome do usuário definido:', userData.userName);
           }
         } catch (error) {
-          console.error("Erro ao buscar nome do usuário que compartilhou:", error);
+          console.error('Erro ao buscar nome do usuário que compartilhou:', error);
         }
       }
     };
@@ -175,7 +174,7 @@ export function Items({
 
   useEffect(() => {
     if (isShared) {
-      console.log("Render - sharedByUserName:", sharedByUserName, "isSharedByMe:", isSharedByMe);
+      console.log('Render - sharedByUserName:', sharedByUserName, 'isSharedByMe:', isSharedByMe);
     }
   }, [isShared, sharedByUserName, isSharedByMe]);
 
@@ -184,10 +183,10 @@ export function Items({
       <Content>
         <MainContent>
           <Row>
-            <Title type={type} status={type === "SECONDARY" ? expenseStatus : undefined}>{category}</Title>
+            <Title type={type} status={type === 'SECONDARY' ? expenseStatus : undefined}>{category}</Title>
             {isShared && (
               <ShareBadge>
-                <ShareIcon name={isSharedByMe ? "share" : "share-variant"} />
+                <ShareIcon name={isSharedByMe ? 'share' : 'share-variant'} />
               </ShareBadge>
             )}
           </Row>
@@ -195,20 +194,20 @@ export function Items({
           <DateText>{formattedDate}</DateText>
           {isShared && (
             <ShareText>
-               {isSharedByMe 
-                ? "Compartilhado por você" 
-                : sharedByUserName 
-                  ? `Compartilhado por ${sharedByUserName}` 
-                  : "Compartilhado com você"
+              {isSharedByMe
+                ? 'Compartilhado por você'
+                : sharedByUserName
+                  ? `Compartilhado por ${sharedByUserName}`
+                  : 'Compartilhado com você'
               }
             </ShareText>
           )}
-          {type === "SECONDARY" && (
+          {type === 'SECONDARY' && (
             <Status status={expenseStatus}>
-              {expenseStatus === "PAID" && "Pago"}
-              {expenseStatus === "PENDING" && "Pendente"}
-              {expenseStatus === "OVERDUE" && "Vencido"}
-              {repeat && " • Recorrente"}
+              {expenseStatus === 'PAID' && 'Pago'}
+              {expenseStatus === 'PENDING' && 'Pendente'}
+              {expenseStatus === 'OVERDUE' && 'Vencido'}
+              {repeat && ' • Recorrente'}
             </Status>
           )}
         </MainContent>
@@ -229,17 +228,17 @@ export function Items({
               <PopoverContainer>
                 {onToggleStatus && (
                   <PopoverItem onPress={handleToggleStatus}>
-                    <MaterialIcons 
-                      name={status ? "check-circle-outline" : "radio-button-unchecked"} 
-                      size={20} 
-                      color={status ? "#16a34a" : "#a7a9ac"} 
+                    <MaterialIcons
+                      name={status ? 'check-circle-outline' : 'radio-button-unchecked'}
+                      size={20}
+                      color={status ? '#16a34a' : '#a7a9ac'}
                     />
                     <PopoverItemText>
-                      {status ? "Marcar como não pago" : "Marcar como pago"}
+                      {status ? 'Marcar como não pago' : 'Marcar como pago'}
                     </PopoverItemText>
                   </PopoverItem>
                 )}
-                
+
                 {onEdit && (
                   <>
                     {onToggleStatus && <PopoverDivider />}
@@ -249,7 +248,7 @@ export function Items({
                     </PopoverItem>
                   </>
                 )}
-                
+
                 {onDelete && (
                   <>
                     {(onEdit || onToggleStatus) && <PopoverDivider />}

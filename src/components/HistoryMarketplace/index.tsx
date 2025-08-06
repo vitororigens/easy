@@ -1,22 +1,22 @@
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { FlatList, View } from "react-native";
-import { Toast } from "react-native-toast-notifications";
-import { DefaultContainer } from "../DefaultContainer";
-import { Button, Content, Title, TotalValue } from "./styles";
-import { useEffect, useState } from "react";
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { FlatList, View } from 'react-native';
+import { Toast } from 'react-native-toast-notifications';
+import { DefaultContainer } from '../DefaultContainer';
+import { Button, Content, Title, TotalValue } from './styles';
+import { useEffect, useState } from 'react';
 import {
   findMarketHistoryById,
   IMarketHistory,
-} from "../../services/firebase/market-history.firebase";
-import { MarketHistoryItem } from "./historyItem";
-import { formatPrice } from "../../utils/price";
-import { createManyMarkets } from "../../services/firebase/market.firebase";
+} from '../../services/firebase/market-history.firebase';
+import { MarketHistoryItem } from './historyItem';
+import { formatPrice } from '../../utils/price';
+import { createManyMarkets } from '../../services/firebase/market.firebase';
 
 export function HistoryMarketplaceModal() {
   const route = useRoute();
 
   const [marketHistory, setMarketHistory] = useState<IMarketHistory | null>(
-    null
+    null,
   );
 
   const { selectedItemId } = route.params as { selectedItemId?: string };
@@ -30,15 +30,15 @@ export function HistoryMarketplaceModal() {
       await createManyMarkets(
         marketHistory.markets.map(({ id, ...rest }) => ({
           ...rest,
-        }))
+        })),
       );
-      Toast.show("Itens adicionados!", { type: "success" });
-      navigation.navigate("tabroutes", {
-        screen: "Market",
+      Toast.show('Itens adicionados!', { type: 'success' });
+      navigation.navigate('tabroutes', {
+        screen: 'Market',
         params: { reload: true },
       });
     } catch (error) {
-      console.error("Erro ao criar os itens: ", error);
+      console.error('Erro ao criar os itens: ', error);
     }
   };
 
@@ -48,7 +48,7 @@ export function HistoryMarketplaceModal() {
       const mh = await findMarketHistoryById(selectedItemId);
       setMarketHistory(mh);
     } catch (error) {
-      console.error("Erro ao buscar o histórico de compras: ", error);
+      console.error('Erro ao buscar o histórico de compras: ', error);
     }
   };
 

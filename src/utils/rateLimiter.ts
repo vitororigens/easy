@@ -51,7 +51,7 @@ class RateLimiter {
   async execute<T>(
     key: string,
     fn: () => Promise<T>,
-    onLimitExceeded?: () => void
+    onLimitExceeded?: () => void,
   ): Promise<T> {
     if (!this.canExecute(key)) {
       onLimitExceeded?.();
@@ -180,7 +180,7 @@ export const useRateLimit = (action: string, config?: RateLimitConfig) => {
   const execute = React.useCallback(async <T>(
     key: string,
     fn: () => Promise<T>,
-    onLimitExceeded?: () => void
+    onLimitExceeded?: () => void,
   ): Promise<T> => {
     return limiter.execute(key, fn, onLimitExceeded);
   }, [limiter]);
@@ -209,7 +209,7 @@ export const withRateLimit = (action: string, config?: RateLimitConfig) => {
 
     descriptor.value = async function (...args: any[]) {
       const key = `${this.constructor.name}:${propertyName}`;
-      
+
       if (!limiter.canExecute(key)) {
         throw new Error(`Rate limit exceeded for ${action}`);
       }
@@ -230,4 +230,4 @@ export const startRateLimitCleanup = (intervalMs: number = 5 * 60 * 1000) => {
   }, intervalMs);
 };
 
-export default RateLimiter; 
+export default RateLimiter;

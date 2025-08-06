@@ -1,4 +1,4 @@
-import { Timestamp } from "@react-native-firebase/firestore";
+import { Timestamp } from '@react-native-firebase/firestore';
 
 type TShareInfo = {
   acceptedAt: Timestamp | null;
@@ -17,8 +17,8 @@ export interface IFinancial {
   month: number;
   repeat: boolean;
   status: boolean;
-  type: "input" | "output";
+  type: 'input' | 'output';
   createdAt: Timestamp;
   shareWith: string[];
   shareInfo: TShareInfo[];
-} 
+}

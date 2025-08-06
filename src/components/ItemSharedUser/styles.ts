@@ -1,8 +1,8 @@
-import styled, { css } from "styled-components/native";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { TSharingStatus } from "../../services/firebase/sharing.firebase";
+import styled, { css } from 'styled-components/native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { TSharingStatus } from '../../services/firebase/sharing.firebase';
 
-export type ItemProps = "PRIMARY" | "SECUNDARY";
+export type ItemProps = 'PRIMARY' | 'SECUNDARY';
 
 type Props = {
   type: ItemProps;
@@ -52,23 +52,23 @@ export const Status = styled.Text<StatusProps>`
 
   ${({ status, theme }) => {
     switch (status) {
-      case 'accepted':
-        return css`
+    case 'accepted':
+      return css`
           background-color: ${theme.COLORS.GREEN_700};
           color: ${theme.COLORS.WHITE};
         `;
-      case 'rejected':
-        return css`
+    case 'rejected':
+      return css`
           background-color: ${theme.COLORS.RED_700};
           color: ${theme.COLORS.WHITE};
         `;
-      case 'pending':
-        return css`
+    case 'pending':
+      return css`
           background-color: ${theme.COLORS.YELLOW_700};
           color: ${theme.COLORS.GRAY_600};
         `;
-      default:
-        return css`
+    default:
+      return css`
           background-color: ${theme.COLORS.GRAY_400};
           color: ${theme.COLORS.WHITE};
         `;
@@ -86,14 +86,14 @@ export const ActionButton = styled.TouchableOpacity<ActionButtonProps>`
   border-radius: 4px;
   background-color: ${({ theme, type }) => {
     switch (type) {
-      case 'accept':
-        return theme.COLORS.GREEN_700;
-      case 'reject':
-        return theme.COLORS.RED_700;
-      case 'delete':
-        return theme.COLORS.RED_700;
-      default:
-        return theme.COLORS.GRAY_400;
+    case 'accept':
+      return theme.COLORS.GREEN_700;
+    case 'reject':
+      return theme.COLORS.RED_700;
+    case 'delete':
+      return theme.COLORS.RED_700;
+    default:
+      return theme.COLORS.GRAY_400;
     }
   }};
 `;
@@ -113,16 +113,16 @@ export const BadgeText = styled.Text<IBadgeProps>`
   font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
 
   ${({ status, theme }) => css`
-    ${status === "accepted" &&
+    ${status === 'accepted' &&
     css`
       color: ${theme.COLORS.WHITE};
     `}
-    ${status === "pending" &&
+    ${status === 'pending' &&
     css`
       background-color: ${theme.COLORS.YELLOW_700};
       color: ${theme.COLORS.GRAY_600};
     `}
-        ${status === "rejected" &&
+        ${status === 'rejected' &&
     css`
       color: ${theme.COLORS.WHITE};
     `}
@@ -137,16 +137,16 @@ export const Badge = styled.View<IBadgeProps>`
   border-radius: 20px;
 
   ${({ status, theme }) => css`
-    ${status === "accepted" &&
+    ${status === 'accepted' &&
     css`
       background-color: ${theme.COLORS.GREEN_700};
     `}
-    ${status === "pending" &&
+    ${status === 'pending' &&
     css`
       background-color: ${theme.COLORS.YELLOW_700};
       color: ${theme.COLORS.GRAY_600};
     `}
-        ${status === "rejected" &&
+        ${status === 'rejected' &&
     css`
       background-color: ${theme.COLORS.RED_700};
     `}

@@ -1,4 +1,4 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from 'firebase/firestore';
 
 export interface ITask {
   id: string;
@@ -10,9 +10,9 @@ export interface ITask {
   updatedAt: Timestamp;
   type: string;
   shareWith: string[];
-  shareInfo: Array<{
+  shareInfo: {
     acceptedAt: Timestamp | null;
     uid: string;
     userName: string;
-  }>;
-} 
+  }[];
+}

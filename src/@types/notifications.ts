@@ -1,16 +1,16 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from 'firebase/firestore';
 
 export interface INotification {
   id?: string;
   sender: string;
   receiver: string;
-  status: "pending" | "sharing_accepted";
-  type: "sharing_invite";
+  status: 'pending' | 'sharing_accepted';
+  type: 'sharing_invite';
   source: {
-    type: "expense";
+    type: 'expense';
     id: string;
   };
   title: string;
   description: string;
   createdAt: Timestamp;
-} 
+}

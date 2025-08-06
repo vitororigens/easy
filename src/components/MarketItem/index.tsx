@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useTheme } from "styled-components/native";
+import React, { useEffect, useState } from 'react';
+import { useTheme } from 'styled-components/native';
 import {
   Button,
   CartIcon,
@@ -11,8 +11,8 @@ import {
   Title,
   ViewLeft,
   ViewRight,
-} from "./styles";
-import { formatPrice } from "../../utils/price";
+} from './styles';
+import { formatPrice } from '../../utils/price';
 
 type IMarketItemProps = {
   title: string;
@@ -77,7 +77,7 @@ export const MarketItem = ({
           <Button onPress={onEditItem}>
             <Title
               style={{
-                textDecorationLine: isTyping ? "line-through" : "none",
+                textDecorationLine: isTyping ? 'line-through' : 'none',
                 color: isTyping ? COLORS.GRAY_400 : COLORS.GRAY_600,
               }}
             >
@@ -91,7 +91,7 @@ export const MarketItem = ({
       </ViewLeft>
 
       <ViewRight>
-        <Content style={{ justifyContent: "center", alignItems: "center" }}>
+        <Content style={{ justifyContent: 'center', alignItems: 'center' }}>
           {isTyping ? (
             <ContainerQuantity>
               <Button onPress={handleDecreaseQuantity}>
@@ -107,7 +107,7 @@ export const MarketItem = ({
               <Icon name="circle-with-plus" />
             </Button>
           )}
-          <Title style={{ textAlign: "center", width: 100 }}>
+          <Title style={{ textAlign: 'center', width: 100 }}>
             {formatPrice(price)}
           </Title>
         </Content>

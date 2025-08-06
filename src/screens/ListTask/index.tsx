@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   FlatList,
   Modal,
@@ -8,15 +8,15 @@ import {
   ScrollView,
   Alert,
   KeyboardAvoidingView,
-} from "react-native";
-import { Toast } from "react-native-toast-notifications";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { LoadData } from "../../components/LoadData";
-import { Loading } from "../../components/Loading";
-import { useMarketplaceCollections } from "../../hooks/useMarketplaceCollections";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { useTask } from "../../contexts/TaskContext";
-import { ITask } from "../../interfaces/ITask";
+} from 'react-native';
+import { Toast } from 'react-native-toast-notifications';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { LoadData } from '../../components/LoadData';
+import { Loading } from '../../components/Loading';
+import { useMarketplaceCollections } from '../../hooks/useMarketplaceCollections';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { useTask } from '../../contexts/TaskContext';
+import { ITask } from '../../interfaces/ITask';
 
 import {
   Title,
@@ -34,36 +34,36 @@ import {
   TaskCard,
   TaskName,
   DateText,
-} from "./styles";
+} from './styles';
 
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { format, getMonth, parse } from "date-fns";
-import { useTheme } from "styled-components/native";
-import PersonImage from "../../assets/illustrations/tasks.png";
-import { FinishTasks } from "../../components/FinishTasks";
-import { ItemTask } from "../../components/ItemTask";
-import { Items } from "../../components/Items";
-import { useMonth } from "../../context/MonthProvider";
-import useHistoryTasksCollections from "../../hooks/useHistoryTasksCollection";
-import { NewItemTask } from "../NewItemTask";
-import { database } from "../../libs/firebase";
-import { Timestamp } from "@react-native-firebase/firestore";
-import { HistoryTaskModal } from "../../components/HistoryTaskModal";
-import { createHistoryTasks } from "../../services/firebase/tasks";
-import { NativeAdComponent } from "../../components/NativeAd";
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { format, getMonth, parse } from 'date-fns';
+import { useTheme } from 'styled-components/native';
+import PersonImage from '../../assets/illustrations/tasks.png';
+import { FinishTasks } from '../../components/FinishTasks';
+import { ItemTask } from '../../components/ItemTask';
+import { Items } from '../../components/Items';
+import { useMonth } from '../../context/MonthProvider';
+import useHistoryTasksCollections from '../../hooks/useHistoryTasksCollection';
+import { NewItemTask } from '../NewItemTask';
+import { database } from '../../libs/firebase';
+import { Timestamp } from '@react-native-firebase/firestore';
+import { HistoryTaskModal } from '../../components/HistoryTaskModal';
+import { createHistoryTasks } from '../../services/firebase/tasks';
+import { NativeAdComponent } from '../../components/NativeAd';
 
-const modalBottom = Platform.OS === "ios" ? 90 : 70;
+const modalBottom = Platform.OS === 'ios' ? 90 : 70;
 
 interface HistoryItem {
   id: string;
   name: string;
   finishedDate: string;
   finishedTime: string;
-  tasks: Array<{
+  tasks: {
     id: string;
     name: string;
     createdAt: string | Timestamp;
-  }>;
+  }[];
 }
 
 export function ListTask({ route }: any) {
@@ -76,32 +76,32 @@ export function ListTask({ route }: any) {
 
   const { selectedMonth } = useMonth();
   const navigation = useNavigation();
-  const [activeButton, setActiveButton] = useState("tarefas");
+  const [activeButton, setActiveButton] = useState('tarefas');
   const [isCompletedListVisible, setIsCompletedListVisible] = useState(false);
   const [modalActive, setModalActive] = useState(false);
   const { COLORS } = useTheme();
 
-  const historyData = useHistoryTasksCollections("HistoryTasks");
+  const historyData = useHistoryTasksCollections('HistoryTasks');
   const historyUser = historyData.filter((item) => item.uid === uid);
   const historyUserMonth = historyUser.filter((item) => {
-    const month = getMonth(parse(item.finishedDate, "dd/MM/yyyy", new Date())) + 1;
+    const month = getMonth(parse(item.finishedDate, 'dd/MM/yyyy', new Date())) + 1;
     return month === selectedMonth;
   });
 
   // Combinar todas as tarefas em uma única lista (exceto concluídas)
   const allTasks = tasks?.filter(task => !task.status) || [];
-  
+
   const completedTasks = tasks?.filter(task => task.status) || [];
 
-  console.log("Tarefas no ListTask:", tasks);
-  console.log("Todas as tarefas ativas:", allTasks);
-  console.log("Tarefas concluídas:", completedTasks);
-  
+  console.log('Tarefas no ListTask:', tasks);
+  console.log('Todas as tarefas ativas:', allTasks);
+  console.log('Tarefas concluídas:', completedTasks);
+
   // Log detalhado da primeira tarefa concluída para debug
   if (completedTasks.length > 0) {
-    console.log("Estrutura da primeira tarefa concluída:", JSON.stringify(completedTasks[0], null, 2));
-    console.log("Tipo de createdAt:", typeof completedTasks[0].createdAt);
-    console.log("Tipo de updatedAt:", typeof completedTasks[0].updatedAt);
+    console.log('Estrutura da primeira tarefa concluída:', JSON.stringify(completedTasks[0], null, 2));
+    console.log('Tipo de createdAt:', typeof completedTasks[0].createdAt);
+    console.log('Tipo de updatedAt:', typeof completedTasks[0].updatedAt);
   }
 
   const handleButtonClick = (buttonName: string) => {
@@ -110,15 +110,15 @@ export function ListTask({ route }: any) {
 
   const handleEditTask = (taskId: string) => {
     // @ts-ignore
-    navigation.navigate("newitemtask", { selectedItemId: taskId });
+    navigation.navigate('newitemtask', { selectedItemId: taskId });
   };
 
   const handleDeleteTask = async (taskId: string, task?: ITask) => {
     try {
       await deleteTask(taskId, task);
     } catch (error) {
-      console.error("Erro ao excluir a tarefa: ", error);
-      Toast.show("Erro ao excluir a tarefa", { type: "error" });
+      console.error('Erro ao excluir a tarefa: ', error);
+      Toast.show('Erro ao excluir a tarefa', { type: 'error' });
     }
   };
 
@@ -126,8 +126,8 @@ export function ListTask({ route }: any) {
     try {
       await toggleTaskCompletion(taskId);
     } catch (error) {
-      console.error("Erro ao alternar status da tarefa: ", error);
-      Toast.show("Erro ao alternar status da tarefa", { type: "error" });
+      console.error('Erro ao alternar status da tarefa: ', error);
+      Toast.show('Erro ao alternar status da tarefa', { type: 'error' });
     }
   };
 
@@ -168,53 +168,53 @@ export function ListTask({ route }: any) {
           return {
             id: task.id,
             name: task.name,
-            createdAt: dateStr
+            createdAt: dateStr,
           };
         });
 
       const now = new Date();
       const historyData = {
         name: groupName,
-        uid: uid,
-        finishedDate: format(now, "dd/MM/yyyy"),
-        finishedTime: format(now, "HH:mm:ss"),
+        uid,
+        finishedDate: format(now, 'dd/MM/yyyy'),
+        finishedTime: format(now, 'HH:mm:ss'),
         tasks: selectedTasksInfo,
         createdAt: Timestamp.now(),
       };
 
-      await database.collection("HistoryTasks").add(historyData);
+      await database.collection('HistoryTasks').add(historyData);
 
       setSelectedTasks([]);
-      Toast.show("Tarefas finalizadas com sucesso!", { type: "success" });
+      Toast.show('Tarefas finalizadas com sucesso!', { type: 'success' });
     } catch (error) {
-      console.error("Erro ao finalizar tarefas:", error);
-      Toast.show("Erro ao finalizar tarefas", { type: "error" });
+      console.error('Erro ao finalizar tarefas:', error);
+      Toast.show('Erro ao finalizar tarefas', { type: 'error' });
     }
   };
 
   const handleDeleteHistoryTaskHistory = async (itemId: string) => {
     Alert.alert(
-      "Excluir histórico",
-      "Tem certeza que deseja excluir este item do histórico?",
+      'Excluir histórico',
+      'Tem certeza que deseja excluir este item do histórico?',
       [
         {
-          text: "Cancelar",
-          style: "cancel"
+          text: 'Cancelar',
+          style: 'cancel',
         },
         {
-          text: "Excluir",
-          style: "destructive",
+          text: 'Excluir',
+          style: 'destructive',
           onPress: async () => {
             try {
-              await database.collection("HistoryTasks").doc(itemId).delete();
-              Toast.show("Item excluído do histórico!", { type: "success" });
+              await database.collection('HistoryTasks').doc(itemId).delete();
+              Toast.show('Item excluído do histórico!', { type: 'success' });
             } catch (error) {
-              console.error("Erro ao excluir item do histórico:", error);
-              Toast.show("Erro ao excluir item do histórico", { type: "error" });
+              console.error('Erro ao excluir item do histórico:', error);
+              Toast.show('Erro ao excluir item do histórico', { type: 'error' });
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     );
   };
 
@@ -234,22 +234,22 @@ export function ListTask({ route }: any) {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
     >
       <DefaultContainer newItem monthButton title="Lista de Tarefas">
         <Header>
           <NavBar>
             <Button
-              onPress={() => handleButtonClick("tarefas")}
-              active={activeButton === "tarefas"}
+              onPress={() => handleButtonClick('tarefas')}
+              active={activeButton === 'tarefas'}
               style={{ borderTopLeftRadius: 40 }}
             >
               <Title>Tarefas</Title>
             </Button>
             <Button
-              onPress={() => handleButtonClick("historico")}
-              active={activeButton === "historico"}
+              onPress={() => handleButtonClick('historico')}
+              active={activeButton === 'historico'}
               style={{ borderTopRightRadius: 40 }}
             >
               <Title>Histórico de tarefas</Title>
@@ -257,7 +257,7 @@ export function ListTask({ route }: any) {
           </NavBar>
         </Header>
 
-        {activeButton === "tarefas" && (
+        {activeButton === 'tarefas' && (
           <Content>
             {/* <ContentTitle>
               <HeaderContainer>
@@ -296,7 +296,7 @@ export function ListTask({ route }: any) {
                 }
               />
             </Container>
-         
+
             {isCompletedListVisible && completedTasks.length > 0 && (
               <Container>
                 <FlatList
@@ -329,7 +329,7 @@ export function ListTask({ route }: any) {
           </Content>
         )}
 
-        {activeButton === "historico" && (
+        {activeButton === 'historico' && (
           <Content>
             {/* <ContentTitle>
               <HeaderContainer>
@@ -353,7 +353,7 @@ export function ListTask({ route }: any) {
                     <DateText>
                       ✅ Total de tarefas: {item.tasks.length}
                     </DateText>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       onPress={() => handleDeleteHistoryTaskHistory(item.id)}
                       style={{ position: 'absolute', right: 10, top: 10 }}
                     >
@@ -396,9 +396,9 @@ export function ListTask({ route }: any) {
               finishedTime={selectedHistoryItem.finishedTime}
               tasks={selectedHistoryItem.tasks.map(task => ({
                 ...task,
-                createdAt: typeof task.createdAt === 'string' 
-                  ? task.createdAt 
-                  : new Date(task.createdAt.toDate()).toISOString()
+                createdAt: typeof task.createdAt === 'string'
+                  ? task.createdAt
+                  : new Date(task.createdAt.toDate()).toISOString(),
               }))}
             />
           )}

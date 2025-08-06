@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Modal, FlatList } from "react-native";
-import { Button } from "../Button";
-import { Input } from "../Input";
+import React, { useEffect, useState } from 'react';
+import { Modal, FlatList } from 'react-native';
+import { Button } from '../Button';
+import { Input } from '../Input';
 import {
   Container,
   ModalContent,
   Title,
   IconCheck,
   ButtonSelect,
-} from "./styles";
+} from './styles';
 import { getFirestore, collection, query, where, getDocs } from '@react-native-firebase/firestore';
 
 const db = getFirestore();
@@ -27,7 +27,7 @@ export function EditshareModal({
   onClose,
   onSelectUser,
 }: EditshareModalProps) {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [sharedUsers, setSharedUsers] = useState<any[]>([]);
 
@@ -40,7 +40,7 @@ export function EditshareModal({
       const userRef = collection(db, 'User');
       const q = query(userRef, where('userName', '==', username));
       const querySnapshot = await getDocs(q);
-      
+
       if (!querySnapshot.empty) {
         const results = querySnapshot.docs.map((doc: any) => ({
           uid: doc.id,
@@ -51,7 +51,7 @@ export function EditshareModal({
         setSearchResults([]);
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error('Error fetching users:', error);
     }
   };
 
@@ -62,7 +62,7 @@ export function EditshareModal({
   const addSharedUser = (user: any) => {
     if (sharedUsers.find((u) => u.uid === user.uid)) return;
     setSharedUsers([...sharedUsers, user]);
-    setSearchTerm("");
+    setSearchTerm('');
     setSearchResults([]);
     onSelectUser(user);
   };
@@ -84,15 +84,15 @@ export function EditshareModal({
               const isChecked = !!sharedUsers.find((u) => u.uid === item.uid);
               return (
                 <ButtonSelect onPress={() => addSharedUser(item)}>
-                  <Title type={isChecked ? "PRIMARY" : "SECONDARY"}>
+                  <Title type={isChecked ? 'PRIMARY' : 'SECONDARY'}>
                     {item.userName}
                   </Title>
                   <IconCheck
-                    type={isChecked ? "PRIMARY" : "SECONDARY"}
+                    type={isChecked ? 'PRIMARY' : 'SECONDARY'}
                     name={
                       isChecked
-                        ? "checkbox-marked-circle-outline"
-                        : "checkbox-blank-circle-outline"
+                        ? 'checkbox-marked-circle-outline'
+                        : 'checkbox-blank-circle-outline'
                     }
                   />
                 </ButtonSelect>

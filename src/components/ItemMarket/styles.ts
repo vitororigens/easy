@@ -1,5 +1,5 @@
-import { TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
+import { TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export type ListItemStyleProps = 'PRIMARY' | 'SECONDARY';
@@ -42,9 +42,9 @@ export const Checkbox = styled.View<{ checked: boolean }>`
   height: 20px;
   border-radius: 10px;
   border-width: 2px;
-  border-color: ${({ theme, checked }) => 
+  border-color: ${({ theme, checked }) =>
     checked ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_400};
-  background-color: ${({ theme, checked }) => 
+  background-color: ${({ theme, checked }) =>
     checked ? theme.COLORS.TEAL_600 : theme.COLORS.TEAL_50};
   align-items: center;
   justify-content: center;
@@ -149,4 +149,4 @@ export const PopoverDivider = styled.View`
   height: 1px;
   background-color: ${({ theme }) => theme.COLORS.GRAY_200};
   margin: 4px 0;
-`; 
+`;

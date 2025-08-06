@@ -1,7 +1,7 @@
-import styled, { css } from "styled-components/native";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import { TouchableOpacity } from "react-native";
-export type IconProps = "success" | "danger";
+import styled, { css } from 'styled-components/native';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { TouchableOpacity } from 'react-native';
+export type IconProps = 'success' | 'danger';
 
 type Props = {
   type: IconProps;
@@ -43,13 +43,13 @@ export const Icon = styled(AntDesign).attrs<Props>(({ theme }) => ({
   size: theme.FONT_SIZE.LG,
 }))`
   ${(props) =>
-    props.type === "success" &&
+    props.type === 'success' &&
     css`
       color: ${({ theme }) => theme.COLORS.GREEN_700};
     `}
 
   ${(props) =>
-    props.type === "danger" &&
+    props.type === 'danger' &&
     css`
       color: ${({ theme }) => theme.COLORS.RED_700};
     `}

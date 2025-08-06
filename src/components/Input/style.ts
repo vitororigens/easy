@@ -1,6 +1,6 @@
-import { TextInput, TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
-import { Octicons, FontAwesome5 } from '@expo/vector-icons';
+import { TextInput, TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
+import { FontAwesome5, Octicons } from '@expo/vector-icons';
 
 export const Container = styled.View`
   flex-direction: column;
@@ -21,7 +21,7 @@ export const InputWrapper = styled.View<{ error?: boolean }>`
 `;
 
 export const InputContainer = styled(TextInput).attrs(({theme}) => ({
-    placeholderTextColor: theme.COLORS.GRAY_400
+  placeholderTextColor: theme.COLORS.GRAY_400,
 }))`
   flex: 1;
   min-height: 60px;
@@ -35,13 +35,13 @@ export const InputContainer = styled(TextInput).attrs(({theme}) => ({
 export const Button = styled(TouchableOpacity)``;
 
 export const Icon = styled(Octicons).attrs(({theme}) => ({
-    color: theme.COLORS.GRAY_400,
-    size: 26
+  color: theme.COLORS.GRAY_400,
+  size: 26,
 }))``;
 
 export const IconInput = styled(FontAwesome5).attrs(({theme}) => ({
-    color: theme.COLORS.GRAY_400,
-    size: 26
+  color: theme.COLORS.GRAY_400,
+  size: 26,
 }))``;
 
 export const ErrorText = styled.Text`

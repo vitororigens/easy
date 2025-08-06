@@ -1,6 +1,6 @@
-import { useNavigation } from "@react-navigation/native";
-import React, { ReactNode } from "react";
-import { View } from "react-native";
+import { useNavigation } from '@react-navigation/native';
+import React, { ReactNode } from 'react';
+import { View } from 'react-native';
 import {
   Button,
   ButtonBack,
@@ -10,7 +10,7 @@ import {
   Header,
   Icon,
   Title,
-} from "./style";
+} from './style';
 
 // Tipos das props do container
 interface DefaultContainerProps {
@@ -26,7 +26,7 @@ interface DefaultContainerProps {
   newEvent?: boolean;
   title?: string;
   customBg?: string;
-  type?: "PRIMARY" | "SECONDARY";
+  type?: 'PRIMARY' | 'SECONDARY';
   closeModalFn?: () => void;
   onNewItemTask?: (documentId: string) => void;
   onNewNotes?: (documentId: string) => void;
@@ -42,7 +42,7 @@ export function DefaultContainer({
   closeModalFn,
   addActionFn,
   customBg,
-  type = "PRIMARY",
+  type = 'PRIMARY',
   newNotes = false,
   newItemMarketplace = false,
   backButton = false,
@@ -59,29 +59,29 @@ export function DefaultContainer({
   onNewEvent,
 }: DefaultContainerProps) {
   const navigation = useNavigation();
-  const selectedItemId = "";
+  const selectedItemId = '';
 
   // Navegação e handlers
   const handleGoBack = () => navigation.goBack();
-  const handleShowFilter = () => navigation.navigate("filter" as never);
+  const handleShowFilter = () => navigation.navigate('filter' as never);
 
   const handleNewItemTask = (documentId: string) =>
-    onNewItemTask ? onNewItemTask(documentId) : navigation.navigate("newitemtask", { selectedItemId: documentId });
+    onNewItemTask ? onNewItemTask(documentId) : navigation.navigate('newitemtask', { selectedItemId: documentId });
 
   const handleNewNotes = (documentId: string) =>
-    onNewNotes ? onNewNotes(documentId) : navigation.navigate("newnotes", { selectedItemId: documentId, isCreator: true });
+    onNewNotes ? onNewNotes(documentId) : navigation.navigate('newnotes', { selectedItemId: documentId, isCreator: true });
 
   const handleNewSubscription = (documentId: string) =>
-    onNewSubscription ? onNewSubscription(documentId) : navigation.navigate("new-subscription", { selectedItemId: documentId });
+    onNewSubscription ? onNewSubscription(documentId) : navigation.navigate('new-subscription', { selectedItemId: documentId });
 
   const handleNewItemMarketplace = (documentId: string) =>
-    onNewItemMarketplace ? onNewItemMarketplace(documentId) : navigation.navigate("market-item", { selectedItemId: documentId });
+    onNewItemMarketplace ? onNewItemMarketplace(documentId) : navigation.navigate('market-item', { selectedItemId: documentId });
 
   const handleNewLaunch = () =>
     onNewLaunch ? onNewLaunch() : null;
 
   const handleNewEvent = () =>
-    onNewEvent ? onNewEvent() : navigation.navigate("new-event" as never);
+    onNewEvent ? onNewEvent() : navigation.navigate('new-event' as never);
 
   return (
     <Container type={type}>
@@ -144,7 +144,7 @@ export function DefaultContainer({
           )}
         </View>
       </Header>
-      <Content customBg={customBg ?? ""}>{children}</Content>
+      <Content customBg={customBg ?? ''}>{children}</Content>
     </Container>
   );
 }

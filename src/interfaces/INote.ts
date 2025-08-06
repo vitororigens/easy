@@ -1,4 +1,4 @@
-import { Timestamp } from "@react-native-firebase/firestore";
+import { Timestamp } from '@react-native-firebase/firestore';
 
 export interface INote {
   uid: string;
@@ -9,4 +9,4 @@ export interface INote {
   createdAt: Timestamp;
   isShared?: boolean;
   sharedWith?: string[];
-} 
+}

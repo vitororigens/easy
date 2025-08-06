@@ -1,6 +1,6 @@
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity } from 'react-native';
 //
-import styled from "styled-components/native";
+import styled from 'styled-components/native';
 
 export type subTitleTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
@@ -8,12 +8,9 @@ type Props = {
     type: subTitleTypeStyleProps;
 }
 
-
 export const Content = styled.View`
     flex: 1;
 `;
-
-
 
 export const Header = styled.View`
     width: 100%;
@@ -45,11 +42,10 @@ export const Divider = styled.View`
     background-color: ${({theme}) => theme.COLORS.TEAL_600};
 `;
 
-
 export const SubTitle = styled.Text<Props>`
 font-size: ${({theme}) => theme.FONT_SIZE.XL}px;
 font-family: ${({theme}) => theme.FONT_FAMILY.BOLD};
-color: ${({theme, type}) => type === 'PRIMARY' 
-    ? theme.COLORS.TEAL_600 
+color: ${({theme, type}) => type === 'PRIMARY'
+    ? theme.COLORS.TEAL_600
     : theme.COLORS.PURPLE_800};
 `;

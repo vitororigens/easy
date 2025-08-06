@@ -1,7 +1,7 @@
-import { TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
+import { TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
 import { Entypo } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export type ListItemStyleProps = 'PRIMARY' | 'SECONDARY'
 
@@ -43,9 +43,9 @@ export const Checkbox = styled.View<{ checked: boolean }>`
   height: 20px;
   border-radius: 10px;
   border-width: 2px;
-  border-color: ${({ theme, checked }) => 
+  border-color: ${({ theme, checked }) =>
     checked ? theme.COLORS.TEAL_600 : theme.COLORS.GRAY_400};
-  background-color: ${({ theme, checked }) => 
+  background-color: ${({ theme, checked }) =>
     checked ? theme.COLORS.TEAL_600 : theme.COLORS.TEAL_50};
   align-items: center;
   justify-content: center;
@@ -115,12 +115,11 @@ export const Button = styled(TouchableOpacity)`
 `;
 
 export const Icon = styled(Entypo).attrs(({ theme }) => ({
-    color: theme.COLORS.TEAL_600,
-    size: theme.FONT_SIZE.XL,
+  color: theme.COLORS.TEAL_600,
+  size: theme.FONT_SIZE.XL,
 }))`
     margin-right: 5px;
-`
-
+`;
 
 export const ContainerMenu = styled.View`
   min-width: 90px;
@@ -135,10 +134,9 @@ export const ContainerMenu = styled.View`
   elevation: 5;
 `;
 
-
 export const IconCheck = styled(MaterialCommunityIcons).attrs<ListItemProps>(({theme, type}) => ({
-    color: type === 'PRIMARY' ?  theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800, 
-    size: theme.FONT_SIZE.XL
+  color: type === 'PRIMARY' ?  theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800,
+  size: theme.FONT_SIZE.XL,
 }))`
     margin-right: 5px;
 `;

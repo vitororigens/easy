@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { View } from "react-native";
+import { ReactNode } from 'react';
+import { View } from 'react-native';
 import {
   ContainerTypeStyleProps,
   Content,
@@ -7,7 +7,7 @@ import {
   Icon,
   SubTitle,
   Title,
-} from "./styles";
+} from './styles';
 
 type ContainerProps = {
   title?: string | number;
@@ -22,14 +22,14 @@ export function Container({
   title,
   subtitle,
   name,
-  type = "PRIMARY",
+  type = 'PRIMARY',
   children,
 }: ContainerProps) {
   return (
     <Content>
       <Header type={type}>
         <Icon name={name} />
-        <View style={{alignItems: "center"}}>
+        <View style={{alignItems: 'center'}}>
           <Title>{title}</Title>
           {!!subtitle && <SubTitle>{subtitle}</SubTitle>}
         </View>

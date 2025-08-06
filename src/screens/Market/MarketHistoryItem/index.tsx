@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Button,
   Container,
@@ -10,13 +10,13 @@ import {
   IconMenu,
   SubTitle,
   Title,
-} from "./styles";
-import { AntDesign } from "@expo/vector-icons";
-import { Popover } from "react-native-popper";
-import { TouchableOpacity } from "react-native";
-import { IMarketHistory } from "../../../services/firebase/market-history.firebase";
-import { formatPrice } from "../../../utils/price";
-import { format } from "date-fns";
+} from './styles';
+import { AntDesign } from '@expo/vector-icons';
+import { Popover } from 'react-native-popper';
+import { TouchableOpacity } from 'react-native';
+import { IMarketHistory } from '../../../services/firebase/market-history.firebase';
+import { formatPrice } from '../../../utils/price';
+import { format } from 'date-fns';
 
 interface IMarketHistoryItemProps {
   marketHistory: IMarketHistory;
@@ -38,13 +38,13 @@ export const MarketHistoryItem = ({
           <Title type="primary">
             {marketHistory.priceAmount
               ? formatPrice(marketHistory.priceAmount)
-              : "R$ 0,00"}
+              : 'R$ 0,00'}
           </Title>
         </ContentItems>
         <Divider />
         <ContentItems>
           <SubTitle>
-            {format(marketHistory.createdAt.toDate(), "dd/MM/yyyy")}
+            {format(marketHistory.createdAt.toDate(), 'dd/MM/yyyy')}
           </SubTitle>
           <SubTitle>Pago</SubTitle>
         </ContentItems>

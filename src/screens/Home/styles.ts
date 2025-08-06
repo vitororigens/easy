@@ -1,14 +1,14 @@
-import styled from "styled-components/native";
-import { TouchableOpacity } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import styled from 'styled-components/native';
+import { TouchableOpacity } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export const Container = styled.View`
   width: 100%;
+  flex: 1;
   background-color: ${({ theme }) => theme.COLORS.WHITE};
   border-radius: 10px;
   padding: 8px;
   margin-bottom: 16px;
-  max-height: 250px;
 `;
 
 export const Header = styled.View`
@@ -35,16 +35,16 @@ export const ContentTitle = styled(TouchableOpacity)`
 export const Title = styled.Text<{ active?: boolean }>`
   font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
-  color: ${({ theme, active }) => 
+  color: ${({ theme, active }) =>
     active ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
   margin-bottom: 4px;
 `;
 
-export const SubTitle = styled.Text<{ type?: "PRIMARY" | "SECONDARY" }>`
+export const SubTitle = styled.Text<{ type?: 'PRIMARY' | 'SECONDARY' }>`
   font-size: ${({ theme }) => theme.FONT_SIZE.MD}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   color: ${({ theme, type }) =>
-    type === "PRIMARY" ? theme.COLORS.GREEN_700 : theme.COLORS.RED_700};
+    type === 'PRIMARY' ? theme.COLORS.GREEN_700 : theme.COLORS.RED_700};
 `;
 
 export const DividerContent = styled.View`
@@ -149,3 +149,22 @@ export const TextEmpty = styled.Text`
   color: ${({ theme }) => theme.COLORS.GRAY_400};
   margin-top: 8px;
 `;
+
+export const CenteredView = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const RedText = styled.Text`
+  color: red;
+  margin-bottom: 20px;
+`;
+
+export const IllustrationImage = styled.Image`
+  height: 200px;
+  width: 200px;
+`;
+
+export const FlatListContentReceita = { paddingBottom: 90 };
+export const FlatListContentDespesa = { paddingBottom: 10 };

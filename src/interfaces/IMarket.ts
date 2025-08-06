@@ -1,4 +1,4 @@
-import { Timestamp } from "@react-native-firebase/firestore";
+import { Timestamp } from '@react-native-firebase/firestore';
 
 type TShareInfo = {
   acceptedAt: Timestamp | null;
@@ -21,4 +21,4 @@ export interface IMarket {
   status?: boolean;
   isOwner?: boolean;
   isShared?: boolean;
-} 
+}

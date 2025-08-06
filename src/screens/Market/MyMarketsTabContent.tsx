@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Container,
   ContentTitle,
@@ -6,11 +6,11 @@ import {
   Icon,
   SubTitle,
   Title,
-} from "./styles";
-import { FlatList, RefreshControl, View } from "react-native";
-import { MarketItem } from "../../components/MarketItem";
-import { IMarket } from "../../services/firebase/market.firebase";
-import { useMarket } from "../../contexts/MarketContext";
+} from './styles';
+import { FlatList, RefreshControl, View } from 'react-native';
+import { MarketItem } from '../../components/MarketItem';
+import { IMarket } from '../../services/firebase/market.firebase';
+import { useMarket } from '../../contexts/MarketContext';
 
 interface IMarketTabMyContentProps {
   setIsMyListVisible: (value: boolean) => void;
@@ -41,7 +41,7 @@ export const MyMarketsTabContent = ({
         <Title>Minha lista de compras</Title>
         <DividerContent />
         <Icon
-          name={isMyListVisible ? "arrow-drop-up" : "arrow-drop-down"}
+          name={isMyListVisible ? 'arrow-drop-up' : 'arrow-drop-down'}
         />
       </ContentTitle>
 
@@ -55,11 +55,11 @@ export const MyMarketsTabContent = ({
                 onEditItem={() => handleEditItem(item.id)}
                 removeItem={() => handleRemoveItem(item)}
                 addItem={() => handleAddItem(item)}
-                measurement={item.measurement || ""}
+                measurement={item.measurement || ''}
                 quantity={item.quantity || 0}
                 title={item.name}
                 price={item.price || 0}
-                resetCountQuantity={!!selectedItems.length ? false : true}
+                resetCountQuantity={selectedItems.length ? false : true}
               />
             )}
             contentContainerStyle={{ paddingBottom: 90 }}
@@ -68,8 +68,8 @@ export const MyMarketsTabContent = ({
               <View
                 style={{
                   padding: 40,
-                  alignItems: "center",
-                  justifyContent: "center",
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
                 <SubTitle>

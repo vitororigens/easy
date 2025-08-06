@@ -33,4 +33,4 @@ export const AppOpenAdComponent = () => {
   }, []);
 
   return null;
-}; 
+};

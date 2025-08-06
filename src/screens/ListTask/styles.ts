@@ -1,9 +1,9 @@
-import styled from "styled-components/native";
-import { TouchableOpacity } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import styled from 'styled-components/native';
+import { TouchableOpacity } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-type ContentTitleProps = "PRIMARY" | "SECONDARY";
+type ContentTitleProps = 'PRIMARY' | 'SECONDARY';
 type Props = {
   type?: ContentTitleProps;
 };
@@ -51,7 +51,7 @@ export const ContentTitle = styled(TouchableOpacity)<Props>`
   justify-content: space-between;
   padding: 12px 16px;
   background-color: ${({ theme, type }) =>
-    type === "PRIMARY" ? theme.COLORS.TEAL_50 : theme.COLORS.PURPLE_50};
+    type === 'PRIMARY' ? theme.COLORS.TEAL_50 : theme.COLORS.PURPLE_50};
   border-radius: 10px;
   elevation: 2;
   shadow-color: #000;
@@ -69,20 +69,20 @@ export const Title = styled.Text<Props>`
   font-size: ${({ theme }) => theme.FONT_SIZE.LG}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme, type }) =>
-    type === "PRIMARY" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_600};
+    type === 'PRIMARY' ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_600};
   text-align: left;
   margin-bottom: 0;
   margin-top: 0;
 `;
 
 export const Icon = styled(MaterialIcons).attrs<Props>(({ theme, type }) => ({
-  color: type === "PRIMARY" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_600,
+  color: type === 'PRIMARY' ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_600,
   size: 26,
 }))``;
 
 export const SectionIcon = styled(MaterialCommunityIcons).attrs<Props>(({ theme, type }) => ({
   size: 24,
-      color: type === "PRIMARY" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_600,
+  color: type === 'PRIMARY' ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_600,
 }))`
   margin-right: 8px;
 `;

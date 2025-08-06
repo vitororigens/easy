@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TouchableOpacity, Text, TextInput, View, Keyboard, Platform, Animated } from 'react-native';
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from '@expo/vector-icons';
 import { Container, Content, ButtonText } from './styles';
 
 interface FinishMarketsProps {
@@ -21,7 +21,7 @@ export function FinishMarkets({ selectedCount, onFinish }: FinishMarketsProps) {
           duration: Platform.OS === 'ios' ? event.duration : 250,
           useNativeDriver: false,
         }).start();
-      }
+      },
     );
 
     const keyboardWillHide = Keyboard.addListener(
@@ -32,7 +32,7 @@ export function FinishMarkets({ selectedCount, onFinish }: FinishMarketsProps) {
           duration: Platform.OS === 'ios' ? 250 : 250,
           useNativeDriver: false,
         }).start();
-      }
+      },
     );
 
     return () => {
@@ -54,8 +54,8 @@ export function FinishMarkets({ selectedCount, onFinish }: FinishMarketsProps) {
           translateY: keyboardHeight.interpolate({
             inputRange: [0, 300],
             outputRange: [0, -300],
-          })
-        }]
+          }),
+        }],
       }}
     >
       <Container>
@@ -74,7 +74,7 @@ export function FinishMarkets({ selectedCount, onFinish }: FinishMarketsProps) {
                 borderBottomWidth: 1,
                 borderBottomColor: '#FFF',
                 marginRight: 8,
-                flex: 1
+                flex: 1,
               }}
             />
             <TouchableOpacity onPress={() => onFinish(groupName || 'Grupo de Itens')}>
@@ -88,4 +88,4 @@ export function FinishMarkets({ selectedCount, onFinish }: FinishMarketsProps) {
       </Container>
     </Animated.View>
   );
-} 
+}

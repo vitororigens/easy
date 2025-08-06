@@ -1,4 +1,4 @@
-import styled from "styled-components/native";
+import styled from 'styled-components/native';
 
 export const Container = styled.View`
     flex: 1;
@@ -22,7 +22,6 @@ export const Span = styled.Text`
     font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
     color: ${({theme}) => theme.COLORS.PURPLE_600};
 `;
-
 
 export const Text = styled.Text`
     font-size: ${({theme}) => theme.FONT_SIZE.SM}px;

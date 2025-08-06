@@ -26,18 +26,18 @@ export declare global {
       };
       newnotes: { selectedItemId?: string; isCreator: boolean };
       newtask: { selectedItemId?: string };
- 
+
       newitemtask: { selectedItemId?: string };
-      "market-item": { selectedItemId?: string };
+      'market-item': { selectedItemId?: string };
       historytask: { selectedItemId?: string };
-      "market-history-item": { selectedItemId?: string };
+      'market-history-item': { selectedItemId?: string };
       newexpense: { selectedItemId?: string };
       newrevenue: { selectedItemId?: string };
       notifications: undefined;
       shared: undefined;
       subscriptions: undefined;
-      "new-subscription": { selectedItemId?: string };
-      "subscription-history": { selectedItemId?: string };
+      'new-subscription': { selectedItemId?: string };
+      'subscription-history': { selectedItemId?: string };
       calendar: { reload?: boolean };
       newevent: { selectedItemId?: string; isCreator: boolean };
     }
@@ -63,7 +63,7 @@ export type RootStackParamList = {
   newnotes: {
     selectedItemId: string;
   };
-  "market-item": {
+  'market-item': {
     selectedItemId: string;
   };
   newsubscription: {

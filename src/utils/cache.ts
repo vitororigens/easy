@@ -172,7 +172,7 @@ export class UserCache extends Cache<any> {
   async getOrFetch(
     key: string,
     fetchFn: () => Promise<any>,
-    ttl?: number
+    ttl?: number,
   ): Promise<any> {
     const cached = this.get(key);
     if (cached) {
@@ -235,7 +235,7 @@ export const useCache = <T>(cache: Cache<T>) => {
   const getOrFetch = React.useCallback(async (
     key: string,
     fetchFn: () => Promise<T>,
-    ttl?: number
+    ttl?: number,
   ): Promise<T> => {
     const cached = cache.get(key);
     if (cached) {
@@ -297,4 +297,4 @@ export const getCacheStats = () => {
   };
 };
 
-export default Cache; 
+export default Cache;

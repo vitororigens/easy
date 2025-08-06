@@ -1,18 +1,18 @@
-import { TouchableOpacity } from "react-native";
-import { Popover } from "react-native-popper";
-import { ContainerMenu } from "../Items/styles";
+import { TouchableOpacity } from 'react-native';
+import { Popover } from 'react-native-popper';
+import { ContainerMenu } from '../Items/styles';
 import {
-    Button,
-    ButtonPoppover,
-    Container,
-    Content,
-    ContentItems,
-    Divider,
-    Icon,
-    IconMenu,
-    SubTitle,
-    Title,
-} from "./styles";
+  Button,
+  ButtonPoppover,
+  Container,
+  Content,
+  ContentItems,
+  Divider,
+  Icon,
+  IconMenu,
+  SubTitle,
+  Title,
+} from './styles';
 
 type ItemsProps = {
   category?: string;
@@ -32,9 +32,9 @@ export function ItemsAccounts({
   date,
   selected,
   income,
-  handleExpenseConfirmation
+  handleExpenseConfirmation,
 }: ItemsProps) {
-  const transactionType = income ? "Despesa fixa" : "Despesa variável";
+  const transactionType = income ? 'Despesa fixa' : 'Despesa variável';
 
   return (
     <Container>
@@ -42,18 +42,18 @@ export function ItemsAccounts({
         <Icon
           name={
             selected
-              ? "checkbox-marked-circle-outline"
-              : "checkbox-blank-circle-outline"
+              ? 'checkbox-marked-circle-outline'
+              : 'checkbox-blank-circle-outline'
           }
         />
       </Button>
 
       <Content>
         <ContentItems>
-          <Title type={selected ? "SECONDARY" : "PRIMARY"}>
+          <Title type={selected ? 'SECONDARY' : 'PRIMARY'}>
             {transactionType}
           </Title>
-          <Title type={selected ? "SECONDARY" : "PRIMARY"}>{category}</Title>
+          <Title type={selected ? 'SECONDARY' : 'PRIMARY'}>{category}</Title>
         </ContentItems>
         <Divider />
         <ContentItems>

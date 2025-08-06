@@ -47,43 +47,43 @@ export const NativeAdComponent: React.FC<NativeAdProps> = ({ style }) => {
 };
 
 const styles = StyleSheet.create({
+  advertiser: {
+    color: '#666',
+    fontSize: 14,
+  },
+  callToAction: {
+    backgroundColor: '#007AFF',
+    borderRadius: 4,
+    color: '#fff',
+    marginTop: 10,
+    overflow: 'hidden',
+    padding: 8,
+    textAlign: 'center',
+  },
   container: {
-    padding: 10,
     backgroundColor: '#fff',
     borderRadius: 8,
     marginHorizontal: 10,
+    padding: 10,
   },
   content: {
-    flexDirection: 'row',
     alignItems: 'center',
-  },
-  icon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
-  placeholderIcon: {
-    backgroundColor: '#E0E0E0',
-  },
-  textContainer: {
-    marginLeft: 10,
-    flex: 1,
+    flexDirection: 'row',
   },
   headline: {
     fontSize: 16,
     fontWeight: 'bold',
   },
-  advertiser: {
-    fontSize: 14,
-    color: '#666',
+  icon: {
+    borderRadius: 25,
+    height: 50,
+    width: 50,
   },
-  callToAction: {
-    marginTop: 10,
-    padding: 8,
-    backgroundColor: '#007AFF',
-    color: '#fff',
-    textAlign: 'center',
-    borderRadius: 4,
-    overflow: 'hidden',
+  placeholderIcon: {
+    backgroundColor: '#E0E0E0',
+  },
+  textContainer: {
+    flex: 1,
+    marginLeft: 10,
   },
 });

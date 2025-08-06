@@ -12,4 +12,4 @@ export function EmptyList({ message }: EmptyListProps) {
       <Text style={styles.message}>{message}</Text>
     </View>
   );
-} 
+}

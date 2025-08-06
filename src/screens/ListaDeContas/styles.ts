@@ -1,5 +1,5 @@
-import { TextInput, TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
+import { TextInput, TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
 
 export type subTitleTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
@@ -32,7 +32,7 @@ export const ButtonClose = styled(TouchableOpacity)`
 `;
 
 export const Input = styled(TextInput).attrs(({ theme }) => ({
-    placeholderTextColor: theme.COLORS.GRAY_400
+  placeholderTextColor: theme.COLORS.GRAY_400,
 }))`
     flex: 1;
 

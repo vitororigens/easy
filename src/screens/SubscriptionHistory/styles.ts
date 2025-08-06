@@ -1,4 +1,4 @@
-import styled from "styled-components/native";
+import styled from 'styled-components/native';
 
 export const Container = styled.View`
   flex: 1;
@@ -56,4 +56,4 @@ export const EmptyText = styled.Text`
   color: ${({theme}) => theme.COLORS.GRAY_400};
   text-align: center;
   margin-top: 8px;
-`; 
+`;

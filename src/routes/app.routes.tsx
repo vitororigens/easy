@@ -1,7 +1,7 @@
-import { CalendarScreen } from "../screens/Calendar";
-import { NewEvent } from "../screens/NewEvent";
+import { CalendarScreen } from '../screens/Calendar';
+import { NewEvent } from '../screens/NewEvent';
 import History from '../screens/History';
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,4 +31,4 @@ export function AppRoutes() {
       />
     </Stack.Navigator>
   );
-} 
+}

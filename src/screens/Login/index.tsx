@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import { ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Logo } from "../../components/Logo";
-import { SingIn } from "../SingIn";
-import { SingUp } from "../SingUp";
+import React, { useState } from 'react';
+import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { Logo } from '../../components/Logo';
+import { SingIn } from '../SingIn';
+import { SingUp } from '../SingUp';
 import {
-    Button,
-    Container,
-    Header,
-    LogoContainer,
-    NavBar,
-    Title,
-} from "./styles";
+  Button,
+  Container,
+  Header,
+  LogoContainer,
+  NavBar,
+  Title,
+} from './styles';
 
 export function Login() {
-  const [activeButton, setActiveButton] = useState("Entrar");
+  const [activeButton, setActiveButton] = useState('Entrar');
 
   const handleButtonClick = (buttonName: string) => {
     setActiveButton(buttonName);
@@ -23,7 +23,7 @@ export function Login() {
   return (
     <DefaultContainer>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -35,15 +35,15 @@ export function Login() {
             <Header>
               <NavBar>
                 <Button
-                  onPress={() => handleButtonClick("Entrar")}
-                  active={activeButton !== "Entrar"}
+                  onPress={() => handleButtonClick('Entrar')}
+                  active={activeButton !== 'Entrar'}
                   style={{ borderTopLeftRadius: 40 }}
                 >
                   <Title>Entrar</Title>
                 </Button>
                 <Button
-                  onPress={() => handleButtonClick("Inscrever-se")}
-                  active={activeButton !== "Inscrever-se"}
+                  onPress={() => handleButtonClick('Inscrever-se')}
+                  active={activeButton !== 'Inscrever-se'}
                   style={{ borderTopRightRadius: 40 }}
                 >
                   <Title>Inscrever-se</Title>
@@ -51,8 +51,8 @@ export function Login() {
               </NavBar>
             </Header>
 
-            {activeButton === "Entrar" && <SingIn />}
-            {activeButton === "Inscrever-se" && <SingUp />}
+            {activeButton === 'Entrar' && <SingIn />}
+            {activeButton === 'Inscrever-se' && <SingUp />}
             <LogoContainer>
               <Logo />
             </LogoContainer>

@@ -1,16 +1,16 @@
 import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
-import { NavigationContainer } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
-import { View } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useTheme } from "styled-components/native";
-import { Loading } from "../components/Loading";
-import { StackNavigation } from "./StackNavigation";
-import { StackPrivateNavigation } from "./StackPrivateNavigation";
+import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from 'styled-components/native';
+import { Loading } from '../components/Loading';
+import { StackNavigation } from './StackNavigation';
+import { StackPrivateNavigation } from './StackPrivateNavigation';
 import {
   NotificationWillDisplayEvent,
   OneSignal,
-} from "react-native-onesignal";
+} from 'react-native-onesignal';
 
 export function Routes() {
   const [user, setUser] = useState<any | null>(null);
@@ -23,12 +23,12 @@ export function Routes() {
   useEffect(() => {
     const loadStoredUser = async () => {
       try {
-        const storedUser = await AsyncStorage.getItem("user");
+        const storedUser = await AsyncStorage.getItem('user');
         if (storedUser) {
           setUser(JSON.parse(storedUser));
         }
       } catch (error) {
-        console.error("Error loading stored user:", error);
+        console.error('Error loading stored user:', error);
       }
     };
 
@@ -42,10 +42,10 @@ export function Routes() {
           email: authUser.email,
         };
         setUser(userData);
-        AsyncStorage.setItem("user", JSON.stringify(userData));
+        AsyncStorage.setItem('user', JSON.stringify(userData));
       } else {
         setUser(null);
-        AsyncStorage.removeItem("user");
+        AsyncStorage.removeItem('user');
       }
       setLoading(false);
     });
@@ -60,14 +60,14 @@ export function Routes() {
     };
 
     OneSignal.Notifications.addEventListener(
-      "foregroundWillDisplay",
-      handleNotification
+      'foregroundWillDisplay',
+      handleNotification,
     );
 
     return () =>
       OneSignal.Notifications.removeEventListener(
-        "foregroundWillDisplay",
-        handleNotification
+        'foregroundWillDisplay',
+        handleNotification,
       );
   }, []);
 

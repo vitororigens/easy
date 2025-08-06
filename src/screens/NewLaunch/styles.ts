@@ -1,15 +1,16 @@
-import { TextInput, ScrollView, KeyboardAvoidingView } from "react-native";
-import styled from "styled-components/native";
+import { TextInput, ScrollView, KeyboardAvoidingView } from 'react-native';
+import styled from 'styled-components/native';
 
 export const Container = styled.View`
     flex: 1;
     padding: 16px;
     align-items: center;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
 `;
 
-
 export const InputValue = styled(TextInput).attrs(({ theme }) => ({
-    placeholderTextColor: theme.COLORS.GRAY_400
+  placeholderTextColor: theme.COLORS.GRAY_400,
 }))`
     min-height: 80px;
     max-height: 80px;
@@ -27,7 +28,7 @@ export const Content = styled.View`
 `;
 
 export const InputDescription = styled(TextInput).attrs(({ theme }) => ({
-    placeholderTextColor: theme.COLORS.GRAY_400,
+  placeholderTextColor: theme.COLORS.GRAY_400,
 }))`
     width: 100%;
     min-height: 100px;
@@ -51,7 +52,7 @@ export const TextError = styled.Text`
 `;
 
 export const ScrollContent = styled(ScrollView).attrs({
-  contentContainerStyle: { flexGrow: 1 }
+  contentContainerStyle: { flexGrow: 1 },
 })``;
 
 export const KeyboardAvoiding = styled(KeyboardAvoidingView)`

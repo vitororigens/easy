@@ -1,35 +1,35 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, Modal, Platform, View } from "react-native";
+import React, { useEffect, useState } from 'react';
+import { FlatList, Modal, Platform, View } from 'react-native';
 //
-import { Content, SubTitle, Title } from "./styles";
+import { Content, SubTitle, Title } from './styles';
 //
-import { DefaultContainer } from "../../components/DefaultContainer";
-import { Loading } from "../../components/Loading";
+import { DefaultContainer } from '../../components/DefaultContainer';
+import { Loading } from '../../components/Loading';
 //
-import { Toast } from "react-native-toast-notifications";
-import { Items } from "../../components/Items";
-import { useMonth } from "../../context/MonthProvider";
-import useFirestoreCollection from "../../hooks/useFirestoreCollection";
-import { useUserAuth } from "../../hooks/useUserAuth";
-import { formatCurrency } from "../../utils/formatCurrency";
-import { NewLaunch } from "../NewLaunch";
-import { database } from "../../libs/firebase";
+import { Toast } from 'react-native-toast-notifications';
+import { Items } from '../../components/Items';
+import { useMonth } from '../../context/MonthProvider';
+import useFirestoreCollection from '../../hooks/useFirestoreCollection';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { formatCurrency } from '../../utils/formatCurrency';
+import { NewLaunch } from '../NewLaunch';
+import { database } from '../../libs/firebase';
 
 export function PiggyBank() {
   const user = useUserAuth();
-  const PiggyBankData = useFirestoreCollection("PiggyBank");
+  const PiggyBankData = useFirestoreCollection('PiggyBank');
   const { selectedMonth } = useMonth();
   const uid = user?.uid;
   const [isLoaded, setIsLoaded] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState("");
+  const [selectedItemId, setSelectedItemId] = useState('');
 
   const userPiggyBankData = PiggyBankData.filter(
-    (item) => item.uid === uid && item.month === selectedMonth
+    (item) => item.uid === uid && item.month === selectedMonth,
   );
   const valueTotal = userPiggyBankData.reduce(
     (total, item) => total + parseFloat(item.valueItem),
-    0
+    0,
   );
 
   useEffect(() => {
@@ -55,14 +55,14 @@ export function PiggyBank() {
 
   function handleDeleteItem(documentId: string) {
     database
-      .collection("PiggyBank")
+      .collection('PiggyBank')
       .doc(documentId)
       .delete()
       .then(() => {
-        Toast.show("Lançamento excluído!", { type: "success" });
+        Toast.show('Lançamento excluído!', { type: 'success' });
       })
       .catch((error) => {
-        console.error("Erro ao excluir a nota: ", error);
+        console.error('Erro ao excluir a nota: ', error);
       });
   }
 
@@ -73,17 +73,17 @@ export function PiggyBank() {
           <View>
             {valueTotal > 0 ? (
               <>
-                <SubTitle style={{ textAlign: "center" }} type="PRIMARY">
+                <SubTitle style={{ textAlign: 'center' }} type="PRIMARY">
                   Parabéns
                 </SubTitle>
-                <Title style={{ textAlign: "center", width: "100%" }}>
+                <Title style={{ textAlign: 'center', width: '100%' }}>
                   Você economizou {formatCurrency(valueTotal.toString())} esse
                   mês!
                 </Title>
                 <Title
                   style={{
-                    textAlign: "center",
-                    width: "100%",
+                    textAlign: 'center',
+                    width: '100%',
                     marginBottom: 40,
                   }}
                 >
@@ -98,12 +98,12 @@ export function PiggyBank() {
                   }}
                 >
                   <SubTitle
-                    style={{ textAlign: "center", paddingBottom: 40 }}
+                    style={{ textAlign: 'center', paddingBottom: 40 }}
                     type="PRIMARY"
                   >
                     Transforme pequenas economias em grandes conquistas!
                   </SubTitle>
-                  <Title style={{ textAlign: "center", width: "100%" }}>
+                  <Title style={{ textAlign: 'center', width: '100%' }}>
                     A função Cofrinho é perfeita para quem quer começar a
                     economizar sem complicação. Insira os valores que você
                     conseguir poupar e veja como pequenas economias podem fazer
@@ -117,28 +117,28 @@ export function PiggyBank() {
           <View>
             {PiggyBankData.filter((item) => item.uid === uid).length ===
             0 ? null : (
-              <FlatList
-                style={{ marginTop: -40 }}
-                data={userPiggyBankData}
-                renderItem={({ item }) => (
-                  <Items
-                    onDelete={() => handleDeleteItem(item.id)}
-                    onEdit={() => handleEditItem(item.id)}
-                    showItemPiggyBank
-                    type={item.description}
-                    category={item.name}
-                    date={item.date}
-                    valueTransaction={
-                      item.valueItem
-                        ? formatCurrency(item.valueItem)
-                        : "R$ 0,00"
-                    }
-                  />
-                )}
-                contentContainerStyle={{ paddingBottom: 90 }}
-                ListFooterComponent={<View style={{ height: 90 }} />}
-              />
-            )}
+                <FlatList
+                  style={{ marginTop: -40 }}
+                  data={userPiggyBankData}
+                  renderItem={({ item }) => (
+                    <Items
+                      onDelete={() => handleDeleteItem(item.id)}
+                      onEdit={() => handleEditItem(item.id)}
+                      showItemPiggyBank
+                      type={item.description}
+                      category={item.name}
+                      date={item.date}
+                      valueTransaction={
+                        item.valueItem
+                          ? formatCurrency(item.valueItem)
+                          : 'R$ 0,00'
+                      }
+                    />
+                  )}
+                  contentContainerStyle={{ paddingBottom: 90 }}
+                  ListFooterComponent={<View style={{ height: 90 }} />}
+                />
+              )}
           </View>
         </View>
       </Content>
@@ -151,7 +151,7 @@ export function PiggyBank() {
         <View
           style={{
             flex: 1,
-            paddingTop: Platform.OS === "ios" ? 20 : 0,
+            paddingTop: Platform.OS === 'ios' ? 20 : 0,
           }}
         >
           <NewLaunch

@@ -1,7 +1,7 @@
-import { TextInput, TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
+import { TextInput, TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
 
-export type subTitleTypeStyleProps = "PRIMARY" | "SECONDARY";
+export type subTitleTypeStyleProps = 'PRIMARY' | 'SECONDARY';
 
 type Props = {
   type: subTitleTypeStyleProps;
@@ -58,7 +58,7 @@ export const SubTitle = styled.Text<Props>`
   font-size: ${({ theme }) => theme.FONT_SIZE.XL}px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.BOLD};
   color: ${({ theme, type }) =>
-    type === "PRIMARY" ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
+    type === 'PRIMARY' ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
 `;
 
 export const DividerTask = styled.View`

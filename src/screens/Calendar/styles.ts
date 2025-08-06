@@ -1,5 +1,5 @@
-import styled from "styled-components/native";
-import { TouchableOpacity } from "react-native";
+import styled from 'styled-components/native';
+import { TouchableOpacity } from 'react-native';
 
 export const Container = styled.View`
   flex: 1;
@@ -64,4 +64,4 @@ export const EmptyContainer = styled.View`
   justify-content: center;
   align-items: center;
   margin-top: 32px;
-`; 
+`;

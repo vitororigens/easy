@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { IMarket } from "../../services/firebase/market.firebase";
-import { useNavigation } from "@react-navigation/native";
-import { SharedMarketsTabContent } from "./SharedMarketsTabContent";
-import { MyMarketsTabContent } from "./MyMarketsTabContent";
-import { useMarket } from "../../contexts/MarketContext";
-import { Toast } from "react-native-toast-notifications";
+import React, { useState, useEffect } from 'react';
+import { IMarket } from '../../services/firebase/market.firebase';
+import { useNavigation } from '@react-navigation/native';
+import { SharedMarketsTabContent } from './SharedMarketsTabContent';
+import { MyMarketsTabContent } from './MyMarketsTabContent';
+import { useMarket } from '../../contexts/MarketContext';
+import { Toast } from 'react-native-toast-notifications';
 
 interface IMarketTabContentProps {
   selectedItems: IMarket[];
@@ -26,13 +26,13 @@ export const MarketTabContent = ({
 
   useEffect(() => {
     if (error) {
-      Toast.show(error, { type: "error" });
+      Toast.show(error, { type: 'error' });
     }
   }, [error]);
 
   const handleAddItem = (item: IMarket) => {
     const itemIndex = selectedItems.findIndex(
-      (selectedItem) => selectedItem.id === item.id
+      (selectedItem) => selectedItem.id === item.id,
     );
     const exists = itemIndex !== -1;
 
@@ -53,7 +53,7 @@ export const MarketTabContent = ({
 
   const handleRemoveItem = (item: IMarket) => {
     const itemIndex = selectedItems.findIndex(
-      (selectedItem) => selectedItem.id === item.id
+      (selectedItem) => selectedItem.id === item.id,
     );
 
     const exists = itemIndex !== -1;
@@ -75,7 +75,7 @@ export const MarketTabContent = ({
   };
 
   function handleEditItem(documentId: string) {
-    navigation.navigate("market-item", { selectedItemId: documentId });
+    navigation.navigate('market-item', { selectedItemId: documentId });
   }
 
   return (

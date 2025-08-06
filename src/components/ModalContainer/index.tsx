@@ -18,11 +18,11 @@ export function ModalContainer({ visible, onClose, children }: ModalContainerPro
       <View
         style={{
           flex: 1,
-          paddingTop: Platform.OS === "ios" ? 20 : 0,
+          paddingTop: Platform.OS === 'ios' ? 20 : 0,
         }}
       >
         {children}
       </View>
     </Modal>
   );
-} 
+}

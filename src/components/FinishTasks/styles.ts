@@ -1,6 +1,6 @@
-import { TouchableOpacity } from "react-native";
-import styled from "styled-components/native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { TextInput } from 'react-native';
 
 export const Container = styled.View`

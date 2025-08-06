@@ -1,7 +1,6 @@
-import styled from "styled-components/native";
+import styled from 'styled-components/native';
 import { TouchableOpacity } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons'
-
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export type ListItemStyleProps = 'PRIMARY' | 'SECONDARY'
 
@@ -23,7 +22,6 @@ export const Content = styled.View`
     padding: 10px;
 `;
 
-
 export const SharedUserContainer = styled.View`
   flex-direction: row;
   flex-wrap: wrap;
@@ -35,8 +33,8 @@ export const SharedUser = styled.View`
 `;
 
 export const IconCheck = styled(MaterialCommunityIcons).attrs<ListItemProps>(({theme, type}) => ({
-    color: type === 'PRIMARY' ?  theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800, 
-    size: theme.FONT_SIZE.XL
+  color: type === 'PRIMARY' ?  theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800,
+  size: theme.FONT_SIZE.XL,
 }))`
     margin-right: 5px;
 `;
@@ -44,7 +42,7 @@ export const IconCheck = styled(MaterialCommunityIcons).attrs<ListItemProps>(({t
 export const Title = styled.Text<ListItemProps>`
     font-family: ${({theme}) => theme.FONT_FAMILY.REGULAR};
     font-size: ${({theme}) => theme.FONT_SIZE.GG}px;
-    color: ${({theme, type}) => type === 'PRIMARY' ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800 };
+    color: ${({theme, type}) => type === 'PRIMARY' ? theme.COLORS.TEAL_600 : theme.COLORS.PURPLE_800};
     text-decoration-line: ${({type}) => type === 'PRIMARY' ? 'line-through' :  'none'};
 `;
 
@@ -76,5 +74,4 @@ export const FilterText = styled.Text<{ active: boolean }>`
   font-size: ${({theme}) => theme.FONT_SIZE.MD}px;
   color: ${({theme, active}) => active ? theme.COLORS.WHITE : theme.COLORS.GRAY_600};
 `;
-
 

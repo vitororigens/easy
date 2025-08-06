@@ -7,4 +7,4 @@ export interface ICalendarContext {
   deleteEvent: (id: string) => void;
   shareEvent: (id: string, email: string) => void;
   unshareEvent: (id: string, email: string) => void;
-} 
+}
